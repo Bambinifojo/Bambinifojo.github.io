@@ -175,19 +175,35 @@
 
         header {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px 100px;
             color: white;
             animation: fadeInDown 1s ease-out;
             position: relative;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         header::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
+            width: 150px;
             height: 4px;
             background: linear-gradient(90deg, transparent, white, transparent);
             animation: shimmer 3s ease-in-out infinite;
@@ -196,26 +212,167 @@
         @keyframes shimmer {
             0%, 100% {
                 opacity: 0.5;
-                width: 100px;
+                width: 150px;
             }
             50% {
                 opacity: 1;
-                width: 200px;
+                width: 250px;
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+
+        .header-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 5px solid rgba(255,255,255,0.3);
+            animation: avatarFloat 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .header-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            animation: avatarPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes avatarFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
             }
         }
 
         header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
             font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite;
+            position: relative;
         }
 
-        header p {
-            font-size: 1.3rem;
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(255,255,255,0.6));
+            }
+        }
+
+        header .subtitle {
+            font-size: 1.5rem;
             opacity: 0.95;
+            margin-bottom: 15px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        header .description {
+            font-size: 1.1rem;
+            opacity: 0.85;
             max-width: 600px;
-            margin: 0 auto;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+
+        .header-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            background: linear-gradient(135deg, #ffffff, #e0e0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.7;
+            animation: scrollBounce 2s ease-in-out infinite;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .scroll-indicator svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(10px);
+            }
         }
 
         .apps-grid {
@@ -535,12 +692,39 @@
                 font-size: 1.3rem;
             }
 
+            header {
+                padding: 60px 20px 80px;
+                min-height: 50vh;
+            }
+
+            .header-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+            }
+
             header h1 {
                 font-size: 2.5rem;
             }
 
-            header p {
-                font-size: 1.1rem;
+            header .subtitle {
+                font-size: 1.2rem;
+            }
+
+            header .description {
+                font-size: 1rem;
+            }
+
+            .header-stats {
+                gap: 30px;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
             }
 
             .apps-grid {
@@ -657,8 +841,37 @@
 
     <div class="container" id="home">
         <header>
-            <h1>🚀 Bambinifojo</h1>
-            <p>Mobil uygulamalarım ve projelerim</p>
+            <div class="header-content">
+                <div class="header-avatar">🚀</div>
+                <h1>Bambinifojo</h1>
+                <p class="subtitle">Mobil Uygulama Geliştirici</p>
+                <p class="description">
+                    Modern ve kullanıcı dostu mobil uygulamalar geliştiriyorum. 
+                    Her projede kalite, performans ve kullanıcı deneyimini ön planda tutuyorum.
+                </p>
+                
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">2+</span>
+                        <span class="stat-label">Uygulama</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Kalite</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">∞</span>
+                        <span class="stat-label">İnovasyon</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scroll-indicator">
+                <span>Keşfet</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                </svg>
+            </div>
         </header>
 
         <div class="apps-grid" id="apps">
@@ -788,6 +1001,17 @@
                 }
             });
         });
+
+        // Scroll indicator'a tıklandığında uygulamalar bölümüne kaydır
+        const scrollIndicator = document.querySelector('.scroll-indicator');
+        if (scrollIndicator) {
+            scrollIndicator.addEventListener('click', () => {
+                const appsSection = document.getElementById('apps');
+                if (appsSection) {
+                    appsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
     </script>
 </body>
 </html>
