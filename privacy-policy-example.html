@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası - Örnek</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .content {
+            margin-top: 30px;
+        }
+
+        .content h2 {
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .content h3 {
+            color: #667eea;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+
+        .content p {
+            margin-bottom: 15px;
+            color: #555;
+            text-align: justify;
+        }
+
+        .content ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .content li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .highlight-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .contact-info h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .contact-info p {
+            color: rgba(255,255,255,0.95);
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .content h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔒 Gizlilik Politikası</h1>
+            <p style="color: #666; font-size: 1.1rem;">Uygulama Adı</p>
+            <a href="index.html" class="back-link">← Ana Sayfaya Dön</a>
+        </header>
+
+        <div class="content">
+            <div class="highlight-box">
+                <p><strong>Son Güncelleme:</strong> 1 Ocak 2024</p>
+                <p>Bu gizlilik politikası, uygulamamızın kişisel verilerinizi nasıl topladığını, kullandığını ve koruduğunu açıklamaktadır.</p>
+            </div>
+
+            <h2>1. Veri Toplama</h2>
+            <p>Uygulamamız aşağıdaki verileri toplayabilir:</p>
+            <ul>
+                <li>Kullanıcı adı ve profil bilgileri</li>
+                <li>Uygulama içi aktiviteler</li>
+                <li>Cihaz bilgileri (model, işletim sistemi versiyonu)</li>
+                <li>Kullanım istatistikleri</li>
+            </ul>
+
+            <h2>2. Veri Kullanımı</h2>
+            <p>Toplanan veriler aşağıdaki amaçlarla kullanılır:</p>
+            <ul>
+                <li>Uygulama performansını iyileştirmek</li>
+                <li>Kullanıcı deneyimini geliştirmek</li>
+                <li>Hata ayıklama ve teknik destek sağlamak</li>
+                <li>Yeni özellikler geliştirmek</li>
+            </ul>
+
+            <h2>3. Veri Paylaşımı</h2>
+            <p>Kişisel verileriniz üçüncü taraflarla paylaşılmaz. Ancak aşağıdaki durumlarda paylaşım yapılabilir:</p>
+            <ul>
+                <li>Yasal yükümlülükler gereği</li>
+                <li>Kullanıcı güvenliğini korumak için</li>
+                <li>Kullanıcının açık izni ile</li>
+            </ul>
+
+            <h2>4. Veri Güvenliği</h2>
+            <p>Verilerinizin güvenliği bizim için önemlidir. Endüstri standardı güvenlik önlemleri kullanıyoruz:</p>
+            <ul>
+                <li>Şifreleme teknolojileri</li>
+                <li>Güvenli sunucu altyapısı</li>
+                <li>Düzenli güvenlik güncellemeleri</li>
+            </ul>
+
+            <h2>5. Çerezler (Cookies)</h2>
+            <p>Uygulamamız, kullanıcı deneyimini iyileştirmek için çerezler kullanabilir. Çerezleri tarayıcı ayarlarınızdan yönetebilirsiniz.</p>
+
+            <h2>6. Kullanıcı Hakları</h2>
+            <p>KVKK kapsamında aşağıdaki haklara sahipsiniz:</p>
+            <ul>
+                <li>Kişisel verilerinize erişim hakkı</li>
+                <li>Verilerinizin düzeltilmesini talep etme hakkı</li>
+                <li>Verilerinizin silinmesini talep etme hakkı</li>
+                <li>Veri işlemeye itiraz etme hakkı</li>
+            </ul>
+
+            <h2>7. Değişiklikler</h2>
+            <p>Bu gizlilik politikası zaman zaman güncellenebilir. Önemli değişiklikler uygulama içinde bildirilecektir.</p>
+
+            <div class="contact-info">
+                <h3>İletişim</h3>
+                <p>Gizlilik politikası ile ilgili sorularınız için bizimle iletişime geçebilirsiniz:</p>
+                <p><strong>E-posta:</strong> info@bambinifojo.com</p>
+            </div>
+
+            <div class="last-updated">
+                <p>Son güncelleme: 1 Ocak 2024</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

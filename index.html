@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bambinifojo - Uygulamalarım</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6a5acd; /* Açık Mor */
+            --secondary-color: #483d8b; /* Koyu Mor */
+            --background-gradient: linear-gradient(135deg, #483d8b, #6a5acd, #9370db);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background-gradient);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .app-card:nth-child(1) { animation-delay: 0.1s; }
+        .app-card:nth-child(2) { animation-delay: 0.2s; }
+        .app-card:nth-child(3) { animation-delay: 0.3s; }
+        .app-card:nth-child(4) { animation-delay: 0.4s; }
+        .app-card:nth-child(5) { animation-delay: 0.5s; }
+        .app-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+        }
+
+        /* SVG İkon Container için özel stil */
+        .icon-container {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-color);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(106, 90, 205, 0.4);
+        }
+
+        .icon-container svg {
+            fill: white;
+            width: 35px;
+            height: 35px;
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+            text-align: center;
+        }
+
+        .app-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .app-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(106, 90, 205, 0.4);
+            flex-grow: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 61, 139, 0.6);
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            flex-grow: 1;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+            transform: translateY(-1px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            opacity: 0.9;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- RESPONSIVE TASARIM (Mobile Uyum) --- */
+        @media (max-width: 768px) {
+            /* Orta ve küçük ekranlar için ayarlar */
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            header p {
+                font-size: 1.1rem;
+            }
+
+            .apps-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .app-card {
+                margin: 20px;
+                padding: 25px;
+                max-width: 90%; /* Daha dar ekranlarda kartın genişlemesini sağlar */
+            }
+
+            .app-title {
+                font-size: 1.4em;
+            }
+
+            .app-description {
+                font-size: 0.9em;
+            }
+
+            .button-group {
+                flex-direction: column; /* Butonları alt alta sıralar */
+                gap: 8px;
+            }
+
+            .btn {
+                width: 100%; /* Alt alta gelen butonların tam genişlik kaplamasını sağlar */
+                padding: 12px 0; /* Dikey dolguyu artırır */
+                justify-content: center; /* Buton içeriğini ortalar */
+            }
+
+            .app-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .app-links .btn {
+                width: 100%;
+                padding: 12px 0;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Çok küçük mobil ekranlar için ince ayarlar */
+            header h1 {
+                font-size: 2rem;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+
+            .app-card {
+                padding: 20px;
+                border-radius: 15px;
+                margin: 15px;
+            }
+
+            .icon-container {
+                width: 50px;
+                height: 50px;
+            }
+
+            .icon-container svg {
+                width: 30px;
+                height: 30px;
+            }
+
+            .app-title {
+                font-size: 1.3em;
+            }
+
+            .app-description {
+                font-size: 0.85em;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+                padding: 10px 0;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Bambinifojo</h1>
+            <p>Mobil uygulamalarım ve projelerim</p>
+        </header>
+
+        <div class="apps-grid">
+            <!-- Task Cosmos Uygulaması -->
+            <div class="app-card">
+                <div class="icon-container">
+                    <svg class="app-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M15 1H9c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 19H9V4h6v16z"/>
+                    </svg>
+                </div>
+                <h3 class="app-title">Task Cosmos</h3>
+                <p class="app-description">
+                    Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama. 
+                    Günlük işlerinizi kolayca takip edin ve organize edin.
+                </p>
+                <div class="button-group">
+                    <a href="https://bambinifojo.github.io/task-cosmos/privacy-policy.html" class="btn btn-secondary">
+                        Gizlilik Politikası
+                    </a>
+                    <a href="https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos" class="btn btn-primary">
+                        Detaylar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Yeni Uygulama Örneği - Buraya kendi uygulamalarınızı ekleyebilirsiniz -->
+            <div class="app-card">
+                <div class="app-icon">⭐</div>
+                <h2 class="app-title">Yeni Uygulama</h2>
+                <p class="app-description">
+                    Buraya yeni uygulamanızın açıklamasını ekleyebilirsiniz. 
+                    Her uygulama için özel privacy policy sayfası oluşturabilirsiniz.
+                </p>
+                <div class="app-links">
+                    <a href="#" class="btn btn-secondary">
+                        🔒 Gizlilik Politikası
+                    </a>
+                    <a href="#" class="btn btn-primary">
+                        📄 Detaylar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Daha fazla uygulama eklemek için bu kartları kopyalayabilirsiniz -->
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Bambinifojo. Tüm hakları saklıdır.</p>
+        </footer>
+    </div>
+</body>
+</html>
+
