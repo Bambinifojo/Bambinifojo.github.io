@@ -1,0 +1,47 @@
+═══════════════════════════════════════════════════════════════
+  GITHUB PAGES YAYINLAMA ADIMLARI
+═══════════════════════════════════════════════════════════════
+
+✅ ADIM 1: TAMAMLANDI
+   - Dosyalar Git'e eklendi
+   - Commit yapıldı
+
+⏳ ADIM 2: GitHub'da Repository Oluşturun
+   
+   1. https://github.com adresine gidin ve giriş yapın
+   2. Sağ üstteki "+" butonuna tıklayın
+   3. "New repository" seçin
+   4. Repository adı: Bambinifojo.github.io
+      (Kullanıcı adınızla TAM OLARAK aynı olmalı!)
+   5. Public seçin
+   6. README, .gitignore, license EKLEMEYİN (zaten dosyalarımız var)
+   7. "Create repository" butonuna tıklayın
+
+⏳ ADIM 3: GitHub'a Push Edin
+   
+   Repository oluşturduktan sonra, GitHub size komutlar gösterecek.
+   Aşağıdaki komutları çalıştırın:
+
+   git remote add origin https://github.com/Bambinifojo/Bambinifojo.github.io.git
+   git branch -M main
+   git push -u origin main
+
+   (Eğer kullanıcı adınız farklıysa, URL'deki "Bambinifojo" kısmını değiştirin)
+
+⏳ ADIM 4: GitHub Pages'i Aktifleştirin
+   
+   1. Repository sayfanızda "Settings" sekmesine tıklayın
+   2. Sol menüden "Pages" seçin
+   3. "Source" bölümünden "main" branch'ini seçin
+   4. "Save" butonuna tıklayın
+   5. Birkaç dakika bekleyin
+
+🎉 ADIM 5: Sitenizi Görüntüleyin
+   
+   Siteniz şu adreste yayında olacak:
+   https://bambinifojo.github.io/
+
+═══════════════════════════════════════════════════════════════
+
+NOT: Eğer branch adınız "master" ise, "main" yerine "master" kullanın.
+
