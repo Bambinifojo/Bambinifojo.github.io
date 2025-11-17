@@ -1,0 +1,19 @@
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #5A3CF0, #A84DF3);
+  color:white;
+  text-align:center;
+}
+.hero { padding:60px 0; }
+.apps-section { padding:40px; }
+.app-card {
+  background:white;
+  color:#222;
+  border-radius:16px;
+  padding:20px;
+  margin:20px auto;
+  width:90%;
+  max-width:420px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.2);
+}
