@@ -17,8 +17,11 @@ body {
     color: #333;
     position: relative;
     overflow-x: hidden;
-    padding: 20px;
     line-height: 1.8;
+}
+
+body.privacy-page {
+    padding: 20px;
 }
 
 /* Animasyonlu arka plan */
@@ -321,7 +324,7 @@ body::before {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 5px;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
