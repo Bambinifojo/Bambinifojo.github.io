@@ -1,1 +1,11 @@
-{"apps": []}
+{
+  "apps": [
+    {
+      "title": "Task Cosmos",
+      "description": "Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama. Günlük işlerinizi kolayca takip edin ve organize edin.",
+      "icon": "📱",
+      "privacy": "https://bambinifojo.github.io/task-cosmos/privacy-policy.html",
+      "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos"
+    }
+  ]
+}

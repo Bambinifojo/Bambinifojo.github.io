@@ -1,16 +1,48 @@
 async function loadApps(){
-  const res = await fetch("data/apps.json");
-  const data = await res.json();
-  const container = document.getElementById("apps-container");
-  container.innerHTML = "";
-  data.apps.forEach(app=>{
-    container.innerHTML += `
-    <div class="app-card">
-      <h3>${app.title}</h3>
-      <p>${app.description}</p>
-      <a href="${app.privacy}">Gizlilik Politikası</a> |
-      <a href="${app.details}">Detaylar</a>
-    </div>`;
-  });
+  try {
+    const res = await fetch("data/apps.json");
+    const data = await res.json();
+    const container = document.getElementById("apps-container");
+    container.innerHTML = "";
+    
+    if (data.apps.length === 0) {
+      container.innerHTML = '<p style="color: white; text-align: center; padding: 40px;">Henüz uygulama eklenmemiş.</p>';
+      return;
+    }
+    
+    data.apps.forEach((app, index) => {
+      const icon = app.icon || '📱';
+      container.innerHTML += `
+      <div class="app-card" style="animation-delay: ${index * 0.1}s">
+        <div class="app-icon-container">
+          <div class="app-icon">${icon}</div>
+        </div>
+        <h3>${app.title}</h3>
+        <p>${app.description}</p>
+        <div class="app-buttons">
+          <a href="${app.privacy}" class="btn btn-secondary">Gizlilik Politikası</a>
+          <a href="${app.details}" class="btn btn-primary">Detaylar</a>
+        </div>
+      </div>`;
+    });
+  } catch (error) {
+    console.error('Uygulamalar yüklenirken hata:', error);
+    const container = document.getElementById("apps-container");
+    container.innerHTML = '<p style="color: white; text-align: center; padding: 40px;">Uygulamalar yüklenirken bir hata oluştu.</p>';
+  }
 }
-loadApps();
+
+// Scroll indicator'a tıklandığında uygulamalar bölümüne kaydır
+document.addEventListener('DOMContentLoaded', () => {
+  loadApps();
+  
+  const scrollIndicator = document.querySelector('.scroll-indicator');
+  if (scrollIndicator) {
+    scrollIndicator.addEventListener('click', () => {
+      const appsSection = document.getElementById('apps');
+      if (appsSection) {
+        appsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+});
