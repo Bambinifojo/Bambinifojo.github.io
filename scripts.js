@@ -6,7 +6,7 @@ async function loadApps(){
     container.innerHTML = "";
     
     if (data.apps.length === 0) {
-      container.innerHTML = '<p style="color: white; text-align: center; padding: 40px;">Henüz uygulama eklenmemiş.</p>';
+      container.innerHTML = '<p style="color: white; text-align: center; padding: 40px; opacity: 0.8;">Henüz uygulama eklenmemiş.</p>';
       return;
     }
     
@@ -28,14 +28,14 @@ async function loadApps(){
   } catch (error) {
     console.error('Uygulamalar yüklenirken hata:', error);
     const container = document.getElementById("apps-container");
-    container.innerHTML = '<p style="color: white; text-align: center; padding: 40px;">Uygulamalar yüklenirken bir hata oluştu.</p>';
+    container.innerHTML = '<p style="color: white; text-align: center; padding: 40px; opacity: 0.8;">Uygulamalar yüklenirken bir hata oluştu.</p>';
   }
 }
 
-// Scroll indicator'a tıklandığında uygulamalar bölümüne kaydır
 document.addEventListener('DOMContentLoaded', () => {
   loadApps();
   
+  // Scroll indicator'a tıklandığında uygulamalar bölümüne kaydır
   const scrollIndicator = document.querySelector('.scroll-indicator');
   if (scrollIndicator) {
     scrollIndicator.addEventListener('click', () => {
