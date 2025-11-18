@@ -1,73 +1,156 @@
-# Bambinifojo GitHub Pages Sitesi
+# 🚀 Bambinifojo Portfolio Website
 
-Bu repository, Bambinifojo'nun uygulamalarını tanıtan ana sayfa sitesini içerir.
+Modern, responsive ve özellik dolu portfolio web sitesi. GitHub Pages üzerinde yayınlanmaktadır.
 
-## 🚀 Sitenizi Yayınlama Adımları
+## 🌐 Canlı Site
 
-### 1. GitHub'da Repository Oluşturun
-
-1. GitHub.com'a giriş yapın
-2. Sağ üstteki **"+"** butonuna tıklayın
-3. **"New repository"** seçin
-4. Repository adı: **`Bambinifojo.github.io`** (kullanıcı adınızla aynı olmalı)
-5. **Public** seçin
-6. **"Create repository"** butonuna tıklayın
-
-### 2. Dosyaları GitHub'a Yükleyin
-
-Terminal/PowerShell'de şu komutları çalıştırın:
-
-```bash
-# Dosyaları staging area'ya ekle
-git add .
-
-# Commit oluştur
-git commit -m "İlk commit: Ana sayfa eklendi"
-
-# GitHub repository'nizi remote olarak ekleyin (URL'yi kendi repository'nizle değiştirin)
-git remote add origin https://github.com/Bambinifojo/Bambinifojo.github.io.git
-
-# Ana branch'i main olarak ayarlayın
-git branch -M main
-
-# Dosyaları GitHub'a gönderin
-git push -u origin main
-```
-
-### 3. GitHub Pages'i Aktifleştirin
-
-1. GitHub repository sayfanıza gidin
-2. **Settings** sekmesine tıklayın
-3. Sol menüden **Pages** seçin
-4. **Source** bölümünden **"main"** branch'ini seçin
-5. **Save** butonuna tıklayın
-
-### 4. Sitenizi Görüntüleyin
-
-Birkaç dakika sonra siteniz şu adreste yayında olacak:
 **https://bambinifojo.github.io/**
+
+## ✨ Özellikler
+
+### 🎨 Tasarım
+- ✅ Modern ve responsive tasarım
+- ✅ Dark/Light mode toggle
+- ✅ Gradient arka planlar
+- ✅ Smooth scroll animasyonları
+- ✅ Particle efektleri
+- ✅ Parallax scroll efektleri
+
+### 📱 Bölümler
+- **Hero Section** - Tanıtım ve istatistikler
+- **Hakkımda** - Misyon, vizyon ve yaklaşım
+- **Teknolojiler & Yetenekler** - Skill progress bar'ları
+- **Uygulamalar** - Uygulama kartları (JSON'dan yüklenir)
+- **İletişim** - İletişim formu
+
+### 🛠️ Teknik Özellikler
+- Pure HTML, CSS, JavaScript
+- JSON tabanlı uygulama yönetimi
+- Intersection Observer API
+- LocalStorage tema desteği
+- Responsive design
+- SEO friendly
 
 ## 📁 Dosya Yapısı
 
-- `index.html` - Ana sayfa
-- `privacy-policy-example.html` - Örnek gizlilik politikası sayfası
-- `README.md` - Bu dosya
+```
+Bambinifojo.github.io/
+├── index.html              # Ana sayfa
+├── styles.css              # Stil dosyası
+├── scripts.js              # JavaScript dosyası
+├── admin.html              # Admin paneli
+├── admin.js                # Admin panel script
+├── package.json            # NPM yapılandırması
+├── build.js                # Build script
+├── validate.js             # Validasyon script
+├── data/
+│   └── apps.json          # Uygulama verileri
+└── task-cosmos/
+    └── privacy-policy.html # Task Cosmos gizlilik politikası
+```
 
-## 🎨 Özellikler
+## 🚀 Kurulum ve Kullanım
 
-- ✅ Modern ve responsive tasarım
-- ✅ Mor tema (Task Cosmos uyumlu)
-- ✅ SVG ikonlar
-- ✅ Mobil uyumlu
-- ✅ Privacy Policy linkleri
+### Gereksinimler
+- Node.js (opsiyonel, sadece build için)
+- Git
 
-## 📱 Yerel Olarak Görüntüleme
+### Yerel Geliştirme
 
-Sitenizi yerel olarak görmek için `index.html` dosyasını çift tıklayarak tarayıcıda açabilirsiniz.
+```bash
+# Bağımlılıkları yükle
+npm install
 
-## 🔗 Mevcut Uygulamalar
+# Build ve validasyon
+npm run build
 
-- **Task Cosmos** - Görev yönetimi uygulaması
-  - Privacy Policy: https://bambinifojo.github.io/task-cosmos/privacy-policy.html
-  - Play Store: https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos
+# Validasyon
+npm run validate
+
+# Local server başlat
+npm run serve
+```
+
+### GitHub'a Deploy
+
+```bash
+# Değişiklikleri ekle
+git add .
+
+# Commit yap
+git commit -m "Açıklama"
+
+# GitHub'a push
+git push origin main
+```
+
+GitHub Pages otomatik olarak deploy edecektir.
+
+## 📝 Uygulama Ekleme
+
+Uygulamalar `data/apps.json` dosyasından yönetilir:
+
+```json
+{
+  "apps": [
+    {
+      "title": "Uygulama Adı",
+      "description": "Açıklama",
+      "icon": "📱",
+      "privacy": "Gizlilik politikası URL",
+      "details": "Detay sayfası URL"
+    }
+  ]
+}
+```
+
+Admin paneli (`admin.html`) ile de uygulama eklenebilir.
+
+## 🎨 Özelleştirme
+
+### Renkler
+`styles.css` dosyasındaki CSS değişkenlerini düzenleyin:
+
+```css
+:root {
+    --primary-color: #6a5acd;
+    --secondary-color: #483d8b;
+    --background-gradient: linear-gradient(135deg, #483d8b, #6a5acd, #9370db);
+}
+```
+
+### İçerik
+- Hero section: `index.html` içinde
+- Hakkımda: `index.html` içinde
+- Yetenekler: `index.html` içinde
+- Uygulamalar: `data/apps.json` dosyasında
+
+## 📱 Responsive
+
+Site tüm cihazlarda responsive çalışır:
+- 📱 Mobil (320px+)
+- 📱 Tablet (768px+)
+- 💻 Desktop (1024px+)
+
+## 🔧 Build Komutları
+
+```bash
+npm run build      # Build ve kontrol
+npm run validate   # Site validasyonu
+npm run serve      # Local server (port 8080)
+```
+
+## 📄 Lisans
+
+MIT License
+
+## 👤 Yazar
+
+**Bambinifojo**
+- GitHub: [@Bambinifojo](https://github.com/Bambinifojo)
+- Website: https://bambinifojo.github.io/
+
+## 🙏 Teşekkürler
+
+Modern web teknolojileri kullanılarak geliştirilmiştir.
 

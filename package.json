@@ -1,0 +1,20 @@
+{
+  "name": "bambinifojo-portfolio",
+  "version": "1.0.0",
+  "description": "Bambinifojo Portfolio Website",
+  "scripts": {
+    "build": "node build.js",
+    "serve": "npx http-server . -p 8080 -o",
+    "validate": "node validate.js"
+  },
+  "keywords": [
+    "portfolio",
+    "website"
+  ],
+  "author": "Bambinifojo",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
+
