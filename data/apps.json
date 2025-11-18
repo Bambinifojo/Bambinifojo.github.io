@@ -6,6 +6,41 @@
       "icon": "📱",
       "privacy": "https://bambinifojo.github.io/task-cosmos/privacy-policy.html",
       "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos"
+    },
+    {
+      "title": "Weather Pro",
+      "description": "Gelişmiş hava durumu uygulaması. Detaylı tahminler, widget desteği ve güzel animasyonlarla hava durumunu takip edin.",
+      "icon": "🌤️",
+      "privacy": "#",
+      "details": "#"
+    },
+    {
+      "title": "NoteSync",
+      "description": "Bulut tabanlı not alma uygulaması. Notlarınızı tüm cihazlarınızda senkronize edin ve hiçbir şeyi kaçırmayın.",
+      "icon": "📝",
+      "privacy": "#",
+      "details": "#"
+    },
+    {
+      "title": "FitTracker",
+      "description": "Sağlık ve fitness takip uygulaması. Egzersizlerinizi kaydedin, ilerlemenizi görün ve hedeflerinize ulaşın.",
+      "icon": "💪",
+      "privacy": "#",
+      "details": "#"
+    },
+    {
+      "title": "Expense Manager",
+      "description": "Akıllı harcama takip uygulaması. Giderlerinizi kategorilere ayırın, bütçe oluşturun ve finansal hedeflerinize ulaşın.",
+      "icon": "💰",
+      "privacy": "#",
+      "details": "#"
+    },
+    {
+      "title": "Music Player Pro",
+      "description": "Modern müzik çalar uygulaması. Yerel müziklerinizi çalın, playlist oluşturun ve müziğin keyfini çıkarın.",
+      "icon": "🎵",
+      "privacy": "#",
+      "details": "#"
     }
   ]
 }

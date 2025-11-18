@@ -8,6 +8,24 @@
 <script defer src="scripts.js"></script>
 </head>
 <body>
+<!-- Dark/Light Mode Toggle -->
+<div class="theme-toggle" id="themeToggle" title="Tema Değiştir">
+  <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="12" r="5"></circle>
+    <line x1="12" y1="1" x2="12" y2="3"></line>
+    <line x1="12" y1="21" x2="12" y2="23"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+    <line x1="1" y1="12" x2="3" y2="12"></line>
+    <line x1="21" y1="12" x2="23" y2="12"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+  </svg>
+  <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+</div>
+
 <!-- Hamburger Menü -->
 <div class="hamburger" id="hamburger">
   <span></span>
@@ -19,8 +37,10 @@
 <div class="menu-overlay" id="menuOverlay">
   <div class="menu-content">
     <a href="#home">Ana Sayfa</a>
+    <a href="#about">Hakkımda</a>
+    <a href="#skills">Yetenekler</a>
     <a href="#apps">Uygulamalar</a>
-    <a href="#contact">İletişim</a>
+    <a href="#contact-section">İletişim</a>
   </div>
 </div>
 
@@ -32,11 +52,11 @@
 <!-- Hero Section -->
 <section class="hero-section">
   <div class="hero-content">
-    <div class="hero-icon">🚀</div>
-    <h2>Mobil Uygulama Geliştirici</h2>
-    <p>Modern, hızlı ve kullanıcı dostu uygulamalar geliştiriyorum. Her projede kalite, performans ve kullanıcı deneyimini ön planda tutuyorum.</p>
+    <div class="hero-icon" data-aos="zoom-in">🚀</div>
+    <h2 data-aos="fade-up" data-aos-delay="100ms">Mobil Uygulama Geliştirici</h2>
+    <p data-aos="fade-up" data-aos-delay="200ms">Modern, hızlı ve kullanıcı dostu uygulamalar geliştiriyorum. Her projede kalite, performans ve kullanıcı deneyimini ön planda tutuyorum.</p>
     
-    <div class="hero-stats">
+    <div class="hero-stats" data-aos="fade-up" data-aos-delay="300ms">
       <div class="stat-item">
         <span class="stat-number">2+</span>
         <span class="stat-label">Uygulama</span>
@@ -51,7 +71,7 @@
       </div>
     </div>
     
-    <div class="scroll-indicator">
+    <div class="scroll-indicator" data-aos="fade-up" data-aos-delay="400ms">
       <span>Keşfet</span>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
         <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
@@ -60,10 +80,113 @@
   </div>
 </section>
 
+<!-- About Section -->
+<section id="about" class="about-section">
+  <div class="about-content">
+    <h2 class="section-title" data-aos="fade-up">Hakkımda</h2>
+    <div class="about-grid">
+      <div class="about-card" data-aos="fade-up" data-aos-delay="100ms">
+        <div class="about-icon">🎯</div>
+        <h3>Misyonum</h3>
+        <p>Kullanıcı deneyimini ön planda tutarak, modern ve işlevsel mobil uygulamalar geliştirmek. Her projede kalite ve performansı bir araya getiriyorum.</p>
+      </div>
+      <div class="about-card" data-aos="fade-up" data-aos-delay="200ms">
+        <div class="about-icon">💡</div>
+        <h3>Yaklaşımım</h3>
+        <p>Kullanıcı ihtiyaçlarını anlayarak, sezgisel ve kullanımı kolay arayüzler tasarlıyorum. Her detayı düşünerek, mükemmel bir deneyim sunuyorum.</p>
+      </div>
+      <div class="about-card" data-aos="fade-up" data-aos-delay="300ms">
+        <div class="about-icon">🚀</div>
+        <h3>Vizyonum</h3>
+        <p>Teknolojinin gücünü kullanarak, insanların hayatlarını kolaylaştıran ve değer katan uygulamalar geliştirmeye devam ediyorum.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Skills Section -->
+<section id="skills" class="skills-section">
+  <div class="skills-content">
+    <h2 class="section-title" data-aos="fade-up">Teknolojiler & Yetenekler</h2>
+    <div class="skills-grid">
+      <div class="skill-item" data-aos="fade-up" data-aos-delay="50ms">
+        <div class="skill-icon">📱</div>
+        <h4>Android Development</h4>
+        <div class="skill-bar">
+          <div class="skill-progress" data-width="95"></div>
+        </div>
+      </div>
+      <div class="skill-item" data-aos="fade-up" data-aos-delay="100ms">
+        <div class="skill-icon">☕</div>
+        <h4>Java & Kotlin</h4>
+        <div class="skill-bar">
+          <div class="skill-progress" data-width="90"></div>
+        </div>
+      </div>
+      <div class="skill-item" data-aos="fade-up" data-aos-delay="150ms">
+        <div class="skill-icon">🎨</div>
+        <h4>UI/UX Design</h4>
+        <div class="skill-bar">
+          <div class="skill-progress" data-width="85"></div>
+        </div>
+      </div>
+      <div class="skill-item" data-aos="fade-up" data-aos-delay="200ms">
+        <div class="skill-icon">🌐</div>
+        <h4>Web Development</h4>
+        <div class="skill-bar">
+          <div class="skill-progress" data-width="80"></div>
+        </div>
+      </div>
+      <div class="skill-item" data-aos="fade-up" data-aos-delay="250ms">
+        <div class="skill-icon">🔥</div>
+        <h4>Firebase</h4>
+        <div class="skill-bar">
+          <div class="skill-progress" data-width="88"></div>
+        </div>
+      </div>
+      <div class="skill-item" data-aos="fade-up" data-aos-delay="300ms">
+        <div class="skill-icon">⚡</div>
+        <h4>Performance Optimization</h4>
+        <div class="skill-bar">
+          <div class="skill-progress" data-width="92"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Apps Section -->
 <section id="apps" class="apps-section">
-  <h2 class="section-title">Uygulamalar</h2>
+  <h2 class="section-title" data-aos="fade-up">Uygulamalar</h2>
   <div id="apps-container"></div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact-section" class="contact-section">
+  <div class="contact-content">
+    <h2 class="section-title" data-aos="fade-up">İletişim</h2>
+    <p class="contact-description" data-aos="fade-up" data-aos-delay="100ms">Projeleriniz için benimle iletişime geçin</p>
+    <form class="contact-form" id="contactForm" data-aos="fade-up" data-aos-delay="200ms">
+      <div class="form-group">
+        <input type="text" id="contactName" placeholder="Adınız" required>
+      </div>
+      <div class="form-group">
+        <input type="email" id="contactEmail" placeholder="E-posta Adresiniz" required>
+      </div>
+      <div class="form-group">
+        <textarea id="contactMessage" rows="5" placeholder="Mesajınız" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Gönder</button>
+    </form>
+    <div class="contact-info" data-aos="fade-up" data-aos-delay="300ms">
+      <a href="mailto:info@bambinifojo.com" class="contact-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+        info@bambinifojo.com
+      </a>
+    </div>
+  </div>
 </section>
 
 <footer id="contact">
@@ -99,6 +222,20 @@
 </footer>
 
 <script>
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+const currentTheme = localStorage.getItem('theme') || (prefersDark.matches ? 'dark' : 'light');
+
+document.documentElement.setAttribute('data-theme', currentTheme);
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+});
+
 // Hamburger Menü
 const hamburger = document.getElementById('hamburger');
 const menuOverlay = document.getElementById('menuOverlay');
@@ -127,6 +264,64 @@ menuOverlay.addEventListener('click', (e) => {
     hamburger.classList.remove('active');
     menuOverlay.classList.remove('active');
   }
+});
+
+// Contact Form
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('contactName').value;
+    const email = document.getElementById('contactEmail').value;
+    const message = document.getElementById('contactMessage').value;
+    
+    // Mailto link oluştur
+    const mailtoLink = `mailto:info@bambinifojo.com?subject=İletişim Formu: ${encodeURIComponent(name)}&body=${encodeURIComponent('E-posta: ' + email + '\n\nMesaj:\n' + message)}`;
+    window.location.href = mailtoLink;
+    
+    // Formu temizle
+    contactForm.reset();
+    alert('E-posta uygulamanız açılıyor...');
+  });
+}
+
+// Scroll Animations
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const delayAttr = entry.target.getAttribute('data-aos-delay') || '0ms';
+      const delay = parseInt(delayAttr.replace('ms', '')) || 0;
+      setTimeout(() => {
+        entry.target.style.opacity = '1';
+        const aosType = entry.target.getAttribute('data-aos');
+        if (aosType === 'zoom-in') {
+          entry.target.style.transform = 'scale(1)';
+        } else {
+          entry.target.style.transform = 'translateY(0)';
+        }
+      }, delay);
+    }
+  });
+}, observerOptions);
+
+// Observe elements with data-aos attribute
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-aos]').forEach(el => {
+    el.style.opacity = '0';
+    const aosType = el.getAttribute('data-aos');
+    if (aosType === 'zoom-in') {
+      el.style.transform = 'scale(0.8)';
+    } else {
+      el.style.transform = 'translateY(30px)';
+    }
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
 });
 </script>
 </body>
