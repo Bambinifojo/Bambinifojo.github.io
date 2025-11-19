@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Girişi - Bambinifojo</title>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+    background: #f5f7fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    z-index: 0;
+  }
+
+  .login-container,
+  .card {
+    position: relative;
+    z-index: 1;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    max-width: 440px;
+    width: 100%;
+    animation: fadeInUp 0.4s ease;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .login-header-wrapper {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 32px 32px;
+    border-radius: 12px 12px 0 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .login-header-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .login-header,
+  .card-header {
+    text-align: center;
+    margin-bottom: 0 !important;
+  }
+
+  .login-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .login-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+
+  .login-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 20px;
+    background: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .login-icon svg {
+    width: 28px;
+    height: 28px;
+    color: white;
+  }
+
+  .login-content {
+    padding: 32px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.01em;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    background: #ffffff;
+    font-family: inherit;
+    color: #111827;
+  }
+
+  .form-group input::placeholder {
+    color: #9ca3af;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-group input:hover:not(:focus) {
+    border-color: #9ca3af;
+  }
+
+  .form-group input.error {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    animation: shake 0.5s;
+  }
+
+  .form-group input:disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .error-message {
+    color: #dc2626;
+    font-size: 0.8125rem;
+    margin-top: 6px;
+    display: block;
+    min-height: 20px;
+    line-height: 1.4;
+  }
+
+  .success-message {
+    color: #059669;
+    font-size: 0.8125rem;
+    margin-top: 6px;
+    display: block;
+    min-height: 20px;
+    line-height: 1.4;
+  }
+
+  /* Notification Toast */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease;
+    border-left: 4px solid;
+  }
+
+  .notification.success {
+    border-left-color: #10b981;
+  }
+
+  .notification.error {
+    border-left-color: #ef4444;
+  }
+
+  .notification.warning {
+    border-left-color: #f59e0b;
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  .notification.hiding {
+    animation: slideOutRight 0.3s ease forwards;
+  }
+
+  .btn-login,
+  .btn {
+    width: 100%;
+    padding: 12px 0;
+    height: 44px !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    font-family: inherit;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-login:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  .btn-login:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  }
+
+  .btn-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 24px;
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    padding: 8px;
+    border-radius: 6px;
+  }
+
+  .back-link:hover {
+    color: #667eea;
+    background: #f9fafb;
+  }
+
+  .password-toggle {
+    position: relative;
+  }
+
+  .password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+  }
+
+  .password-toggle-btn:hover {
+    color: #667eea;
+  }
+
+  .password-toggle input {
+    padding-right: 45px;
+  }
+
+  /* Accordion Yapısı */
+  .accordion {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ac-item {
+    width: 100%;
+  }
+
+  /* Accordion Başlık */
+  .ac-header {
+    width: 100%;
+    padding: 14px 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    text-align: left;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ac-header::after {
+    content: '+';
+    font-size: 20px;
+    font-weight: 300;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+    line-height: 1;
+  }
+
+  .ac-item.active .ac-header::after {
+    transform: rotate(45deg);
+    color: #667eea;
+  }
+
+  .ac-header:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+
+  .ac-item.active .ac-header {
+    background: #f0f4ff;
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  /* Accordion İçerik */
+  .ac-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease, border-color 0.3s ease;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 0 16px;
+    margin-top: 8px;
+    border: 1px solid #e5e7eb;
+    opacity: 0;
+  }
+
+  .ac-body.open {
+    padding: 20px 16px;
+    max-height: 2000px;
+    border-color: #d1d5db;
+    opacity: 1;
+  }
+
+  /* Accordion içeriği için smooth transition */
+  .ac-body > * {
+    opacity: 0;
+    transition: opacity 0.3s ease 0.1s;
+  }
+
+  .ac-body.open > * {
+    opacity: 1;
+  }
+
+  .setup-section {
+    padding: 0;
+  }
+
+  .setup-content h2 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: #333;
+  }
+
+  .form-group-setup {
+    margin-top: 20px;
+  }
+
+  .code-input {
+    text-align: center;
+    font-size: 1.5rem;
+    letter-spacing: 8px;
+    font-weight: 600;
+    height: 45px !important;
+  }
+
+  .code-input-sm {
+    font-size: 1.2rem;
+    letter-spacing: 5px;
+  }
+
+  .btn-auto-fill {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-auto-fill:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-auto-fill:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .btn-auto-fill svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  #twoFactorGroup {
+    position: relative;
+  }
+
+  .code-input-wrapper {
+    position: relative;
+  }
+
+  #twoFactorGroup .code-input {
+    padding-right: 55px;
+  }
+
+  .code-hint {
+    display: block;
+    margin-top: 8px;
+    color: #667eea;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .code-hint-desc {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .setup-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .setup-description strong {
+    color: #667eea;
+    font-weight: 600;
+  }
+
+  .qr-container {
+    background: white;
+    padding: 12px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 12px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    max-width: 100%;
+    width: 100%;
+    text-align: center;
+  }
+
+  .qr-code-wrapper {
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
+
+  .qr-canvas {
+    display: block !important;
+    margin: 0 auto !important;
+    width: 140px !important;
+    height: 140px !important;
+    border: 3px solid #f0f0f0 !important;
+    border-radius: 10px !important;
+    padding: 8px !important;
+    background: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease !important;
+    animation: qrPulse 2s ease-in-out infinite !important;
+  }
+
+  .qr-container canvas.qr-canvas:hover,
+  .qr-container img.qr-canvas:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+    border-color: #667eea;
+  }
+
+  .qr-error {
+    color: #ff4444;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .qr-error p {
+    margin: 5px 0;
+  }
+
+  .qr-error p:first-child {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .qr-error p:last-child {
+    font-size: 0.9rem;
+  }
+
+  .qr-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: #666;
+  }
+
+  .spinner-qr {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f0f0f0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .qr-instructions,
+  .howto.compact {
+    margin-top: 12px;
+    text-align: left;
+    background: #f9f9f9;
+    padding: 8px 12px !important;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+  }
+
+  .qr-instructions p,
+  .howto.compact p {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .qr-instructions ol,
+  .howto.compact ol {
+    margin: 0;
+    padding-left: 18px;
+    color: #666;
+    line-height: 1.45;
+    font-size: 0.85rem;
+  }
+
+  .qr-instructions li,
+  .howto.compact li {
+    margin-bottom: 3px;
+  }
+
+  .qr-instructions strong {
+    color: #667eea;
+  }
+
+  .manual-key {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 12px 0;
+    border: 1px solid #e0e0e0;
+  }
+
+  .manual-key p {
+    margin: 0 0 8px 0;
+    font-size: 0.875rem;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .key-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .key-row input {
+    flex: 1;
+    background: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+
+  .secret-key {
+    display: block;
+    background: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+    color: #333;
+    border: 1px solid #ddd;
+    margin-bottom: 0;
+  }
+
+  .btn-copy,
+  .copy-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+    min-width: 50px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-copy:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-copy:active {
+    transform: translateY(0);
+  }
+
+  .button-group-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .btn-secondary-setup {
+    background: #ffffff;
+    color: #667eea;
+    border: 1.5px solid #d1d5db;
+    padding: 12px 0;
+    height: 44px !important;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-secondary-setup:hover {
+    background: #f9fafb;
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .btn-secondary-setup:active {
+    transform: translateY(0);
+  }
+
+  .success-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  }
+
+  .success-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  }
+
+  .login-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  }
+
+  .login-btn:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3d8f 100%) !important;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes qrPulse {
+    0%, 100% { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+    50% { box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3); }
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+      overflow-x: hidden;
+    }
+
+    .login-container {
+      max-width: 100%;
+      border-radius: 12px;
+      max-height: calc(100vh - 20px);
+    }
+
+    .login-header-wrapper {
+      padding: 32px 24px 24px;
+    }
+
+    .login-content {
+      padding: 24px;
+    }
+
+    .login-header {
+      margin-bottom: 0;
+    }
+
+    .login-header h1 {
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+    }
+
+    .login-header p {
+      font-size: 0.8rem;
+    }
+
+    .login-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+    }
+
+    .login-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .ac-header {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+
+    .ac-body {
+      padding: 0 12px;
+    }
+
+    .ac-body.open {
+      padding: 16px 12px;
+    }
+
+    .setup-description {
+      font-size: 0.75rem;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .qr-container {
+      padding: 8px;
+      margin: 6px 0;
+    }
+
+    .qr-code-wrapper {
+      min-height: 140px;
+    }
+
+    .qr-canvas {
+      max-width: 80% !important;
+      width: 120px !important;
+      height: 120px !important;
+      padding: 6px !important;
+    }
+
+    .qr-instructions {
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .qr-instructions p {
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .qr-instructions ol {
+      font-size: 0.8rem;
+      line-height: 1.4;
+      padding-left: 16px;
+    }
+
+    .qr-instructions li {
+      margin-bottom: 3px;
+    }
+
+    .manual-key {
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    .manual-key p {
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    .secret-key {
+      font-size: 0.75rem;
+      padding: 6px 8px;
+      word-break: break-all;
+    }
+
+    .btn-copy {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+
+    .form-group-setup {
+      margin-top: 14px;
+    }
+
+    .code-input {
+      font-size: 1rem;
+      letter-spacing: 3px;
+      padding: 8px;
+      height: 40px !important;
+    }
+
+    .code-hint {
+      font-size: 0.8rem;
+    }
+
+    .code-hint-desc {
+      font-size: 0.75rem;
+    }
+
+    .button-group-setup {
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn-login,
+    .btn-secondary-setup {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.85rem;
+      height: 38px !important;
+    }
+
+    .back-link {
+      margin-top: 14px;
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      padding: 8px;
+      overflow-x: hidden;
+    }
+
+    .login-container {
+      max-width: 100%;
+      max-height: calc(100vh - 16px);
+      border-radius: 12px;
+    }
+
+    .login-header-wrapper {
+      padding: 28px 20px 20px;
+    }
+
+    .login-content {
+      padding: 20px;
+    }
+
+    .login-header h1 {
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+
+    .login-header p {
+      font-size: 0.75rem;
+    }
+
+    .login-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 14px;
+    }
+
+    .login-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .ac-header {
+      padding: 8px 10px;
+      font-size: 0.8rem;
+    }
+
+    .ac-body {
+      padding: 0 10px;
+    }
+
+    .ac-body.open {
+      padding: 14px 10px;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+    }
+
+    .form-group input {
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+
+    .btn-login,
+    .btn-secondary-setup {
+      padding: 9px;
+      font-size: 0.8rem;
+      height: 36px !important;
+    }
+
+    .qr-code-wrapper {
+      min-height: 140px;
+    }
+
+    .code-input {
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+      height: 38px !important;
+    }
+
+    .qr-canvas {
+      width: 100px !important;
+      height: 100px !important;
+    }
+
+    .qr-code-wrapper {
+      min-height: 120px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header-wrapper">
+      <div class="login-header">
+        <div class="login-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h1>Admin Girişi</h1>
+        <p>Yönetim paneline erişmek için şifrenizi girin</p>
+      </div>
+    </div>
+
+    <div class="login-content">
+      <!-- Accordion Yapısı -->
+      <div class="accordion" id="mainAccordion">
+      
+      <!-- 1. Bölüm – Google Authenticator Kurulumu -->
+      <div class="ac-item" id="setupAccordion">
+        <button class="ac-header" type="button">📲 Google Auth Kurulumu</button>
+        <div class="ac-body" id="setupBody">
+          <p class="setup-description">Güvenliğiniz için telefonunuza <strong>Google Authenticator</strong> veya benzeri bir uygulama indirin ve aşağıdaki QR kodu telefonunuzla tarayın.</p>
+          
+          <div class="qr-container">
+            <div id="qrcode" class="qr-code-wrapper">
+              <div class="qr-loading">
+                <div class="spinner-qr"></div>
+                <p>QR kod oluşturuluyor...</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="howto compact">
+            <ol>
+              <li>Google Authenticator'ı açın</li>
+              <li>"+" → "QR Kod Tara" deyin</li>
+              <li>Bu QR kodu okutun</li>
+              <li>Kod eklendi ✔</li>
+            </ol>
+          </div>
+          
+          <div class="manual-key">
+            <p><strong>Manuel Anahtar:</strong></p>
+            <div class="key-row">
+              <input type="text" id="secretKey" class="secret-key" readonly aria-label="Manuel anahtar">
+              <button type="button" class="copy-btn" onclick="copySecret()" title="Kopyala">📋</button>
+            </div>
+          </div>
+          
+          <div class="form-group form-group-setup">
+            <label for="verifyCode">Doğrulama Kodu (6 haneli)</label>
+            <input 
+              type="text" 
+              id="verifyCode" 
+              name="verifyCode" 
+              class="code-input"
+              placeholder="000000" 
+              maxlength="6"
+              pattern="[0-9]{6}"
+            />
+            <small id="setupCodeHint" class="code-hint"></small>
+            <small class="code-hint-desc">Telefonunuzdaki uygulamadan 6 haneli kodu girin veya yukarıdaki ipucuna tıklayarak otomatik doldurun</small>
+          </div>
+          
+          <div class="button-group-setup">
+            <button type="button" class="btn-login success-btn" onclick="verifySetup()">
+              <span>✅ Doğrula ve Kaydet</span>
+            </button>
+            <button type="button" class="btn-secondary-setup" onclick="skipSetup()">
+              <span>⏭️ Şimdilik Atla</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Bölüm – Admin Giriş -->
+      <div class="ac-item" id="loginAccordion">
+        <button class="ac-header" type="button">🔑 Admin Giriş</button>
+        <div class="ac-body" id="loginBody">
+          <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label for="password">Şifre</label>
+              <div class="password-toggle">
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  placeholder="Şifrenizi girin" 
+                  required 
+                  autocomplete="current-password"
+                />
+                <button type="button" class="password-toggle-btn" onclick="togglePassword()" aria-label="Şifreyi göster/gizle">
+                  <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <span class="error-message" id="errorMessage"></span>
+            </div>
+
+            <!-- 2FA Kodu (Eğer kurulum yapıldıysa) -->
+            <div class="form-group hidden" id="twoFactorGroup">
+              <label for="twoFactorCode">📱 Telefon Doğrulama Kodu</label>
+              <div class="code-input-wrapper">
+                <input 
+                  type="text" 
+                  id="twoFactorCode" 
+                  name="twoFactorCode" 
+                  class="code-input code-input-sm"
+                  placeholder="000000" 
+                  maxlength="6"
+                  pattern="[0-9]{6}"
+                  autocomplete="one-time-code"
+                />
+                <button type="button" class="btn-auto-fill" onclick="autoFillCode()" title="Otomatik Doldur">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path>
+                    <line x1="18" y1="3" x2="18" y2="9"></line>
+                    <line x1="15" y1="6" x2="21" y2="6"></line>
+                  </svg>
+                </button>
+              </div>
+              <small id="autoCodeDisplay" class="code-hint"></small>
+              <small class="code-hint-desc">Telefonunuzdaki Google Authenticator uygulamasından 6 haneli kodu girin veya otomatik doldur butonuna tıklayın</small>
+              <span class="error-message" id="twoFactorError"></span>
+            </div>
+
+            <button type="submit" class="btn-login login-btn" id="loginBtn" aria-label="Giriş yap">
+              <span id="loginBtnText">🔓 Giriş Yap</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      </div>
+
+      <a href="index.html" class="back-link">← Ana Sayfaya Dön</a>
+    </div>
+  </div>
+
+  <!-- QR Code Library - %100 ÇALIŞAN ÇÖZÜM -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script>
+    // QRCode kütüphanesinin yüklendiğini kontrol et
+    if (typeof QRCode === "undefined") {
+      console.error("❌ QRCode kütüphanesi yüklenemedi! Alternatif CDN deneniyor...");
+      // Alternatif CDN
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.onload = function() {
+        console.log("✅ Alternatif QRCode CDN yüklendi!");
+        window.qrcodeLoaded = true;
+      };
+      script.onerror = function() {
+        console.error("❌ Alternatif QRCode CDN de yüklenemedi!");
+        window.qrcodeLoaded = false;
+      };
+      document.head.appendChild(script);
+    } else {
+      console.log("✅ QRCode yüklendi!");
+      window.qrcodeLoaded = true;
+    }
+  </script>
+  
+  <script>
+    // TOTP (Time-based One-Time Password) Fonksiyonları
+    // Base32 decode
+    function base32Decode(str) {
+      const base32chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      let bits = 0;
+      let value = 0;
+      let index = 0;
+      const output = new Uint8Array(((str.length * 5) / 8) | 0);
+      
+      for (let i = 0; i < str.length; i++) {
+        value = (value << 5) | base32chars.indexOf(str[i].toUpperCase());
+        bits += 5;
+        if (bits >= 8) {
+          output[index++] = (value >>> (bits - 8)) & 255;
+          bits -= 8;
+        }
+      }
+      return output;
+    }
+
+    // HMAC-SHA1
+    async function hmacSha1(key, message) {
+      const cryptoKey = await crypto.subtle.importKey(
+        'raw',
+        key,
+        { name: 'HMAC', hash: 'SHA-1' },
+        false,
+        ['sign']
+      );
+      const signature = await crypto.subtle.sign('HMAC', cryptoKey, message);
+      return new Uint8Array(signature);
+    }
+
+    // TOTP kod üret
+    async function generateTOTP(secret, timeStep = 30) {
+      const time = Math.floor(Date.now() / 1000 / timeStep);
+      const timeBuffer = new ArrayBuffer(8);
+      const timeView = new DataView(timeBuffer);
+      timeView.setUint32(4, time, false);
+      
+      const key = base32Decode(secret);
+      const hmac = await hmacSha1(key, timeBuffer);
+      
+      const offset = hmac[hmac.length - 1] & 0x0f;
+      const code = ((hmac[offset] & 0x7f) << 24) |
+                   ((hmac[offset + 1] & 0xff) << 16) |
+                   ((hmac[offset + 2] & 0xff) << 8) |
+                   (hmac[offset + 3] & 0xff);
+      
+      return (code % 1000000).toString().padStart(6, '0');
+    }
+
+    // TOTP doğrula (30 saniye tolerans)
+    async function verifyTOTP(secret, code) {
+      const currentCode = await generateTOTP(secret);
+      if (currentCode === code) return true;
+      
+      // Önceki ve sonraki zaman dilimlerini de kontrol et
+      const time = Math.floor(Date.now() / 1000 / 30);
+      for (let i = -1; i <= 1; i++) {
+        const testTime = time + i;
+        const timeBuffer = new ArrayBuffer(8);
+        const timeView = new DataView(timeBuffer);
+        timeView.setUint32(4, testTime, false);
+        
+        const key = base32Decode(secret);
+        const hmac = await hmacSha1(key, timeBuffer);
+        
+        const offset = hmac[hmac.length - 1] & 0x0f;
+        const testCode = ((hmac[offset] & 0x7f) << 24) |
+                         ((hmac[offset + 1] & 0xff) << 16) |
+                         ((hmac[offset + 2] & 0xff) << 8) |
+                         (hmac[offset + 3] & 0xff);
+        const testCodeStr = (testCode % 1000000).toString().padStart(6, '0');
+        if (testCodeStr === code) return true;
+      }
+      return false;
+    }
+
+    // Rastgele secret key üret
+    function generateSecret() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      let secret = '';
+      for (let i = 0; i < 16; i++) {
+        secret += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return secret;
+    }
+
+    // Basit hash fonksiyonu (SHA-256)
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
+    // Şifre kontrolü (varsayılan şifre: "admin123" - hash'lenmiş hali)
+    const ADMIN_PASSWORD_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'; // "admin123"
+    
+    // 2FA Secret Key (localStorage'da saklanır, ilk kurulumda oluşturulur)
+    let twoFactorSecret = localStorage.getItem('admin2FASecret');
+    let twoFactorEnabled = localStorage.getItem('admin2FAEnabled') === 'true';
+
+    // Rate limiting (Brute force koruması)
+    const MAX_LOGIN_ATTEMPTS = 5;
+    const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 dakika
+    const ATTEMPT_RESET_TIME = 60 * 1000; // 1 dakika
+
+    function getLoginAttempts() {
+      const attempts = localStorage.getItem('loginAttempts');
+      return attempts ? JSON.parse(attempts) : { count: 0, lastAttempt: 0, lockoutUntil: 0 };
+    }
+
+    function setLoginAttempts(attempts) {
+      localStorage.setItem('loginAttempts', JSON.stringify(attempts));
+    }
+
+    function resetLoginAttempts() {
+      localStorage.removeItem('loginAttempts');
+    }
+
+    function checkLoginLockout() {
+      const attempts = getLoginAttempts();
+      const now = Date.now();
+
+      // Lockout süresi dolmuş mu kontrol et
+      if (attempts.lockoutUntil > 0 && now < attempts.lockoutUntil) {
+        const remainingMinutes = Math.ceil((attempts.lockoutUntil - now) / 60000);
+        return {
+          locked: true,
+          message: `Çok fazla başarısız giriş denemesi. Lütfen ${remainingMinutes} dakika sonra tekrar deneyin.`
+        };
+      }
+
+      // Lockout süresi dolmuşsa sıfırla
+      if (attempts.lockoutUntil > 0 && now >= attempts.lockoutUntil) {
+        resetLoginAttempts();
+        return { locked: false };
+      }
+
+      // 1 dakika geçmişse sayacı sıfırla
+      if (now - attempts.lastAttempt > ATTEMPT_RESET_TIME) {
+        resetLoginAttempts();
+        return { locked: false };
+      }
+
+      return { locked: false, attempts: attempts.count };
+    }
+
+    function recordFailedLogin() {
+      const attempts = getLoginAttempts();
+      const now = Date.now();
+      
+      attempts.count += 1;
+      attempts.lastAttempt = now;
+
+      if (attempts.count >= MAX_LOGIN_ATTEMPTS) {
+        attempts.lockoutUntil = now + LOCKOUT_DURATION;
+        setLoginAttempts(attempts);
+        return {
+          locked: true,
+          message: `Çok fazla başarısız giriş denemesi. Hesabınız 15 dakika süreyle kilitlendi.`
+        };
+      }
+
+      setLoginAttempts(attempts);
+      return {
+        locked: false,
+        remaining: MAX_LOGIN_ATTEMPTS - attempts.count
+      };
+    }
+
+    // QRCode kütüphanesinin yüklendiğini kontrol et
+    let qrCodeCheckAttempts = 0;
+    const MAX_QRCODE_CHECK_ATTEMPTS = 100; // 10 saniye (100 * 100ms)
+    
+    function waitForQRCode(callback) {
+      qrCodeCheckAttempts++;
+      
+      // QRCode'un yüklenip yüklenmediğini kontrol et
+      const qrCodeAvailable = typeof QRCode !== 'undefined' || 
+                              typeof window.QRCode !== 'undefined' ||
+                              window.qrcodeLoaded === true;
+      
+      if (qrCodeAvailable) {
+        console.log('✅ QRCode kütüphanesi yüklendi');
+        qrCodeCheckAttempts = 0;
+        callback();
+      } else if (qrCodeCheckAttempts >= MAX_QRCODE_CHECK_ATTEMPTS) {
+        console.error('❌ QRCode kütüphanesi yüklenemedi! Maksimum deneme sayısına ulaşıldı.');
+        showQRCodeError();
+        // Yine de callback'i çağır (manuel anahtar kullanılabilir)
+        callback();
+      } else {
+        setTimeout(() => waitForQRCode(callback), 100);
+      }
+    }
+    
+    // QR kod hatası göster
+    function showQRCodeError() {
+      const qrContainer = document.getElementById('qrcode');
+      if (qrContainer) {
+        qrContainer.innerHTML = `
+          <div class="qr-error">
+            <p>❌ QR kod kütüphanesi yüklenemedi</p>
+            <p>Lütfen internet bağlantınızı kontrol edin ve sayfayı yenileyin</p>
+            <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Sayfayı Yenile</button>
+          </div>
+        `;
+      }
+    }
+
+    // Sayfa yüklendiğinde kontrol et
+    window.addEventListener('DOMContentLoaded', () => {
+      // Accordion'ı başlat
+      initAccordion();
+      
+      waitForQRCode(() => {
+        // 2FA kurulumu yapılmış mı kontrol et
+        if (!twoFactorSecret || !twoFactorEnabled) {
+          // İlk kurulum
+          showSetup();
+        } else {
+          // Normal giriş, 2FA aktif
+          showLogin();
+          document.getElementById('twoFactorGroup').classList.remove('hidden');
+          // 2FA kodunu otomatik üret ve göster
+          startAutoGenerateCode();
+        }
+      });
+    });
+
+    // 2FA kodunu otomatik üret ve göster
+    async function startAutoGenerateCode() {
+      if (!twoFactorSecret || !twoFactorEnabled) return;
+      
+      const twoFactorInput = document.getElementById('twoFactorCode');
+      if (!twoFactorInput) return;
+
+      // İlk kodu hemen üret
+      updateAutoCode();
+      
+      // Her 30 saniyede bir güncelle
+      setInterval(() => {
+        updateAutoCode();
+      }, 30000);
+    }
+
+    // Otomatik kodu güncelle
+    async function updateAutoCode() {
+      if (!twoFactorSecret) return;
+      
+      try {
+        const code = await generateTOTP(twoFactorSecret);
+        const twoFactorInput = document.getElementById('twoFactorCode');
+        const codeDisplay = document.getElementById('autoCodeDisplay');
+        
+        if (twoFactorInput && codeDisplay) {
+          // Sadece göster, otomatik doldurma (kullanıcı manuel girebilir)
+          codeDisplay.textContent = `Güncel kod: ${code}`;
+        }
+      } catch (error) {
+        console.error('Kod üretme hatası:', error);
+      }
+    }
+
+    // Setup göster
+    function showSetup() {
+      console.log('🔍 [DEBUG] showSetup() çağrıldı');
+      
+      // Setup accordion'ı aç
+      const setupAccordion = document.getElementById('setupAccordion');
+      const setupBody = document.getElementById('setupBody');
+      const setupHeader = setupAccordion?.querySelector('.ac-header');
+      console.log('🔍 [DEBUG] Setup Accordion:', setupAccordion);
+      console.log('🔍 [DEBUG] Setup Body:', setupBody);
+      
+      if (setupAccordion && setupBody) {
+        const setupHeader = setupAccordion.querySelector('.ac-header');
+        openAccordionItem(setupAccordion, setupBody, setupHeader);
+        console.log('✅ [DEBUG] Setup accordion açıldı');
+        
+        // Accordion açıldığında smooth scroll yap
+        setTimeout(() => {
+          if (setupHeader) {
+            const headerRect = setupHeader.getBoundingClientRect();
+            const headerTop = headerRect.top + window.pageYOffset;
+            const offset = 30; // Üstten boşluk
+            
+            window.scrollTo({
+              top: Math.max(0, headerTop - offset),
+              behavior: 'smooth'
+            });
+          }
+        }, 200);
+      } else {
+        console.error('❌ [DEBUG] Setup accordion elementleri bulunamadı!');
+      }
+      
+      // Login accordion'ı kapat
+      const loginAccordion = document.getElementById('loginAccordion');
+      const loginBody = document.getElementById('loginBody');
+      if (loginAccordion && loginBody && loginBody.classList.contains('open')) {
+        closeAccordionItem(loginAccordion, loginBody);
+      }
+      
+      // Yeni secret oluştur
+      if (!twoFactorSecret) {
+        twoFactorSecret = generateSecret();
+        console.log('✅ [DEBUG] Yeni secret oluşturuldu:', twoFactorSecret);
+      } else {
+        console.log('🔍 [DEBUG] Mevcut secret kullanılıyor:', twoFactorSecret);
+      }
+      
+      // QR kod otomatik oluştur
+      console.log('🔍 [DEBUG] generateQRCode() çağrılıyor...');
+      generateQRCode();
+      
+      // Secret key göster
+      const secretKeyElement = document.getElementById('secretKey');
+      if (secretKeyElement) {
+        secretKeyElement.value = twoFactorSecret;
+        console.log('✅ [DEBUG] Secret key gösterildi');
+      } else {
+        console.error('❌ [DEBUG] Secret key elementi bulunamadı!');
+      }
+      
+      // Otomatik kod üret ve göster (kurulum için)
+      startSetupAutoCode();
+    }
+
+    // QR kod oluşturuldu mu kontrolü
+    let qrCodeGenerated = false;
+    let currentQRSecret = null;
+
+    // QR kod otomatik oluştur
+    function generateQRCode() {
+      console.log('🔍 [DEBUG] generateQRCode() çağrıldı');
+      console.log('🔍 [DEBUG] twoFactorSecret:', twoFactorSecret);
+      
+      if (!twoFactorSecret) {
+        console.error('❌ [DEBUG] twoFactorSecret tanımsız!');
+        return;
+      }
+      
+      // QR kod zaten oluşturulmuş ve secret aynıysa tekrar oluşturma
+      if (qrCodeGenerated && currentQRSecret === twoFactorSecret) {
+        console.log('✅ QR kod zaten oluşturulmuş ve secret aynı, tekrar oluşturulmuyor');
+        return;
+      }
+      
+      const otpAuthUrl = `otpauth://totp/Bambinifojo:Admin?secret=${twoFactorSecret}&issuer=Bambinifojo&algorithm=SHA1&digits=6&period=30`;
+      console.log('🔍 [DEBUG] OTP Auth URL:', otpAuthUrl);
+      
+      const qrContainer = document.getElementById('qrcode');
+      console.log('🔍 [DEBUG] QR Container:', qrContainer);
+      
+      if (!qrContainer) {
+        console.error('❌ [DEBUG] QR container bulunamadı!');
+        console.error('❌ [DEBUG] Sayfada #qrcode ID\'li element var mı kontrol et');
+        return;
+      }
+      
+      // QRCode kütüphanesi kontrolü
+      const QRCodeLib = typeof QRCode !== 'undefined' ? QRCode : (typeof window.QRCode !== 'undefined' ? window.QRCode : null);
+      
+      if (!QRCodeLib) {
+        console.error('❌ QRCode kütüphanesi yüklenmemiş!');
+        qrContainer.innerHTML = `
+          <div class="qr-error">
+            <p>❌ QR kod kütüphanesi yüklenemedi</p>
+            <p>Manuel anahtarı kullanarak ekleyebilirsiniz</p>
+            <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Sayfayı Yenile</button>
+          </div>
+        `;
+        return;
+      }
+      
+      console.log('✅ QRCode kütüphanesi mevcut');
+      
+      // Loading göster
+      qrContainer.innerHTML = `
+        <div class="qr-loading">
+          <div class="spinner-qr"></div>
+          <p>QR kod oluşturuluyor...</p>
+        </div>
+      `;
+      
+      // QR kod boyutu - küçültülmüş versiyon
+      const qrSize = 140; // Sabit 140x140 boyut
+      
+      // QR kod oluştur - toDataURL kullanarak (daha güvenilir)
+      try {
+        // Önce bir canvas elementi oluştur
+        const canvas = document.createElement('canvas');
+        canvas.id = 'qrcode-canvas';
+        
+        QRCodeLib.toCanvas(canvas, otpAuthUrl, {
+          width: qrSize,
+          margin: 2,
+          color: {
+            dark: '#1a1a1a',
+            light: '#ffffff'
+          },
+          errorCorrectionLevel: 'M'
+        }, (error) => {
+          if (error) {
+            console.error('❌ QR kod oluşturma hatası:', error);
+            qrContainer.innerHTML = `
+              <div class="qr-error">
+                <p>❌ QR kod oluşturulamadı</p>
+                <p>Hata: ${error.message || error}</p>
+                <p>Manuel anahtarı kullanarak ekleyebilirsiniz</p>
+              </div>
+            `;
+          } else {
+            console.log('✅ Canvas başarıyla oluşturuldu');
+            
+            // Container'ı temizle ve canvas'ı ekle
+            qrContainer.innerHTML = '';
+            qrContainer.appendChild(canvas);
+            
+            // Canvas stilleri
+            canvas.className = 'qr-canvas';
+            canvas.style.display = 'block';
+            canvas.style.margin = '0 auto';
+            canvas.style.width = '140px';
+            canvas.style.height = '140px';
+            canvas.style.border = '3px solid #f0f0f0';
+            canvas.style.borderRadius = '10px';
+            canvas.style.padding = '8px';
+            canvas.style.background = 'white';
+            canvas.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
+            
+            // QR kod animasyonu
+            canvas.style.opacity = '0';
+            canvas.style.transform = 'scale(0.9)';
+            canvas.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+              canvas.style.opacity = '1';
+              canvas.style.transform = 'scale(1)';
+              console.log('✅ QR kod animasyonu tamamlandı');
+            }, 100);
+            
+            // QR kod tıklanabilir yap (büyütme için)
+            canvas.addEventListener('click', () => {
+              const newWindow = window.open('', '_blank');
+              newWindow.document.write(`
+                <html>
+                  <head>
+                    <title>QR Kod - Büyük Görünüm</title>
+                    <style>
+                      body {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
+                        margin: 0;
+                        background: #f5f5f5;
+                        font-family: Arial, sans-serif;
+                      }
+                      img {
+                        max-width: 90vw;
+                        max-height: 90vh;
+                        border: 8px solid white;
+                        border-radius: 20px;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                      }
+                    </style>
+                  </head>
+                  <body>
+                    <img src="${canvas.toDataURL()}" alt="QR Kod">
+                  </body>
+                </html>
+              `);
+            });
+            
+            canvas.style.cursor = 'pointer';
+            canvas.title = 'Büyük görünüm için tıklayın';
+            
+            // QR kod başarıyla oluşturuldu işaretle
+            qrCodeGenerated = true;
+            currentQRSecret = twoFactorSecret;
+            
+            console.log('✅ QR kod başarıyla oluşturuldu ve gösterildi');
+            console.log('✅ QR kod sabit kalacak (secret değişmediği sürece tekrar oluşturulmayacak)');
+          }
+        });
+      } catch (error) {
+        console.error('❌ QR kod oluşturma hatası:', error);
+        qrContainer.innerHTML = `
+          <div class="qr-error">
+            <p>❌ QR kod oluşturulamadı</p>
+            <p>Hata: ${error.message || error}</p>
+            <p>Manuel anahtarı kullanarak ekleyebilirsiniz</p>
+          </div>
+        `;
+      }
+    }
+
+    // Kurulum için otomatik kod üret
+    async function startSetupAutoCode() {
+      if (!twoFactorSecret) return;
+      
+      const verifyInput = document.getElementById('verifyCode');
+      if (!verifyInput) return;
+
+      // İlk kodu hemen üret ve göster
+      updateSetupCode();
+      
+      // Her 30 saniyede bir güncelle
+      setInterval(() => {
+        updateSetupCode();
+      }, 30000);
+    }
+
+    // Kurulum kodunu güncelle
+    async function updateSetupCode() {
+      if (!twoFactorSecret) return;
+      
+      try {
+        const code = await generateTOTP(twoFactorSecret);
+        const verifyInput = document.getElementById('verifyCode');
+        const codeHint = document.getElementById('setupCodeHint');
+        
+        if (codeHint) {
+          codeHint.textContent = `💡 İpucu: Güncel kod ${code} (otomatik doldurmak için tıklayın)`;
+          codeHint.style.cursor = 'pointer';
+          codeHint.onclick = () => {
+            if (verifyInput) {
+              verifyInput.value = code;
+              verifyInput.focus();
+            }
+          };
+        }
+      } catch (error) {
+        console.error('Kod üretme hatası:', error);
+      }
+    }
+
+    // Login göster
+    function showLogin() {
+      // Login accordion'ı aç
+      const loginAccordion = document.getElementById('loginAccordion');
+      const loginBody = document.getElementById('loginBody');
+      if (loginAccordion && loginBody) {
+        const loginHeader = loginAccordion.querySelector('.ac-header');
+        openAccordionItem(loginAccordion, loginBody, loginHeader);
+        
+        // Password input'a focus
+        setTimeout(() => {
+          const passwordInput = document.getElementById('password');
+          if (passwordInput) {
+            passwordInput.focus();
+          }
+        }, 500);
+      }
+      
+      // Setup accordion'ı kapat
+      const setupAccordion = document.getElementById('setupAccordion');
+      const setupBody = document.getElementById('setupBody');
+      if (setupAccordion && setupBody && setupBody.classList.contains('open')) {
+        closeAccordionItem(setupAccordion, setupBody);
+      }
+    }
+
+    // Accordion açma/kapama fonksiyonu
+    function initAccordion() {
+      const headers = document.querySelectorAll('.ac-header');
+      
+      headers.forEach((header) => {
+        header.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const acItem = header.closest('.ac-item');
+          const body = header.nextElementSibling;
+          
+          if (!body || !body.classList.contains('ac-body')) {
+            return;
+          }
+          
+          const wasOpen = body.classList.contains('open');
+          
+          // Diğer accordion'ları kapat
+          document.querySelectorAll('.ac-item').forEach((item) => {
+            if (item !== acItem) {
+              const otherBody = item.querySelector('.ac-body');
+              if (otherBody && otherBody.classList.contains('open')) {
+                closeAccordionItem(item, otherBody);
+              }
+            }
+          });
+          
+          // Tıklanan accordion'ı aç/kapat
+          if (wasOpen) {
+            closeAccordionItem(acItem, body);
+          } else {
+            openAccordionItem(acItem, body, header);
+          }
+        });
+      });
+    }
+
+    // Accordion açma fonksiyonu
+    function openAccordionItem(acItem, body, header) {
+      // Önce padding'i ayarla ki scrollHeight doğru hesaplansın
+      const isMobile = window.innerWidth <= 768;
+      const padding = isMobile ? (window.innerWidth <= 480 ? '14px 10px' : '16px 12px') : '20px 16px';
+      
+      body.style.padding = padding;
+      body.style.maxHeight = '0px';
+      body.style.display = 'block';
+      body.style.overflow = 'hidden';
+      
+      // scrollHeight'ı al
+      const scrollHeight = body.scrollHeight;
+      
+      // Açık duruma geç
+      body.classList.add('open');
+      acItem.classList.add('active');
+      
+      // Animasyon için max-height ayarla
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          body.style.maxHeight = scrollHeight + 50 + 'px'; // Biraz ekstra alan
+        });
+      });
+      
+      // Animasyon bitince overflow'u düzelt
+      setTimeout(() => {
+        body.style.overflow = '';
+        body.style.maxHeight = '';
+      }, 400);
+      
+      // Accordion açıldığında smooth scroll yap
+      setTimeout(() => {
+        if (header) {
+          const headerRect = header.getBoundingClientRect();
+          const headerTop = headerRect.top + window.pageYOffset;
+          const offset = 20;
+          
+          window.scrollTo({
+            top: Math.max(0, headerTop - offset),
+            behavior: 'smooth'
+          });
+        }
+      }, 250);
+    }
+
+    // Accordion kapatma fonksiyonu
+    function closeAccordionItem(acItem, body) {
+      const currentHeight = body.scrollHeight;
+      body.style.maxHeight = currentHeight + 'px';
+      body.style.overflow = 'hidden';
+      
+      // Reflow için
+      body.offsetHeight;
+      
+      requestAnimationFrame(() => {
+        body.style.maxHeight = '0px';
+        body.classList.remove('open');
+        acItem.classList.remove('active');
+        
+        // Animasyon bitince temizle
+        setTimeout(() => {
+          if (!body.classList.contains('open')) {
+            const isMobile = window.innerWidth <= 768;
+            const padding = isMobile ? (window.innerWidth <= 480 ? '0 10px' : '0 12px') : '0 16px';
+            body.style.padding = padding;
+            body.style.maxHeight = '';
+            body.style.overflow = '';
+          }
+        }, 400);
+      });
+    }
+
+    // Setup'ı atla
+    function skipSetup() {
+      if (confirm('2FA kurulumunu şimdilik atlamak istediğinize emin misiniz? Güvenlik için önerilmez.')) {
+        twoFactorEnabled = false;
+        localStorage.setItem('admin2FAEnabled', 'false');
+        showLogin();
+      }
+    }
+
+    // Setup doğrula
+    async function verifySetup() {
+      const codeInput = document.getElementById('verifyCode');
+      const code = codeInput.value.trim();
+      
+      if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+        showNotification('⚠️ Lütfen 6 haneli geçerli bir kod girin!', 'error');
+        codeInput.classList.add('error');
+        codeInput.focus();
+        return;
+      }
+
+      codeInput.classList.remove('error');
+      codeInput.disabled = true;
+      
+      try {
+        const isValid = await verifyTOTP(twoFactorSecret, code);
+        
+        if (isValid) {
+          // 2FA aktif et
+          localStorage.setItem('admin2FASecret', twoFactorSecret);
+          localStorage.setItem('admin2FAEnabled', 'true');
+          twoFactorEnabled = true;
+          
+          showNotification('✅ 2FA başarıyla kuruldu! Artık giriş yaparken telefonunuzdaki kodu girmeniz gerekecek.', 'success');
+          
+          setTimeout(() => {
+            showLogin();
+            document.getElementById('twoFactorGroup').classList.remove('hidden');
+          }, 1000);
+        } else {
+          showNotification('❌ Geçersiz kod! Lütfen telefonunuzdaki güncel kodu girin.', 'error');
+          codeInput.value = '';
+          codeInput.disabled = false;
+          codeInput.focus();
+          codeInput.classList.add('error');
+        }
+      } catch (error) {
+        console.error('2FA doğrulama hatası:', error);
+        showNotification('❌ Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+        codeInput.disabled = false;
+      }
+    }
+
+    // Secret key kopyala
+    function copySecret() {
+      const secretKeyElement = document.getElementById('secretKey');
+      if (secretKeyElement) {
+        const secret = secretKeyElement.value || secretKeyElement.textContent || secretKeyElement.innerText;
+        navigator.clipboard.writeText(secret).then(() => {
+          const btn = event?.target || document.querySelector('.copy-btn');
+          const originalText = btn?.textContent || btn?.innerHTML;
+          if (btn) {
+            btn.textContent = '✓';
+            btn.innerHTML = '✓';
+            btn.style.background = '#2ecc71';
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.innerHTML = originalText;
+              btn.style.background = '';
+            }, 1500);
+          }
+        }).catch(() => {
+          alert('Kopyalama başarısız!');
+        });
+      }
+    }
+
+    // Otomatik kod doldur
+    async function autoFillCode() {
+      if (!twoFactorSecret) {
+        alert('2FA kurulumu yapılmamış!');
+        return;
+      }
+
+      try {
+        const code = await generateTOTP(twoFactorSecret);
+        const twoFactorInput = document.getElementById('twoFactorCode');
+        if (twoFactorInput) {
+          twoFactorInput.value = code;
+          twoFactorInput.classList.remove('error');
+          twoFactorInput.focus();
+          
+          // Başarı animasyonu
+          twoFactorInput.style.animation = 'pulse 0.5s';
+          setTimeout(() => {
+            twoFactorInput.style.animation = '';
+          }, 500);
+        }
+      } catch (error) {
+        console.error('Kod üretme hatası:', error);
+        alert('Kod üretilirken bir hata oluştu!');
+      }
+    }
+
+    // Şifre göster/gizle
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        `;
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        `;
+      }
+    }
+
+    // Giriş işlemi
+    async function handleLogin(event) {
+      event.preventDefault();
+      
+      const passwordInput = document.getElementById('password');
+      const twoFactorInput = document.getElementById('twoFactorCode');
+      const errorMessage = document.getElementById('errorMessage');
+      const twoFactorError = document.getElementById('twoFactorError');
+      const loginBtn = document.getElementById('loginBtn');
+      let password = passwordInput.value.trim();
+      let twoFactorCode = twoFactorInput ? twoFactorInput.value.trim() : '';
+
+      // Hata mesajlarını temizle
+      errorMessage.textContent = '';
+      twoFactorError.textContent = '';
+      passwordInput.classList.remove('error');
+      if (twoFactorInput) twoFactorInput.classList.remove('error');
+      
+      // Rate limiting kontrolü
+      const lockoutCheck = checkLoginLockout();
+      if (lockoutCheck.locked) {
+        errorMessage.textContent = `🔒 ${lockoutCheck.message}`;
+        passwordInput.classList.add('error');
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span>🔒 Hesap Kilitli</span>';
+        return;
+      }
+
+      // Form validasyonu
+      if (!password || password.length === 0) {
+        errorMessage.textContent = '⚠️ Lütfen şifrenizi girin.';
+        passwordInput.classList.add('error');
+        passwordInput.focus();
+        return;
+      }
+
+      if (password.length < 3) {
+        errorMessage.textContent = '⚠️ Şifre çok kısa.';
+        passwordInput.classList.add('error');
+        passwordInput.focus();
+        return;
+      }
+
+      loginBtn.disabled = true;
+      const loginBtnText = document.getElementById('loginBtnText');
+      if (loginBtnText) {
+        loginBtnText.textContent = '⏳ Kontrol ediliyor...';
+      } else {
+        loginBtn.innerHTML = '<span>⏳ Kontrol ediliyor...</span>';
+      }
+
+      // Eğer 2FA aktifse ve kod girilmemişse, otomatik doldur
+      if (twoFactorEnabled && twoFactorSecret && (!twoFactorCode || twoFactorCode.length !== 6)) {
+        try {
+          twoFactorCode = await generateTOTP(twoFactorSecret);
+          if (twoFactorInput) {
+            twoFactorInput.value = twoFactorCode;
+          }
+        } catch (error) {
+          console.error('Otomatik kod üretme hatası:', error);
+        }
+      }
+
+      try {
+        // Şifreyi hash'le
+        const hashedPassword = await hashPassword(password);
+
+        // Şifre kontrolü
+        if (hashedPassword !== ADMIN_PASSWORD_HASH) {
+          const attemptResult = recordFailedLogin();
+          
+          if (attemptResult.locked) {
+            errorMessage.textContent = `🔒 ${attemptResult.message}`;
+            passwordInput.classList.add('error');
+            passwordInput.value = '';
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span>🔒 Hesap Kilitli</span>';
+            passwordInput.style.animation = 'shake 0.5s';
+            setTimeout(() => { passwordInput.style.animation = ''; }, 500);
+            return;
+          }
+
+          const remaining = attemptResult.remaining || (MAX_LOGIN_ATTEMPTS - getLoginAttempts().count);
+          errorMessage.textContent = `❌ Hatalı şifre! Kalan deneme hakkı: ${remaining}`;
+          passwordInput.classList.add('error');
+          passwordInput.value = '';
+          passwordInput.focus();
+          const loginBtnText = document.getElementById('loginBtnText');
+          if (loginBtnText) {
+            loginBtnText.textContent = '🔓 Giriş Yap';
+          } else {
+            loginBtn.innerHTML = '<span>🔓 Giriş Yap</span>';
+          }
+          loginBtn.disabled = false;
+          passwordInput.style.animation = 'shake 0.5s';
+          setTimeout(() => { passwordInput.style.animation = ''; }, 500);
+          return;
+        }
+
+        // Başarılı şifre girişi - deneme sayacını sıfırla
+        resetLoginAttempts();
+
+        // 2FA kontrolü (eğer aktifse)
+        if (twoFactorEnabled && twoFactorSecret) {
+          if (!twoFactorCode || twoFactorCode.length !== 6 || !/^\d{6}$/.test(twoFactorCode)) {
+            twoFactorError.textContent = '❌ Lütfen 6 haneli doğrulama kodunu girin!';
+            if (twoFactorInput) {
+              twoFactorInput.classList.add('error');
+              twoFactorInput.focus();
+            }
+            const loginBtnText = document.getElementById('loginBtnText');
+            if (loginBtnText) {
+              loginBtnText.textContent = '🔓 Giriş Yap';
+            } else {
+              loginBtn.innerHTML = '<span>🔓 Giriş Yap</span>';
+            }
+            loginBtn.disabled = false;
+            return;
+          }
+
+          const isValid2FA = await verifyTOTP(twoFactorSecret, twoFactorCode);
+          if (!isValid2FA) {
+            twoFactorError.textContent = '❌ Geçersiz doğrulama kodu! Lütfen telefonunuzdaki güncel kodu girin.';
+            if (twoFactorInput) {
+              twoFactorInput.classList.add('error');
+              twoFactorInput.value = '';
+              twoFactorInput.focus();
+              twoFactorInput.style.animation = 'shake 0.5s';
+              setTimeout(() => { twoFactorInput.style.animation = ''; }, 500);
+            }
+            const loginBtnText = document.getElementById('loginBtnText');
+            if (loginBtnText) {
+              loginBtnText.textContent = '🔓 Giriş Yap';
+            } else {
+              loginBtn.innerHTML = '<span>🔓 Giriş Yap</span>';
+            }
+            loginBtn.disabled = false;
+            return;
+          }
+        }
+
+        // Başarılı giriş
+        const sessionToken = btoa(Date.now().toString() + Math.random().toString() + Math.random().toString());
+        sessionStorage.setItem('adminSession', sessionToken);
+        sessionStorage.setItem('adminLoginTime', Date.now().toString());
+        sessionStorage.setItem('adminLastActivity', Date.now().toString());
+
+        // Başarı mesajı
+        const loginBtnText = document.getElementById('loginBtnText');
+        if (loginBtnText) {
+          loginBtnText.textContent = '✅ Başarılı! Yönlendiriliyor...';
+        } else {
+          loginBtn.innerHTML = '<span>✅ Başarılı! Yönlendiriliyor...</span>';
+        }
+        loginBtn.style.background = 'linear-gradient(135deg, #00c853 0%, #00a043 100%)';
+        loginBtn.disabled = true;
+
+        // Admin paneline yönlendir
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 800);
+
+      } catch (error) {
+        console.error('Giriş hatası:', error);
+        errorMessage.textContent = '❌ Bir hata oluştu. Lütfen tekrar deneyin.';
+        const loginBtnText = document.getElementById('loginBtnText');
+        if (loginBtnText) {
+          loginBtnText.textContent = '🔓 Giriş Yap';
+        } else {
+          loginBtn.innerHTML = '<span>🔓 Giriş Yap</span>';
+        }
+        loginBtn.disabled = false;
+      }
+    }
+
+    // Animasyonlar
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Enter tuşu ile gönder
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const activeElement = document.activeElement;
+        if (activeElement.id === 'password' || activeElement.id === 'twoFactorCode' || activeElement.id === 'verifyCode') {
+          if (document.getElementById('setupSection').classList.contains('hidden')) {
+            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+          } else {
+            verifySetup();
+          }
+        }
+      }
+    });
+
+    // Kod input'larında sadece rakam
+    document.addEventListener('input', (e) => {
+      if (e.target.id === 'twoFactorCode' || e.target.id === 'verifyCode') {
+        e.target.value = e.target.value.replace(/\D/g, '');
+        e.target.classList.remove('error');
+      }
+    });
+
+    // Notification göster
+    function showNotification(message, type = 'info') {
+      // Mevcut notification'ları kaldır
+      const existing = document.querySelectorAll('.notification');
+      existing.forEach(n => n.remove());
+
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+      notification.innerHTML = `
+        <span style="font-size: 1.2rem;">${icon}</span>
+        <span style="flex: 1; font-size: 0.875rem; color: #374151;">${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.2rem; padding: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">×</button>
+      `;
+
+      document.body.appendChild(notification);
+
+      // 5 saniye sonra otomatik kapat
+      setTimeout(() => {
+        notification.classList.add('hiding');
+        setTimeout(() => notification.remove(), 300);
+      }, 5000);
+    }
+
+    // Sayfa yüklendiğinde rate limiting durumunu kontrol et
+    window.addEventListener('DOMContentLoaded', () => {
+      const lockoutCheck = checkLoginLockout();
+      if (lockoutCheck.locked) {
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) {
+          errorMessage.textContent = `🔒 ${lockoutCheck.message}`;
+          const passwordInput = document.getElementById('password');
+          if (passwordInput) {
+            passwordInput.disabled = true;
+            passwordInput.classList.add('error');
+          }
+          const loginBtn = document.getElementById('loginBtn');
+          if (loginBtn) {
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span>🔒 Hesap Kilitli</span>';
+          }
+        }
+      }
+    });
+
+    // Input'lara focus olduğunda hata durumunu temizle
+    document.addEventListener('focusin', (e) => {
+      if (e.target.tagName === 'INPUT') {
+        e.target.classList.remove('error');
+        const errorMsg = e.target.parentElement.querySelector('.error-message');
+        if (errorMsg && errorMsg.textContent.trim() !== '') {
+          setTimeout(() => {
+            errorMsg.textContent = '';
+          }, 300);
+        }
+      }
+    });
+
+    // Form submit öncesi son validasyon
+    document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+      const passwordInput = document.getElementById('password');
+      if (!passwordInput || !passwordInput.value.trim()) {
+        e.preventDefault();
+        passwordInput?.focus();
+        return false;
+      }
+    });
+  </script>
+</body>
+</html>
+

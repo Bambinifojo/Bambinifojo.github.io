@@ -3,14 +3,1361 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin Paneli</title>
+<title>Admin Paneli - Bambinifojo</title>
 <link rel="stylesheet" href="styles.css"/>
+<script>
+  // Admin paneli güvenlik kontrolü
+  (function() {
+    // Session kontrolü
+    const adminSession = sessionStorage.getItem('adminSession');
+    const adminLoginTime = sessionStorage.getItem('adminLoginTime');
+    
+    // Session yoksa veya 8 saatten eskiyse login sayfasına yönlendir
+    if (!adminSession || !adminLoginTime) {
+      window.location.href = 'admin-login.html';
+      return;
+    }
+    
+    const loginTime = parseInt(adminLoginTime);
+    const currentTime = Date.now();
+    const eightHours = 8 * 60 * 60 * 1000; // 8 saat
+    
+    if (currentTime - loginTime > eightHours) {
+      // Session süresi dolmuş
+      sessionStorage.removeItem('adminSession');
+      sessionStorage.removeItem('adminLoginTime');
+      window.location.href = 'admin-login.html';
+      return;
+    }
+    
+    // Her 5 dakikada bir session'ı yenile
+    setInterval(() => {
+      const currentSession = sessionStorage.getItem('adminSession');
+      if (currentSession) {
+        sessionStorage.setItem('adminLoginTime', Date.now().toString());
+      }
+    }, 5 * 60 * 1000);
+  })();
+</script>
+<style>
+  /* Admin Panel Özel Stiller - Modern Tasarım */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .admin-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    position: relative;
+  }
+
+  .admin-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #adminPanel {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .admin-header {
+    background: rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 35px 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .admin-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+  }
+
+  .admin-header h1 {
+    margin: 0 0 10px 0;
+    color: #1a1a1a;
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .admin-header p {
+    color: #666;
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  .admin-card {
+    background: rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease;
+  }
+
+  .admin-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .admin-card h2 {
+    margin: 0 0 24px 0;
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .admin-card h2 svg {
+    width: 26px;
+    height: 26px;
+    color: #667eea;
+  }
+
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+  }
+
+  .stat-item:hover {
+    background: #f9f9f9;
+    margin: 0 -15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 10px;
+  }
+
+  .stat-item:last-child {
+    border-bottom: none;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .stat-value {
+    color: #1a1a1a;
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background: #fff;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .form-group input.error,
+  .form-group textarea.error {
+    border-color: #ff4444;
+    box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.1);
+  }
+
+  .form-group .error-message {
+    color: #ff4444;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    display: block;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .features-input {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .feature-tag-input {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  .feature-tag-input button {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .feature-tag-input button:hover {
+    color: #ff4444;
+  }
+
+  .add-feature {
+    display: flex;
+    gap: 10px;
+  }
+
+  .add-feature input {
+    flex: 1;
+  }
+
+  .btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    font-family: inherit;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .btn span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-secondary {
+    background: #f5f5f5;
+    color: #333;
+    border: 2px solid #e0e0e0;
+  }
+
+  .btn-secondary:hover {
+    background: #e8e8e8;
+    border-color: #d0d0d0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+  }
+
+  .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(255, 68, 68, 0.4);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #00c853 0%, #00a043 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+  }
+
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 200, 83, 0.4);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .apps-list {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  .apps-list::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .apps-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .apps-list::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+  }
+
+  .apps-list::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+  }
+
+  .app-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .app-item:hover {
+    background: #fff;
+    border-color: #e0e0e0;
+    transform: translateX(4px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .app-item-info {
+    flex: 1;
+  }
+
+  .app-item-title {
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+
+  .app-item-desc {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .app-item-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-sm {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+
+  /* Success/Error Messages */
+  .alert {
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .alert-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 2px solid #4caf50;
+  }
+
+  .alert-error {
+    background: #ffebee;
+    color: #c62828;
+    border: 2px solid #f44336;
+  }
+
+  .alert-info {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 2px solid #2196f3;
+  }
+
+  .login-section-inline {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 25px;
+    min-width: 300px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .login-section-inline .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .login-section-inline .form-group input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mode-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: #f5f5f5;
+    padding: 6px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+  }
+
+  .mode-toggle button {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    color: #666;
+    font-family: inherit;
+  }
+
+  .mode-toggle button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .mode-toggle button:hover:not(.active) {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+  }
+
+  /* Modal/Overlay System */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+  }
+
+  /* Modal açıkken body scroll'u engelle */
+  body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 0;
+    max-width: 800px;
+    width: 100%;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+    position: relative;
+    margin: auto;
+  }
+
+  .modal-content::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .modal-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+  }
+
+  .modal-content::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+  }
+
+  .modal-overlay.active .modal-content {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-header {
+    padding: 30px 35px;
+    border-bottom: 2px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .modal-header h2 {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 1.8rem;
+    font-weight: 700;
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+  }
+
+  .modal-close {
+    background: #f5f5f5;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    color: #666;
+    flex-shrink: 0;
+    margin-left: 15px;
+  }
+
+  .modal-close:hover {
+    background: #e0e0e0;
+    transform: rotate(90deg);
+  }
+
+  .modal-body {
+    padding: 35px;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .site-form-section {
+    padding: 20px 0;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .site-form-section h3 {
+    margin: 0 0 24px 0;
+    color: #1a1a1a;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  /* Section Tabs */
+  .section-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0;
+  }
+
+  .section-tab {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -2px;
+    font-family: inherit;
+  }
+
+  .section-tab:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  .section-tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  /* Loading Spinner */
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Feature Tags */
+  .features-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .feature-tag {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeInUp 0.3s ease;
+  }
+
+  .feature-tag button {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    padding: 0;
+  }
+
+  .feature-tag button:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 768px) {
+    .admin-container {
+      padding: 15px;
+    }
+
+    .admin-header {
+      padding: 25px 20px;
+    }
+
+    .admin-header h1 {
+      font-size: 1.8rem;
+    }
+
+    .admin-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .admin-card {
+      padding: 20px;
+    }
+
+    .app-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .app-item-actions {
+      width: 100%;
+    }
+
+    .app-item-actions .btn {
+      flex: 1;
+    }
+
+    /* Modal Optimizasyonları - Mobil */
+    .modal-overlay {
+      padding: 10px;
+      align-items: flex-start;
+      padding-top: 20px;
+    }
+
+    .modal-content {
+      max-width: 100%;
+      max-height: calc(100vh - 20px);
+      border-radius: 20px;
+      margin: 0;
+    }
+
+    .modal-content-large {
+      max-width: 100%;
+    }
+
+    .modal-header {
+      padding: 20px 18px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .modal-header h2 {
+      font-size: 1.4rem;
+      padding-right: 10px;
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+      margin-left: 10px;
+    }
+
+    .modal-body {
+      padding: 20px 18px;
+    }
+
+    .section-tabs {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    .section-tab {
+      white-space: nowrap;
+      font-size: 0.85rem;
+      padding: 10px 16px;
+    }
+
+    .site-form-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 12px 16px;
+      font-size: 0.95rem;
+    }
+
+    .form-actions {
+      margin-top: 24px;
+      flex-direction: column;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+    }
+
+    .login-section-inline {
+      min-width: 100%;
+    }
+  }
+
+  /* Küçük mobil cihazlar için ek optimizasyonlar */
+  @media (max-width: 480px) {
+    .modal-overlay {
+      padding: 5px;
+      padding-top: 10px;
+    }
+
+    .modal-content {
+      max-height: calc(100vh - 10px);
+      border-radius: 16px;
+    }
+
+    .modal-header {
+      padding: 16px 14px;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .modal-header h2 {
+      font-size: 1.2rem;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+    }
+
+    .modal-body {
+      padding: 16px 14px;
+    }
+
+    .section-tab {
+      font-size: 0.8rem;
+      padding: 8px 12px;
+    }
+
+    .site-form-section h3 {
+      font-size: 1.1rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 10px 14px;
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Utility Classes for Inline Styles */
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .form-group-compact {
+    margin-bottom: 10px;
+  }
+
+  .input-compact {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-flex {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .header-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-link {
+    text-decoration: none;
+  }
+
+  .actions-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .loading-text {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+  }
+
+  .add-feature {
+    margin-top: 10px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .modal-content-large {
+    max-width: 900px;
+  }
+
+  .textarea-code {
+    font-family: monospace;
+    min-height: 120px;
+  }
+
+  .textarea-medium {
+    min-height: 100px;
+  }
+
+  .alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    max-width: 400px;
+  }
+</style>
 <script defer src="admin.js"></script>
 </head>
 <body>
-<h1>Admin Paneli</h1>
-<input id="token" placeholder="GitHub Token"/>
-<button onclick="login()">Bağlan</button>
-<div id="panel"></div>
+  <div class="admin-container">
+    <!-- Admin Panel -->
+    <div id="adminPanel">
+      <div class="admin-header">
+        <div class="header-top">
+          <div>
+            <h1>📊 Admin Paneli</h1>
+            <p>Uygulamalarınızı ve site ayarlarınızı yönetin</p>
+          </div>
+          
+          <!-- Login Section (Header içinde) -->
+          <div class="login-section-inline">
+            <div class="mode-toggle">
+              <button id="localModeBtn" class="active" onclick="setMode('local')">LocalStorage</button>
+              <button id="githubModeBtn" onclick="setMode('github')">GitHub API</button>
+            </div>
+            <div class="form-group form-group-compact">
+              <input type="password" id="token" class="input-compact" placeholder="GitHub Token (opsiyonel)"/>
+            </div>
+            <div class="button-group">
+              <button class="btn btn-primary btn-flex" onclick="login()">
+                <span>🔓 Giriş Yap</span>
+              </button>
+              <button class="btn btn-secondary hidden" onclick="logout()" id="logoutBtn">
+                <span>Çıkış</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <a href="index.html" class="btn btn-secondary btn-link">
+            <span>🏠 Ana Sayfaya Dön</span>
+          </a>
+          <button class="btn btn-success hidden" onclick="saveToGitHub()" id="saveGitHubBtn">
+            <span>💾 GitHub'a Kaydet</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <!-- İstatistikler -->
+        <div class="admin-card">
+          <h2>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="20" x2="12" y2="10"></line>
+              <line x1="18" y1="20" x2="18" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="16"></line>
+            </svg>
+            İstatistikler
+          </h2>
+          <div class="stat-item">
+            <span class="stat-label">Toplam Uygulama</span>
+            <span class="stat-value" id="totalApps">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Yayında Olan</span>
+            <span class="stat-value" id="publishedApps">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Yakında</span>
+            <span class="stat-value" id="comingSoonApps">0</span>
+          </div>
+        </div>
+
+        <!-- Hızlı İşlemler -->
+        <div class="admin-card">
+          <h2>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Hızlı İşlemler
+          </h2>
+          <div class="actions-column">
+            <button class="btn btn-primary" onclick="showAddForm()">
+              <span>➕ Yeni Uygulama Ekle</span>
+            </button>
+            <button class="btn btn-primary" onclick="showSiteSettings()">
+              <span>⚙️ Site Ayarları</span>
+            </button>
+            <button class="btn btn-secondary" onclick="exportData()">
+              <span>📥 Veriyi Dışa Aktar</span>
+            </button>
+            <button class="btn btn-secondary" onclick="importData()">
+              <span>📤 Veriyi İçe Aktar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Uygulama Listesi -->
+      <div class="admin-card">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+          Uygulamalar
+        </h2>
+        <div id="appsList" class="apps-list">
+          <p class="loading-text">Yükleniyor...</p>
+        </div>
+      </div>
+
+      <!-- Uygulama Ekleme/Düzenleme Modal -->
+      <div id="appFormModal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="formTitle">Yeni Uygulama Ekle</h2>
+            <button type="button" class="modal-close" onclick="closeAppModal()">✖</button>
+          </div>
+          <div class="modal-body">
+            <form id="appForm" onsubmit="saveApp(event)">
+          <input type="hidden" id="appIndex" value="-1">
+          
+          <div class="form-group">
+            <label>Uygulama Adı *</label>
+            <input type="text" id="appTitle" required placeholder="Örn: Task Cosmos"/>
+          </div>
+
+          <div class="form-group">
+            <label>Açıklama *</label>
+            <textarea id="appDescription" required placeholder="Uygulamanın kısa açıklaması..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>İkon (Emoji) *</label>
+            <input type="text" id="appIcon" required placeholder="📱" maxlength="2"/>
+            <small>Bir emoji girin (örn: 📱, 🌤️, 📝)</small>
+          </div>
+
+          <div class="form-group">
+            <label>Kategori *</label>
+            <input type="text" id="appCategory" required placeholder="Örn: Üretkenlik, Hava Durumu"/>
+          </div>
+
+          <div class="form-group">
+            <label>Rating (0-5) *</label>
+            <input type="number" id="appRating" required min="0" max="5" step="0.1" placeholder="4.5"/>
+          </div>
+
+          <div class="form-group">
+            <label>İndirme Sayısı *</label>
+            <input type="text" id="appDownloads" required placeholder="Örn: 10K+, 5K+"/>
+          </div>
+
+          <div class="form-group">
+            <label>Google Play Store Linki</label>
+            <input type="url" id="appDetails" placeholder="https://play.google.com/store/apps/details?id=..."/>
+            <small>Boş bırakılırsa "Yakında" butonu gösterilir</small>
+          </div>
+
+          <div class="form-group">
+            <label>Gizlilik Politikası Linki</label>
+            <input type="url" id="appPrivacy" placeholder="https://..."/>
+          </div>
+
+          <div class="form-group">
+            <label>Özellikler</label>
+            <div id="featuresList" class="features-input"></div>
+            <div class="add-feature">
+              <input type="text" id="newFeature" placeholder="Yeni özellik ekle..."/>
+              <button type="button" class="btn btn-secondary" onclick="addFeature()">Ekle</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <span>💾 Kaydet</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="cancelForm()">
+              <span>❌ İptal</span>
+            </button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+      <!-- Site Ayarları Modal -->
+      <div id="siteSettingsModal" class="modal-overlay">
+        <div class="modal-content modal-content-large">
+          <div class="modal-header">
+            <h2>⚙️ Site Ayarları</h2>
+            <button type="button" class="modal-close" onclick="closeSiteModal()">✖</button>
+          </div>
+          <div class="modal-body">
+            <div class="section-tabs">
+              <button class="section-tab active" onclick="showSiteSection('header')">📝 Header</button>
+              <button class="section-tab" onclick="showSiteSection('hero')">🚀 Hero</button>
+              <button class="section-tab" onclick="showSiteSection('about')">👤 Hakkımda</button>
+              <button class="section-tab" onclick="showSiteSection('skills')">⚡ Yetenekler</button>
+              <button class="section-tab" onclick="showSiteSection('contact')">✉️ İletişim</button>
+            </div>
+
+        <!-- Header Ayarları -->
+        <div id="siteHeaderForm" class="site-form-section">
+          <h3>Header Ayarları</h3>
+          <div class="form-group">
+            <label>Logo Metni</label>
+            <input type="text" id="siteHeaderLogo" placeholder="Bambinifojo"/>
+          </div>
+          <div class="form-group">
+            <label>Tagline</label>
+            <input type="text" id="siteHeaderTagline" placeholder="Mobil Uygulama Geliştirici"/>
+          </div>
+          <button class="btn btn-primary" onclick="saveSiteSection('header')">💾 Kaydet</button>
+        </div>
+
+        <!-- Hero Ayarları -->
+        <div id="siteHeroForm" class="site-form-section hidden">
+          <h3>Hero Bölümü Ayarları</h3>
+          <div class="form-group">
+            <label>Başlık</label>
+            <input type="text" id="siteHeroTitle" placeholder="Bambinifojo"/>
+          </div>
+          <div class="form-group">
+            <label>Tagline</label>
+            <textarea id="siteHeroTagline" placeholder="Açıklama metni..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Play Store URL</label>
+            <input type="url" id="siteHeroPlayStoreUrl" placeholder="https://play.google.com/..."/>
+          </div>
+          <div class="form-group">
+            <label>İstatistikler (JSON formatında)</label>
+            <textarea id="siteHeroStats" class="textarea-code" placeholder='[{"number":"2+","label":"Uygulama"}]'></textarea>
+            <small>Her istatistik: {"number": "2+", "label": "Uygulama"}</small>
+          </div>
+          <button class="btn btn-primary" onclick="saveSiteSection('hero')">💾 Kaydet</button>
+        </div>
+
+        <!-- About Ayarları -->
+        <div id="siteAboutForm" class="site-form-section hidden">
+          <h3>Hakkımda Bölümü Ayarları</h3>
+          <div class="form-group">
+            <label>Başlık</label>
+            <input type="text" id="siteAboutTitle" placeholder="Hakkımda"/>
+          </div>
+          <div class="form-group">
+            <label>Metinler (Her satır bir paragraf)</label>
+            <textarea id="siteAboutTexts" class="textarea-medium" placeholder="Paragraf 1&#10;Paragraf 2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Teknolojiler (Her satır: icon|isim)</label>
+            <textarea id="siteAboutTech" class="textarea-medium" placeholder="🤖|Android&#10;🎨|Flutter"></textarea>
+            <small>Format: Emoji|İsim (her satır bir teknoloji)</small>
+          </div>
+          <button class="btn btn-primary" onclick="saveSiteSection('about')">💾 Kaydet</button>
+        </div>
+
+        <!-- Skills Ayarları -->
+        <div id="siteSkillsForm" class="site-form-section hidden">
+          <h3>Yetenekler Bölümü Ayarları</h3>
+          <div class="form-group">
+            <label>Başlık</label>
+            <input type="text" id="siteSkillsTitle" placeholder="Teknolojiler & Yetenekler"/>
+          </div>
+          <div id="skillsListContainer"></div>
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" onclick="addSkillItem()">➕ Yetenek Ekle</button>
+          </div>
+          <button class="btn btn-primary" onclick="saveSiteSection('skills')">💾 Kaydet</button>
+        </div>
+
+        <!-- Contact Ayarları -->
+        <div id="siteContactForm" class="site-form-section hidden">
+          <h3>İletişim Bölümü Ayarları</h3>
+          <div class="form-group">
+            <label>Başlık</label>
+            <input type="text" id="siteContactTitle" placeholder="İletişim"/>
+          </div>
+          <div class="form-group">
+            <label>Alt Başlık</label>
+            <input type="text" id="siteContactSubtitle" placeholder="Açıklama metni..."/>
+          </div>
+          <div id="contactListContainer"></div>
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" onclick="addContactItem()">➕ İletişim Ekle</button>
+          </div>
+          <button class="btn btn-primary" onclick="saveSiteSection('contact')">💾 Kaydet</button>
+        </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert Container -->
+      <div id="alertContainer" class="alert-container"></div>
+    </div>
+  </div>
 </body>
 </html>

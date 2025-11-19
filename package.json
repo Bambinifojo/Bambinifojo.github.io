@@ -4,7 +4,7 @@
   "description": "Bambinifojo Portfolio Website",
   "scripts": {
     "build": "node build.js",
-    "serve": "npx http-server . -p 8080 -o",
+    "serve": "npx http-server . -p 3000 -o",
     "validate": "node validate.js"
   },
   "keywords": [

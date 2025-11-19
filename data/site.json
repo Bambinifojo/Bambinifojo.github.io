@@ -113,73 +113,7 @@
         }
       ]
     }
-  },
-  "apps": [
-    {
-      "title": "Task Cosmos",
-      "description": "Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama. Günlük işlerinizi kolayca takip edin ve organize edin.",
-      "icon": "📱",
-      "privacy": "https://bambinifojo.github.io/task-cosmos/privacy-policy.html",
-      "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos",
-      "rating": 4.8,
-      "downloads": "10K+",
-      "category": "Üretkenlik",
-      "features": ["Görev Takibi", "Hatırlatıcılar", "Kategoriler", "Widget Desteği"]
-    },
-    {
-      "title": "Weather Pro",
-      "description": "Gelişmiş hava durumu uygulaması. Detaylı tahminler, widget desteği ve güzel animasyonlarla hava durumunu takip edin.",
-      "icon": "🌤️",
-      "privacy": "#",
-      "details": "#",
-      "rating": 4.6,
-      "downloads": "5K+",
-      "category": "Hava Durumu",
-      "features": ["7 Günlük Tahmin", "Widget", "Animasyonlar", "Konum Bazlı"]
-    },
-    {
-      "title": "NoteSync",
-      "description": "Bulut tabanlı not alma uygulaması. Notlarınızı tüm cihazlarınızda senkronize edin ve hiçbir şeyi kaçırmayın.",
-      "icon": "📝",
-      "privacy": "#",
-      "details": "#",
-      "rating": 4.7,
-      "downloads": "8K+",
-      "category": "Not Alma",
-      "features": ["Bulut Senkronizasyon", "Çoklu Cihaz", "Arama", "Kategoriler"]
-    },
-    {
-      "title": "FitTracker",
-      "description": "Sağlık ve fitness takip uygulaması. Egzersizlerinizi kaydedin, ilerlemenizi görün ve hedeflerinize ulaşın.",
-      "icon": "💪",
-      "privacy": "#",
-      "details": "#",
-      "rating": 4.9,
-      "downloads": "15K+",
-      "category": "Sağlık & Fitness",
-      "features": ["Egzersiz Takibi", "İlerleme Grafikleri", "Hedefler", "İstatistikler"]
-    },
-    {
-      "title": "Expense Manager",
-      "description": "Akıllı harcama takip uygulaması. Giderlerinizi kategorilere ayırın, bütçe oluşturun ve finansal hedeflerinize ulaşın.",
-      "icon": "💰",
-      "privacy": "#",
-      "details": "#",
-      "rating": 4.5,
-      "downloads": "12K+",
-      "category": "Finans",
-      "features": ["Harcama Takibi", "Bütçe Yönetimi", "Raporlar", "Kategoriler"]
-    },
-    {
-      "title": "Music Player Pro",
-      "description": "Modern müzik çalar uygulaması. Yerel müziklerinizi çalın, playlist oluşturun ve müziğin keyfini çıkarın.",
-      "icon": "🎵",
-      "privacy": "#",
-      "details": "#",
-      "rating": 4.4,
-      "downloads": "20K+",
-      "category": "Müzik & Ses",
-      "features": ["Playlist", "Eşitleyici", "Widget", "Şarkı Sözleri"]
-    }
-  ]
+  }
 }
+
+
