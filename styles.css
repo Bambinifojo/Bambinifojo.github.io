@@ -3409,17 +3409,18 @@ html {
     cursor: not-allowed;
 }
 
-/* Responsive */
+/* Responsive - Mobil Uyumluluk İyileştirmeleri */
 @media (max-width: 768px) {
     .ai-assistant-modal {
-        width: calc(100vw - 20px);
-        height: calc(100vh - 100px);
-        bottom: 80px;
-        right: 10px;
-        left: 10px;
+        width: 100vw;
+        height: 100vh;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        top: 0;
         max-width: none;
         max-height: none;
-        border-radius: 16px;
+        border-radius: 0;
     }
 
     .ai-assistant-toggle {
@@ -3427,6 +3428,67 @@ html {
         height: 56px;
         bottom: 16px;
         right: 16px;
+        min-width: 56px;
+        min-height: 56px;
+    }
+
+    .ai-badge {
+        width: 22px;
+        height: 22px;
+        font-size: 0.7rem;
+        top: -3px;
+        right: -3px;
+    }
+
+    .ai-modal-header {
+        padding: 14px 16px;
+    }
+
+    .ai-logo {
+        font-size: 1rem;
+    }
+
+    .ai-header-btn {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    .ai-chat-messages {
+        padding: 16px;
+    }
+
+    .ai-message {
+        margin-bottom: 16px;
+    }
+
+    .ai-message-content {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .ai-input-wrapper {
+        padding: 12px;
+    }
+
+    .ai-message-input {
+        font-size: 16px; /* iOS zoom önleme */
+        padding: 12px 16px;
+        min-height: 48px;
+    }
+
+    .ai-send-btn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .ai-status-bar {
+        padding: 8px 12px;
+        font-size: 0.85rem;
     }
 
     .ai-content-types {
@@ -3435,7 +3497,60 @@ html {
 
     .ai-type-btn {
         font-size: 0.8rem;
-        padding: 6px 12px;
+        padding: 8px 14px;
+        min-height: 36px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ai-assistant-toggle {
+        width: 52px;
+        height: 52px;
+        bottom: 12px;
+        right: 12px;
+    }
+
+    .ai-badge {
+        width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+
+    .ai-modal-header {
+        padding: 12px 14px;
+    }
+
+    .ai-logo {
+        font-size: 0.95rem;
+        gap: 8px;
+    }
+
+    .ai-header-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .ai-chat-messages {
+        padding: 12px;
+    }
+
+    .ai-message-content {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+
+    .ai-input-wrapper {
+        padding: 10px;
+    }
+
+    .ai-message-input {
+        font-size: 16px;
+        padding: 10px 14px;
+    }
+
+    .ai-send-btn {
+        width: 40px;
+        height: 40px;
     }
 }
 
@@ -3568,4 +3683,446 @@ html {
 
 [data-theme="dark"] .ai-assistant-toggle:hover {
     box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
+}
+
+/* ============================================
+   KAPSAMLI MOBİL UYUMLULUK İYİLEŞTİRMELERİ
+   ============================================ */
+
+/* Genel Mobil İyileştirmeler */
+@media (max-width: 480px) {
+    /* Touch-friendly butonlar - minimum 44x44px */
+    button, .btn, a.btn, .btn-playstore, .btn-contact-link,
+    .btn-play-store, .btn-coming-soon, .btn-privacy,
+    .search-toggle, .theme-toggle, .hamburger {
+        min-width: 44px;
+        min-height: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(106, 90, 205, 0.2);
+    }
+
+    /* Font boyutları - okunabilirlik için minimum 16px */
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    /* Hero Section Mobil İyileştirmeleri */
+    .hero-section {
+        padding: 120px 16px 40px;
+        min-height: calc(100vh - 60px);
+    }
+
+    .hero-brand {
+        font-size: 2.5rem;
+        line-height: 1.2;
+        margin-bottom: 16px;
+    }
+
+    .hero-tagline {
+        font-size: 0.95rem;
+        margin-bottom: 32px;
+        padding: 0 8px;
+        line-height: 1.5;
+    }
+
+    .btn-playstore {
+        width: 100%;
+        max-width: 100%;
+        padding: 14px 24px;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+
+    .hero-stats {
+        flex-direction: column;
+        gap: 24px;
+        padding: 32px 20px;
+        margin-top: 40px;
+    }
+
+    .stat-item {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .stat-number {
+        font-size: 2.2rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+
+    /* Section Başlıkları */
+    .section-title {
+        font-size: 1.75rem;
+        margin-bottom: 24px;
+        padding: 0 16px;
+    }
+
+    /* About Section */
+    .about-section {
+        padding: 50px 16px;
+    }
+
+    .about-content {
+        max-width: 100%;
+    }
+
+    .about-main {
+        margin-top: 24px;
+        margin-bottom: 32px;
+    }
+
+    .about-text {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 16px;
+    }
+
+    .about-tech {
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: center;
+    }
+
+    .tech-item {
+        min-width: 100px;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+
+    /* Skills Section */
+    .skills-section {
+        padding: 50px 16px;
+    }
+
+    .skills-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0;
+    }
+
+    .skill-item {
+        padding: 20px;
+    }
+
+    .skill-item h4 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    /* Apps Section */
+    .apps-section {
+        padding: 50px 16px;
+    }
+
+    #apps-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0;
+    }
+
+    .app-card {
+        border-radius: 16px;
+        margin: 0;
+    }
+
+    .app-card-header {
+        padding: 20px 16px;
+        gap: 16px;
+    }
+
+    .app-icon-large {
+        width: 64px;
+        height: 64px;
+        min-width: 64px;
+        font-size: 1.8rem;
+    }
+
+    .app-title {
+        font-size: 1.3rem;
+    }
+
+    .app-category {
+        font-size: 0.85rem;
+    }
+
+    .app-description {
+        padding: 0 16px;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .app-features {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .app-feature-tag {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .app-actions {
+        padding: 16px;
+        gap: 10px;
+    }
+
+    .btn-play-store,
+    .btn-coming-soon,
+    .btn-privacy {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        min-height: 44px;
+    }
+
+    /* Contact Section */
+    .contact-section {
+        padding: 50px 16px;
+    }
+
+    .contact-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 32px;
+    }
+
+    .btn-contact-link {
+        width: 100%;
+        padding: 14px 24px;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+
+    /* Footer */
+    footer {
+        padding: 40px 16px 24px;
+    }
+
+    .footer-content {
+        gap: 32px;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .footer-links a {
+        font-size: 0.95rem;
+        padding: 8px 0;
+    }
+
+    .social-links {
+        gap: 16px;
+        justify-content: center;
+    }
+
+    .social-links a {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .footer-copyright {
+        font-size: 0.85rem;
+        text-align: center;
+    }
+
+    /* Header İyileştirmeleri */
+    .header-container {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .logo-wrapper {
+        gap: 8px;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        padding: 6px;
+    }
+
+    .logo {
+        font-size: 1.1rem;
+    }
+
+    .header-tagline {
+        display: none;
+    }
+
+    /* Top Butonlar - Mobil Düzeni */
+    .search-toggle {
+        width: 44px;
+        height: 44px;
+        top: 12px;
+        right: 60px;
+    }
+
+    .theme-toggle {
+        width: 44px;
+        height: 44px;
+        top: 12px;
+        right: 108px;
+    }
+
+    .hamburger {
+        width: 44px;
+        height: 44px;
+        top: 12px;
+        right: 12px;
+    }
+
+    /* Search Container */
+    .search-container {
+        padding-top: 70px;
+    }
+
+    .search-box {
+        min-width: calc(100% - 32px);
+        max-width: calc(100% - 32px);
+        padding: 12px 16px;
+        margin: 0 16px;
+    }
+
+    .search-input {
+        font-size: 16px; /* iOS zoom önleme */
+        padding: 10px 12px;
+    }
+
+    /* Sidebar Mobil İyileştirmeleri */
+    .sidebar {
+        width: 85vw;
+        max-width: 280px;
+        padding: 20px 16px;
+    }
+
+    .close-btn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 0;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .menu-item {
+        padding: 14px 16px;
+        font-size: 1rem;
+        margin-bottom: 10px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* App Card Butonları */
+    .app-card-actions {
+        gap: 8px;
+    }
+
+    /* Skills Progress Bar */
+    .skill-bar {
+        height: 8px;
+    }
+
+    .skill-progress {
+        height: 8px;
+    }
+}
+
+/* Tablet ve Küçük Ekranlar (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .hero-section {
+        padding: 140px 24px 50px;
+    }
+
+    .hero-brand {
+        font-size: 3rem;
+    }
+
+    .hero-tagline {
+        font-size: 1.05rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    #apps-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+    }
+
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .about-tech {
+        gap: 20px;
+    }
+}
+
+/* Küçük Mobil Cihazlar (max-width: 360px) */
+@media (max-width: 360px) {
+    .hero-brand {
+        font-size: 2rem;
+    }
+
+    .hero-tagline {
+        font-size: 0.9rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .sidebar {
+        width: 90vw;
+        max-width: 260px;
+    }
+
+    .app-card-header {
+        padding: 16px;
+    }
+
+    .app-icon-large {
+        width: 56px;
+        height: 56px;
+        font-size: 1.6rem;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+    }
+}
+
+/* Landscape Modu - Mobil */
+@media (max-width: 768px) and (orientation: landscape) {
+    .hero-section {
+        padding: 100px 20px 40px;
+        min-height: auto;
+    }
+
+    .hero-brand {
+        font-size: 2.5rem;
+    }
+
+    .hero-stats {
+        flex-direction: row;
+        gap: 20px;
+        padding: 24px 20px;
+    }
+
+    .ai-assistant-modal {
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+    }
 }

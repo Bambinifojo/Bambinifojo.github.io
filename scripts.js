@@ -632,12 +632,6 @@ document.addEventListener('DOMContentLoaded', () => {
     item.addEventListener('click', (e) => {
       const href = item.getAttribute('href');
       
-          // Admin linki ise direkt git (preventDefault yok)
-          if (href && (href.includes('admin.html') || href.includes('admin-login.html'))) {
-            closeMenu();
-            return; // Sayfa değişecek, preventDefault yapma
-          }
-      
       e.preventDefault();
       
       // Menüyü hemen kapat
