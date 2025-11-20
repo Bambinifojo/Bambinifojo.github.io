@@ -1563,6 +1563,12 @@
       gap: 20px;
     }
 
+    /* Stat Cards Grid - iPad Pro */
+    .stat-cards-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
     .dashboard-grid-2-1 {
       grid-template-columns: 1fr;
       gap: 20px;
@@ -1603,6 +1609,12 @@
 
     .admin-grid {
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+    }
+
+    /* Stat Cards Grid - iPad */
+    .stat-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
       gap: 18px;
     }
 
@@ -1819,7 +1831,7 @@
     /* Stat Cards Grid - Tablet */
     .stat-cards-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      gap: 18px;
     }
 
     /* Preview Container - Tablet */
@@ -2061,6 +2073,11 @@
     .stat-cards-grid {
       grid-template-columns: 1fr;
       gap: 16px;
+    }
+
+    /* Desktop'ta admin-grid için de düzeltme */
+    .admin-grid:not(.stat-cards-grid) {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
 
     .stat-card {
@@ -2592,9 +2609,17 @@
   /* Stat Cards Grid - Responsive */
   .stat-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     margin-bottom: 30px;
+  }
+
+  /* Desktop'ta stat kartları yan yana */
+  @media (min-width: 1200px) {
+    .stat-cards-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
   }
 
   /* Preview Container - Responsive */
@@ -3201,7 +3226,7 @@
             </div>
 
             <!-- Statistics Cards -->
-            <div class="admin-grid">
+            <div class="admin-grid stat-cards-grid">
               <div class="stat-card">
                 <div class="stat-card-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
