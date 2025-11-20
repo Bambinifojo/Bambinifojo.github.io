@@ -1906,6 +1906,8 @@
       transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
       overflow-y: auto;
+      /* iOS için smooth scrolling - modern tarayıcılarda desteklenmiyor ama iOS için gerekli */
+      /* stylelint-disable-next-line property-no-unknown */
       -webkit-overflow-scrolling: touch;
     }
 
@@ -2274,6 +2276,8 @@
       transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
       overflow-y: auto;
+      /* iOS için smooth scrolling - modern tarayıcılarda desteklenmiyor ama iOS için gerekli */
+      /* stylelint-disable-next-line property-no-unknown */
       -webkit-overflow-scrolling: touch;
     }
 
@@ -3932,7 +3936,7 @@
 
                   <div class="form-group">
                     <label>Zorunlu Güncelleme</label>
-                    <select id="force_update" required>
+                    <select id="force_update" required title="Zorunlu güncelleme durumunu seçin">
                       <option value="false">Hayır</option>
                       <option value="true">Evet</option>
                     </select>
@@ -3962,7 +3966,7 @@
 
                   <div class="form-group">
                     <label>Yayın Durumu</label>
-                    <select id="broadcast_enabled" required>
+                    <select id="broadcast_enabled" required title="Yayın durumunu seçin">
                       <option value="true">Açık</option>
                       <option value="false">Kapalı</option>
                     </select>
@@ -3976,7 +3980,7 @@
                   
                   <div class="form-group">
                     <label>Bakım Modu</label>
-                    <select id="maintenance" required>
+                    <select id="maintenance" required title="Bakım modu durumunu seçin">
                       <option value="false">Kapalı</option>
                       <option value="true">Açık</option>
                     </select>
@@ -4139,7 +4143,7 @@
 
           <div class="form-group">
             <label>Zorunlu Güncelleme</label>
-            <select id="appNotificationForceUpdate">
+            <select id="appNotificationForceUpdate" title="Uygulama için zorunlu güncelleme durumunu seçin">
               <option value="false">Hayır</option>
               <option value="true">Evet</option>
             </select>
@@ -4154,7 +4158,7 @@
 
           <div class="form-group">
             <label>Bildirim Aktif mi?</label>
-            <select id="appNotificationEnabled">
+            <select id="appNotificationEnabled" title="Uygulama bildirim durumunu seçin">
               <option value="false">Kapalı</option>
               <option value="true">Açık</option>
             </select>
@@ -4333,7 +4337,7 @@
 
               <div class="form-group">
                 <label>Rol</label>
-                <select id="userRole">
+                <select id="userRole" title="Kullanıcı rolünü seçin">
                   <option value="admin">Admin</option>
                   <option value="editor">Editör</option>
                   <option value="viewer">Görüntüleyici</option>
