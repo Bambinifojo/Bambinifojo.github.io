@@ -1,0 +1,11 @@
+{
+  "latest_version": "1.0.0",
+  "force_update": false,
+  "update_message": "Yeni sürüm mevcut! Daha iyi performans için güncelleyin.",
+  "broadcast_enabled": false,
+  "broadcast_title": "Yeni Görev Yayınlandı!",
+  "broadcast_message": "Yeni gezegen görevleri seni bekliyor!",
+  "maintenance": false,
+  "maintenance_message": "Bakım modu aktif. Lütfen daha sonra tekrar deneyin."
+}
+

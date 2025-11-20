@@ -2304,6 +2304,13 @@
             </svg>
             Geri Bildirimler
           </a>
+          <a href="#notifications" class="admin-nav-item" onclick="showSection('notifications')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            Bildirim Ayarları
+          </a>
         </div>
         <div class="admin-sidebar-section">
           <div class="admin-sidebar-title">Hızlı İşlemler</div>
@@ -2632,6 +2639,105 @@
               <div id="usersList" class="apps-list">
                 <p class="loading-text">Yükleniyor...</p>
               </div>
+            </div>
+          </div>
+
+          <!-- Notifications Section -->
+          <div id="notificationsSection" class="admin-section hidden">
+            <div class="admin-page-header">
+              <h1 class="admin-page-title">📢 Bildirim & Versiyon Yönetimi</h1>
+              <p class="admin-page-subtitle">Uygulama bildirimleri, güncellemeler ve bakım modu ayarlarını yönetin</p>
+            </div>
+
+            <div class="admin-card">
+              <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                Bildirim Ayarları
+              </h2>
+
+              <form id="notificationsForm" onsubmit="saveNotificationsConfig(event)">
+                <!-- Versiyon Yönetimi -->
+                <div class="site-form-section">
+                  <h3>📦 Versiyon Yönetimi</h3>
+                  
+                  <div class="form-group">
+                    <label>Son Sürüm *</label>
+                    <input type="text" id="latest_version" required placeholder="Örn: 1.0.0" pattern="^\d+\.\d+\.\d+$"/>
+                    <small>Format: X.Y.Z (örn: 1.0.0, 2.1.5)</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Zorunlu Güncelleme</label>
+                    <select id="force_update" required>
+                      <option value="false">Hayır</option>
+                      <option value="true">Evet</option>
+                    </select>
+                    <small>Evet seçilirse kullanıcılar uygulamayı güncellemeden kullanamaz</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Güncelleme Mesajı *</label>
+                    <textarea id="update_message" required placeholder="Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin." class="textarea-medium"></textarea>
+                    <small>Kullanıcılara gösterilecek güncelleme mesajı</small>
+                  </div>
+                </div>
+
+                <!-- Genel Yayın (Broadcast) -->
+                <div class="site-form-section">
+                  <h3>📢 Genel Yayın (Broadcast)</h3>
+                  
+                  <div class="form-group">
+                    <label>Yayın Başlığı *</label>
+                    <input type="text" id="broadcast_title" required placeholder="Örn: Yeni Görev Yayınlandı!"/>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Yayın Mesajı *</label>
+                    <textarea id="broadcast_message" required placeholder="Yeni bölümler aktif! Hemen kontrol edin." class="textarea-medium"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Yayın Durumu</label>
+                    <select id="broadcast_enabled" required>
+                      <option value="true">Açık</option>
+                      <option value="false">Kapalı</option>
+                    </select>
+                    <small>Yayın açıkken kullanıcılara gösterilir</small>
+                  </div>
+                </div>
+
+                <!-- Bakım Modu -->
+                <div class="site-form-section">
+                  <h3>🔧 Bakım Modu</h3>
+                  
+                  <div class="form-group">
+                    <label>Bakım Modu</label>
+                    <select id="maintenance" required>
+                      <option value="false">Kapalı</option>
+                      <option value="true">Açık</option>
+                    </select>
+                    <small>Bakım modu açıkken kullanıcılara bakım mesajı gösterilir</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Bakım Mesajı *</label>
+                    <textarea id="maintenance_message" required placeholder="Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin." class="textarea-medium"></textarea>
+                    <small>Bakım modu açıkken gösterilecek mesaj</small>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" id="saveNotificationsBtn">
+                    <span>💾 Kaydet</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="loadNotificationsConfig()">
+                    <span>🔄 Yenile</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 

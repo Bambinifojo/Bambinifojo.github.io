@@ -225,6 +225,11 @@ function showSection(section) {
     renderVotes();
   }
   
+  // Bildirim ayarları bölümüne geçildiğinde config'i yükle
+  if (section === 'notifications') {
+    loadNotificationsConfig();
+  }
+  
   // Dashboard'a geçildiğinde istatistikleri güncelle
   if (section === 'dashboard') {
     updateStats();
@@ -2218,5 +2223,162 @@ function deleteVote(appName) {
     localStorage.setItem('aiVotes', JSON.stringify(votes));
     renderVotes();
     showAlert('✅ Oylar sıfırlandı!', 'success');
+  }
+}
+
+// ==================== BİLDİRİM & VERSİYON YÖNETİMİ ====================
+
+// Bildirim config'ini yükle
+async function loadNotificationsConfig() {
+  try {
+    // Önce GitHub Pages'dan yükle
+    const response = await fetch('https://bambinifojo.github.io/app_config.json?t=' + Date.now());
+    let config = {};
+    
+    if (response.ok) {
+      config = await response.json();
+    } else {
+      // Eğer GitHub'da yoksa varsayılan değerleri kullan
+      config = {
+        latest_version: "1.0.0",
+        force_update: false,
+        update_message: "Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.",
+        broadcast_enabled: false,
+        broadcast_title: "Yeni Görev Yayınlandı!",
+        broadcast_message: "Yeni bölümler aktif! Hemen kontrol edin.",
+        maintenance: false,
+        maintenance_message: "Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin."
+      };
+    }
+    
+    // Form alanlarını doldur
+    document.getElementById('latest_version').value = config.latest_version || "1.0.0";
+    document.getElementById('force_update').value = String(config.force_update || false);
+    document.getElementById('update_message').value = config.update_message || "";
+    document.getElementById('broadcast_title').value = config.broadcast_title || "";
+    document.getElementById('broadcast_message').value = config.broadcast_message || "";
+    document.getElementById('broadcast_enabled').value = String(config.broadcast_enabled || false);
+    document.getElementById('maintenance').value = String(config.maintenance || false);
+    document.getElementById('maintenance_message').value = config.maintenance_message || "";
+    
+  } catch (error) {
+    console.error('Config yükleme hatası:', error);
+    showAlert('⚠️ Config yüklenirken hata oluştu. Varsayılan değerler kullanılıyor.', 'error');
+  }
+}
+
+// Bildirim config'ini kaydet
+async function saveNotificationsConfig(event) {
+  event.preventDefault();
+  
+  const saveBtn = document.getElementById('saveNotificationsBtn');
+  const originalText = saveBtn.querySelector('span')?.textContent || '💾 Kaydet';
+  
+  // Loading state
+  saveBtn.disabled = true;
+  saveBtn.querySelector('span').textContent = '⏳ Kaydediliyor...';
+  
+  try {
+    // Form verilerini topla
+    const config = {
+      latest_version: document.getElementById('latest_version').value.trim(),
+      force_update: document.getElementById('force_update').value === 'true',
+      update_message: document.getElementById('update_message').value.trim(),
+      broadcast_enabled: document.getElementById('broadcast_enabled').value === 'true',
+      broadcast_title: document.getElementById('broadcast_title').value.trim(),
+      broadcast_message: document.getElementById('broadcast_message').value.trim(),
+      maintenance: document.getElementById('maintenance').value === 'true',
+      maintenance_message: document.getElementById('maintenance_message').value.trim()
+    };
+    
+    // Validasyon
+    if (!config.latest_version || !config.update_message || !config.broadcast_title || 
+        !config.broadcast_message || !config.maintenance_message) {
+      throw new Error('Lütfen tüm zorunlu alanları doldurun.');
+    }
+    
+    // Versiyon format kontrolü
+    if (!/^\d+\.\d+\.\d+$/.test(config.latest_version)) {
+      throw new Error('Versiyon formatı hatalı. Format: X.Y.Z (örn: 1.0.0)');
+    }
+    
+    // GitHub API ile kaydet
+    if (currentMode === 'github' && token) {
+      await saveConfigToGitHub(config);
+    } else {
+      // LocalStorage'a kaydet (geçici)
+      localStorage.setItem('app_config', JSON.stringify(config));
+      showAlert('✅ Ayarlar LocalStorage\'a kaydedildi. GitHub\'a kaydetmek için GitHub modunu kullanın.', 'info');
+    }
+    
+    saveBtn.querySelector('span').textContent = '✅ Kaydedildi!';
+    setTimeout(() => {
+      saveBtn.querySelector('span').textContent = originalText;
+      saveBtn.disabled = false;
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Kaydetme hatası:', error);
+    showAlert('❌ Hata: ' + error.message, 'error');
+    saveBtn.querySelector('span').textContent = originalText;
+    saveBtn.disabled = false;
+  }
+}
+
+// GitHub'a config kaydet
+async function saveConfigToGitHub(config) {
+  const REPO_OWNER = 'Bambinifojo';
+  const REPO_NAME = 'Bambinifojo.github.io';
+  const FILE_PATH = 'app_config.json';
+  const FILE_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+  
+  try {
+    // Önce mevcut dosyayı al (SHA için)
+    let sha = null;
+    try {
+      const getResponse = await fetch(FILE_URL, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      
+      if (getResponse.ok) {
+        const fileData = await getResponse.json();
+        sha = fileData.sha;
+      }
+    } catch (e) {
+      // Dosya yoksa SHA null kalır (yeni dosya oluşturulacak)
+    }
+    
+    // JSON'u string'e çevir
+    const content = JSON.stringify(config, null, 2);
+    const encodedContent = btoa(unescape(encodeURIComponent(content)));
+    
+    // GitHub API'ye gönder
+    const response = await fetch(FILE_URL, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `Bildirim ayarları güncellendi - ${new Date().toLocaleString('tr-TR')}`,
+        content: encodedContent,
+        sha: sha // Mevcut dosya varsa SHA gerekli
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'GitHub\'a kaydetme başarısız oldu.');
+    }
+    
+    showAlert('✅ Ayarlar GitHub\'a başarıyla kaydedildi!', 'success');
+    
+  } catch (error) {
+    console.error('GitHub kaydetme hatası:', error);
+    throw error;
   }
 }
