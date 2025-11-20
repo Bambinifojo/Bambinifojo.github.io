@@ -108,7 +108,7 @@
           "icon": "🌐",
           "title": "Portfolio",
           "value": "bambinifojo.github.io",
-          "link": "https://bambinifojo.github.io",
+          "link": "https://bambinifojo.netlify.app",
           "description": "Web sitemi ziyaret ederek daha fazla bilgi alın"
         }
       ]
@@ -119,7 +119,7 @@
       "title": "Task Cosmos",
       "description": "Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama. Günlük işlerinizi kolayca takip edin ve organize edin.",
       "icon": "📱",
-      "privacy": "https://bambinifojo.github.io/task-cosmos/privacy-policy.html",
+      "privacy": "https://bambinifojo.netlify.app/task-cosmos/privacy-policy.html",
       "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos",
       "detailPage": "task-cosmos/",
       "rating": 4.8,

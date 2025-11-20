@@ -399,7 +399,7 @@ function getDefaultSiteData() {
           icon: "🌐",
           title: "Portfolio",
           value: "bambinifojo.github.io",
-          link: "https://bambinifojo.github.io",
+          link: "https://bambinifojo.netlify.app",
           description: "Web sitemi ziyaret ederek daha fazla bilgi alın"
         }
       ]
@@ -2231,8 +2231,11 @@ function deleteVote(appName) {
 // Bildirim config'ini yükle
 async function loadNotificationsConfig() {
   try {
-    // Önce GitHub Pages'dan yükle
-    const response = await fetch('https://bambinifojo.github.io/app_config.json?t=' + Date.now());
+    // Önce Netlify'dan yükle, yoksa GitHub'dan
+    let response = await fetch('https://bambinifojo.netlify.app/app_config.json?t=' + Date.now());
+    if (!response.ok) {
+      response = await fetch('https://bambinifojo.github.io/app_config.json?t=' + Date.now());
+    }
     let config = {};
     
     if (response.ok) {
@@ -2302,13 +2305,32 @@ async function saveNotificationsConfig(event) {
       throw new Error('Versiyon formatı hatalı. Format: X.Y.Z (örn: 1.0.0)');
     }
     
-    // GitHub API ile kaydet
-    if (currentMode === 'github' && token) {
-      await saveConfigToGitHub(config);
-    } else {
-      // LocalStorage'a kaydet (geçici)
-      localStorage.setItem('app_config', JSON.stringify(config));
-      showAlert('✅ Ayarlar LocalStorage\'a kaydedildi. GitHub\'a kaydetmek için GitHub modunu kullanın.', 'info');
+    // Netlify Function ile GitHub'a kaydet
+    try {
+      const response = await fetch('/.netlify/functions/updateConfig', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config)
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Kaydetme başarısız oldu');
+      }
+      
+      showAlert('✅ Ayarlar başarıyla GitHub\'a kaydedildi!', 'success');
+    } catch (error) {
+      // Netlify Function çalışmıyorsa fallback
+      console.warn('Netlify Function hatası, fallback kullanılıyor:', error);
+      if (currentMode === 'github' && token) {
+        await saveConfigToGitHub(config);
+      } else {
+        localStorage.setItem('app_config', JSON.stringify(config));
+        showAlert('⚠️ Netlify Function kullanılamıyor. LocalStorage\'a kaydedildi.', 'info');
+      }
     }
     
     saveBtn.querySelector('span').textContent = '✅ Kaydedildi!';

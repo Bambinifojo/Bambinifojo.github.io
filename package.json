@@ -13,8 +13,10 @@
   ],
   "author": "Bambinifojo",
   "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.1.2"
+  },
   "devDependencies": {
     "http-server": "^14.1.1"
   }
 }
-

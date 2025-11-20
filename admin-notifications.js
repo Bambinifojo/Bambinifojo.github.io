@@ -3,8 +3,15 @@
 // Config yükleme
 async function loadConfig() {
   try {
-    const url = "https://bambinifojo.github.io/app_config.json?t=" + Date.now();
-    const res = await fetch(url);
+    // Netlify'dan yükle (öncelikli)
+    const url = "https://bambinifojo.netlify.app/app_config.json?t=" + Date.now();
+    let res = await fetch(url);
+    
+    // Eğer Netlify'da yoksa GitHub'dan dene
+    if (!res.ok) {
+      const githubUrl = "https://bambinifojo.github.io/app_config.json?t=" + Date.now();
+      res = await fetch(githubUrl);
+    }
     
     if (!res.ok) {
       throw new Error('Config dosyası yüklenemedi');
@@ -75,16 +82,24 @@ async function saveConfig() {
       throw new Error('Versiyon formatı hatalı. Format: X.Y.Z (örn: 1.0.0)');
     }
     
-    // Şimdilik alert göster (Cloudflare Worker kurulunca aktif edilecek)
-    showAlert('ℹ️ Kaydetme işlemi Cloudflare Worker kurulunca aktif edilecek! Şu anda sadece önizleme modu.', 'info');
+    // Netlify Function'a POST isteği gönder
+    const response = await fetch('/.netlify/functions/updateConfig', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(config)
+    });
     
-    // Config'i console'a yazdır (test için)
-    console.log('Kaydedilecek config:', config);
+    const result = await response.json();
     
-    // LocalStorage'a kaydet (geçici)
-    localStorage.setItem('app_config_preview', JSON.stringify(config));
+    if (!response.ok) {
+      throw new Error(result.error || 'Kaydetme başarısız oldu');
+    }
     
-    saveBtn.textContent = '✅ Kaydedildi (Önizleme)';
+    showAlert('✅ Ayarlar başarıyla GitHub\'a kaydedildi!', 'success');
+    
+    saveBtn.textContent = '✅ Kaydedildi!';
     setTimeout(() => {
       saveBtn.textContent = originalText;
       saveBtn.disabled = false;
