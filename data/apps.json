@@ -108,7 +108,7 @@
           "icon": "🌐",
           "title": "Portfolio",
           "value": "bambinifojo.github.io",
-          "link": "https://bambinifojo.netlify.app",
+          "link": "https://bambinifojo.github.io",
           "description": "Web sitemi ziyaret ederek daha fazla bilgi alın"
         }
       ]
@@ -119,13 +119,17 @@
       "title": "Task Cosmos",
       "description": "Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama. Günlük işlerinizi kolayca takip edin ve organize edin.",
       "icon": "📱",
-      "privacy": "https://bambinifojo.netlify.app/task-cosmos/privacy-policy.html",
-      "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos",
-      "detailPage": "task-cosmos/",
+      "category": "Üretkenlik",
       "rating": 4.8,
       "downloads": "10K+",
-      "category": "Üretkenlik",
-      "features": ["Görev Takibi", "Hatırlatıcılar", "Kategoriler", "Widget Desteği"]
+      "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos",
+      "privacy": "https://bambinifojo.netlify.app/task-cosmos/privacy-policy.html",
+      "features": [
+        "Görev Takibi",
+        "Hatırlatıcılar",
+        "Kategoriler",
+        "Widget Desteği"
+      ]
     },
     {
       "title": "Weather Pro",
@@ -136,7 +140,12 @@
       "rating": 4.6,
       "downloads": "5K+",
       "category": "Hava Durumu",
-      "features": ["7 Günlük Tahmin", "Widget", "Animasyonlar", "Konum Bazlı"]
+      "features": [
+        "7 Günlük Tahmin",
+        "Widget",
+        "Animasyonlar",
+        "Konum Bazlı"
+      ]
     },
     {
       "title": "NoteSync",
@@ -147,7 +156,12 @@
       "rating": 4.7,
       "downloads": "8K+",
       "category": "Not Alma",
-      "features": ["Bulut Senkronizasyon", "Çoklu Cihaz", "Arama", "Kategoriler"]
+      "features": [
+        "Bulut Senkronizasyon",
+        "Çoklu Cihaz",
+        "Arama",
+        "Kategoriler"
+      ]
     },
     {
       "title": "FitTracker",
@@ -158,7 +172,12 @@
       "rating": 4.9,
       "downloads": "15K+",
       "category": "Sağlık & Fitness",
-      "features": ["Egzersiz Takibi", "İlerleme Grafikleri", "Hedefler", "İstatistikler"]
+      "features": [
+        "Egzersiz Takibi",
+        "İlerleme Grafikleri",
+        "Hedefler",
+        "İstatistikler"
+      ]
     },
     {
       "title": "Expense Manager",
@@ -169,7 +188,12 @@
       "rating": 4.5,
       "downloads": "12K+",
       "category": "Finans",
-      "features": ["Harcama Takibi", "Bütçe Yönetimi", "Raporlar", "Kategoriler"]
+      "features": [
+        "Harcama Takibi",
+        "Bütçe Yönetimi",
+        "Raporlar",
+        "Kategoriler"
+      ]
     },
     {
       "title": "Music Player Pro",
@@ -180,7 +204,12 @@
       "rating": 4.4,
       "downloads": "20K+",
       "category": "Müzik & Ses",
-      "features": ["Playlist", "Eşitleyici", "Widget", "Şarkı Sözleri"]
+      "features": [
+        "Playlist",
+        "Eşitleyici",
+        "Widget",
+        "Şarkı Sözleri"
+      ]
     },
     {
       "title": "Photo Editor Pro",
@@ -191,7 +220,12 @@
       "rating": 4.7,
       "downloads": "25K+",
       "category": "Fotoğraf & Video",
-      "features": ["Filtreler", "Efektler", "Düzenleme", "Paylaşım"]
+      "features": [
+        "Filtreler",
+        "Efektler",
+        "Düzenleme",
+        "Paylaşım"
+      ]
     },
     {
       "title": "Language Learning",
@@ -202,7 +236,12 @@
       "rating": 4.9,
       "downloads": "50K+",
       "category": "Eğitim",
-      "features": ["Çoklu Dil", "Oyunlaştırma", "Sesli Telaffuz", "İlerleme Takibi"]
+      "features": [
+        "Çoklu Dil",
+        "Oyunlaştırma",
+        "Sesli Telaffuz",
+        "İlerleme Takibi"
+      ]
     },
     {
       "title": "Sleep Tracker",
@@ -213,7 +252,12 @@
       "rating": 4.6,
       "downloads": "18K+",
       "category": "Sağlık & Fitness",
-      "features": ["Uyku Analizi", "Alarm", "İstatistikler", "Rahatlatıcı Sesler"]
+      "features": [
+        "Uyku Analizi",
+        "Alarm",
+        "İstatistikler",
+        "Rahatlatıcı Sesler"
+      ]
     },
     {
       "title": "Budget Planner",
@@ -224,7 +268,12 @@
       "rating": 4.5,
       "downloads": "15K+",
       "category": "Finans",
-      "features": ["Bütçe Planlama", "Hedef Takibi", "Grafikler", "Bildirimler"]
+      "features": [
+        "Bütçe Planlama",
+        "Hedef Takibi",
+        "Grafikler",
+        "Bildirimler"
+      ]
     },
     {
       "title": "Recipe Book",
@@ -235,7 +284,12 @@
       "rating": 4.8,
       "downloads": "30K+",
       "category": "Yaşam Tarzı",
-      "features": ["Binlerce Tarif", "Video Rehberler", "Alışveriş Listesi", "Favoriler"]
+      "features": [
+        "Binlerce Tarif",
+        "Video Rehberler",
+        "Alışveriş Listesi",
+        "Favoriler"
+      ]
     },
     {
       "title": "Meditation App",
@@ -246,7 +300,12 @@
       "rating": 4.9,
       "downloads": "40K+",
       "category": "Sağlık & Fitness",
-      "features": ["Rehberli Meditasyon", "Rahatlatıcı Sesler", "İlerleme Takibi", "Günlük Hedefler"]
+      "features": [
+        "Rehberli Meditasyon",
+        "Rahatlatıcı Sesler",
+        "İlerleme Takibi",
+        "Günlük Hedefler"
+      ]
     },
     {
       "title": "Code Editor",
@@ -257,7 +316,12 @@
       "rating": 4.6,
       "downloads": "12K+",
       "category": "Geliştirici Araçları",
-      "features": ["Syntax Highlighting", "Git Entegrasyonu", "Çoklu Dil", "Tema Desteği"]
+      "features": [
+        "Syntax Highlighting",
+        "Git Entegrasyonu",
+        "Çoklu Dil",
+        "Tema Desteği"
+      ]
     }
   ]
 }
