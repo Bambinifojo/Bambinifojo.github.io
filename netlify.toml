@@ -5,6 +5,11 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  command = "npm run build"
+
+# Environment variables'ı build log'larından gizle
+[build.environment]
+  NETLIFY_BUILD_DEBUG = "false"
 
 # URL Kısaltmaları ve Path Routing
 [[redirects]]
