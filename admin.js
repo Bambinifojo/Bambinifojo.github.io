@@ -25,6 +25,8 @@ function checkAdminSession() {
   const adminLoginTime = sessionStorage.getItem('adminLoginTime');
   
   if (!adminSession || !adminLoginTime) {
+    // Session yok - yönlendir
+    redirectToLogin();
     return false;
   }
   
@@ -32,7 +34,33 @@ function checkAdminSession() {
   const currentTime = Date.now();
   const eightHours = 8 * 60 * 60 * 1000;
   
-  return (currentTime - loginTime) <= eightHours;
+  if ((currentTime - loginTime) > eightHours) {
+    // Session süresi dolmuş - temizle ve yönlendir
+    sessionStorage.removeItem('adminSession');
+    sessionStorage.removeItem('adminLoginTime');
+    sessionStorage.removeItem('adminLastActivity');
+    sessionStorage.removeItem('adminUsername');
+    sessionStorage.removeItem('adminRole');
+    redirectToLogin();
+    return false;
+  }
+  
+  return true;
+}
+
+// Login sayfasına yönlendir
+function redirectToLogin() {
+  // Eğer zaten login sayfasındaysak yönlendirme yapma
+  if (window.location.pathname.includes('admin-login.html')) {
+    return;
+  }
+  
+  // Session timeout mesajı göster
+  const message = 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.';
+  sessionStorage.setItem('sessionTimeoutMessage', message);
+  
+  // Login sayfasına yönlendir
+  window.location.href = 'admin-login.html';
 }
 
 // Admin giriş formunu göster/gizle
@@ -254,6 +282,11 @@ function toggleSidebar() {
 
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
 document.addEventListener('DOMContentLoaded', () => {
+  // Önce session kontrolü yap - eğer timeout varsa yönlendir
+  if (!checkAdminSession()) {
+    return; // checkAdminSession içinde yönlendirme yapıldı
+  }
+  
   // Admin giriş formunu kontrol et
   toggleAdminLoginForm();
   
@@ -1018,6 +1051,15 @@ function renderApps() {
           </svg>
           Düzenle
         </button>
+        ${app.notification && app.notification.enabled ? `
+        <button class="btn btn-info btn-sm" onclick="editApp(${index})" title="Bildirim Aktif - v${app.notification.latest_version || '1.0.0'}" style="background: #10b981; color: white; border: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          Bildirim
+        </button>
+        ` : ''}
         <button class="btn btn-danger btn-sm" onclick="deleteApp(${index})" title="Sil">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
             <polyline points="3 6 5 6 21 6"></polyline>
@@ -1065,6 +1107,13 @@ function editApp(index) {
   currentFeatures = [...(app.features || [])];
   renderFeatures();
   
+  // Bildirim ayarları
+  const notification = app.notification || {};
+  document.getElementById('appNotificationVersion').value = notification.latest_version || '';
+  document.getElementById('appNotificationForceUpdate').value = String(notification.force_update || false);
+  document.getElementById('appNotificationMessage').value = notification.update_message || '';
+  document.getElementById('appNotificationEnabled').value = String(notification.enabled || false);
+  
   document.getElementById('formTitle').textContent = 'Uygulama Düzenle';
   
   // Kısa bir gecikme ile modal'ı aç
@@ -1074,7 +1123,7 @@ function editApp(index) {
 }
 
 // Uygulama kaydet
-function saveApp(event) {
+async function saveApp(event) {
   event.preventDefault();
   
   const index = parseInt(document.getElementById('appIndex').value);
@@ -1093,9 +1142,20 @@ function saveApp(event) {
     features: currentFeatures
   };
   
-  // Eğer Play Store linki yoksa, otomatik olarak "Yakında" durumuna geç
-  if (!detailsValue || detailsValue === '') {
-    app.details = '#';
+  // Link alanları boş bırakıldığında "#" değerine ayarlama
+  // Sadece "Kaydet" butonuna basıldığında kaydedilir, otomatik kaydetme yok
+  
+  // Bildirim ayarları (eğer doldurulmuşsa)
+  const notificationVersion = document.getElementById('appNotificationVersion').value.trim();
+  const notificationMessage = document.getElementById('appNotificationMessage').value.trim();
+  
+  if (notificationVersion || notificationMessage) {
+    app.notification = {
+      latest_version: notificationVersion || '1.0.0',
+      force_update: document.getElementById('appNotificationForceUpdate').value === 'true',
+      update_message: notificationMessage || 'Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.',
+      enabled: document.getElementById('appNotificationEnabled').value === 'true'
+    };
   }
 
   if (index === -1) {
@@ -1109,11 +1169,45 @@ function saveApp(event) {
     logActivity('update', `"${app.title}" uygulaması güncellendi`);
   }
 
-  if (currentMode === 'local') {
-    saveToLocal();
-    showAlert('✅ LocalStorage\'a kaydedildi!', 'success');
-  } else {
-    showAlert('✅ Değişiklikler kaydedildi. GitHub\'a kaydetmek için "GitHub\'a Kaydet" butonuna tıklayın.', 'info');
+  // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
+  try {
+    const response = await fetch('/.netlify/functions/updateApps', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(appsData)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      // GitHub'a başarıyla kaydedildi
+      saveToLocal(); // LocalStorage'a da kaydet (backup)
+      showAlert('✅ Değişiklikler GitHub\'a kaydedildi ve deploy edildi!', 'success');
+    } else {
+      // Netlify Function çalışmıyorsa fallback
+      throw new Error(result.error || 'GitHub kaydetme başarısız');
+    }
+  } catch (error) {
+    console.warn('Netlify Function hatası, fallback kullanılıyor:', error);
+    // Fallback: Eski yöntem
+    if (currentMode === 'local') {
+      saveToLocal();
+      showAlert('✅ LocalStorage\'a kaydedildi! (GitHub deploy hatası)', 'warning');
+    } else if (currentMode === 'github' && token) {
+      // GitHub modunda ve token varsa direkt GitHub'a kaydet
+      try {
+        await saveToGitHub();
+        showAlert('✅ GitHub\'a kaydedildi!', 'success');
+      } catch (githubError) {
+        saveToLocal();
+        showAlert('⚠️ GitHub kaydetme hatası. LocalStorage\'a kaydedildi.', 'error');
+      }
+    } else {
+      saveToLocal();
+      showAlert('✅ LocalStorage\'a kaydedildi! GitHub\'a kaydetmek için GitHub modunu aktif edin.', 'info');
+    }
   }
 
   updateStats();
@@ -1203,7 +1297,18 @@ function closeSiteModal() {
 }
 
 // Overlay click to close
+// Kullanıcı aktivitesi olduğunda session'ı güncelle
 document.addEventListener('click', (e) => {
+  // Session kontrolü yap
+  if (!checkAdminSession()) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  // Son aktivite zamanını güncelle
+  if (sessionStorage.getItem('adminSession')) {
+    sessionStorage.setItem('adminLastActivity', Date.now().toString());
+  }
   if (e.target.classList.contains('modal-overlay')) {
     closeAppModal();
     closeSiteModal();
@@ -1214,6 +1319,16 @@ document.addEventListener('click', (e) => {
 
 // ESC key to close modals
 document.addEventListener('keydown', (e) => {
+  // Session kontrolü yap
+  if (!checkAdminSession()) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  // Son aktivite zamanını güncelle
+  if (sessionStorage.getItem('adminSession')) {
+    sessionStorage.setItem('adminLastActivity', Date.now().toString());
+  }
   if (e.key === 'Escape') {
     closeAppModal();
     closeSiteModal();
@@ -1400,7 +1515,7 @@ function loadSiteSectionData(section) {
   }
 }
 
-function saveSiteSection(section) {
+async function saveSiteSection(section) {
   if (!appsData.site) {
     appsData.site = getDefaultSiteData();
   }
@@ -1471,11 +1586,43 @@ function saveSiteSection(section) {
     };
   }
   
-  if (currentMode === 'local') {
-    saveToLocal();
-    showAlert('✅ Site ayarları kaydedildi!', 'success');
-  } else {
-    showAlert('✅ Site ayarları kaydedildi. GitHub\'a kaydetmek için "GitHub\'a Kaydet" butonuna tıklayın.', 'info');
+  // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
+  try {
+    const response = await fetch('/.netlify/functions/updateApps', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(appsData)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      // GitHub'a başarıyla kaydedildi
+      saveToLocal(); // LocalStorage'a da kaydet (backup)
+      showAlert('✅ Site ayarları GitHub\'a kaydedildi ve deploy edildi!', 'success');
+    } else {
+      throw new Error(result.error || 'GitHub kaydetme başarısız');
+    }
+  } catch (error) {
+    console.warn('Netlify Function hatası, fallback kullanılıyor:', error);
+    // Fallback: Eski yöntem
+    if (currentMode === 'local') {
+      saveToLocal();
+      showAlert('✅ Site ayarları LocalStorage\'a kaydedildi! (GitHub deploy hatası)', 'warning');
+    } else if (currentMode === 'github' && token) {
+      try {
+        await saveToGitHub();
+        showAlert('✅ Site ayarları GitHub\'a kaydedildi!', 'success');
+      } catch (githubError) {
+        saveToLocal();
+        showAlert('⚠️ GitHub kaydetme hatası. LocalStorage\'a kaydedildi.', 'error');
+      }
+    } else {
+      saveToLocal();
+      showAlert('✅ Site ayarları LocalStorage\'a kaydedildi!', 'info');
+    }
   }
 }
 

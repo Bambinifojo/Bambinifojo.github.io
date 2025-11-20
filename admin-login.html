@@ -2695,6 +2695,21 @@
 
     // Sayfa yüklendiğinde rate limiting durumunu kontrol et
     window.addEventListener('DOMContentLoaded', () => {
+      // Session timeout mesajını kontrol et
+      const timeoutMessage = sessionStorage.getItem('sessionTimeoutMessage');
+      if (timeoutMessage) {
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) {
+          errorMessage.textContent = `⏱️ ${timeoutMessage}`;
+          errorMessage.style.display = 'block';
+          errorMessage.style.background = '#fef3c7';
+          errorMessage.style.color = '#92400e';
+          errorMessage.style.border = '1px solid #fbbf24';
+          // Mesajı gösterdikten sonra temizle
+          sessionStorage.removeItem('sessionTimeoutMessage');
+        }
+      }
+      
       const lockoutCheck = checkLoginLockout();
       if (lockoutCheck.locked) {
         const errorMessage = document.getElementById('errorMessage');

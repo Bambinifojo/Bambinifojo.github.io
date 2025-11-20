@@ -13,24 +13,67 @@
     const adminSession = sessionStorage.getItem('adminSession');
     const adminLoginTime = sessionStorage.getItem('adminLoginTime');
     
-    // Session kontrolü - eğer yoksa veya süresi dolmuşsa, sayfayı göster ama giriş gerektir
-    if (adminSession && adminLoginTime) {
+    // Session kontrolü - eğer yoksa veya süresi dolmuşsa, login sayfasına yönlendir
+    if (!adminSession || !adminLoginTime) {
+      // Session yok - login sayfasına yönlendir
+      if (!window.location.pathname.includes('admin-login.html')) {
+        window.location.href = 'admin-login.html';
+        return;
+      }
+    } else {
       const loginTime = parseInt(adminLoginTime);
       const currentTime = Date.now();
       const eightHours = 8 * 60 * 60 * 1000; // 8 saat
       
-      if (currentTime - loginTime <= eightHours) {
-        // Session geçerli - her 5 dakikada bir session'ı yenile
-        setInterval(() => {
-          const currentSession = sessionStorage.getItem('adminSession');
-          if (currentSession) {
-            sessionStorage.setItem('adminLoginTime', Date.now().toString());
-          }
-        }, 5 * 60 * 1000);
-      } else {
-        // Session süresi dolmuş - temizle
+      if (currentTime - loginTime > eightHours) {
+        // Session süresi dolmuş - temizle ve yönlendir
         sessionStorage.removeItem('adminSession');
         sessionStorage.removeItem('adminLoginTime');
+        sessionStorage.removeItem('adminLastActivity');
+        sessionStorage.removeItem('adminUsername');
+        sessionStorage.removeItem('adminRole');
+        
+        if (!window.location.pathname.includes('admin-login.html')) {
+          sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+          window.location.href = 'admin-login.html';
+          return;
+        }
+      } else {
+        // Session geçerli - her 1 dakikada bir session kontrolü yap
+        setInterval(() => {
+          const currentSession = sessionStorage.getItem('adminSession');
+          const currentLoginTime = sessionStorage.getItem('adminLoginTime');
+          
+          if (!currentSession || !currentLoginTime) {
+            // Session yok - yönlendir
+            if (!window.location.pathname.includes('admin-login.html')) {
+              sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+              window.location.href = 'admin-login.html';
+            }
+            return;
+          }
+          
+          const loginTime = parseInt(currentLoginTime);
+          const currentTime = Date.now();
+          const eightHours = 8 * 60 * 60 * 1000;
+          
+          if (currentTime - loginTime > eightHours) {
+            // Session süresi dolmuş - temizle ve yönlendir
+            sessionStorage.removeItem('adminSession');
+            sessionStorage.removeItem('adminLoginTime');
+            sessionStorage.removeItem('adminLastActivity');
+            sessionStorage.removeItem('adminUsername');
+            sessionStorage.removeItem('adminRole');
+            
+            if (!window.location.pathname.includes('admin-login.html')) {
+              sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+              window.location.href = 'admin-login.html';
+            }
+          } else {
+            // Session geçerli - son aktivite zamanını güncelle
+            sessionStorage.setItem('adminLastActivity', Date.now().toString());
+          }
+        }, 60 * 1000); // Her 1 dakikada bir kontrol et
       }
     }
   })();
@@ -2855,6 +2898,49 @@
               <input type="text" id="newFeature" placeholder="Yeni özellik ekle..."/>
               <button type="button" class="btn btn-secondary" onclick="addFeature()">Ekle</button>
             </div>
+          </div>
+
+          <hr style="margin: 30px 0; border: none; border-top: 2px solid #e5e7eb;">
+
+          <div class="form-group">
+            <h3 style="margin-top: 0; color: #6C63FF; display: flex; align-items: center; gap: 8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              Uygulama Bildirim Ayarları
+            </h3>
+            <small style="color: #6b7280; display: block; margin-bottom: 15px;">Bu uygulama için özel bildirim ayarları</small>
+          </div>
+
+          <div class="form-group">
+            <label>Son Sürüm</label>
+            <input type="text" id="appNotificationVersion" placeholder="Örn: 1.0.0" pattern="^\d+\.\d+\.\d+$"/>
+            <small>Format: X.Y.Z (örn: 1.0.0, 2.1.5)</small>
+          </div>
+
+          <div class="form-group">
+            <label>Zorunlu Güncelleme</label>
+            <select id="appNotificationForceUpdate">
+              <option value="false">Hayır</option>
+              <option value="true">Evet</option>
+            </select>
+            <small>Evet seçilirse kullanıcılar uygulamayı güncellemeden kullanamaz</small>
+          </div>
+
+          <div class="form-group">
+            <label>Güncelleme Mesajı</label>
+            <textarea id="appNotificationMessage" rows="3" placeholder="Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin."></textarea>
+            <small>Kullanıcılara gösterilecek güncelleme mesajı</small>
+          </div>
+
+          <div class="form-group">
+            <label>Bildirim Aktif mi?</label>
+            <select id="appNotificationEnabled">
+              <option value="false">Kapalı</option>
+              <option value="true">Açık</option>
+            </select>
+            <small>Bildirim açıkken kullanıcılara gösterilir</small>
           </div>
 
           <div class="form-actions">
