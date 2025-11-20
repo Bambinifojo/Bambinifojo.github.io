@@ -1546,18 +1546,263 @@
   }
 
   /* Responsive Design */
-  @media (max-width: 1024px) {
+  
+  /* iPad Pro (1024px - 1366px) */
+  @media (min-width: 1024px) and (max-width: 1366px) {
+    .admin-sidebar {
+      width: 260px;
+    }
+
+    .admin-content {
+      max-width: calc(100vw - 260px);
+      padding: 30px 24px;
+    }
+
+    .admin-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .dashboard-grid-2-1 {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .dashboard-grid-1-1 {
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .stat-card {
+      padding: 24px;
+    }
+
+    .admin-card {
+      padding: 24px;
+    }
+
+    .modal-content {
+      max-width: 90%;
+    }
+
+    .modal-content-large {
+      max-width: 95%;
+    }
+  }
+
+  /* iPad (768px - 1024px) */
+  @media (min-width: 768px) and (max-width: 1024px) {
     .admin-sidebar {
       width: 240px;
     }
 
     .admin-content {
       max-width: calc(100vw - 240px);
+      padding: 24px 20px;
     }
 
     .admin-grid {
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
+      gap: 18px;
+    }
+
+    .dashboard-grid-2-1,
+    .dashboard-grid-1-1 {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .admin-page-title {
+      font-size: 1.75rem;
+    }
+
+    .admin-header {
+      padding: 24px 20px;
+    }
+
+    .admin-header h1 {
+      font-size: 1.6rem;
+    }
+
+    .stat-card {
+      padding: 20px;
+    }
+
+    .stat-card-value {
+      font-size: 2rem;
+    }
+
+    .admin-card {
+      padding: 20px;
+    }
+
+    .app-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .app-item-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .app-item-actions .btn {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .modal-content {
+      max-width: 92%;
+    }
+
+    .modal-content-large {
+      max-width: 95%;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+    }
+  }
+
+  /* Tablet Portrait (481px - 768px) */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .admin-sidebar-overlay {
+      display: block;
+    }
+
+    .admin-sidebar {
+      position: fixed;
+      left: -280px;
+      top: 64px;
+      height: calc(100vh - 64px);
+      width: 280px;
+      z-index: 200;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-sidebar.open {
+      left: 0;
+    }
+
+    .admin-content {
+      max-width: 100vw;
+      padding: 20px 16px;
+    }
+
+    .admin-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .dashboard-grid-2-1,
+    .dashboard-grid-1-1 {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .admin-page-title {
+      font-size: 1.5rem;
+    }
+
+    .admin-header {
+      padding: 20px 18px;
+    }
+
+    .admin-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .stat-card {
+      padding: 20px;
+    }
+
+    .stat-card-value {
+      font-size: 1.75rem;
+    }
+
+    .admin-card {
+      padding: 20px;
+    }
+
+    .app-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .app-item-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .app-item-actions .btn {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .modal-content {
+      max-width: 95%;
+      max-height: calc(100vh - 20px);
+    }
+
+    .modal-content-large {
+      max-width: 98%;
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+    }
+  }
+
+  /* Touch-friendly elements for tablets */
+  @media (min-width: 481px) and (max-width: 1024px) {
+    button,
+    .btn,
+    .admin-nav-item,
+    .app-item-actions .btn {
+      min-height: 44px;
+      min-width: 44px;
+      padding: 12px 20px;
+      font-size: 1rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="url"],
+    textarea,
+    select {
+      min-height: 44px;
+      font-size: 16px; /* iOS zoom önleme */
+      padding: 12px 16px;
+    }
+
+    .admin-nav-item {
+      min-height: 48px;
+      padding: 12px 16px;
+    }
+
+    .admin-menu-toggle {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
     }
   }
 

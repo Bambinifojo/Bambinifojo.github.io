@@ -4129,3 +4129,305 @@ html {
         max-height: calc(100vh - 20px);
     }
 }
+
+/* ============================================
+   TABLET & iPad RESPONSIVE İYİLEŞTİRMELERİ
+   ============================================ */
+
+/* iPad (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Hero Section */
+    .hero-section {
+        padding: 120px 40px 60px;
+    }
+
+    .hero-brand {
+        font-size: 3.5rem;
+    }
+
+    .hero-tagline {
+        font-size: 1.15rem;
+        max-width: 600px;
+    }
+
+    /* Apps Grid - 2 sütun */
+    #apps-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        padding: 0 20px;
+    }
+
+    /* Skills Grid - 2 sütun */
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    /* About Section */
+    .about-section {
+        padding: 60px 40px;
+    }
+
+    .about-content {
+        max-width: 700px;
+    }
+
+    /* App Cards */
+    .app-card {
+        padding: 0;
+    }
+
+    .app-card-header {
+        padding: 24px;
+    }
+
+    .app-card-body {
+        padding: 20px 24px;
+    }
+
+    /* Section Titles */
+    .section-title {
+        font-size: 2.25rem;
+    }
+
+    /* Hamburger Menu */
+    .hamburger {
+        width: 44px;
+        height: 44px;
+    }
+
+    /* AI Assistant */
+    .ai-assistant-widget {
+        width: 60px;
+        height: 60px;
+        bottom: 24px;
+        right: 24px;
+    }
+
+    .ai-assistant-modal {
+        width: 90%;
+        max-width: 600px;
+        height: 85vh;
+    }
+
+    /* Contact Form */
+    .contact-form {
+        max-width: 600px;
+    }
+
+    /* Footer */
+    .footer-content {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 40px;
+    }
+}
+
+/* iPad Pro (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+    /* Hero Section */
+    .hero-section {
+        padding: 140px 60px 80px;
+    }
+
+    .hero-brand {
+        font-size: 4rem;
+    }
+
+    .hero-tagline {
+        font-size: 1.25rem;
+        max-width: 700px;
+    }
+
+    /* Apps Grid - 3 sütun */
+    #apps-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        padding: 0 40px;
+    }
+
+    /* Skills Grid - 3 sütun */
+    .skills-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+    }
+
+    /* About Section */
+    .about-section {
+        padding: 80px 60px;
+    }
+
+    .about-content {
+        max-width: 800px;
+    }
+
+    /* Section Titles */
+    .section-title {
+        font-size: 2.5rem;
+    }
+
+    /* AI Assistant */
+    .ai-assistant-modal {
+        width: 85%;
+        max-width: 700px;
+        height: 80vh;
+    }
+
+    /* Contact Form */
+    .contact-form {
+        max-width: 700px;
+    }
+}
+
+/* iPad Pro Landscape (1024px - 1366px landscape) */
+@media (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+    .hero-section {
+        padding: 100px 60px 60px;
+        min-height: 70vh;
+    }
+
+    .hero-brand {
+        font-size: 3.5rem;
+    }
+
+    .hero-stats {
+        flex-direction: row;
+        gap: 40px;
+    }
+
+    #apps-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
+}
+
+/* Tablet Portrait (481px - 768px) - Daha detaylı */
+@media (min-width: 481px) and (max-width: 768px) {
+    /* Hero optimizasyonları */
+    .hero-section {
+        padding: 120px 30px 50px;
+    }
+
+    .hero-brand {
+        font-size: 3rem;
+    }
+
+    .hero-tagline {
+        font-size: 1.05rem;
+    }
+
+    /* Apps Grid - 2 sütun */
+    #apps-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding: 0 15px;
+    }
+
+    /* App Cards */
+    .app-card-header {
+        padding: 20px;
+    }
+
+    .app-card-body {
+        padding: 18px 20px;
+    }
+
+    .app-icon-large {
+        width: 64px;
+        height: 64px;
+        font-size: 2rem;
+    }
+
+    /* Skills Grid */
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    /* Section Titles */
+    .section-title {
+        font-size: 2rem;
+    }
+
+    /* AI Assistant */
+    .ai-assistant-widget {
+        width: 56px;
+        height: 56px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .ai-assistant-modal {
+        width: 92%;
+        max-width: 550px;
+        height: 88vh;
+    }
+
+    /* Contact Form */
+    .contact-form {
+        max-width: 550px;
+        padding: 30px 25px;
+    }
+
+    /* Footer */
+    .footer-content {
+        flex-direction: column;
+        gap: 30px;
+        text-align: center;
+    }
+}
+
+/* Touch-friendly elements for tablets */
+@media (min-width: 481px) and (max-width: 1024px) {
+    /* Butonlar */
+    button,
+    .btn,
+    .app-card-actions button {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+
+    /* Input fields */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea,
+    select {
+        min-height: 44px;
+        font-size: 16px; /* iOS zoom önleme */
+        padding: 12px 16px;
+    }
+
+    /* Links */
+    a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Menu items */
+    .menu-item {
+        min-height: 48px;
+        padding: 14px 20px;
+    }
+
+    /* Search toggle */
+    .search-toggle {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+        width: 48px;
+        height: 48px;
+    }
+
+    /* Hamburger */
+    .hamburger {
+        width: 44px;
+        height: 44px;
+    }
+}
