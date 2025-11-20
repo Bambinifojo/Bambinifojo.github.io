@@ -267,6 +267,27 @@ function showSection(section) {
   if (window.innerWidth <= 768) {
     toggleSidebar();
   }
+  
+  // Path-based routing kullan (admin/dashboard formatı)
+  const currentPath = window.location.pathname;
+  const newPath = `/admin/${section}`;
+  
+  // History API ile path'i güncelle (sayfa yenilenmeden)
+  if (currentPath !== newPath) {
+    window.history.pushState({ section: section }, '', newPath);
+  }
+}
+
+// Path-based routing: URL'den section'ı oku
+function getSectionFromPath() {
+  const path = window.location.pathname;
+  const pathMatch = path.match(/\/admin\/([^\/]+)/);
+  if (pathMatch) {
+    return pathMatch[1];
+  }
+  // Hash fallback
+  const hash = window.location.hash.replace('#', '');
+  return hash || 'dashboard';
 }
 
 // Sidebar toggle (Mobile)
@@ -289,6 +310,20 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Admin giriş formunu kontrol et
   toggleAdminLoginForm();
+  
+  // Path'den section'ı oku ve göster
+  const section = getSectionFromPath();
+  if (section) {
+    showSection(section);
+  }
+  
+  // Browser back/forward butonları için
+  window.addEventListener('popstate', (e) => {
+    const section = getSectionFromPath();
+    if (section) {
+      showSection(section);
+    }
+  });
   
   // Session varsa verileri yükle
   if (checkAdminSession()) {
@@ -1091,6 +1126,9 @@ function showAddForm() {
 
 // Uygulama düzenle
 function editApp(index) {
+  // Hash'i koru (adres bozulmasını önlemek için)
+  const currentHash = window.location.hash;
+  
   // Apps section'ına geç
   showSection('apps');
   
@@ -1184,29 +1222,25 @@ async function saveApp(event) {
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
       saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Değişiklikler GitHub\'a kaydedildi ve deploy edildi!', 'success');
+      showAlert('✅ Değişiklikler GitHub\'a kaydedildi ve deploy edildi! Site birkaç saniye içinde güncellenecek.', 'success');
     } else {
       // Netlify Function çalışmıyorsa fallback
       throw new Error(result.error || 'GitHub kaydetme başarısız');
     }
   } catch (error) {
-    console.warn('Netlify Function hatası, fallback kullanılıyor:', error);
-    // Fallback: Eski yöntem
-    if (currentMode === 'local') {
-      saveToLocal();
-      showAlert('✅ LocalStorage\'a kaydedildi! (GitHub deploy hatası)', 'warning');
-    } else if (currentMode === 'github' && token) {
-      // GitHub modunda ve token varsa direkt GitHub'a kaydet
+    console.error('Netlify Function hatası:', error);
+    // Netlify Function çalışmıyor - kullanıcıyı uyar
+    saveToLocal(); // LocalStorage'a backup olarak kaydet
+    showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin veya manuel olarak GitHub\'a push yapın.', 'error');
+    
+    // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
+    if (currentMode === 'github' && token) {
       try {
         await saveToGitHub();
-        showAlert('✅ GitHub\'a kaydedildi!', 'success');
+        showAlert('✅ GitHub\'a manuel olarak kaydedildi!', 'success');
       } catch (githubError) {
-        saveToLocal();
-        showAlert('⚠️ GitHub kaydetme hatası. LocalStorage\'a kaydedildi.', 'error');
+        console.error('GitHub kaydetme hatası:', githubError);
       }
-    } else {
-      saveToLocal();
-      showAlert('✅ LocalStorage\'a kaydedildi! GitHub\'a kaydetmek için GitHub modunu aktif edin.', 'info');
     }
   }
 
@@ -1601,27 +1635,24 @@ async function saveSiteSection(section) {
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
       saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Site ayarları GitHub\'a kaydedildi ve deploy edildi!', 'success');
+      showAlert('✅ Site ayarları GitHub\'a kaydedildi ve deploy edildi! Site birkaç saniye içinde güncellenecek.', 'success');
     } else {
       throw new Error(result.error || 'GitHub kaydetme başarısız');
     }
   } catch (error) {
-    console.warn('Netlify Function hatası, fallback kullanılıyor:', error);
-    // Fallback: Eski yöntem
-    if (currentMode === 'local') {
-      saveToLocal();
-      showAlert('✅ Site ayarları LocalStorage\'a kaydedildi! (GitHub deploy hatası)', 'warning');
-    } else if (currentMode === 'github' && token) {
+    console.error('Netlify Function hatası:', error);
+    // Netlify Function çalışmıyor - kullanıcıyı uyar
+    saveToLocal(); // LocalStorage'a backup olarak kaydet
+    showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+    
+    // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
+    if (currentMode === 'github' && token) {
       try {
         await saveToGitHub();
-        showAlert('✅ Site ayarları GitHub\'a kaydedildi!', 'success');
+        showAlert('✅ Site ayarları GitHub\'a manuel olarak kaydedildi!', 'success');
       } catch (githubError) {
-        saveToLocal();
-        showAlert('⚠️ GitHub kaydetme hatası. LocalStorage\'a kaydedildi.', 'error');
+        console.error('GitHub kaydetme hatası:', githubError);
       }
-    } else {
-      saveToLocal();
-      showAlert('✅ Site ayarları LocalStorage\'a kaydedildi!', 'info');
     }
   }
 }

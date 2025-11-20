@@ -6,9 +6,15 @@
   publish = "."
   functions = "netlify/functions"
 
-# URL Kısaltmaları
+# URL Kısaltmaları ve Path Routing
 [[redirects]]
   from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+# SPA routing: /admin/* path'lerini admin.html'e yönlendir (hash kullanmadan)
+[[redirects]]
+  from = "/admin/*"
   to = "/admin.html"
   status = 200
 
