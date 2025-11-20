@@ -265,7 +265,7 @@ function showSection(section) {
   
   // Mobile'da sidebar'ı kapat
   if (window.innerWidth <= 768) {
-    toggleSidebar();
+    closeSidebar();
   }
   
   // Path-based routing kullan (admin/dashboard formatı)
@@ -294,10 +294,43 @@ function getSectionFromPath() {
 function toggleSidebar() {
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.querySelector('.admin-sidebar-overlay');
+  const menuToggle = document.querySelector('.admin-menu-toggle');
   
   if (sidebar && overlay) {
-    sidebar.classList.toggle('open');
+    const isOpen = sidebar.classList.toggle('open');
     overlay.classList.toggle('active');
+    
+    // Body scroll lock
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('sidebar-open');
+    } else {
+      document.body.style.overflow = '';
+      document.body.classList.remove('sidebar-open');
+    }
+    
+    // Menu toggle button active state
+    if (menuToggle) {
+      menuToggle.classList.toggle('active');
+    }
+  }
+}
+
+// Sidebar'ı kapat (dışarıdan çağrılabilir)
+function closeSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  const overlay = document.querySelector('.admin-sidebar-overlay');
+  const menuToggle = document.querySelector('.admin-menu-toggle');
+  
+  if (sidebar && overlay) {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.classList.remove('sidebar-open');
+    
+    if (menuToggle) {
+      menuToggle.classList.remove('active');
+    }
   }
 }
 
