@@ -632,14 +632,12 @@ document.addEventListener('DOMContentLoaded', () => {
     item.addEventListener('click', (e) => {
       const href = item.getAttribute('href');
       
-      e.preventDefault();
-      
       // Menüyü hemen kapat
       closeMenu();
       
-      // Smooth scroll to target section
-      // Sadece hash (#) ile başlayan veya geçerli CSS selector olan href'ler için querySelector kullan
+      // Hash (#) ile başlayan linkler için smooth scroll
       if (href && href !== '#' && href !== '#home' && href.startsWith('#')) {
+        e.preventDefault();
         // Hash ile başlayan linkler için (örn: #about, #contact)
         const target = document.querySelector(href);
         if (target) {
@@ -654,14 +652,17 @@ document.addEventListener('DOMContentLoaded', () => {
           }, 100);
         }
       } else if (href === '#home' || href === '#') {
+        e.preventDefault();
         // Ana sayfaya scroll
-      setTimeout(() => {
+        setTimeout(() => {
           window.scrollTo({
             top: 0,
             behavior: 'smooth'
           });
         }, 100);
       }
+      // HTML dosyalarına veya external linklere giden linkler için preventDefault yapma
+      // Normal link davranışına izin ver (sayfa değişimi için)
     });
   });
   
