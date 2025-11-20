@@ -1804,6 +1804,110 @@
       min-width: 44px;
       min-height: 44px;
     }
+
+    /* Dashboard Grid Optimizasyonları - Tablet */
+    .dashboard-grid-2-1 {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .dashboard-grid-1-1 {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    /* Stat Cards Grid - Tablet */
+    .stat-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    /* Preview Container - Tablet */
+    .preview-container {
+      min-height: 350px;
+    }
+
+    .preview-frame {
+      transform: scale(0.7);
+      width: 142.86%;
+      height: 714px;
+    }
+
+    /* Quick Actions - Tablet */
+    .quick-actions-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    /* Distribution Items - Tablet */
+    .distribution-item {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .distribution-bar {
+      order: 3;
+      width: 100%;
+      margin: 8px 0 0 0;
+    }
+
+    /* Play Store App Card - Tablet */
+    .playstore-app-card {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .playstore-app-info {
+      width: 100%;
+    }
+
+    .playstore-app-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .playstore-app-actions .btn {
+      flex: 1;
+    }
+
+    /* Activity Items - Tablet */
+    .activity-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .activity-icon {
+      align-self: flex-start;
+    }
+
+    /* Modal Optimizasyonları - Tablet */
+    .modal-content {
+      max-width: 90%;
+      max-height: calc(100vh - 40px);
+    }
+
+    .modal-content-large {
+      max-width: 95%;
+    }
+
+    .modal-header {
+      padding: 24px 20px;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .modal-body {
+      padding: 24px 20px;
+    }
+
+    /* Alert Container - Tablet */
+    .alert-container {
+      max-width: 90%;
+      right: 5%;
+      left: 5%;
+    }
   }
 
   @media (max-width: 768px) {
@@ -1946,6 +2050,137 @@
       gap: 12px;
     }
 
+    /* Dashboard Grid Optimizasyonları - Mobil */
+    .dashboard-grid-2-1,
+    .dashboard-grid-1-1 {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    /* Stat Cards Grid - Mobil */
+    .stat-cards-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .stat-card {
+      padding: 20px;
+    }
+
+    .stat-card-value {
+      font-size: 1.75rem;
+    }
+
+    /* Preview Container - Mobil */
+    .preview-container {
+      min-height: 300px;
+      border-radius: 12px;
+    }
+
+    .preview-frame {
+      transform: scale(0.5);
+      width: 200%;
+      height: 1000px;
+      transform-origin: top left;
+    }
+
+    .preview-badge {
+      bottom: 8px;
+      right: 8px;
+      padding: 6px 10px;
+      font-size: 0.75rem;
+    }
+
+    /* Quick Actions - Mobil */
+    .quick-actions-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .quick-actions-card .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Distribution Items - Mobil */
+    .distribution-item {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px 0;
+      gap: 8px;
+    }
+
+    .distribution-label {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 4px;
+    }
+
+    .distribution-bar {
+      width: 100%;
+      margin: 0;
+      order: 2;
+    }
+
+    .distribution-value {
+      width: 100%;
+      text-align: left;
+      order: 1;
+      margin-bottom: 4px;
+    }
+
+    /* Play Store App Card - Mobil */
+    .playstore-app-card {
+      flex-direction: column;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .playstore-app-icon {
+      width: 56px;
+      height: 56px;
+      font-size: 1.75rem;
+      margin: 0 auto;
+    }
+
+    .playstore-app-info {
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .playstore-app-meta {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .playstore-app-actions {
+      width: 100%;
+      flex-direction: column;
+      margin-top: 12px;
+    }
+
+    .playstore-app-actions .btn {
+      width: 100%;
+    }
+
+    /* Activity Items - Mobil */
+    .activity-item {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .activity-icon {
+      align-self: flex-start;
+      width: 36px;
+      height: 36px;
+    }
+
+    .activity-content {
+      width: 100%;
+    }
+
     /* Modal Optimizasyonları - Mobil */
     .modal-overlay {
       padding: 10px;
@@ -1967,11 +2202,15 @@
     .modal-header {
       padding: 20px 18px;
       border-radius: 20px 20px 0 0;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .modal-header h2 {
       font-size: 1.4rem;
       padding-right: 10px;
+      flex: 1;
+      min-width: 0;
     }
 
     .modal-close {
@@ -1979,10 +2218,19 @@
       height: 36px;
       font-size: 18px;
       margin-left: 10px;
+      flex-shrink: 0;
     }
 
     .modal-body {
       padding: 20px 18px;
+    }
+
+    /* Alert Container - Mobil */
+    .alert-container {
+      top: 70px;
+      right: 10px;
+      left: 10px;
+      max-width: calc(100% - 20px);
     }
 
     .section-tabs {
@@ -2034,6 +2282,87 @@
 
   /* Küçük mobil cihazlar için ek optimizasyonlar */
   @media (max-width: 480px) {
+    /* Stat Cards - Küçük Mobil */
+    .stat-card {
+      padding: 16px;
+    }
+
+    .stat-card-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1.25rem;
+    }
+
+    .stat-card-value {
+      font-size: 1.5rem;
+    }
+
+    .stat-card-label {
+      font-size: 0.85rem;
+    }
+
+    /* Preview Container - Küçük Mobil */
+    .preview-container {
+      min-height: 250px;
+    }
+
+    .preview-frame {
+      transform: scale(0.4);
+      width: 250%;
+      height: 1250px;
+    }
+
+    /* Distribution Items - Küçük Mobil */
+    .distribution-item {
+      padding: 12px 0;
+    }
+
+    .distribution-label {
+      font-size: 0.9rem;
+    }
+
+    .distribution-value {
+      font-size: 0.85rem;
+    }
+
+    /* Play Store App Card - Küçük Mobil */
+    .playstore-app-card {
+      padding: 12px;
+    }
+
+    .playstore-app-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 1.5rem;
+    }
+
+    .playstore-app-title {
+      font-size: 0.95rem;
+    }
+
+    .playstore-app-meta {
+      font-size: 0.8rem;
+    }
+
+    /* Activity Items - Küçük Mobil */
+    .activity-item {
+      padding: 12px;
+    }
+
+    .activity-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .activity-text {
+      font-size: 0.9rem;
+    }
+
+    .activity-time {
+      font-size: 0.75rem;
+    }
+
+    /* Modal Optimizasyonları - Küçük Mobil */
     .modal-overlay {
       padding: 5px;
       padding-top: 10px;
@@ -2057,6 +2386,7 @@
       width: 32px;
       height: 32px;
       font-size: 16px;
+      margin-left: 8px;
     }
 
     .modal-body {
@@ -2077,6 +2407,14 @@
     .form-group select {
       padding: 10px 14px;
       font-size: 0.9rem;
+    }
+
+    /* Alert Container - Küçük Mobil */
+    .alert-container {
+      top: 60px;
+      right: 8px;
+      left: 8px;
+      max-width: calc(100% - 16px);
     }
   }
 
@@ -2164,6 +2502,11 @@
     right: 20px;
     z-index: 2000;
     max-width: 400px;
+    pointer-events: none;
+  }
+
+  .alert-container > * {
+    pointer-events: auto;
   }
 
   /* Mobile Menu Toggle */
@@ -2246,6 +2589,171 @@
     margin-bottom: 30px;
   }
 
+  /* Stat Cards Grid - Responsive */
+  .stat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  /* Preview Container - Responsive */
+  .preview-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview-frame {
+    width: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* Quick Actions - Responsive */
+  .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  /* Category & Rating Distribution - Responsive */
+  .distribution-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .distribution-item:last-child {
+    border-bottom: none;
+  }
+
+  .distribution-label {
+    flex: 1;
+    min-width: 0;
+    margin-right: 12px;
+  }
+
+  .distribution-bar {
+    flex: 1;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 12px;
+  }
+
+  .distribution-value {
+    min-width: 60px;
+    text-align: right;
+    font-weight: 600;
+    color: #4b5563;
+  }
+
+  /* Play Store Integration Card - Responsive */
+  .playstore-app-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+  }
+
+  .playstore-app-card:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .playstore-app-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .playstore-app-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .playstore-app-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+  }
+
+  .playstore-app-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+
+  .playstore-app-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Activity Feed - Responsive */
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.2s ease;
+  }
+
+  .activity-item:hover {
+    background: #f9fafb;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #667eea;
+  }
+
+  .activity-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .activity-text {
+    margin: 0 0 4px 0;
+    color: #1a1a1a;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .activity-time {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
   .preview-header {
     margin-bottom: 20px;
   }
@@ -2282,6 +2790,39 @@
     transform-origin: top left;
     width: 125%;
     height: 625px;
+  }
+
+  /* Preview Frame - Responsive Overrides */
+  @media (min-width: 1024px) and (max-width: 1366px) {
+    .preview-frame {
+      transform: scale(0.75);
+      width: 133.33%;
+      height: 666px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .preview-frame {
+      transform: scale(0.65);
+      width: 153.85%;
+      height: 769px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .preview-frame {
+      transform: scale(0.5);
+      width: 200%;
+      height: 1000px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .preview-frame {
+      transform: scale(0.4);
+      width: 250%;
+      height: 1250px;
+    }
   }
 
   .preview-badge {
