@@ -644,7 +644,9 @@ document.addEventListener('DOMContentLoaded', () => {
       closeMenu();
       
       // Smooth scroll to target section
-      if (href && href !== '#' && href !== '#home') {
+      // Sadece hash (#) ile başlayan veya geçerli CSS selector olan href'ler için querySelector kullan
+      if (href && href !== '#' && href !== '#home' && href.startsWith('#')) {
+        // Hash ile başlayan linkler için (örn: #about, #contact)
         const target = document.querySelector(href);
         if (target) {
           setTimeout(() => {

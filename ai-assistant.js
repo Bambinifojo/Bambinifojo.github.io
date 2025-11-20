@@ -157,6 +157,10 @@ function toggleAIModal() {
     if (modal) {
         modal.classList.toggle('active');
         if (modal.classList.contains('active')) {
+            // Chat messages'ı direkt aktif yap (welcome section yok)
+            const chatMessages = document.getElementById('aiChatMessages');
+            if (chatMessages) chatMessages.classList.add('active');
+            
             const input = document.getElementById('aiMessageInput');
             if (input) {
                 setTimeout(() => input.focus(), 100);
@@ -190,10 +194,8 @@ function sendAIMessage() {
     input.value = '';
     input.style.height = 'auto';
 
-    // Welcome section'ı gizle
-    const welcomeSection = document.getElementById('aiWelcomeSection');
+    // Welcome section'ı gizle (zaten HTML'den kaldırıldı)
     const chatMessages = document.getElementById('aiChatMessages');
-    if (welcomeSection) welcomeSection.style.display = 'none';
     if (chatMessages) chatMessages.classList.add('active');
 
     // Krediyi azalt
