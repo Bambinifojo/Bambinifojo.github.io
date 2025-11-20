@@ -77,12 +77,18 @@ function toggleAdminLoginForm() {
     if (passwordForm) passwordForm.classList.add('hidden');
     if (dataLoadSection) dataLoadSection.classList.add('hidden');
     if (logoutBtn) logoutBtn.classList.remove('hidden');
+    // Mobile menu logout butonunu da göster
+    const topbarMenuLogoutBtn = document.getElementById('topbarMenuLogoutBtn');
+    if (topbarMenuLogoutBtn) topbarMenuLogoutBtn.classList.remove('hidden');
   } else {
     // Session yok - login section'ı göster, logout butonunu gizle
     if (loginSection) loginSection.classList.remove('hidden');
     if (passwordForm) passwordForm.classList.remove('hidden');
     if (dataLoadSection) dataLoadSection.classList.add('hidden');
     if (logoutBtn) logoutBtn.classList.add('hidden');
+    // Mobile menu logout butonunu da gizle
+    const topbarMenuLogoutBtn = document.getElementById('topbarMenuLogoutBtn');
+    if (topbarMenuLogoutBtn) topbarMenuLogoutBtn.classList.add('hidden');
   }
 }
 
@@ -334,6 +340,50 @@ function closeSidebar() {
   }
 }
 
+// Topbar Menu Toggle (Mobile)
+function toggleTopbarMenu() {
+  const modal = document.getElementById('topbarMenuModal');
+  const overlay = document.getElementById('topbarMenuOverlay');
+  const menuBtn = document.getElementById('topbarMenuBtn');
+  
+  if (modal && overlay) {
+    const isOpen = modal.classList.toggle('active');
+    overlay.classList.toggle('active');
+    
+    // Body scroll lock
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('topbar-menu-open');
+    } else {
+      document.body.style.overflow = '';
+      document.body.classList.remove('topbar-menu-open');
+    }
+    
+    // Menu button active state
+    if (menuBtn) {
+      menuBtn.classList.toggle('active');
+    }
+  }
+}
+
+// Topbar Menu'yu kapat
+function closeTopbarMenu() {
+  const modal = document.getElementById('topbarMenuModal');
+  const overlay = document.getElementById('topbarMenuOverlay');
+  const menuBtn = document.getElementById('topbarMenuBtn');
+  
+  if (modal && overlay) {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.classList.remove('topbar-menu-open');
+    
+    if (menuBtn) {
+      menuBtn.classList.remove('active');
+    }
+  }
+}
+
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
 document.addEventListener('DOMContentLoaded', () => {
   // Önce session kontrolü yap - eğer timeout varsa yönlendir
@@ -569,6 +619,9 @@ async function login() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.classList.remove('hidden');
+    // Mobile menu logout butonunu da göster
+    const topbarMenuLogoutBtn = document.getElementById('topbarMenuLogoutBtn');
+    if (topbarMenuLogoutBtn) topbarMenuLogoutBtn.classList.remove('hidden');
   }
   const loginSection = document.getElementById('adminLoginSection');
   if (loginSection) {
@@ -610,6 +663,13 @@ function logout() {
     if (logoutBtn) {
       logoutBtn.classList.add('hidden');
     }
+    // Mobile menu logout butonunu da gizle
+    const topbarMenuLogoutBtn = document.getElementById('topbarMenuLogoutBtn');
+    if (topbarMenuLogoutBtn) {
+      topbarMenuLogoutBtn.classList.add('hidden');
+    }
+    // Topbar menu'yu kapat
+    closeTopbarMenu();
     const loginSection = document.getElementById('adminLoginSection');
     if (loginSection) {
       loginSection.classList.remove('hidden');
