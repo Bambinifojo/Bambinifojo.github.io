@@ -6,3 +6,14 @@
   publish = "."
   functions = "netlify/functions"
 
+# URL Kısaltmaları
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-login"
+  to = "/admin-login.html"
+  status = 200
+
