@@ -1,6 +1,6 @@
 const { Octokit } = require("@octokit/rest");
 
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
   try {
     if (event.httpMethod !== "POST") {
       return {
