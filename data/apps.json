@@ -121,6 +121,7 @@
       "icon": "📱",
       "privacy": "https://bambinifojo.github.io/task-cosmos/privacy-policy.html",
       "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos",
+      "detailPage": "task-cosmos/",
       "rating": 4.8,
       "downloads": "10K+",
       "category": "Üretkenlik",
@@ -180,6 +181,83 @@
       "downloads": "20K+",
       "category": "Müzik & Ses",
       "features": ["Playlist", "Eşitleyici", "Widget", "Şarkı Sözleri"]
+    },
+    {
+      "title": "Photo Editor Pro",
+      "description": "Profesyonel fotoğraf düzenleme uygulaması. Filtreler, efektler ve gelişmiş düzenleme araçları ile fotoğraflarınızı mükemmelleştirin.",
+      "icon": "📸",
+      "privacy": "#",
+      "details": "#",
+      "rating": 4.7,
+      "downloads": "25K+",
+      "category": "Fotoğraf & Video",
+      "features": ["Filtreler", "Efektler", "Düzenleme", "Paylaşım"]
+    },
+    {
+      "title": "Language Learning",
+      "description": "Eğlenceli ve etkili dil öğrenme uygulaması. Oyunlaştırılmış dersler ile yeni diller öğrenin ve pratik yapın.",
+      "icon": "🌍",
+      "privacy": "#",
+      "details": "#",
+      "rating": 4.9,
+      "downloads": "50K+",
+      "category": "Eğitim",
+      "features": ["Çoklu Dil", "Oyunlaştırma", "Sesli Telaffuz", "İlerleme Takibi"]
+    },
+    {
+      "title": "Sleep Tracker",
+      "description": "Uyku kalitesini takip eden akıllı uygulama. Uyku düzeninizi analiz edin ve daha iyi uyku için öneriler alın.",
+      "icon": "😴",
+      "privacy": "#",
+      "details": "#",
+      "rating": 4.6,
+      "downloads": "18K+",
+      "category": "Sağlık & Fitness",
+      "features": ["Uyku Analizi", "Alarm", "İstatistikler", "Rahatlatıcı Sesler"]
+    },
+    {
+      "title": "Budget Planner",
+      "description": "Kişisel bütçe planlama ve finansal hedef takip uygulaması. Gelir ve giderlerinizi yönetin, tasarruf hedefleri belirleyin.",
+      "icon": "💳",
+      "privacy": "#",
+      "details": "#",
+      "rating": 4.5,
+      "downloads": "15K+",
+      "category": "Finans",
+      "features": ["Bütçe Planlama", "Hedef Takibi", "Grafikler", "Bildirimler"]
+    },
+    {
+      "title": "Recipe Book",
+      "description": "Binlerce lezzetli tarif içeren dijital yemek kitabı. Adım adım talimatlar, video rehberler ve alışveriş listesi özellikleri.",
+      "icon": "🍳",
+      "privacy": "#",
+      "details": "#",
+      "rating": 4.8,
+      "downloads": "30K+",
+      "category": "Yaşam Tarzı",
+      "features": ["Binlerce Tarif", "Video Rehberler", "Alışveriş Listesi", "Favoriler"]
+    },
+    {
+      "title": "Meditation App",
+      "description": "Stres azaltma ve mindfulness için rehberli meditasyon uygulaması. Günlük meditasyon seansları ile iç huzurunuzu bulun.",
+      "icon": "🧘",
+      "privacy": "#",
+      "details": "#",
+      "rating": 4.9,
+      "downloads": "40K+",
+      "category": "Sağlık & Fitness",
+      "features": ["Rehberli Meditasyon", "Rahatlatıcı Sesler", "İlerleme Takibi", "Günlük Hedefler"]
+    },
+    {
+      "title": "Code Editor",
+      "description": "Mobil cihazlar için güçlü kod editörü. Syntax highlighting, otomatik tamamlama ve Git entegrasyonu ile kod yazın.",
+      "icon": "💻",
+      "privacy": "#",
+      "details": "#",
+      "rating": 4.6,
+      "downloads": "12K+",
+      "category": "Geliştirici Araçları",
+      "features": ["Syntax Highlighting", "Git Entegrasyonu", "Çoklu Dil", "Tema Desteği"]
     }
   ]
 }

@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bambinifojo - Uygulamalarım</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles.css"/>
 <script defer src="scripts.js"></script>
 </head>
@@ -77,7 +78,7 @@
   <a href="#about" class="menu-item">👤 Hakkımda</a>
   <a href="#skills" class="menu-item">⚡ Yetenekler</a>
   <a href="#apps" class="menu-item">📱 Uygulamalar</a>
-  <a href="#contact-section" class="menu-item">✉️ İletişim</a>
+  <a href="contact.html" class="menu-item">✉️ İletişim</a>
   <a href="admin-login.html" class="menu-item admin-link">⚙️ Admin Paneli</a>
 </div>
 
@@ -259,14 +260,20 @@
   <div id="apps-container"></div>
 </section>
 
-<!-- Contact Section -->
+<!-- Contact Section Link -->
 <section id="contact-section" class="contact-section">
   <div class="contact-content">
     <h2 class="section-title" data-aos="fade-up">İletişim</h2>
     <p class="contact-subtitle" data-aos="fade-up" data-aos-delay="50ms">Projeleriniz veya işbirliği için benimle iletişime geçebilirsiniz</p>
     
-    <div class="contact-grid" data-aos="fade-up" data-aos-delay="100ms">
-      <!-- Contact cards will be loaded dynamically from JSON -->
+    <div class="contact-link-container" data-aos="fade-up" data-aos-delay="100ms">
+      <a href="contact.html" class="btn-contact-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+        <span>İletişim Sayfasına Git</span>
+      </a>
     </div>
   </div>
 </section>
@@ -276,7 +283,7 @@
     <div class="footer-links">
       <a href="#home">Ana Sayfa</a>
       <a href="#apps">Uygulamalar</a>
-      <a href="#contact-section">İletişim</a>
+      <a href="contact.html">İletişim</a>
     </div>
     
     <div class="social-links">
@@ -360,5 +367,103 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
+<!-- AI Asistan Widget -->
+<div class="ai-assistant-widget" id="aiAssistantWidget">
+  <!-- Floating Button -->
+  <button class="ai-assistant-toggle" id="aiAssistantToggle" title="AI Asistan" aria-label="AI Asistan">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      <path d="M13 8H7"></path>
+      <path d="M17 12H7"></path>
+    </svg>
+    <span class="ai-badge" id="aiBadge">3</span>
+  </button>
+
+  <!-- Chat Modal -->
+  <div class="ai-assistant-modal" id="aiAssistantModal">
+    <div class="ai-modal-content">
+      <!-- Header -->
+      <div class="ai-modal-header">
+        <div class="ai-header-left">
+          <div class="ai-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+              <path d="M2 17l10 5 10-5"></path>
+              <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            <span>AI Asistan</span>
+          </div>
+        </div>
+        <div class="ai-header-right">
+          <button class="ai-header-btn" id="aiMinimizeBtn" title="Küçült">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+          <button class="ai-header-btn" id="aiCloseBtn" title="Kapat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Welcome Message -->
+      <div class="ai-welcome-section" id="aiWelcomeSection">
+        <div class="ai-welcome-content">
+          <div class="ai-welcome-icon">🤖</div>
+          <h3>AI Asistan'a Hoş Geldiniz!</h3>
+          <p>Site ve uygulamalarım hakkında sorular sorabilir, geri bildirim verebilir veya oy kullanabilirsiniz.</p>
+          <div class="ai-mode-info">
+            <div class="ai-mode-item">
+              <span class="ai-mode-icon">💡</span>
+              <div>
+                <strong>Demo Mod</strong>
+                <p>Saat başına 3 mesaj krediniz var</p>
+              </div>
+            </div>
+            <div class="ai-mode-item">
+              <span class="ai-mode-icon">📱</span>
+              <div>
+                <strong>Hızlı Başlangıç</strong>
+                <p>Alttaki kategorilerden birini seçin veya doğrudan soru sorun</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Messages -->
+      <div class="ai-chat-messages" id="aiChatMessages"></div>
+
+      <!-- Input Area -->
+      <div class="ai-input-area">
+        <div class="ai-input-wrapper">
+          <textarea 
+            id="aiMessageInput" 
+            class="ai-message-input" 
+            placeholder="Mesaj yaz..."
+            rows="1"
+          ></textarea>
+          <button class="ai-send-btn" id="aiSendBtn" title="Gönder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div class="ai-status-bar">
+          <span class="ai-status-text" id="aiStatusText">
+            <span id="aiCredits">3</span> kredi kaldı
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="ai-assistant.js"></script>
 </body>
 </html>

@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Girişi - Bambinifojo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
   * {
@@ -264,6 +265,35 @@
 
   .notification.hiding {
     animation: slideOutRight 0.3s ease forwards;
+  }
+
+  .notification-icon {
+    font-size: 1.2rem;
+  }
+
+  .notification-message {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #374151;
+  }
+
+  .notification-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 1.2rem;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+  }
+
+  .notification-close:hover {
+    color: #374151;
   }
 
   .btn-login,
@@ -1056,6 +1086,31 @@
 </style>
 </head>
 <body>
+  <script>
+    // Sayfa yüklenme kontrolü
+    console.log('✅ Admin login sayfası yükleniyor...');
+    
+    // Global error handler
+    window.addEventListener('error', (e) => {
+      console.error('❌ Sayfa hatası:', e.error);
+      console.error('Hata mesajı:', e.message);
+      console.error('Dosya:', e.filename);
+      console.error('Satır:', e.lineno);
+      console.error('Sütun:', e.colno);
+    });
+
+    // Unhandled promise rejection handler
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('❌ Promise hatası:', e.reason);
+    });
+
+    // Sayfa görünürlüğü kontrolü
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        console.log('✅ Sayfa görünür');
+      }
+    });
+  </script>
   <div class="login-container">
     <div class="login-header-wrapper">
       <div class="login-header">
@@ -1194,32 +1249,54 @@
 
       </div>
 
-      <a href="index.html" class="back-link">← Ana Sayfaya Dön</a>
+      <a href="/" class="back-link">← Ana Sayfaya Dön</a>
     </div>
   </div>
 
   <!-- QR Code Library - %100 ÇALIŞAN ÇÖZÜM -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script>
+    // Tracking Prevention uyarılarını gizle (zararsız uyarılar)
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+      if (args[0] && typeof args[0] === 'string' && args[0].includes('Tracking Prevention')) {
+        return; // Bu uyarıları gizle
+      }
+      originalWarn.apply(console, args);
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js" onerror="console.error('❌ QRCode CDN yüklenemedi!')"></script>
   <script>
     // QRCode kütüphanesinin yüklendiğini kontrol et
-    if (typeof QRCode === "undefined") {
-      console.error("❌ QRCode kütüphanesi yüklenemedi! Alternatif CDN deneniyor...");
-      // Alternatif CDN
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-      script.onload = function() {
-        console.log("✅ Alternatif QRCode CDN yüklendi!");
+    (function checkQRCode() {
+      if (typeof QRCode !== "undefined") {
+        console.log("✅ QRCode yüklendi!");
         window.qrcodeLoaded = true;
-      };
-      script.onerror = function() {
-        console.error("❌ Alternatif QRCode CDN de yüklenemedi!");
-        window.qrcodeLoaded = false;
-      };
-      document.head.appendChild(script);
-    } else {
-      console.log("✅ QRCode yüklendi!");
-      window.qrcodeLoaded = true;
-    }
+        return;
+      }
+      
+      // Kısa bir gecikme ile tekrar kontrol et
+      setTimeout(() => {
+        if (typeof QRCode !== "undefined") {
+          console.log("✅ QRCode yüklendi! (gecikmeli)");
+          window.qrcodeLoaded = true;
+          return;
+        }
+        
+        console.warn("⚠️ QRCode kütüphanesi yüklenemedi! Alternatif CDN deneniyor...");
+        // Alternatif CDN
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+        script.onload = function() {
+          console.log("✅ Alternatif QRCode CDN yüklendi!");
+          window.qrcodeLoaded = true;
+        };
+        script.onerror = function() {
+          console.error("❌ Alternatif QRCode CDN de yüklenemedi!");
+          window.qrcodeLoaded = false;
+        };
+        document.head.appendChild(script);
+      }, 500);
+    })();
   </script>
   
   <script>
@@ -1400,7 +1477,7 @@
 
     // QRCode kütüphanesinin yüklendiğini kontrol et
     let qrCodeCheckAttempts = 0;
-    const MAX_QRCODE_CHECK_ATTEMPTS = 100; // 10 saniye (100 * 100ms)
+    const MAX_QRCODE_CHECK_ATTEMPTS = 50; // 5 saniye (50 * 100ms)
     
     function waitForQRCode(callback) {
       qrCodeCheckAttempts++;
@@ -1413,50 +1490,119 @@
       if (qrCodeAvailable) {
         console.log('✅ QRCode kütüphanesi yüklendi');
         qrCodeCheckAttempts = 0;
-        callback();
+        if (typeof callback === 'function') {
+          callback();
+        }
       } else if (qrCodeCheckAttempts >= MAX_QRCODE_CHECK_ATTEMPTS) {
-        console.error('❌ QRCode kütüphanesi yüklenemedi! Maksimum deneme sayısına ulaşıldı.');
+        console.warn('⚠️ QRCode kütüphanesi yüklenemedi! Maksimum deneme sayısına ulaşıldı. Manuel anahtar kullanılabilir.');
         showQRCodeError();
         // Yine de callback'i çağır (manuel anahtar kullanılabilir)
-        callback();
+        qrCodeCheckAttempts = 0;
+        if (typeof callback === 'function') {
+          callback();
+        }
       } else {
         setTimeout(() => waitForQRCode(callback), 100);
       }
     }
     
-    // QR kod hatası göster
     function showQRCodeError() {
       const qrContainer = document.getElementById('qrcode');
       if (qrContainer) {
         qrContainer.innerHTML = `
           <div class="qr-error">
-            <p>❌ QR kod kütüphanesi yüklenemedi</p>
-            <p>Lütfen internet bağlantınızı kontrol edin ve sayfayı yenileyin</p>
+            <p>⚠️ QR kod kütüphanesi yüklenemedi</p>
+            <p>Manuel anahtarı kullanarak ekleyebilirsiniz</p>
             <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Sayfayı Yenile</button>
           </div>
         `;
       }
     }
+    
 
     // Sayfa yüklendiğinde kontrol et
     window.addEventListener('DOMContentLoaded', () => {
-      // Accordion'ı başlat
-      initAccordion();
-      
-      waitForQRCode(() => {
-        // 2FA kurulumu yapılmış mı kontrol et
-        if (!twoFactorSecret || !twoFactorEnabled) {
-          // İlk kurulum
-          showSetup();
+      console.log('✅ DOMContentLoaded tetiklendi');
+      try {
+        // Accordion'ı başlat
+        console.log('🔍 initAccordion fonksiyonu kontrol ediliyor...');
+        if (typeof initAccordion === 'function') {
+          console.log('✅ initAccordion çağrılıyor...');
+          initAccordion();
         } else {
-          // Normal giriş, 2FA aktif
-          showLogin();
-          document.getElementById('twoFactorGroup').classList.remove('hidden');
-          // 2FA kodunu otomatik üret ve göster
-          startAutoGenerateCode();
+          console.error('❌ initAccordion fonksiyonu bulunamadı!');
         }
-      });
+        
+        console.log('🔍 waitForQRCode çağrılıyor...');
+        waitForQRCode(() => {
+          console.log('✅ QR kod callback çağrıldı');
+          try {
+            // 2FA kurulumu yapılmış mı kontrol et
+            console.log('🔍 2FA durumu kontrol ediliyor...', { twoFactorSecret: !!twoFactorSecret, twoFactorEnabled });
+            if (!twoFactorSecret || !twoFactorEnabled) {
+              // İlk kurulum
+              console.log('📱 İlk kurulum modu');
+              if (typeof showSetup === 'function') {
+                console.log('✅ showSetup çağrılıyor...');
+                showSetup();
+              } else {
+                console.error('❌ showSetup fonksiyonu bulunamadı!');
+              }
+            } else {
+              // Normal giriş, 2FA aktif
+              console.log('🔐 Normal giriş modu (2FA aktif)');
+              if (typeof showLogin === 'function') {
+                console.log('✅ showLogin çağrılıyor...');
+                showLogin();
+              } else {
+                console.error('❌ showLogin fonksiyonu bulunamadı!');
+              }
+              const twoFactorGroup = document.getElementById('twoFactorGroup');
+              if (twoFactorGroup) {
+                twoFactorGroup.classList.remove('hidden');
+              }
+              // 2FA kodunu otomatik üret ve göster
+              if (typeof startAutoGenerateCode === 'function') {
+                startAutoGenerateCode();
+              }
+            }
+          } catch (error) {
+            console.error('❌ QR kod callback hatası:', error);
+            console.error('Stack:', error.stack);
+          }
+        });
+      } catch (error) {
+        console.error('❌ DOMContentLoaded hatası:', error);
+        console.error('Stack:', error.stack);
+      }
     });
+
+    // Sayfa yüklendiğinde ek kontrol
+    if (document.readyState === 'loading') {
+      console.log('⏳ Sayfa yükleniyor...');
+    } else {
+      console.log('✅ Sayfa zaten yüklü');
+      // Eğer sayfa zaten yüklüyse, DOMContentLoaded tetiklenmeyebilir
+      setTimeout(() => {
+        try {
+          if (typeof initAccordion === 'function') {
+            initAccordion();
+          }
+          // 2FA durumunu kontrol et ve uygun accordion'ı aç
+          if (!twoFactorSecret || !twoFactorEnabled) {
+            if (typeof showSetup === 'function') {
+              showSetup();
+            }
+          } else {
+            if (typeof showLogin === 'function') {
+              showLogin();
+            }
+          }
+        } catch (error) {
+          console.error('❌ Sayfa yükleme hatası:', error);
+        }
+      }, 100);
+    }
 
     // 2FA kodunu otomatik üret ve göster
     async function startAutoGenerateCode() {
@@ -1673,35 +1819,279 @@
             
             // QR kod tıklanabilir yap (büyütme için)
             canvas.addEventListener('click', () => {
-              const newWindow = window.open('', '_blank');
+              const newWindow = window.open('', '_blank', 'width=800,height=900,scrollbars=no,resizable=yes');
+              const qrDataUrl = canvas.toDataURL();
               newWindow.document.write(`
-                <html>
-                  <head>
-                    <title>QR Kod - Büyük Görünüm</title>
-                    <style>
-                      body {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        min-height: 100vh;
-                        margin: 0;
-                        background: #f5f5f5;
-                        font-family: Arial, sans-serif;
+                <!DOCTYPE html>
+                <html lang="tr">
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>QR Kod - Büyük Görünüm</title>
+                  <style>
+                    * {
+                      margin: 0;
+                      padding: 0;
+                      box-sizing: border-box;
+                    }
+                    
+                    body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                      min-height: 100vh;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      justify-content: center;
+                      padding: 40px 20px;
+                      position: relative;
+                      overflow-x: hidden;
+                    }
+                    
+                    body::before {
+                      content: '';
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                      background: 
+                        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+                      pointer-events: none;
+                      z-index: 0;
+                    }
+                    
+                    .container {
+                      position: relative;
+                      z-index: 1;
+                      background: rgba(255, 255, 255, 0.98);
+                      backdrop-filter: blur(20px);
+                      border-radius: 24px;
+                      padding: 40px;
+                      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                      border: 1px solid rgba(255, 255, 255, 0.3);
+                      max-width: 600px;
+                      width: 100%;
+                      text-align: center;
+                      animation: fadeInUp 0.5s ease;
+                    }
+                    
+                    @keyframes fadeInUp {
+                      from {
+                        opacity: 0;
+                        transform: translateY(30px);
                       }
-                      img {
-                        max-width: 90vw;
-                        max-height: 90vh;
-                        border: 8px solid white;
+                      to {
+                        opacity: 1;
+                        transform: translateY(0);
+                      }
+                    }
+                    
+                    .header {
+                      margin-bottom: 30px;
+                    }
+                    
+                    .header h1 {
+                      font-size: 1.75rem;
+                      font-weight: 700;
+                      color: #1a1a1a;
+                      margin-bottom: 8px;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      -webkit-background-clip: text;
+                      -webkit-text-fill-color: transparent;
+                      background-clip: text;
+                    }
+                    
+                    .header p {
+                      color: #6b7280;
+                      font-size: 0.9375rem;
+                      line-height: 1.6;
+                    }
+                    
+                    .qr-wrapper {
+                      background: white;
+                      padding: 30px;
+                      border-radius: 20px;
+                      display: inline-block;
+                      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                      margin: 20px 0;
+                      position: relative;
+                      transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    }
+                    
+                    .qr-wrapper:hover {
+                      transform: scale(1.02);
+                      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+                    }
+                    
+                    .qr-wrapper::before {
+                      content: '';
+                      position: absolute;
+                      top: -2px;
+                      left: -2px;
+                      right: -2px;
+                      bottom: -2px;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      border-radius: 22px;
+                      z-index: -1;
+                      opacity: 0;
+                      transition: opacity 0.3s ease;
+                    }
+                    
+                    .qr-wrapper:hover::before {
+                      opacity: 0.1;
+                    }
+                    
+                    .qr-image {
+                      max-width: 100%;
+                      height: auto;
+                      border-radius: 12px;
+                      display: block;
+                      margin: 0 auto;
+                      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                      transition: transform 0.3s ease;
+                      cursor: pointer;
+                    }
+                    
+                    .qr-wrapper:hover .qr-image {
+                      transform: scale(1.05);
+                    }
+                    
+                    .instructions {
+                      margin-top: 30px;
+                      padding: 20px;
+                      background: #f9fafb;
+                      border-radius: 12px;
+                      border-left: 4px solid #667eea;
+                    }
+                    
+                    .instructions h3 {
+                      font-size: 1rem;
+                      font-weight: 600;
+                      color: #374151;
+                      margin-bottom: 12px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      gap: 8px;
+                    }
+                    
+                    .instructions ol {
+                      text-align: left;
+                      color: #6b7280;
+                      font-size: 0.875rem;
+                      line-height: 1.8;
+                      padding-left: 20px;
+                      max-width: 400px;
+                      margin: 0 auto;
+                    }
+                    
+                    .instructions li {
+                      margin-bottom: 8px;
+                    }
+                    
+                    .instructions li strong {
+                      color: #667eea;
+                      font-weight: 600;
+                    }
+                    
+                    .close-btn {
+                      margin-top: 30px;
+                      padding: 12px 32px;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      border: none;
+                      border-radius: 10px;
+                      font-size: 0.9375rem;
+                      font-weight: 600;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                    }
+                    
+                    .close-btn:hover {
+                      transform: translateY(-2px);
+                      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+                    }
+                    
+                    .close-btn:active {
+                      transform: translateY(0);
+                    }
+                    
+                    @media (max-width: 768px) {
+                      .container {
+                        padding: 30px 20px;
                         border-radius: 20px;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
                       }
-                    </style>
-                  </head>
-                  <body>
-                    <img src="${canvas.toDataURL()}" alt="QR Kod">
-                  </body>
+                      
+                      .header h1 {
+                        font-size: 1.5rem;
+                      }
+                      
+                      .qr-wrapper {
+                        padding: 20px;
+                      }
+                      
+                      .instructions {
+                        padding: 16px;
+                      }
+                      
+                      .instructions ol {
+                        font-size: 0.8125rem;
+                      }
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <div class="header">
+                      <h1>📱 QR Kod</h1>
+                      <p>Google Authenticator ile tarayın</p>
+                    </div>
+                    
+                    <div class="qr-wrapper">
+                      <img src="${qrDataUrl}" alt="QR Kod" class="qr-image">
+                    </div>
+                    
+                    <div class="instructions">
+                      <h3>📋 Nasıl Kullanılır?</h3>
+                      <ol>
+                        <li><strong>Google Authenticator</strong> uygulamasını açın</li>
+                        <li><strong>"+"</strong> butonuna tıklayın</li>
+                        <li><strong>"QR kod tarayarak ekle"</strong> seçeneğini seçin</li>
+                        <li>Yukarıdaki QR kodu telefonunuzla tarayın</li>
+                        <li>Hesap başarıyla eklenecek! ✅</li>
+                      </ol>
+                    </div>
+                    
+                    <button class="close-btn" onclick="window.close()">✖️ Pencereyi Kapat</button>
+                  </div>
+                  
+                  <script>
+                    // ESC tuşu ile kapat
+                    document.addEventListener('keydown', (e) => {
+                      if (e.key === 'Escape') {
+                        window.close();
+                      }
+                    });
+                    
+                    // QR kod tıklanabilir yap (indirme için)
+                    document.querySelector('.qr-image').addEventListener('click', function() {
+                      const link = document.createElement('a');
+                      link.download = 'qrcode-' + Date.now() + '.png';
+                      link.href = this.src;
+                      link.click();
+                    });
+                    
+                    // QR kod üzerine gelince tooltip göster
+                    const qrImage = document.querySelector('.qr-image');
+                    qrImage.title = 'İndirmek için tıklayın';
+                  <\/script>
+                </body>
                 </html>
               `);
+              newWindow.document.close();
             });
             
             canvas.style.cursor = 'pointer';
@@ -1769,28 +2159,41 @@
 
     // Login göster
     function showLogin() {
-      // Login accordion'ı aç
-      const loginAccordion = document.getElementById('loginAccordion');
-      const loginBody = document.getElementById('loginBody');
-      if (loginAccordion && loginBody) {
-        const loginHeader = loginAccordion.querySelector('.ac-header');
-        openAccordionItem(loginAccordion, loginBody, loginHeader);
-        
-        // Password input'a focus
-        setTimeout(() => {
-          const passwordInput = document.getElementById('password');
-          if (passwordInput) {
-            passwordInput.focus();
-          }
-        }, 500);
-      }
+      console.log('🔍 [DEBUG] showLogin() çağrıldı');
       
-      // Setup accordion'ı kapat
+      // Önce setup accordion'ı kapat
       const setupAccordion = document.getElementById('setupAccordion');
       const setupBody = document.getElementById('setupBody');
       if (setupAccordion && setupBody && setupBody.classList.contains('open')) {
+        console.log('🔍 [DEBUG] Setup accordion kapatılıyor...');
         closeAccordionItem(setupAccordion, setupBody);
       }
+      
+      // Kısa bir gecikme ile login accordion'ı aç
+      setTimeout(() => {
+        const loginAccordion = document.getElementById('loginAccordion');
+        const loginBody = document.getElementById('loginBody');
+        console.log('🔍 [DEBUG] Login Accordion:', loginAccordion);
+        console.log('🔍 [DEBUG] Login Body:', loginBody);
+        
+        if (loginAccordion && loginBody) {
+          const loginHeader = loginAccordion.querySelector('.ac-header');
+          console.log('🔍 [DEBUG] Login Header:', loginHeader);
+          openAccordionItem(loginAccordion, loginBody, loginHeader);
+          console.log('✅ [DEBUG] Login accordion açıldı');
+          
+          // Password input'a focus
+          setTimeout(() => {
+            const passwordInput = document.getElementById('password');
+            if (passwordInput) {
+              passwordInput.focus();
+              console.log('✅ [DEBUG] Password input focus edildi');
+            }
+          }, 600);
+        } else {
+          console.error('❌ [DEBUG] Login accordion elementleri bulunamadı!');
+        }
+      }, 400);
     }
 
     // Accordion açma/kapama fonksiyonu
@@ -1937,11 +2340,33 @@
           localStorage.setItem('admin2FAEnabled', 'true');
           twoFactorEnabled = true;
           
+          console.log('✅ 2FA doğrulama başarılı! Giriş formuna geçiliyor...');
           showNotification('✅ 2FA başarıyla kuruldu! Artık giriş yaparken telefonunuzdaki kodu girmeniz gerekecek.', 'success');
           
+          // Setup accordion'ı kapat
+          const setupAccordion = document.getElementById('setupAccordion');
+          const setupBody = document.getElementById('setupBody');
+          if (setupAccordion && setupBody) {
+            closeAccordionItem(setupAccordion, setupBody);
+          }
+          
           setTimeout(() => {
+            console.log('🔍 showLogin() çağrılıyor...');
             showLogin();
-            document.getElementById('twoFactorGroup').classList.remove('hidden');
+            
+            // 2FA grup'u göster
+            const twoFactorGroup = document.getElementById('twoFactorGroup');
+            if (twoFactorGroup) {
+              twoFactorGroup.classList.remove('hidden');
+              console.log('✅ 2FA grup gösterildi');
+            } else {
+              console.error('❌ twoFactorGroup elementi bulunamadı!');
+            }
+            
+            // Otomatik kod üret
+            if (typeof startAutoGenerateCode === 'function') {
+              startAutoGenerateCode();
+            }
           }, 1000);
         } else {
           showNotification('❌ Geçersiz kod! Lütfen telefonunuzdaki güncel kodu girin.', 'error');
@@ -2222,12 +2647,15 @@
     document.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         const activeElement = document.activeElement;
-        if (activeElement.id === 'password' || activeElement.id === 'twoFactorCode' || activeElement.id === 'verifyCode') {
-          if (document.getElementById('setupSection').classList.contains('hidden')) {
-            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-          } else {
-            verifySetup();
+        if (activeElement.id === 'password' || activeElement.id === 'twoFactorCode') {
+          // Login formu için
+          const loginForm = document.getElementById('loginForm');
+          if (loginForm) {
+            loginForm.dispatchEvent(new Event('submit'));
           }
+        } else if (activeElement.id === 'verifyCode') {
+          // Setup formu için
+          verifySetup();
         }
       }
     });
@@ -2251,9 +2679,9 @@
       
       const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
       notification.innerHTML = `
-        <span style="font-size: 1.2rem;">${icon}</span>
-        <span style="flex: 1; font-size: 0.875rem; color: #374151;">${message}</span>
-        <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 1.2rem; padding: 0; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">×</button>
+        <span class="notification-icon">${icon}</span>
+        <span class="notification-message">${message}</span>
+        <button class="notification-close" onclick="this.parentElement.remove()">×</button>
       `;
 
       document.body.appendChild(notification);
@@ -2308,6 +2736,17 @@
         return false;
       }
     });
+
+    // Global scope'a fonksiyonları ekle (onclick handler'lar için)
+    window.showSetup = showSetup;
+    window.showLogin = showLogin;
+    window.initAccordion = initAccordion;
+    window.verifySetup = verifySetup;
+    window.handleLogin = handleLogin;
+    window.togglePassword = togglePassword;
+    window.copySecret = copySecret;
+    window.autoFillCode = autoFillCode;
+    window.skipSetup = skipSetup;
   </script>
 </body>
 </html>

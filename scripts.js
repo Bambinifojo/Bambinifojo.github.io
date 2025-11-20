@@ -172,7 +172,6 @@ async function loadSiteData() {
     if (data.site.contact) {
       const contactTitle = document.querySelector('#contact-section .section-title');
       const contactSubtitle = document.querySelector('.contact-subtitle');
-      const contactGrid = document.querySelector('.contact-grid');
       
       if (contactTitle && data.site.contact.title) {
         contactTitle.textContent = data.site.contact.title;
@@ -180,44 +179,6 @@ async function loadSiteData() {
       
       if (contactSubtitle && data.site.contact.subtitle) {
         contactSubtitle.textContent = data.site.contact.subtitle;
-      }
-      
-      if (contactGrid && data.site.contact.items) {
-        contactGrid.innerHTML = data.site.contact.items.map((item, index) => {
-          let iconClass = 'email-icon';
-          if (item.type === 'github') iconClass = 'github-icon';
-          else if (item.type === 'portfolio') iconClass = 'portfolio-icon';
-          
-          // Icon için SVG veya emoji
-          let iconHTML = `<span style="font-size: 28px;">${item.icon}</span>`;
-          if (item.type === 'email') {
-            iconHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>`;
-          } else if (item.type === 'github') {
-            iconHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>`;
-          } else if (item.type === 'portfolio') {
-            iconHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-              <line x1="12" y1="22.08" x2="12" y2="12"></line>
-            </svg>`;
-          }
-          
-          return `
-            <div class="contact-card" data-aos="fade-up" data-aos-delay="${index * 100}ms">
-              <div class="contact-card-icon ${iconClass}">
-                ${iconHTML}
-              </div>
-              <h3 class="contact-card-title">${item.title}</h3>
-              <a href="${item.link}" class="contact-card-link" ${item.link.startsWith('http') ? 'target="_blank" rel="noopener"' : ''}>${item.value}</a>
-              <p class="contact-card-desc">${item.description}</p>
-            </div>
-          `;
-        }).join('');
       }
     }
   } catch (error) {
@@ -256,6 +217,9 @@ async function loadApps(){
       
       const card = document.createElement('div');
       card.className = 'app-card';
+      if (!hasPlayStore) {
+        card.classList.add('app-card-coming-soon');
+      }
       card.style.animationDelay = `${index * 0.1}s`;
       card.setAttribute('data-aos', 'fade-up');
       card.setAttribute('data-aos-delay', `${index * 100}ms`);
@@ -281,8 +245,11 @@ async function loadApps(){
           </div>`
         : '';
       
+      // Check if app has a detail page
+      const detailPage = app.detailPage || (app.title === 'Task Cosmos' ? 'task-cosmos/' : null);
+      
       card.innerHTML = `
-        <div class="app-card-header">
+        <div class="app-card-header" ${detailPage ? 'style="cursor: pointer;"' : ''}>
           <div class="app-icon-large">${icon}</div>
           <div class="app-header-info">
             <div class="app-category">${category}</div>
@@ -301,18 +268,18 @@ async function loadApps(){
         
         <div class="app-actions">
           ${hasPlayStore ? `
-            <a href="${app.details}" class="btn-play-store" target="_blank" rel="noopener">
+            <a href="${app.details}" class="btn-play-store" target="_blank" rel="noopener" onclick="event.stopPropagation();">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
               </svg>
               <span>Google Play'de İndir</span>
             </a>
           ` : `
-            <button class="btn-coming-soon" disabled>
+            <button class="btn-coming-soon" disabled onclick="event.stopPropagation();">
               <span>Yakında</span>
             </button>
           `}
-          <a href="${app.privacy}" class="btn-privacy" target="_blank" rel="noopener">
+          <a href="${app.privacy}" class="btn-privacy" target="_blank" rel="noopener" onclick="event.stopPropagation();">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
@@ -320,6 +287,18 @@ async function loadApps(){
           </a>
         </div>
       `;
+      
+      // Add click event to navigate to detail page
+      if (detailPage) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+          // Don't navigate if clicking on buttons or links
+          if (e.target.closest('.app-actions') || e.target.closest('a') || e.target.closest('button')) {
+            return;
+          }
+          window.location.href = detailPage;
+        });
+      }
       
       container.appendChild(card);
     });
@@ -576,9 +555,63 @@ function initSearch() {
   observer.observe(searchContainer, { attributes: true, attributeFilter: ['class'] });
 }
 
+// Contact Form Handler
+function initContactForm() {
+  const contactForm = document.getElementById('contactForm');
+  if (!contactForm) return;
+  
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+      name: document.getElementById('contactName').value.trim(),
+      email: document.getElementById('contactEmail').value.trim(),
+      subject: document.getElementById('contactSubject').value.trim(),
+      message: document.getElementById('contactMessage').value.trim()
+    };
+    
+    const messageDiv = document.getElementById('contactFormMessage');
+    
+    // Validation
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      messageDiv.textContent = 'Lütfen tüm alanları doldurun.';
+      messageDiv.className = 'contact-form-message error';
+      return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      messageDiv.textContent = 'Lütfen geçerli bir e-posta adresi girin.';
+      messageDiv.className = 'contact-form-message error';
+      return;
+    }
+    
+    // Create mailto link
+    const mailtoLink = `mailto:bambinifojo@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Ad: ${formData.name}\nE-posta: ${formData.email}\n\nMesaj:\n${formData.message}`)}`;
+    
+    // Open email client
+    window.location.href = mailtoLink;
+    
+    // Show success message
+    messageDiv.textContent = 'E-posta uygulamanız açılıyor... Mesajınızı gönderebilirsiniz.';
+    messageDiv.className = 'contact-form-message success';
+    
+    // Reset form after 3 seconds
+    setTimeout(() => {
+      contactForm.reset();
+      messageDiv.className = 'contact-form-message';
+      messageDiv.textContent = '';
+    }, 5000);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Search initialization
   initSearch();
+  
+  // Contact form initialization
+  initContactForm();
   
   // Logo animation
   initLogoAnimation();

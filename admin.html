@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Paneli - Bambinifojo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles.css"/>
 <script>
   // Admin paneli güvenlik kontrolü
@@ -12,31 +13,26 @@
     const adminSession = sessionStorage.getItem('adminSession');
     const adminLoginTime = sessionStorage.getItem('adminLoginTime');
     
-    // Session yoksa veya 8 saatten eskiyse login sayfasına yönlendir
-    if (!adminSession || !adminLoginTime) {
-      window.location.href = 'admin-login.html';
-      return;
-    }
-    
-    const loginTime = parseInt(adminLoginTime);
-    const currentTime = Date.now();
-    const eightHours = 8 * 60 * 60 * 1000; // 8 saat
-    
-    if (currentTime - loginTime > eightHours) {
-      // Session süresi dolmuş
-      sessionStorage.removeItem('adminSession');
-      sessionStorage.removeItem('adminLoginTime');
-      window.location.href = 'admin-login.html';
-      return;
-    }
-    
-    // Her 5 dakikada bir session'ı yenile
-    setInterval(() => {
-      const currentSession = sessionStorage.getItem('adminSession');
-      if (currentSession) {
-        sessionStorage.setItem('adminLoginTime', Date.now().toString());
+    // Session kontrolü - eğer yoksa veya süresi dolmuşsa, sayfayı göster ama giriş gerektir
+    if (adminSession && adminLoginTime) {
+      const loginTime = parseInt(adminLoginTime);
+      const currentTime = Date.now();
+      const eightHours = 8 * 60 * 60 * 1000; // 8 saat
+      
+      if (currentTime - loginTime <= eightHours) {
+        // Session geçerli - her 5 dakikada bir session'ı yenile
+        setInterval(() => {
+          const currentSession = sessionStorage.getItem('adminSession');
+          if (currentSession) {
+            sessionStorage.setItem('adminLoginTime', Date.now().toString());
+          }
+        }, 5 * 60 * 1000);
+      } else {
+        // Session süresi dolmuş - temizle
+        sessionStorage.removeItem('adminSession');
+        sessionStorage.removeItem('adminLoginTime');
       }
-    }, 5 * 60 * 1000);
+    }
   })();
 </script>
 <style>
@@ -52,8 +48,9 @@
 
   .admin-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    background: #f5f7fa;
+    display: flex;
+    flex-direction: column;
     position: relative;
   }
 
@@ -65,75 +62,286 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+      radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
+  }
+
+  /* Top Navigation Bar */
+  .admin-topbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 30px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .admin-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .admin-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    color: #4b5563;
+    transition: all 0.2s ease;
+  }
+
+  .admin-menu-toggle:hover {
+    background: #f3f4f6;
+    color: #667eea;
+  }
+
+  .admin-menu-toggle svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .admin-sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 199;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .admin-sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .admin-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #1a1a1a;
+  }
+
+  .admin-logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .admin-logo-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .admin-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .admin-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .admin-user-avatar {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .admin-user-name {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 0.9rem;
+  }
+
+  #changePasswordBtn {
+    display: none;
+  }
+
+  #changePasswordBtn:not(.hidden) {
+    display: inline-flex;
+  }
+
+  .btn-icon {
+    margin-right: 6px;
+  }
+
+  /* Main Content Area */
+  .admin-main {
+    display: flex;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Sidebar Navigation */
+  .admin-sidebar {
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 30px 0;
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .admin-sidebar-section {
+    padding: 0 20px;
+    margin-bottom: 30px;
+  }
+
+  .admin-sidebar-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding: 0 12px;
+  }
+
+  .admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #4b5563;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+
+  .admin-nav-item:hover {
+    background: #f3f4f6;
+    color: #667eea;
+  }
+
+  .admin-nav-item.active {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    color: #667eea;
+    border-left: 3px solid #667eea;
+  }
+
+  .admin-nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Content Area */
+  .admin-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    max-width: calc(100vw - 260px);
+  }
+
+  .admin-page-header {
+    margin-bottom: 30px;
+  }
+
+  .admin-page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+  }
+
+  .admin-page-subtitle {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin: 0;
   }
 
   #adminPanel {
     position: relative;
     z-index: 1;
-    max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;
   }
 
   .admin-header {
-    background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 35px 40px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .admin-header:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
   }
 
   .admin-header h1 {
     margin: 0 0 10px 0;
     color: #1a1a1a;
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
   .admin-header p {
-    color: #666;
+    color: #6b7280;
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .admin-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
     margin-bottom: 30px;
   }
 
   .admin-card {
-    background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 30px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
     transition: all 0.3s ease;
     animation: fadeInUp 0.5s ease;
   }
 
   .admin-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #d1d5db;
   }
 
   @keyframes fadeInUp {
@@ -148,38 +356,110 @@
   }
 
   .admin-card h2 {
-    margin: 0 0 24px 0;
+    margin: 0 0 20px 0;
     color: #1a1a1a;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     padding-bottom: 16px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 1px solid #e5e7eb;
   }
 
   .admin-card h2 svg {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     color: #667eea;
+  }
+
+  /* Enhanced Stat Cards */
+  .stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 24px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .stat-card-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-card-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-card-trend {
+    font-size: 0.75rem;
+    margin-top: 8px;
+    opacity: 0.8;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .stat-card-trend.up {
+    color: #10b981;
+  }
+
+  .stat-card-trend.down {
+    color: #ef4444;
+  }
+
+  .stat-card-trend.neutral {
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .stat-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 0;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 14px 0;
+    border-bottom: 1px solid #e5e7eb;
     transition: all 0.2s ease;
   }
 
   .stat-item:hover {
-    background: #f9f9f9;
-    margin: 0 -15px;
-    padding-left: 15px;
-    padding-right: 15px;
-    border-radius: 10px;
+    background: #f9fafb;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 8px;
   }
 
   .stat-item:last-child {
@@ -187,31 +467,43 @@
   }
 
   .stat-label {
-    color: #666;
-    font-size: 0.95rem;
+    color: #6b7280;
+    font-size: 0.9rem;
     font-weight: 500;
   }
 
   .stat-value {
     color: #1a1a1a;
-    font-size: 1.4rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #667eea;
   }
 
   .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.5s ease both;
   }
+
+  .form-group:nth-child(1) { animation-delay: 0.1s; }
+  .form-group:nth-child(2) { animation-delay: 0.15s; }
+  .form-group:nth-child(3) { animation-delay: 0.2s; }
+  .form-group:nth-child(4) { animation-delay: 0.25s; }
+  .form-group:nth-child(5) { animation-delay: 0.3s; }
+  .form-group:nth-child(6) { animation-delay: 0.35s; }
+  .form-group:nth-child(7) { animation-delay: 0.4s; }
+  .form-group:nth-child(8) { animation-delay: 0.45s; }
 
   .form-group label {
     display: block;
-    margin-bottom: 8px;
-    color: #333;
+    margin-bottom: 10px;
+    color: #374151;
     font-weight: 600;
     font-size: 0.9rem;
+    transition: color 0.2s ease;
+  }
+
+  .form-group:focus-within label {
+    color: #667eea;
   }
 
   .form-group input,
@@ -219,13 +511,15 @@
   .form-group select {
     width: 100%;
     padding: 14px 18px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #e5e7eb;
     border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-sizing: border-box;
-    background: #fff;
+    background: #ffffff;
     font-family: inherit;
+    color: #1a1a1a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .form-group input:focus,
@@ -233,14 +527,32 @@
   .form-group select:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 
+      0 0 0 4px rgba(102, 126, 234, 0.1),
+      0 4px 12px rgba(102, 126, 234, 0.15);
     transform: translateY(-1px);
+  }
+
+  .form-group input:hover:not(:focus),
+  .form-group textarea:hover:not(:focus),
+  .form-group select:hover:not(:focus) {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   }
 
   .form-group input.error,
   .form-group textarea.error {
-    border-color: #ff4444;
-    box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.1);
+    border-color: #ef4444;
+    box-shadow: 
+      0 0 0 4px rgba(239, 68, 68, 0.1),
+      0 4px 12px rgba(239, 68, 68, 0.15);
+    animation: shakeError 0.5s ease;
+  }
+
+  @keyframes shakeError {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
   }
 
   .form-group .error-message {
@@ -308,7 +620,7 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -328,7 +640,7 @@
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn:hover::before {
@@ -339,34 +651,55 @@
   .btn span {
     position: relative;
     z-index: 1;
+    transition: transform 0.3s ease;
+  }
+
+  .btn:hover span {
+    transform: translateX(2px);
   }
 
   .btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 
+      0 4px 12px rgba(102, 126, 234, 0.25),
+      0 2px 4px rgba(102, 126, 234, 0.15);
+    border: none;
   }
 
   .btn-primary:hover {
+    box-shadow: 
+      0 8px 20px rgba(102, 126, 234, 0.35),
+      0 4px 8px rgba(102, 126, 234, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
   }
 
   .btn-primary:active {
     transform: translateY(0);
+    box-shadow: 
+      0 2px 8px rgba(102, 126, 234, 0.25),
+      0 1px 2px rgba(102, 126, 234, 0.15);
   }
 
   .btn-secondary {
-    background: #f5f5f5;
-    color: #333;
-    border: 2px solid #e0e0e0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    color: #374151;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
 
   .btn-secondary:hover {
-    background: #e8e8e8;
-    border-color: #d0d0d0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-color: #d1d5db;
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+  }
+
+  .btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .btn-danger {
@@ -398,9 +731,10 @@
   }
 
   .apps-list {
-    max-height: 600px;
+    max-height: 700px;
     overflow-y: auto;
     padding-right: 8px;
+    margin-top: 24px;
   }
 
   .apps-list::-webkit-scrollbar {
@@ -423,53 +757,160 @@
 
   .app-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    background: #f9f9f9;
+    gap: 20px;
+    padding: 24px;
+    background: #ffffff;
     border-radius: 16px;
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    margin-bottom: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e5e7eb;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
   }
 
   .app-item:hover {
-    background: #fff;
-    border-color: #e0e0e0;
-    transform: translateX(4px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-color: #667eea;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .app-item:hover::before {
+    transform: scaleY(1);
+  }
+
+  .app-item-icon {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-item:hover .app-item-icon {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: scale(1.05);
   }
 
   .app-item-info {
     flex: 1;
+    min-width: 0;
   }
 
   .app-item-title {
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 8px;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .app-item-title-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .app-item-title-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .app-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .app-item-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .app-item-meta-item svg {
+    width: 14px;
+    height: 14px;
+    color: #9ca3af;
   }
 
   .app-item-desc {
-    font-size: 0.9rem;
-    color: #666;
-    line-height: 1.5;
+    font-size: 0.95rem;
+    color: #4b5563;
+    line-height: 1.6;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    margin-top: 4px;
   }
 
   .app-item-actions {
     display: flex;
     gap: 10px;
     flex-shrink: 0;
+    align-items: center;
   }
 
   .btn-sm {
     padding: 10px 18px;
     font-size: 0.9rem;
+  }
+
+  /* Apps Header Styles */
+  .apps-header {
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 0;
+  }
+
+  .apps-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .apps-header-icon {
+    color: #667eea;
+  }
+
+  .apps-count {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-left: 8px;
+  }
+
+  .apps-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   /* Success/Error Messages */
@@ -568,16 +1009,16 @@
     color: #667eea;
   }
 
-  /* Modal/Overlay System */
+  /* Modal/Overlay System - İyileştirilmiş */
   .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.65);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(12px) saturate(180%);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -585,8 +1026,18 @@
     padding: 20px;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
+    animation: fadeInOverlay 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes fadeInOverlay {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   /* Modal açıkken body scroll'u engelle */
@@ -606,53 +1057,86 @@
 
   .modal-content {
     background: white;
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 0;
     max-width: 800px;
     width: 100%;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
     overflow-x: hidden;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
-    transform: scale(0.9) translateY(20px);
-    transition: transform 0.3s ease;
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(0, 0, 0, 0.05),
+      0 0 100px rgba(102, 126, 234, 0.1);
+    transform: scale(0.9) translateY(30px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     margin: auto;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
 
   .modal-content::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
   }
 
   .modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #f8f9fa;
     border-radius: 10px;
+    margin: 10px 0;
   }
 
   .modal-content::-webkit-scrollbar-thumb {
-    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 10px;
+    border: 2px solid #f8f9fa;
+    transition: all 0.3s ease;
   }
 
   .modal-content::-webkit-scrollbar-thumb:hover {
-    background: #5568d3;
+    background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%);
+    border-color: #e9ecef;
   }
 
   .modal-overlay.active .modal-content {
     transform: scale(1) translateY(0);
+    animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
   .modal-header {
-    padding: 30px 35px;
-    border-bottom: 2px solid #f0f0f0;
+    padding: 28px 32px;
+    border-bottom: 1px solid #e5e7eb;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
     top: 0;
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     z-index: 10;
-    border-radius: 24px 24px 0 0;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px 20px 0 0;
   }
 
   .modal-header h2 {
@@ -663,36 +1147,202 @@
     flex: 1;
     min-width: 0;
     word-wrap: break-word;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.5s ease 0.1s both;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes modalSlideOut {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.9) translateY(30px);
+    }
+  }
+
+  @keyframes fadeOutOverlay {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
 
   .modal-close {
-    background: #f5f5f5;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
     border: none;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    font-size: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 22px;
     color: #666;
     flex-shrink: 0;
     margin-left: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .modal-close::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
   }
 
   .modal-close:hover {
-    background: #e0e0e0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .modal-close:hover::before {
+    width: 100%;
+    height: 100%;
+  }
+
+  .modal-close span {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+  }
+
+  .modal-close:hover span {
     transform: rotate(90deg);
   }
 
   .modal-body {
-    padding: 35px;
+    padding: 32px;
+    animation: fadeInUp 0.5s ease 0.2s both;
   }
 
   .hidden {
     display: none !important;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+
+  .admin-password-wrapper {
+    position: relative;
+  }
+
+  .admin-password-wrapper input[type="password"],
+  .admin-password-wrapper input[type="text"] {
+    padding-right: 40px;
+  }
+
+  .admin-password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  .admin-password-toggle:hover {
+    color: #374151;
+  }
+
+  .admin-password-toggle svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  /* Tarayıcının otomatik göz ikonunu gizle */
+  .admin-password-wrapper input::-ms-reveal,
+  .admin-password-wrapper input::-ms-clear {
+    display: none;
+  }
+
+  .admin-password-error {
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+    min-height: 16px;
+  }
+
+  .admin-login-link {
+    text-align: center;
+    padding: 12px;
+  }
+
+  .admin-password-label {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    color: #374151;
+  }
+
+  /* Stat Card Variants */
+  .stat-card-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .stat-card-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  /* Flex Utilities */
+  .flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .margin-top-20 {
+    margin-top: 20px;
+  }
+
+  .margin-top-10 {
+    margin-top: 10px;
+  }
+
+  .margin-0 {
+    margin: 0;
   }
 
   .site-form-section {
@@ -721,11 +1371,14 @@
   /* Section Tabs */
   .section-tabs {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 30px;
     flex-wrap: wrap;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: 2px solid #e5e7eb;
     padding-bottom: 0;
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 12px;
   }
 
   .section-tab {
@@ -734,24 +1387,43 @@
     border: none;
     border-bottom: 3px solid transparent;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: #666;
-    transition: all 0.3s ease;
+    color: #6b7280;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     bottom: -2px;
     font-family: inherit;
+    border-radius: 8px;
+  }
+
+  .section-tab::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 3px 3px 0 0;
   }
 
   .section-tab:hover {
     color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    background: rgba(102, 126, 234, 0.08);
+    transform: translateY(-2px);
   }
 
   .section-tab.active {
     color: #667eea;
-    border-bottom-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    background: rgba(102, 126, 234, 0.1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  }
+
+  .section-tab.active::before {
+    transform: scaleX(1);
   }
 
   /* Loading Spinner */
@@ -780,43 +1452,148 @@
   .feature-tag {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 10px 18px;
+    border-radius: 24px;
     font-size: 0.9rem;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    animation: fadeInUp 0.3s ease;
+    gap: 10px;
+    animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .feature-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
   }
 
   .feature-tag button {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.25);
     border: none;
     color: white;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    transition: all 0.2s ease;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0;
+    line-height: 1;
+    font-weight: 600;
   }
 
   .feature-tag button:hover {
-    background: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.15) rotate(90deg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Section Management */
+  .admin-section {
+    display: block;
+  }
+
+  .admin-section.hidden {
+    display: none;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .admin-sidebar {
+      width: 240px;
+    }
+
+    .admin-content {
+      max-width: calc(100vw - 240px);
+    }
+
+    .admin-grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
   }
 
   @media (max-width: 768px) {
     .admin-container {
-      padding: 15px;
+      padding: 0;
+    }
+
+    .admin-topbar {
+      padding: 0 16px;
+      height: 64px;
+    }
+
+    .admin-menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-logo-text {
+      font-size: 1.1rem;
+    }
+
+    .admin-topbar-right {
+      gap: 10px;
+    }
+
+    .admin-user-info {
+      padding: 6px 12px;
+      gap: 8px;
+    }
+
+    .admin-user-name {
+      display: none;
+    }
+
+    .admin-sidebar-overlay {
+      display: block;
+    }
+
+    .admin-sidebar {
+      position: fixed;
+      left: -280px;
+      top: 64px;
+      height: calc(100vh - 64px);
+      width: 280px;
+      z-index: 200;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-sidebar.open {
+      left: 0;
+    }
+
+    .admin-content {
+      max-width: 100vw;
+      padding: 20px 16px;
     }
 
     .admin-header {
-      padding: 25px 20px;
+      padding: 24px 20px;
+    }
+
+    .admin-page-title {
+      font-size: 1.75rem;
+    }
+
+    .admin-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .stat-card {
+      padding: 20px;
+    }
+
+    .admin-card {
+      padding: 20px;
     }
 
     .admin-header h1 {
@@ -832,18 +1609,53 @@
       padding: 20px;
     }
 
+    .admin-page-title {
+      font-size: 1.5rem;
+    }
+
+    .stat-card {
+      padding: 20px;
+    }
+
+    .stat-card-value {
+      font-size: 1.75rem;
+    }
+
+    .admin-nav-item {
+      padding: 10px 14px;
+      font-size: 0.9rem;
+    }
+
     .app-item {
       flex-direction: column;
       align-items: flex-start;
-      gap: 15px;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .app-item-icon {
+      width: 56px;
+      height: 56px;
+      min-width: 56px;
+      font-size: 1.75rem;
+    }
+
+    .app-item-info {
+      width: 100%;
     }
 
     .app-item-actions {
       width: 100%;
+      justify-content: stretch;
     }
 
     .app-item-actions .btn {
       flex: 1;
+      min-width: 0;
+    }
+
+    .app-item-meta {
+      gap: 12px;
     }
 
     /* Modal Optimizasyonları - Mobil */
@@ -1038,8 +1850,11 @@
 
   .form-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 30px;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    animation: fadeInUp 0.5s ease 0.5s both;
   }
 
   .modal-content-large {
@@ -1057,120 +1872,822 @@
 
   .alert-container {
     position: fixed;
-    top: 20px;
+    top: 90px;
     right: 20px;
     z-index: 2000;
     max-width: 400px;
+  }
+
+  /* Mobile Menu Toggle */
+  .admin-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .admin-menu-toggle:hover {
+    background: #f3f4f6;
+  }
+
+  .admin-menu-toggle svg {
+    width: 24px;
+    height: 24px;
+    color: #1a1a1a;
+  }
+
+  @media (max-width: 768px) {
+    .admin-menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-topbar-right {
+      gap: 10px;
+    }
+
+    .admin-user-info {
+      display: none;
+    }
+  }
+
+  /* Sidebar Overlay (Mobile) */
+  .admin-sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .admin-sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (max-width: 768px) {
+    .admin-sidebar-overlay {
+      display: block;
+    }
+  }
+
+  /* Dashboard Özel Stiller */
+  .stat-card-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  }
+
+  .dashboard-grid-2-1 {
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  .dashboard-grid-1-1 {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  .preview-header {
+    margin-bottom: 20px;
+  }
+
+  .preview-title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .preview-icon {
+    color: #667eea;
+  }
+
+  .preview-link {
+    text-decoration: none;
+  }
+
+  .preview-container {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    min-height: 400px;
+    position: relative;
+  }
+
+  .preview-frame {
+    width: 100%;
+    height: 500px;
+    border: none;
+    transform: scale(0.8);
+    transform-origin: top left;
+    width: 125%;
+    height: 625px;
+  }
+
+  .preview-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+
+  .quick-actions-card {
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+  }
+
+  .section-title-large {
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-icon {
+    color: #667eea;
+  }
+
+  .actions-column-gap {
+    gap: 12px;
+  }
+
+  .btn-full-width {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .activities-container {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .activities-empty {
+    color: #6b7280;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+  }
+
+  .chart-container {
+    min-height: 200px;
+  }
+
+  .chart-canvas {
+    max-width: 100%;
+  }
+
+  .playstore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  .playstore-card {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .playstore-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+
+  .playstore-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .playstore-icon {
+    font-size: 2rem;
+  }
+
+  .playstore-info {
+    flex: 1;
+  }
+
+  .playstore-title {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .playstore-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .playstore-link {
+    width: 100%;
+    justify-content: center;
+    text-decoration: none;
+  }
+
+  .icon-spacing {
+    margin-right: 6px;
+  }
+
+  /* Chart Styles */
+  .chart-item {
+    margin-bottom: 16px;
+  }
+
+  .chart-item-small {
+    margin-bottom: 12px;
+  }
+
+  .chart-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .chart-item-label {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 0.9rem;
+  }
+
+  .chart-item-value {
+    color: #6b7280;
+    font-size: 0.85rem;
+  }
+
+  .chart-bar-container {
+    background: #f3f4f6;
+    border-radius: 8px;
+    height: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .chart-bar-container-small {
+    height: 20px;
+  }
+
+  .chart-bar {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+  }
+
+  .chart-bar-primary {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .chart-bar-warning {
+    background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+  }
+
+  /* Activity Styles */
+  .activity-item {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+  }
+
+  .activity-item:hover {
+    background: #f3f4f6;
+  }
+
+  .activity-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .activity-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .activity-message {
+    margin: 0 0 4px 0;
+    font-size: 0.9rem;
+    color: #1a1a1a;
+    font-weight: 500;
+  }
+
+  .activity-time {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  .playstore-empty {
+    color: #6b7280;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
   }
 </style>
 <script defer src="admin.js"></script>
 </head>
 <body>
   <div class="admin-container">
-    <!-- Admin Panel -->
-    <div id="adminPanel">
-      <div class="admin-header">
-        <div class="header-top">
-          <div>
-            <h1>📊 Admin Paneli</h1>
-            <p>Uygulamalarınızı ve site ayarlarınızı yönetin</p>
-          </div>
-          
-          <!-- Login Section (Header içinde) -->
-          <div class="login-section-inline">
-            <div class="mode-toggle">
-              <button id="localModeBtn" class="active" onclick="setMode('local')">LocalStorage</button>
-              <button id="githubModeBtn" onclick="setMode('github')">GitHub API</button>
-            </div>
-            <div class="form-group form-group-compact">
-              <input type="password" id="token" class="input-compact" placeholder="GitHub Token (opsiyonel)"/>
-            </div>
-            <div class="button-group">
-              <button class="btn btn-primary btn-flex" onclick="login()">
-                <span>🔓 Giriş Yap</span>
-              </button>
-              <button class="btn btn-secondary hidden" onclick="logout()" id="logoutBtn">
-                <span>Çıkış</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="header-actions">
-          <a href="index.html" class="btn btn-secondary btn-link">
-            <span>🏠 Ana Sayfaya Dön</span>
-          </a>
-          <button class="btn btn-success hidden" onclick="saveToGitHub()" id="saveGitHubBtn">
-            <span>💾 GitHub'a Kaydet</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="admin-grid">
-        <!-- İstatistikler -->
-        <div class="admin-card">
-          <h2>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="20" x2="12" y2="10"></line>
-              <line x1="18" y1="20" x2="18" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="16"></line>
-            </svg>
-            İstatistikler
-          </h2>
-          <div class="stat-item">
-            <span class="stat-label">Toplam Uygulama</span>
-            <span class="stat-value" id="totalApps">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Yayında Olan</span>
-            <span class="stat-value" id="publishedApps">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Yakında</span>
-            <span class="stat-value" id="comingSoonApps">0</span>
-          </div>
-        </div>
-
-        <!-- Hızlı İşlemler -->
-        <div class="admin-card">
-          <h2>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            Hızlı İşlemler
-          </h2>
-          <div class="actions-column">
-            <button class="btn btn-primary" onclick="showAddForm()">
-              <span>➕ Yeni Uygulama Ekle</span>
-            </button>
-            <button class="btn btn-primary" onclick="showSiteSettings()">
-              <span>⚙️ Site Ayarları</span>
-            </button>
-            <button class="btn btn-secondary" onclick="exportData()">
-              <span>📥 Veriyi Dışa Aktar</span>
-            </button>
-            <button class="btn btn-secondary" onclick="importData()">
-              <span>📤 Veriyi İçe Aktar</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Uygulama Listesi -->
-      <div class="admin-card">
-        <h2>
+    <!-- Top Navigation Bar -->
+    <div class="admin-topbar">
+      <div class="admin-topbar-left">
+        <button class="admin-menu-toggle" onclick="toggleSidebar()" aria-label="Menüyü aç/kapat">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
-          Uygulamalar
-        </h2>
-        <div id="appsList" class="apps-list">
-          <p class="loading-text">Yükleniyor...</p>
+        </button>
+        <a href="/" class="admin-logo">
+          <div class="admin-logo-icon">B</div>
+          <div class="admin-logo-text">Admin Panel</div>
+        </a>
+      </div>
+      <div class="admin-topbar-right">
+        <div class="admin-user-info">
+          <div class="admin-user-avatar" id="adminUserAvatar">A</div>
+          <div class="admin-user-name" id="adminUserName">Admin</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="showChangePasswordModal()" id="changePasswordBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="btn-icon">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Şifre Değiştir
+        </button>
+        <a href="/" class="btn btn-secondary btn-sm">Ana Sayfa</a>
+        <button class="btn btn-secondary btn-sm hidden" onclick="logout()" id="logoutBtn">Çıkış</button>
+      </div>
+    </div>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="admin-sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+      <!-- Sidebar Navigation -->
+      <div class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-section">
+          <div class="admin-sidebar-title">Ana Menü</div>
+          <a href="#dashboard" class="admin-nav-item active" onclick="showSection('dashboard')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Dashboard
+          </a>
+          <a href="#apps" class="admin-nav-item" onclick="showSection('apps')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+            Uygulamalar
+          </a>
+          <a href="#settings" class="admin-nav-item" onclick="showSection('settings')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+            </svg>
+            Site Ayarları
+          </a>
+          <a href="#users" class="admin-nav-item" onclick="showSection('users')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Kullanıcılar
+          </a>
+          <a href="#feedback" class="admin-nav-item" onclick="showSection('feedback')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Geri Bildirimler
+          </a>
+        </div>
+        <div class="admin-sidebar-section">
+          <div class="admin-sidebar-title">Hızlı İşlemler</div>
+          <a href="#add-app" class="admin-nav-item" onclick="showAddForm()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Yeni Uygulama
+          </a>
+          <a href="#export" class="admin-nav-item" onclick="exportData()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Dışa Aktar
+          </a>
+          <a href="#import" class="admin-nav-item" onclick="importData()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            İçe Aktar
+          </a>
         </div>
       </div>
+
+      <!-- Content Area -->
+      <div class="admin-content">
+        <!-- Admin Panel -->
+        <div id="adminPanel">
+          <!-- Dashboard Section -->
+          <div id="dashboardSection" class="admin-section">
+            <div class="admin-page-header">
+              <h1 class="admin-page-title">Dashboard</h1>
+              <p class="admin-page-subtitle">Genel bakış ve istatistikler</p>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="admin-grid">
+              <div class="stat-card">
+                <div class="stat-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="totalApps">0</div>
+                <div class="stat-card-label">Toplam Uygulama</div>
+                <div class="stat-card-trend" id="totalAppsTrend"></div>
+              </div>
+
+              <div class="stat-card stat-card-success">
+                <div class="stat-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="publishedApps">0</div>
+                <div class="stat-card-label">Yayında Olan</div>
+                <div class="stat-card-trend" id="publishedAppsTrend"></div>
+              </div>
+
+              <div class="stat-card stat-card-warning">
+                <div class="stat-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="comingSoonApps">0</div>
+                <div class="stat-card-label">Yakında</div>
+                <div class="stat-card-trend" id="comingSoonAppsTrend"></div>
+              </div>
+
+              <div class="stat-card stat-card-blue">
+                <div class="stat-card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="avgRating">0.0</div>
+                <div class="stat-card-label">Ortalama Rating</div>
+                <div class="stat-card-trend" id="avgRatingTrend"></div>
+              </div>
+            </div>
+
+            <!-- Ana Sayfa Önizleme ve Hızlı Erişim -->
+            <div class="admin-grid dashboard-grid-2-1">
+              <!-- Ana Sayfa Canlı Önizleme -->
+              <div class="admin-card">
+                <div class="flex-between preview-header">
+                  <h2 class="preview-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" class="preview-icon">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    Ana Sayfa Önizleme
+                  </h2>
+                  <a href="/" target="_blank" class="btn btn-secondary btn-sm preview-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="icon-spacing">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Yeni Sekmede Aç
+                  </a>
+                </div>
+                <div id="homePreview" class="preview-container">
+                  <iframe id="homePreviewFrame" src="/" title="Ana Sayfa Canlı Önizleme" class="preview-frame"></iframe>
+                  <div class="preview-badge">
+                    Canlı Önizleme
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hızlı İşlemler ve Analiz -->
+              <div>
+                <!-- Hızlı İşlemler -->
+                <div class="admin-card quick-actions-card">
+                  <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" class="section-icon">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    Hızlı İşlemler
+                  </h2>
+                  <div class="actions-column actions-column-gap">
+                    <button class="btn btn-primary btn-full-width" onclick="showAddForm()">
+                      <span>➕ Yeni Uygulama</span>
+                    </button>
+                    <button class="btn btn-primary btn-full-width" onclick="showSiteSettings()">
+                      <span>⚙️ Site Ayarları</span>
+                    </button>
+                    <button class="btn btn-secondary btn-full-width" onclick="exportData()">
+                      <span>📥 Dışa Aktar</span>
+                    </button>
+                    <button class="btn btn-secondary btn-full-width" onclick="importData()">
+                      <span>📤 İçe Aktar</span>
+                    </button>
+                    <button class="btn btn-secondary btn-full-width" onclick="refreshPreview()">
+                      <span>🔄 Önizlemeyi Yenile</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Son Aktiviteler -->
+                <div class="admin-card">
+                  <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" class="section-icon">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Son Aktiviteler
+                  </h2>
+                  <div id="recentActivities" class="activities-container">
+                    <p class="activities-empty">Henüz aktivite yok</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Uygulama Analizi ve Kategoriler -->
+            <div class="admin-grid dashboard-grid-1-1">
+              <!-- Kategori Dağılımı -->
+              <div class="admin-card">
+                <h2 class="section-title-large">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" class="section-icon">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                  Kategori Dağılımı
+                </h2>
+                <div id="categoryChart" class="chart-container">
+                  <canvas id="categoryChartCanvas" class="chart-canvas"></canvas>
+                </div>
+              </div>
+
+              <!-- Rating Dağılımı -->
+              <div class="admin-card">
+                <h2 class="section-title-large">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" class="section-icon">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  Rating Dağılımı
+                </h2>
+                <div id="ratingChart" class="chart-container">
+                  <canvas id="ratingChartCanvas" class="chart-canvas"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Play Store Entegrasyonu -->
+            <div class="admin-card">
+              <h2 class="section-title-large">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" class="section-icon">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                Play Store Entegrasyonu
+              </h2>
+              <div class="playstore-grid" id="playStoreApps">
+                <p class="playstore-empty">Play Store linki olan uygulamalar burada görünecek</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Apps Section -->
+          <div id="appsSection" class="admin-section hidden">
+            <div class="admin-page-header">
+              <h1 class="admin-page-title">Uygulamalar</h1>
+              <p class="admin-page-subtitle">Uygulamalarınızı yönetin ve düzenleyin</p>
+            </div>
+
+            <div class="admin-card">
+              <div class="flex-between apps-header">
+                <h2 class="margin-0 apps-header-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" class="apps-header-icon">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                  </svg>
+                  <span>Uygulama Listesi</span>
+                  <span id="appsCount" class="apps-count"></span>
+                </h2>
+                <button class="btn btn-primary btn-sm apps-add-btn" onclick="showAddForm()">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>Yeni Ekle</span>
+                </button>
+              </div>
+              <div id="appsList" class="apps-list">
+                <p class="loading-text">Yükleniyor...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Section -->
+          <div id="settingsSection" class="admin-section hidden">
+            <div class="admin-page-header">
+              <h1 class="admin-page-title">Site Ayarları</h1>
+              <p class="admin-page-subtitle">Site içeriğini ve görünümünü yönetin</p>
+            </div>
+
+            <div class="admin-card">
+              <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+                </svg>
+                Ayarlar
+              </h2>
+              <button class="btn btn-primary" onclick="showSiteSettings()">
+                <span>⚙️ Site Ayarlarını Aç</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Feedback Section -->
+          <div id="feedbackSection" class="admin-section hidden">
+            <div class="admin-page-header">
+              <h1 class="admin-page-title">Geri Bildirimler & Oylar</h1>
+              <p class="admin-page-subtitle">Kullanıcı geri bildirimlerini ve oylarını görüntüleyin</p>
+            </div>
+
+            <div class="admin-grid">
+              <!-- Geri Bildirimler -->
+              <div class="admin-card">
+                <h2>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  Geri Bildirimler
+                </h2>
+                <div id="feedbackList" class="apps-list">
+                  <p class="loading-text">Yükleniyor...</p>
+                </div>
+              </div>
+
+              <!-- Oylar -->
+              <div class="admin-card">
+                <h2>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  Oylar
+                </h2>
+                <div id="votesList" class="apps-list">
+                  <p class="loading-text">Yükleniyor...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users Section -->
+          <div id="usersSection" class="admin-section hidden">
+            <div class="admin-page-header">
+              <h1 class="admin-page-title">Kullanıcı Yönetimi</h1>
+              <p class="admin-page-subtitle">Admin kullanıcılarını yönetin ve düzenleyin</p>
+            </div>
+
+            <div class="admin-card">
+              <div class="flex-between apps-header">
+                <h2 class="margin-0 apps-header-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" class="apps-header-icon">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span>Kullanıcı Listesi</span>
+                  <span id="usersCount" class="apps-count"></span>
+                </h2>
+                <button class="btn btn-primary btn-sm apps-add-btn" onclick="showAddUserForm()">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>Yeni Kullanıcı</span>
+                </button>
+              </div>
+              <div id="usersList" class="apps-list">
+                <p class="loading-text">Yükleniyor...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Login Section (Session yoksa göster) -->
+          <div class="admin-header" id="adminLoginSection">
+            <!-- Şifre Girişi (Session yoksa göster) -->
+            <div id="passwordLoginForm" class="hidden">
+              <h1>Admin Girişi</h1>
+              <p>Yönetim paneline erişmek için giriş yapın</p>
+              <div class="form-group margin-top-20">
+                <label class="admin-password-label">Admin Şifresi</label>
+                <div class="admin-password-wrapper">
+                  <input type="password" id="adminPassword" placeholder="Şifrenizi girin" autocomplete="current-password"/>
+                  <button type="button" onclick="toggleAdminPassword()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
+                    <svg id="adminEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <span class="error-message admin-password-error" id="adminPasswordError"></span>
+              </div>
+              <div class="button-group margin-top-20">
+                <button class="btn btn-primary btn-flex" onclick="handleAdminLogin()" id="adminLoginBtn">
+                  <span>🔐 Admin Girişi</span>
+                </button>
+                <a href="admin-login.html" class="btn btn-secondary btn-link admin-login-link">
+                  <span>📱 2FA ile Giriş</span>
+                </a>
+              </div>
+            </div>
+            
+            <!-- Veri Yükleme (Session varsa göster) -->
+            <div id="dataLoadSection" class="hidden">
+              <h1>Veri Kaynağı</h1>
+              <p>Verilerinizi yüklemek için bir kaynak seçin</p>
+              <div class="mode-toggle margin-top-20">
+                <button id="localModeBtn" class="active" onclick="setMode('local')">LocalStorage</button>
+                <button id="githubModeBtn" onclick="setMode('github')">GitHub API</button>
+              </div>
+              <div class="form-group margin-top-20">
+                <input type="password" id="token" placeholder="GitHub Token (opsiyonel)"/>
+              </div>
+              <div class="button-group margin-top-20">
+                <button class="btn btn-primary btn-flex" onclick="login()">
+                  <span>🔓 Giriş Yap</span>
+                </button>
+                <button class="btn btn-success hidden margin-top-10" onclick="saveToGitHub()" id="saveGitHubBtn">
+                  <span>💾 GitHub'a Kaydet</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
       <!-- Uygulama Ekleme/Düzenleme Modal -->
       <div id="appFormModal" class="modal-overlay">
@@ -1351,6 +2868,142 @@
           <button class="btn btn-primary" onclick="saveSiteSection('contact')">💾 Kaydet</button>
         </div>
 
+          </div>
+        </div>
+      </div>
+
+      <!-- Kullanıcı Ekleme/Düzenleme Modal -->
+      <div id="userFormModal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="userFormTitle">Yeni Kullanıcı Ekle</h2>
+            <button type="button" class="modal-close" onclick="closeUserModal()">✖</button>
+          </div>
+          <div class="modal-body">
+            <form id="userForm" onsubmit="saveUser(event)">
+              <input type="hidden" id="userIndex" value="-1">
+              
+              <div class="form-group">
+                <label>Kullanıcı Adı *</label>
+                <input type="text" id="userName" required placeholder="Örn: admin, john_doe"/>
+                <small>Kullanıcı adı benzersiz olmalıdır</small>
+              </div>
+
+              <div class="form-group">
+                <label>E-posta</label>
+                <input type="email" id="userEmail" placeholder="user@example.com"/>
+              </div>
+
+              <div class="form-group">
+                <label>Şifre *</label>
+                <div class="admin-password-wrapper">
+                  <input type="password" id="userPassword" required placeholder="Güçlü bir şifre girin" minlength="6"/>
+                  <button type="button" onclick="toggleUserPassword()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
+                    <svg id="userEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <small>Minimum 6 karakter olmalıdır</small>
+              </div>
+
+              <div class="form-group" id="userPasswordConfirmGroup">
+                <label>Şifre Tekrar *</label>
+                <div class="admin-password-wrapper">
+                  <input type="password" id="userPasswordConfirm" required placeholder="Şifreyi tekrar girin" minlength="6"/>
+                  <button type="button" onclick="toggleUserPasswordConfirm()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
+                    <svg id="userEyeIconConfirm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Rol</label>
+                <select id="userRole">
+                  <option value="admin">Admin</option>
+                  <option value="editor">Editör</option>
+                  <option value="viewer">Görüntüleyici</option>
+                </select>
+                <small>Admin: Tüm yetkiler, Editör: Düzenleme yetkisi, Görüntüleyici: Sadece görüntüleme</small>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <span>💾 Kaydet</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeUserModal()">
+                  <span>❌ İptal</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Şifre Değiştirme Modal -->
+      <div id="changePasswordModal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Şifre Değiştir</h2>
+            <button type="button" class="modal-close" onclick="closeChangePasswordModal()">✖</button>
+          </div>
+          <div class="modal-body">
+            <form id="changePasswordForm" onsubmit="changePassword(event)">
+              <div class="form-group">
+                <label>Mevcut Şifre *</label>
+                <div class="admin-password-wrapper">
+                  <input type="password" id="currentPassword" required placeholder="Mevcut şifrenizi girin"/>
+                  <button type="button" onclick="togglePasswordVisibility('currentPassword', 'currentPasswordEye')" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
+                    <svg id="currentPasswordEye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <span class="error-message" id="currentPasswordError"></span>
+              </div>
+
+              <div class="form-group">
+                <label>Yeni Şifre *</label>
+                <div class="admin-password-wrapper">
+                  <input type="password" id="newPassword" required placeholder="Yeni şifrenizi girin (min. 6 karakter)" minlength="6"/>
+                  <button type="button" onclick="togglePasswordVisibility('newPassword', 'newPasswordEye')" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
+                    <svg id="newPasswordEye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <span class="error-message" id="newPasswordError"></span>
+              </div>
+
+              <div class="form-group">
+                <label>Yeni Şifre Tekrar *</label>
+                <div class="admin-password-wrapper">
+                  <input type="password" id="confirmNewPassword" required placeholder="Yeni şifreyi tekrar girin" minlength="6"/>
+                  <button type="button" onclick="togglePasswordVisibility('confirmNewPassword', 'confirmNewPasswordEye')" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
+                    <svg id="confirmNewPasswordEye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <span class="error-message" id="confirmPasswordError"></span>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <span>🔐 Şifreyi Değiştir</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeChangePasswordModal()">
+                  <span>❌ İptal</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
