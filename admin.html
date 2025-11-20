@@ -1735,16 +1735,37 @@
     .admin-sidebar {
       position: fixed;
       left: -280px;
-      top: 64px;
-      height: calc(100vh - 64px);
+      top: 60px;
+      height: calc(100vh - 60px);
       width: 280px;
+      max-width: 85vw;
       z-index: 200;
       transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .admin-sidebar.open {
       left: 0;
+    }
+
+    /* Sidebar scrollbar styling */
+    .admin-sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.3);
     }
 
     .admin-content {
@@ -2109,16 +2130,37 @@
     .admin-sidebar {
       position: fixed;
       left: -280px;
-      top: 64px;
-      height: calc(100vh - 64px);
+      top: 60px;
+      height: calc(100vh - 60px);
       width: 280px;
+      max-width: 85vw;
       z-index: 200;
       transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .admin-sidebar.open {
       left: 0;
+    }
+
+    /* Sidebar scrollbar styling */
+    .admin-sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.3);
     }
 
     .admin-content {
