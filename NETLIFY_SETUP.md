@@ -18,7 +18,7 @@ Netlify Dashboard'da şu adımları izleyin:
 2. Aşağıdaki değişkenleri ekleyin:
 
 ```
-GITHUB_TOKEN = ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GITHUB_TOKEN = YOUR_GITHUB_TOKEN_HERE
 REPO_OWNER = Bambinifojo
 REPO_NAME = Bambinifojo.github.io
 CONFIG_FILE = app_config.json

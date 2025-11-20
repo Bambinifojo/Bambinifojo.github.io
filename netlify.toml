@@ -10,7 +10,8 @@
 # Environment variables'ı build log'larından gizle
 [build.environment]
   NETLIFY_BUILD_DEBUG = "false"
-  SECRETS_SCAN_OMIT_KEYS = "REPO_OWNER,REPO_NAME,CONFIG_FILE"
+  SECRETS_SCAN_OMIT_KEYS = "REPO_OWNER,REPO_NAME,CONFIG_FILE,GITHUB_TOKEN"
+  SECRETS_SCAN_OMIT_PATHS = "NETLIFY_SETUP.md"
 
 # URL Kısaltmaları ve Path Routing
 [[redirects]]
