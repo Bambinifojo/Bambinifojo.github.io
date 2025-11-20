@@ -3,21 +3,28 @@
 // Config yükleme
 async function loadConfig() {
   try {
-    // Netlify'dan yükle (öncelikli)
+    // Sadece Netlify'dan yükle (CORS sorunu nedeniyle GitHub'dan yükleme kaldırıldı)
     const url = "https://bambinifojo.netlify.app/app_config.json?t=" + Date.now();
-    let res = await fetch(url);
+    const res = await fetch(url);
     
-    // Eğer Netlify'da yoksa GitHub'dan dene
-    if (!res.ok) {
-      const githubUrl = "https://bambinifojo.github.io/app_config.json?t=" + Date.now();
-      res = await fetch(githubUrl);
+    let data = {};
+    
+    if (res.ok) {
+      data = await res.json();
+    } else {
+      // Eğer Netlify'da yoksa varsayılan değerleri kullan
+      console.warn('Config dosyası Netlify\'da bulunamadı, varsayılan değerler kullanılıyor');
+      data = {
+        latest_version: "1.0.0",
+        force_update: false,
+        update_message: "Yeni sürüm mevcut! Daha iyi performans için güncelleyin.",
+        broadcast_enabled: false,
+        broadcast_title: "Yeni Görev Yayınlandı!",
+        broadcast_message: "Yeni gezegen görevleri seni bekliyor!",
+        maintenance: false,
+        maintenance_message: "Bakım modu aktif. Lütfen daha sonra tekrar deneyin."
+      };
     }
-    
-    if (!res.ok) {
-      throw new Error('Config dosyası yüklenemedi');
-    }
-    
-    const data = await res.json();
 
     // Form alanlarını doldur
     document.getElementById("latest_version").value = data.latest_version || "1.0.0";

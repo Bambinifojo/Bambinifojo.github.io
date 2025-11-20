@@ -2231,17 +2231,14 @@ function deleteVote(appName) {
 // Bildirim config'ini yükle
 async function loadNotificationsConfig() {
   try {
-    // Önce Netlify'dan yükle, yoksa GitHub'dan
-    let response = await fetch('https://bambinifojo.netlify.app/app_config.json?t=' + Date.now());
-    if (!response.ok) {
-      response = await fetch('https://bambinifojo.github.io/app_config.json?t=' + Date.now());
-    }
+    // Sadece Netlify'dan yükle (CORS sorunu nedeniyle GitHub'dan yükleme kaldırıldı)
+    const response = await fetch('https://bambinifojo.netlify.app/app_config.json?t=' + Date.now());
     let config = {};
     
     if (response.ok) {
       config = await response.json();
     } else {
-      // Eğer GitHub'da yoksa varsayılan değerleri kullan
+      // Eğer Netlify'da yoksa varsayılan değerleri kullan
       config = {
         latest_version: "1.0.0",
         force_update: false,
