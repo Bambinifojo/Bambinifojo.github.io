@@ -195,7 +195,7 @@
     background: rgba(0, 0, 0, 0.5);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
-    z-index: 199;
+    z-index: 299;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -205,6 +205,7 @@
   .admin-sidebar-overlay.active {
     opacity: 1;
     visibility: visible;
+    display: block;
   }
 
   .admin-logo {
@@ -1902,10 +1903,11 @@
       height: calc(100vh - 60px);
       width: 280px;
       max-width: 85vw;
-      z-index: 200;
+      z-index: 300;
       transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
       overflow-y: auto;
+      background: #ffffff;
       /* iOS için smooth scrolling - modern tarayıcılarda desteklenmiyor ama iOS için gerekli */
       /* stylelint-disable-next-line property-no-unknown */
       -webkit-overflow-scrolling: touch;
@@ -2272,10 +2274,11 @@
       height: calc(100vh - 60px);
       width: 280px;
       max-width: 85vw;
-      z-index: 200;
+      z-index: 300;
       transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
       overflow-y: auto;
+      background: #ffffff;
       /* iOS için smooth scrolling - modern tarayıcılarda desteklenmiyor ama iOS için gerekli */
       /* stylelint-disable-next-line property-no-unknown */
       -webkit-overflow-scrolling: touch;
@@ -2896,24 +2899,30 @@
   .admin-sidebar-overlay {
     display: none;
     position: fixed;
-    top: 60px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 150;
+    z-index: 299;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    cursor: pointer;
   }
 
   .admin-sidebar-overlay.active {
     opacity: 1;
     visibility: visible;
+    display: block;
   }
 
   @media (max-width: 768px) {
     .admin-sidebar-overlay {
+      display: none;
+    }
+    
+    .admin-sidebar-overlay.active {
       display: block;
     }
   }
