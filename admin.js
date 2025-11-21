@@ -659,40 +659,8 @@ function logout() {
     sessionStorage.removeItem('adminLoginTime');
     sessionStorage.removeItem('adminLastActivity');
     
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-      logoutBtn.classList.add('hidden');
-    }
-    // Mobile menu logout butonunu da gizle
-    const topbarMenuLogoutBtn = document.getElementById('topbarMenuLogoutBtn');
-    if (topbarMenuLogoutBtn) {
-      topbarMenuLogoutBtn.classList.add('hidden');
-    }
-    // Topbar menu'yu kapat
-    closeTopbarMenu();
-    const loginSection = document.getElementById('adminLoginSection');
-    if (loginSection) {
-      loginSection.classList.remove('hidden');
-    }
-    // Tüm section'ları gizle
-    document.querySelectorAll('.admin-section').forEach(sec => {
-      sec.classList.add('hidden');
-    });
-    const tokenInput = document.getElementById('token');
-    if (tokenInput) {
-      tokenInput.value = '';
-      tokenInput.disabled = false;
-    }
-    token = '';
-    appsData = { apps: [] };
-    const appsList = document.getElementById('appsList');
-    if (appsList) {
-      appsList.innerHTML = '<p class="loading-text">Çıkış yapıldı. Tekrar giriş yapın.</p>';
-    }
-    updateStats();
-    
-    // Admin giriş formunu göster
-    toggleAdminLoginForm();
+    // Login ekranına yönlendir
+    window.location.href = '/admin-login';
   }
 }
 
