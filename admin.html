@@ -208,6 +208,13 @@
     display: block;
   }
 
+  /* Modal açıkken sidebar overlay'in blur'unu kaldır - modallar bulanık görünmesin */
+  body.modal-open .admin-sidebar-overlay {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
   .admin-logo {
     display: flex;
     align-items: center;
@@ -1267,7 +1274,7 @@
     background: rgba(0, 0, 0, 0.65);
     -webkit-backdrop-filter: blur(12px) saturate(180%);
     backdrop-filter: blur(12px) saturate(180%);
-    z-index: 1000;
+    z-index: 2000; /* Sidebar overlay'den (299) çok daha yüksek - blur'dan etkilenmez */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1277,6 +1284,8 @@
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-y: auto;
     animation: fadeInOverlay 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    /* Modal overlay blur'dan etkilenmemesi için */
+    isolation: isolate;
   }
 
   @keyframes fadeInOverlay {
@@ -1322,6 +1331,11 @@
     margin: auto;
     border: 1px solid rgba(255, 255, 255, 0.2);
     animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    z-index: 2001; /* Modal overlay'den daha yüksek */
+    /* Blur'dan etkilenmemesi için */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   @keyframes modalSlideIn {
