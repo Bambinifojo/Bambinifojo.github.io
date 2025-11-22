@@ -3136,6 +3136,32 @@
     text-decoration: none;
   }
 
+  .preview-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .preview-actions {
+      flex-direction: column;
+      width: 100%;
+      margin-top: 12px;
+    }
+    
+    .preview-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .preview-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+
   .preview-container {
     border: 2px solid #e5e7eb;
     border-radius: 12px;
@@ -3687,14 +3713,24 @@
                     </svg>
                     Ana Sayfa Önizleme
                   </h2>
-                  <a href="/" target="_blank" class="btn btn-secondary btn-sm preview-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="icon-spacing">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    Yeni Sekmede Aç
-                  </a>
+                  <div class="preview-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="refreshPreview()" title="Önizlemeyi Yenile">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="icon-spacing">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                      </svg>
+                      Yenile
+                    </button>
+                    <a href="/" target="_blank" class="btn btn-secondary btn-sm preview-link" title="Yeni Sekmede Aç">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="icon-spacing">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                      </svg>
+                      Yeni Sekmede Aç
+                    </a>
+                  </div>
                 </div>
                 <div id="homePreview" class="preview-container">
                   <iframe id="homePreviewFrame" src="/" title="Ana Sayfa Canlı Önizleme" class="preview-frame"></iframe>
