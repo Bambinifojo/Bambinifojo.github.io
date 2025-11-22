@@ -198,6 +198,7 @@
     z-index: 299;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
   }
@@ -206,13 +207,17 @@
     opacity: 1;
     visibility: visible;
     display: block;
+    pointer-events: auto;
   }
 
-  /* Modal açıkken sidebar overlay'in blur'unu kaldır - modallar bulanık görünmesin */
+  /* Modal açıkken sidebar overlay'i tamamen gizle - modallar bulanık görünmesin */
   body.modal-open .admin-sidebar-overlay {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    background: rgba(0, 0, 0, 0.3);
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
 
   .admin-logo {
@@ -1272,9 +1277,10 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.65);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    backdrop-filter: blur(12px) saturate(180%);
-    z-index: 2000; /* Sidebar overlay'den (299) çok daha yüksek - blur'dan etkilenmez */
+    /* Blur'u kaldırdık - sidebar overlay blur'u modalları etkilemesin */
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    z-index: 2000; /* Sidebar overlay'den (299) çok daha yüksek */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1286,6 +1292,9 @@
     animation: fadeInOverlay 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     /* Modal overlay blur'dan etkilenmemesi için */
     isolation: isolate;
+    /* GPU hızlandırma */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
   }
 
   @keyframes fadeInOverlay {
@@ -3534,7 +3543,7 @@
     </div>
 
     <!-- Sidebar Overlay (Mobile) -->
-    <div class="admin-sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="admin-sidebar-overlay" onclick="closeSidebar()"></div>
 
     <!-- Topbar Menu Modal (Mobile) -->
     <div class="admin-topbar-menu-overlay" id="topbarMenuOverlay" onclick="toggleTopbarMenu()"></div>

@@ -1,3 +1,9 @@
+// Sidebar state kontrolü
+function isMenuOpen() {
+  const sidebar = document.getElementById('sidebar');
+  return sidebar && sidebar.classList.contains('active');
+}
+
 // Hamburger Menu Toggle
 function toggleMenu() {
   const sidebar = document.getElementById('sidebar');
@@ -11,11 +17,47 @@ function toggleMenu() {
     
     // Body scroll lock ve menu-open class
     if (isActive) {
+      // Scroll pozisyonunu kaydet
+      const scrollY = window.scrollY;
+      document.body.style.top = `-${scrollY}px`;
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
       document.body.classList.add('menu-open');
     } else {
+      // Scroll pozisyonunu geri yükle
+      const scrollY = document.body.style.top;
+      document.body.style.top = '';
       document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
       document.body.classList.remove('menu-open');
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+  }
+}
+
+// Menüyü aç
+function openMenu() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const hamburger = document.getElementById('hamburger');
+  
+  if (sidebar && overlay && hamburger) {
+    if (!sidebar.classList.contains('active')) {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+      hamburger.classList.add('active');
+      
+      // Scroll pozisyonunu kaydet
+      const scrollY = window.scrollY;
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.classList.add('menu-open');
     }
   }
 }
@@ -31,8 +73,17 @@ function closeMenu() {
       sidebar.classList.remove('active');
       overlay.classList.remove('active');
       hamburger.classList.remove('active');
+      
+      // Scroll pozisyonunu geri yükle
+      const scrollY = document.body.style.top;
+      document.body.style.top = '';
       document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
       document.body.classList.remove('menu-open');
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
     }
   }
 }
@@ -617,12 +668,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initLogoAnimation();
   
   // ESC tuşu ile menüyü kapat
+  // ESC tuşu ile menüyü kapat
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar && sidebar.classList.contains('active')) {
-        closeMenu();
-      }
+    if (e.key === 'Escape' && isMenuOpen()) {
+      closeMenu();
     }
   });
   

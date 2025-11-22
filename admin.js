@@ -318,6 +318,12 @@ function getSectionFromPath() {
   return hash || 'dashboard';
 }
 
+// Sidebar state kontrolü
+function isSidebarOpen() {
+  const sidebar = document.getElementById('adminSidebar');
+  return sidebar && sidebar.classList.contains('open');
+}
+
 // Sidebar toggle (Mobile)
 function toggleSidebar() {
   const sidebar = document.getElementById('adminSidebar');
@@ -344,6 +350,26 @@ function toggleSidebar() {
   }
 }
 
+// Sidebar'ı aç
+function openSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  const overlay = document.querySelector('.admin-sidebar-overlay');
+  const menuToggle = document.querySelector('.admin-menu-toggle');
+  
+  if (sidebar && overlay) {
+    if (!sidebar.classList.contains('open')) {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('sidebar-open');
+      
+      if (menuToggle) {
+        menuToggle.classList.add('active');
+      }
+    }
+  }
+}
+
 // Sidebar'ı kapat (dışarıdan çağrılabilir)
 function closeSidebar() {
   const sidebar = document.getElementById('adminSidebar');
@@ -361,6 +387,14 @@ function closeSidebar() {
     }
   }
 }
+
+// ESC tuşu ile sidebar'ı kapat
+document.addEventListener('keydown', function(e) {
+  // ESC tuşu basıldığında sidebar açıksa kapat
+  if (e.key === 'Escape' && isSidebarOpen()) {
+    closeSidebar();
+  }
+});
 
 // Topbar Menu Toggle (Mobile)
 function toggleTopbarMenu() {
@@ -1446,6 +1480,12 @@ async function saveApp(event) {
 function showAppModal() {
   const modal = document.getElementById('appFormModal');
   if (modal) {
+    // Modal açılmadan önce sidebar overlay'i gizle
+    const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
+    if (sidebarOverlay) {
+      sidebarOverlay.style.display = 'none';
+    }
+    
     modal.classList.add('active');
     document.body.classList.add('modal-open');
     // Scroll pozisyonunu kaydet
@@ -1469,6 +1509,14 @@ function closeModal(modalId, formId = null) {
   setTimeout(() => {
     modal.classList.remove('active');
     document.body.classList.remove('modal-open');
+    
+    // Modal kapandıktan sonra sidebar overlay'i geri getir (eğer sidebar açıksa)
+    const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
+    const sidebar = document.getElementById('adminSidebar');
+    if (sidebarOverlay && sidebar && sidebar.classList.contains('open')) {
+      sidebarOverlay.style.display = '';
+    }
+    
     // Scroll pozisyonunu geri yükle
     const scrollY = document.body.style.top;
     document.body.style.top = '';
@@ -1495,6 +1543,12 @@ function closeAppModal() {
 function showSiteModal() {
   const modal = document.getElementById('siteSettingsModal');
   if (modal) {
+    // Modal açılmadan önce sidebar overlay'i gizle
+    const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
+    if (sidebarOverlay) {
+      sidebarOverlay.style.display = 'none';
+    }
+    
     modal.classList.add('active');
     document.body.classList.add('modal-open');
     // Scroll pozisyonunu kaydet
@@ -2228,12 +2282,18 @@ function showAddUserForm() {
     document.getElementById('userPassword').required = true;
     document.getElementById('userPasswordConfirm').required = true;
     
-    const modal = document.getElementById('userFormModal');
-    if (modal) {
-      modal.classList.add('active');
-      document.body.classList.add('modal-open');
+  const modal = document.getElementById('userFormModal');
+  if (modal) {
+    // Modal açılmadan önce sidebar overlay'i gizle
+    const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
+    if (sidebarOverlay) {
+      sidebarOverlay.style.display = 'none';
     }
-  }, 100);
+    
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+  }
+}, 100);
 }
 
 // Kullanıcı düzenleme formunu göster
@@ -2257,6 +2317,12 @@ function editUser(index) {
   
   const modal = document.getElementById('userFormModal');
   if (modal) {
+    // Modal açılmadan önce sidebar overlay'i gizle
+    const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
+    if (sidebarOverlay) {
+      sidebarOverlay.style.display = 'none';
+    }
+    
     modal.classList.add('active');
     document.body.classList.add('modal-open');
   }
@@ -2391,6 +2457,12 @@ function closeUserModal() {
 function showChangePasswordModal() {
   const modal = document.getElementById('changePasswordModal');
   if (modal) {
+    // Modal açılmadan önce sidebar overlay'i gizle
+    const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
+    if (sidebarOverlay) {
+      sidebarOverlay.style.display = 'none';
+    }
+    
     modal.classList.add('active');
     document.body.classList.add('modal-open');
     const scrollY = window.scrollY;
@@ -2444,12 +2516,73 @@ async function changePassword(event) {
   
   // Mevcut şifreyi kontrol et
   const hashedCurrentPassword = await hashPassword(currentPassword);
-  const currentUser = usersData.find(user => user.passwordHash === hashedCurrentPassword);
   
-  if (!currentUser && hashedCurrentPassword !== ADMIN_PASSWORD_HASH) {
-    currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
-    document.getElementById('currentPassword').classList.add('error');
-    return;
+  // Önce session'dan giriş yapan kullanıcıyı bul
+  const loggedInUsername = sessionStorage.getItem('adminUsername');
+  let currentUser = null;
+  
+  if (loggedInUsername) {
+    // Session'dan kullanıcı adını al ve kullanıcıyı bul
+    currentUser = usersData.find(user => user.username === loggedInUsername);
+    
+    // Eğer kullanıcı bulunduysa, mevcut şifresini kontrol et
+    if (currentUser) {
+      if (currentUser.passwordHash !== hashedCurrentPassword) {
+        // Varsayılan admin şifresi kontrolü (geriye dönük uyumluluk için)
+        if (hashedCurrentPassword !== ADMIN_PASSWORD_HASH) {
+          currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
+          document.getElementById('currentPassword').classList.add('error');
+          return;
+        }
+      }
+    } else {
+      // Kullanıcı bulunamadıysa, varsayılan admin şifresi kontrolü
+      if (hashedCurrentPassword !== ADMIN_PASSWORD_HASH) {
+        currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
+        document.getElementById('currentPassword').classList.add('error');
+        return;
+      }
+      // Varsayılan admin kullanıcısını oluştur veya bul
+      currentUser = usersData.find(user => user.username === 'admin');
+      if (!currentUser) {
+        currentUser = {
+          id: Date.now().toString(),
+          username: 'admin',
+          email: 'admin@example.com',
+          passwordHash: ADMIN_PASSWORD_HASH,
+          role: 'admin',
+          createdAt: new Date().toISOString(),
+          lastLogin: null
+        };
+        usersData.push(currentUser);
+      }
+    }
+  } else {
+    // Session yoksa, şifre hash'ine göre kullanıcıyı bul
+    currentUser = usersData.find(user => user.passwordHash === hashedCurrentPassword);
+    
+    if (!currentUser && hashedCurrentPassword !== ADMIN_PASSWORD_HASH) {
+      currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
+      document.getElementById('currentPassword').classList.add('error');
+      return;
+    }
+    
+    // Varsayılan admin şifresi kontrolü
+    if (!currentUser && hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
+      currentUser = usersData.find(user => user.username === 'admin');
+      if (!currentUser) {
+        currentUser = {
+          id: Date.now().toString(),
+          username: 'admin',
+          email: 'admin@example.com',
+          passwordHash: ADMIN_PASSWORD_HASH,
+          role: 'admin',
+          createdAt: new Date().toISOString(),
+          lastLogin: null
+        };
+        usersData.push(currentUser);
+      }
+    }
   }
   
   // Şifreyi güncelle
@@ -2458,17 +2591,24 @@ async function changePassword(event) {
   if (currentUser) {
     currentUser.passwordHash = hashedNewPassword;
     saveUsers();
+    
+    // Kullanıcı listesini yeniden yükle (güncel veriler için)
+    loadUsers();
+    
+    // Form'u temizle
+    document.getElementById('changePasswordForm').reset();
+    
+    // Hata sınıflarını temizle
+    document.getElementById('currentPassword').classList.remove('error');
+    document.getElementById('newPassword').classList.remove('error');
+    document.getElementById('confirmNewPassword').classList.remove('error');
+    
+    showAlert('✅ Şifre başarıyla değiştirildi! Yeni şifrenizle giriş yapabilirsiniz.', 'success');
+    closeChangePasswordModal();
   } else {
-    // Varsayılan admin şifresi değiştiriliyor
-    const adminUser = usersData.find(user => user.username === 'admin');
-    if (adminUser) {
-      adminUser.passwordHash = hashedNewPassword;
-      saveUsers();
-    }
+    currentPasswordError.textContent = '❌ Kullanıcı bulunamadı.';
+    document.getElementById('currentPassword').classList.add('error');
   }
-  
-  showAlert('✅ Şifre başarıyla değiştirildi!', 'success');
-  closeChangePasswordModal();
 }
 
 // Şifre göster/gizle (kullanıcı formu)
