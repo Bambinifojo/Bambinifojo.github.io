@@ -17,7 +17,7 @@
     if (!adminSession || !adminLoginTime) {
       // Session yok - login sayfasına yönlendir
       if (!window.location.pathname.includes('admin-login.html')) {
-        window.location.href = 'admin-login.html';
+        window.location.replace('admin-login.html');
         return;
       }
     } else {
@@ -35,7 +35,7 @@
         
         if (!window.location.pathname.includes('admin-login.html')) {
           sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-          window.location.href = 'admin-login.html';
+          window.location.replace('admin-login.html');
           return;
         }
       } else {
@@ -4142,6 +4142,18 @@
               Uygulama Bildirim Ayarları
             </h3>
             <small class="notification-section-subtitle">Bu uygulama için özel bildirim ayarları</small>
+          </div>
+
+          <div class="form-group">
+            <label>Uygulama ID (appId)</label>
+            <input type="text" id="appNotificationId" placeholder="Örn: task-cosmos"/>
+            <small>Bildirim API'sinde kullanılacak benzersiz ID (opsiyonel)</small>
+          </div>
+
+          <div class="form-group">
+            <label>Package Name</label>
+            <input type="text" id="appNotificationPackage" placeholder="Örn: com.bambinifojo.taskcosmos"/>
+            <small>Android uygulama package adı (opsiyonel)</small>
           </div>
 
           <div class="form-group">

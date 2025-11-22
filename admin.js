@@ -1,10 +1,24 @@
 // Admin Panel JavaScript
+
+// ==================== SABİTLER ====================
+const CONSTANTS = {
+  SESSION_TIMEOUT: 8 * 60 * 60 * 1000, // 8 saat (milisaniye)
+  MOBILE_BREAKPOINT: 768, // px
+  MODAL_ANIMATION_DURATION: 300, // ms
+  ALERT_DISPLAY_DURATION: 3000, // ms
+  MIN_PASSWORD_LENGTH: 6,
+  MAX_ACTIVITIES: 20,
+  RECENT_ACTIVITIES_LIMIT: 5
+};
+
+// ==================== DEĞİŞKENLER ====================
 let currentMode = 'local'; // 'local' veya 'github'
 let token = '';
 let appsData = { apps: [], site: null };
 let currentFeatures = [];
 let currentSiteSection = 'header';
 let usersData = []; // Kullanıcı verileri
+let lastSessionCheck = 0; // Session kontrolü için throttle
 
 // Şifre hash fonksiyonu
 async function hashPassword(password) {
@@ -32,9 +46,8 @@ function checkAdminSession() {
   
   const loginTime = parseInt(adminLoginTime);
   const currentTime = Date.now();
-  const eightHours = 8 * 60 * 60 * 1000;
   
-  if ((currentTime - loginTime) > eightHours) {
+  if ((currentTime - loginTime) > CONSTANTS.SESSION_TIMEOUT) {
     // Session süresi dolmuş - temizle ve yönlendir
     sessionStorage.removeItem('adminSession');
     sessionStorage.removeItem('adminLoginTime');
@@ -59,8 +72,8 @@ function redirectToLogin() {
   const message = 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.';
   sessionStorage.setItem('sessionTimeoutMessage', message);
   
-  // Login sayfasına yönlendir
-  window.location.href = 'admin-login.html';
+  // Login sayfasına yönlendir (replace kullanarak history'yi temizle)
+  window.location.replace('admin-login.html');
 }
 
 // Admin giriş formunu göster/gizle
@@ -202,26 +215,31 @@ async function handleAdminLogin() {
   }
 }
 
-// Şifre göster/gizle
-function toggleAdminPassword() {
-  const passwordInput = document.getElementById('adminPassword');
-  const eyeIcon = document.getElementById('adminEyeIcon');
+// Şifre göster/gizle ikonları
+const PASSWORD_ICONS = {
+  visible: '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>',
+  hidden: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>'
+};
+
+// Şifre göster/gizle (genel fonksiyon)
+function togglePasswordVisibility(inputId, iconId) {
+  const passwordInput = document.getElementById(inputId);
+  const eyeIcon = document.getElementById(iconId);
   
   if (!passwordInput || !eyeIcon) return;
   
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
-    eyeIcon.innerHTML = `
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-      <line x1="1" y1="1" x2="23" y2="23"></line>
-    `;
+    eyeIcon.innerHTML = PASSWORD_ICONS.visible;
   } else {
     passwordInput.type = 'password';
-    eyeIcon.innerHTML = `
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-      <circle cx="12" cy="12" r="3"></circle>
-    `;
+    eyeIcon.innerHTML = PASSWORD_ICONS.hidden;
   }
+}
+
+// Şifre göster/gizle (admin login)
+function toggleAdminPassword() {
+  togglePasswordVisibility('adminPassword', 'adminEyeIcon');
 }
 
 // Section yönetimi
@@ -264,13 +282,17 @@ function showSection(section) {
     loadNotificationsConfig();
   }
   
-  // Dashboard'a geçildiğinde istatistikleri güncelle
+  // Dashboard'a geçildiğinde istatistikleri güncelle ve önizlemeyi yenile
   if (section === 'dashboard') {
     updateStats();
+    // Önizlemeyi otomatik yenile (dashboard'a geçildiğinde)
+    setTimeout(() => {
+      refreshPreview(false);
+    }, 500);
   }
   
   // Mobile'da sidebar'ı kapat
-  if (window.innerWidth <= 768) {
+  if (window.innerWidth <= CONSTANTS.MOBILE_BREAKPOINT) {
     closeSidebar();
   }
   
@@ -654,13 +676,23 @@ async function login() {
 // Çıkış
 function logout() {
   if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
-    // Session'ı temizle
+    // Tüm sessionStorage'ı temizle (auth ile ilgili tüm veriler)
     sessionStorage.removeItem('adminSession');
     sessionStorage.removeItem('adminLoginTime');
     sessionStorage.removeItem('adminLastActivity');
+    sessionStorage.removeItem('adminUsername');
+    sessionStorage.removeItem('adminRole');
+    sessionStorage.removeItem('sessionTimeoutMessage');
     
-    // Login ekranına yönlendir
-    window.location.href = '/admin-login';
+    // localStorage'dan auth ile ilgili verileri temizle
+    // Not: appsData, adminUsers gibi veriler kalabilir (opsiyonel - isterseniz bunları da temizleyebilirsiniz)
+    // localStorage.removeItem('appsData');
+    // localStorage.removeItem('adminUsers');
+    // localStorage.removeItem('adminActivities');
+    
+    // Login ekranına yönlendir (replace kullanarak history'yi temizle)
+    // admin-login.html kullan (redirectToLogin ile tutarlı)
+    window.location.replace('admin-login.html');
   }
 }
 
@@ -1003,7 +1035,7 @@ function updateRecentActivities() {
     return;
   }
   
-  container.innerHTML = activities.slice(0, 5).map(activity => {
+  container.innerHTML = activities.slice(0, CONSTANTS.RECENT_ACTIVITIES_LIMIT).map(activity => {
     const timeAgo = getTimeAgo(new Date(activity.timestamp));
     const icon = activity.type === 'create' ? '➕' : activity.type === 'update' ? '✏️' : activity.type === 'delete' ? '🗑️' : '📝';
     
@@ -1043,8 +1075,8 @@ function logActivity(type, message) {
     timestamp: new Date().toISOString()
   });
   
-  // Son 20 aktiviteyi sakla
-  if (activities.length > 20) {
+  // Son N aktiviteyi sakla
+  if (activities.length > CONSTANTS.MAX_ACTIVITIES) {
     activities.pop();
   }
   
@@ -1052,13 +1084,35 @@ function logActivity(type, message) {
   updateRecentActivities();
 }
 
-// Önizlemeyi yenile
-function refreshPreview() {
+// Güvenli HTML escape fonksiyonu (XSS koruması için)
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
+// Önizlemeyi yenile (cache bypass ile)
+function refreshPreview(showNotification = true) {
   const frame = document.getElementById('homePreviewFrame');
   if (frame) {
-    frame.src = frame.src;
-    showAlert('✅ Önizleme yenilendi!', 'success');
+    // Cache'i bypass etmek için timestamp ekle
+    const timestamp = new Date().getTime();
+    const currentSrc = frame.src.split('?')[0]; // Mevcut query string'i temizle
+    frame.src = `${currentSrc}?preview=${timestamp}`;
+    
+    if (showNotification) {
+      showAlert('✅ Önizleme yenilendi!', 'success');
+    }
   }
+}
+
+// Önizlemeyi otomatik yenile (değişikliklerden sonra)
+function autoRefreshPreview() {
+  // Kısa bir gecikme ile yenile (deploy'un tamamlanması için)
+  setTimeout(() => {
+    refreshPreview(false); // Bildirim gösterme
+  }, 2000); // 2 saniye bekle
 }
 
 // Uygulamaları listele
@@ -1147,7 +1201,7 @@ function renderApps() {
           </svg>
           Düzenle
         </button>
-        ${app.notification && app.notification.enabled ? `
+        ${app.notification && app.notification.enabled === true ? `
         <button class="btn btn-info btn-sm" onclick="editApp(${index})" title="Bildirim Aktif - v${app.notification.latest_version || '1.0.0'}" style="background: #10b981; color: white; border: none;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -1187,37 +1241,61 @@ function showAddForm() {
 
 // Uygulama düzenle
 function editApp(index) {
-  // Hash'i koru (adres bozulmasını önlemek için)
-  const currentHash = window.location.hash;
-  
   // Apps section'ına geç
   showSection('apps');
   
-  const app = appsData.apps[index];
-  document.getElementById('appIndex').value = index;
-  document.getElementById('appTitle').value = app.title || '';
-  document.getElementById('appDescription').value = app.description || '';
-  document.getElementById('appIcon').value = app.icon || '';
-  document.getElementById('appCategory').value = app.category || '';
-  document.getElementById('appRating').value = app.rating || 4.5;
-  document.getElementById('appDownloads').value = app.downloads || '';
-  document.getElementById('appDetails').value = app.details && app.details !== '#' ? app.details : '';
-  document.getElementById('appPrivacy').value = app.privacy && app.privacy !== '#' ? app.privacy : '';
+  const app = appsData.apps?.[index];
+  if (!app) {
+    showAlert('❌ Uygulama bulunamadı!', 'error');
+    return;
+  }
+  
+  // Null kontrolleri ile form alanlarını doldur
+  const appIndexEl = document.getElementById('appIndex');
+  const appTitleEl = document.getElementById('appTitle');
+  const appDescriptionEl = document.getElementById('appDescription');
+  const appIconEl = document.getElementById('appIcon');
+  const appCategoryEl = document.getElementById('appCategory');
+  const appRatingEl = document.getElementById('appRating');
+  const appDownloadsEl = document.getElementById('appDownloads');
+  const appDetailsEl = document.getElementById('appDetails');
+  const appPrivacyEl = document.getElementById('appPrivacy');
+  const formTitleEl = document.getElementById('formTitle');
+  
+  if (appIndexEl) appIndexEl.value = index;
+  if (appTitleEl) appTitleEl.value = app.title || '';
+  if (appDescriptionEl) appDescriptionEl.value = app.description || '';
+  if (appIconEl) appIconEl.value = app.icon || '';
+  if (appCategoryEl) appCategoryEl.value = app.category || '';
+  if (appRatingEl) appRatingEl.value = app.rating || 4.5;
+  if (appDownloadsEl) appDownloadsEl.value = app.downloads || '';
+  if (appDetailsEl) appDetailsEl.value = app.details && app.details !== '#' ? app.details : '';
+  if (appPrivacyEl) appPrivacyEl.value = app.privacy && app.privacy !== '#' ? app.privacy : '';
+  
   currentFeatures = [...(app.features || [])];
   renderFeatures();
   
   // Bildirim ayarları
   const notification = app.notification || {};
-  document.getElementById('appNotificationVersion').value = notification.latest_version || '';
-  document.getElementById('appNotificationForceUpdate').value = String(notification.force_update || false);
-  document.getElementById('appNotificationMessage').value = notification.update_message || '';
-  document.getElementById('appNotificationEnabled').value = String(notification.enabled || false);
+  const appNotificationIdEl = document.getElementById('appNotificationId');
+  const appNotificationPackageEl = document.getElementById('appNotificationPackage');
+  const appNotificationVersionEl = document.getElementById('appNotificationVersion');
+  const appNotificationForceUpdateEl = document.getElementById('appNotificationForceUpdate');
+  const appNotificationMessageEl = document.getElementById('appNotificationMessage');
+  const appNotificationEnabledEl = document.getElementById('appNotificationEnabled');
   
-  document.getElementById('formTitle').textContent = 'Uygulama Düzenle';
+  if (appNotificationIdEl) appNotificationIdEl.value = app.appId || '';
+  if (appNotificationPackageEl) appNotificationPackageEl.value = app.package || '';
+  if (appNotificationVersionEl) appNotificationVersionEl.value = notification.latest_version || '';
+  if (appNotificationForceUpdateEl) appNotificationForceUpdateEl.value = String(notification.force_update || false);
+  if (appNotificationMessageEl) appNotificationMessageEl.value = notification.update_message || '';
+  if (appNotificationEnabledEl) appNotificationEnabledEl.value = String(notification.enabled || false);
+  
+  if (formTitleEl) formTitleEl.textContent = 'Uygulama Düzenle';
   
   // Kısa bir gecikme ile modal'ı aç
   setTimeout(() => {
-  showAppModal();
+    showAppModal();
   }, 100);
 }
 
@@ -1225,36 +1303,76 @@ function editApp(index) {
 async function saveApp(event) {
   event.preventDefault();
   
-  const index = parseInt(document.getElementById('appIndex').value);
-  const detailsValue = document.getElementById('appDetails').value.trim();
-  const privacyValue = document.getElementById('appPrivacy').value.trim();
+  // Form elemanlarını güvenli şekilde al
+  const appIndexEl = document.getElementById('appIndex');
+  const appTitleEl = document.getElementById('appTitle');
+  const appDescriptionEl = document.getElementById('appDescription');
+  const appIconEl = document.getElementById('appIcon');
+  const appCategoryEl = document.getElementById('appCategory');
+  const appRatingEl = document.getElementById('appRating');
+  const appDownloadsEl = document.getElementById('appDownloads');
+  const appDetailsEl = document.getElementById('appDetails');
+  const appPrivacyEl = document.getElementById('appPrivacy');
+  const appNotificationIdEl = document.getElementById('appNotificationId');
+  const appNotificationPackageEl = document.getElementById('appNotificationPackage');
+  const appNotificationVersionEl = document.getElementById('appNotificationVersion');
+  const appNotificationMessageEl = document.getElementById('appNotificationMessage');
+  const appNotificationEnabledEl = document.getElementById('appNotificationEnabled');
+  const appNotificationForceUpdateEl = document.getElementById('appNotificationForceUpdate');
+  
+  if (!appTitleEl || !appDescriptionEl) {
+    showAlert('❌ Form elemanları bulunamadı!', 'error');
+    return;
+  }
+  
+  const index = parseInt(appIndexEl?.value || '-1');
+  const detailsValue = appDetailsEl?.value.trim() || '';
+  const privacyValue = appPrivacyEl?.value.trim() || '';
+  
+  // Validasyon
+  const title = appTitleEl.value.trim();
+  if (!title) {
+    showAlert('⚠️ Uygulama adı gereklidir!', 'error');
+    appTitleEl.focus();
+    return;
+  }
   
   const app = {
-    title: document.getElementById('appTitle').value.trim(),
-    description: document.getElementById('appDescription').value.trim(),
-    icon: document.getElementById('appIcon').value.trim(),
-    category: document.getElementById('appCategory').value.trim(),
-    rating: parseFloat(document.getElementById('appRating').value),
-    downloads: document.getElementById('appDownloads').value.trim(),
+    title,
+    description: appDescriptionEl.value.trim(),
+    icon: appIconEl?.value.trim() || '',
+    category: appCategoryEl?.value.trim() || '',
+    rating: parseFloat(appRatingEl?.value || 0),
+    downloads: appDownloadsEl?.value.trim() || '',
     details: detailsValue || '#', // Boşsa otomatik olarak "#" (Yakında)
     privacy: privacyValue || '#',
     features: currentFeatures
   };
   
-  // Link alanları boş bırakıldığında "#" değerine ayarlama
-  // Sadece "Kaydet" butonuna basıldığında kaydedilir, otomatik kaydetme yok
+  // AppId ve Package bilgileri (bildirim sistemi için)
+  const appId = appNotificationIdEl?.value.trim();
+  const appPackage = appNotificationPackageEl?.value.trim();
+  if (appId) app.appId = appId;
+  if (appPackage) app.package = appPackage;
   
-  // Bildirim ayarları (eğer doldurulmuşsa)
-  const notificationVersion = document.getElementById('appNotificationVersion').value.trim();
-  const notificationMessage = document.getElementById('appNotificationMessage').value.trim();
+  // Bildirim ayarları
+  const notificationVersion = appNotificationVersionEl?.value.trim() || '';
+  const notificationMessage = appNotificationMessageEl?.value.trim() || '';
+  const notificationEnabled = appNotificationEnabledEl?.value === 'true';
   
-  if (notificationVersion || notificationMessage) {
+  if (notificationEnabled && (notificationVersion || notificationMessage)) {
+    // Bildirim aktif ve bilgiler doluysa ekle
     app.notification = {
       latest_version: notificationVersion || '1.0.0',
-      force_update: document.getElementById('appNotificationForceUpdate').value === 'true',
+      force_update: appNotificationForceUpdateEl?.value === 'true',
       update_message: notificationMessage || 'Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.',
-      enabled: document.getElementById('appNotificationEnabled').value === 'true'
+      enabled: true
     };
+  } else if (index !== -1 && appsData.apps?.[index]?.notification) {
+    // Düzenleme modunda ve bildirim kapatıldıysa veya boşsa, mevcut bildirimi sil
+    if (!notificationEnabled || (!notificationVersion && !notificationMessage)) {
+      delete app.notification;
+    }
   }
 
   if (index === -1) {
@@ -1284,12 +1402,17 @@ async function saveApp(event) {
       // GitHub'a başarıyla kaydedildi
       saveToLocal(); // LocalStorage'a da kaydet (backup)
       showAlert('✅ Değişiklikler GitHub\'a kaydedildi ve deploy edildi! Site birkaç saniye içinde güncellenecek.', 'success');
+      // Önizlemeyi otomatik yenile
+      autoRefreshPreview();
     } else {
       // Netlify Function çalışmıyorsa fallback
       throw new Error(result.error || 'GitHub kaydetme başarısız');
     }
   } catch (error) {
+    // Hata yönetimi - kullanıcı dostu mesajlar
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
     console.error('Netlify Function hatası:', error);
+    
     // Netlify Function çalışmıyor - kullanıcıyı uyar
     saveToLocal(); // LocalStorage'a backup olarak kaydet
     showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin veya manuel olarak GitHub\'a push yapın.', 'error');
@@ -1300,7 +1423,9 @@ async function saveApp(event) {
         await saveToGitHub();
         showAlert('✅ GitHub\'a manuel olarak kaydedildi!', 'success');
       } catch (githubError) {
+        const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
         console.error('GitHub kaydetme hatası:', githubError);
+        showAlert(`❌ GitHub kaydetme hatası: ${githubErrorMessage}`, 'error');
       }
     }
   }
@@ -1308,6 +1433,13 @@ async function saveApp(event) {
   updateStats();
   renderApps();
   closeAppModal();
+  
+  // LocalStorage'a kaydedildiyse önizlemeyi yenile (anında görüntüleme için)
+  if (currentMode === 'local') {
+    setTimeout(() => {
+      refreshPreview(false);
+    }, 500);
+  }
 }
 
 // Modal Functions
@@ -1322,32 +1454,42 @@ function showAppModal() {
   }
 }
 
-function closeAppModal() {
-  const modal = document.getElementById('appFormModal');
-  if (modal) {
-    const modalContent = modal.querySelector('.modal-content');
-    if (modalContent) {
-      // Kapanış animasyonu
-      modalContent.style.animation = 'modalSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-      modal.style.animation = 'fadeOutOverlay 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-    }
-    
-    setTimeout(() => {
-      modal.classList.remove('active');
-      document.body.classList.remove('modal-open');
-      // Scroll pozisyonunu geri yükle
-      const scrollY = document.body.style.top;
-      document.body.style.top = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-      // Animasyon stillerini sıfırla
-      if (modalContent) {
-        modalContent.style.animation = '';
-        modal.style.animation = '';
-      }
-    }, 300);
+// Modal kapatma yardımcı fonksiyonu (tekrar kullanılabilir)
+function closeModal(modalId, formId = null) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  
+  const modalContent = modal.querySelector('.modal-content');
+  if (modalContent) {
+    // Kapanış animasyonu
+    modalContent.style.animation = `modalSlideOut ${CONSTANTS.MODAL_ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1) forwards`;
+    modal.style.animation = `fadeOutOverlay ${CONSTANTS.MODAL_ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1) forwards`;
   }
+  
+  setTimeout(() => {
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    // Scroll pozisyonunu geri yükle
+    const scrollY = document.body.style.top;
+    document.body.style.top = '';
+    if (scrollY) {
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
+    // Animasyon stillerini sıfırla
+    if (modalContent) {
+      modalContent.style.animation = '';
+      modal.style.animation = '';
+    }
+    // Form'u temizle
+    if (formId) {
+      const form = document.getElementById(formId);
+      if (form) form.reset();
+    }
+  }, CONSTANTS.MODAL_ANIMATION_DURATION);
+}
+
+function closeAppModal() {
+  closeModal('appFormModal');
 }
 
 function showSiteModal() {
@@ -1364,73 +1506,67 @@ function showSiteModal() {
 }
 
 function closeSiteModal() {
-  const modal = document.getElementById('siteSettingsModal');
-  if (modal) {
-    const modalContent = modal.querySelector('.modal-content');
-    if (modalContent) {
-      // Kapanış animasyonu
-      modalContent.style.animation = 'modalSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-      modal.style.animation = 'fadeOutOverlay 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-    }
-    
-    setTimeout(() => {
-      modal.classList.remove('active');
-      document.body.classList.remove('modal-open');
-      // Scroll pozisyonunu geri yükle
-      const scrollY = document.body.style.top;
-      document.body.style.top = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-      // Animasyon stillerini sıfırla
-      if (modalContent) {
-        modalContent.style.animation = '';
-        modal.style.animation = '';
-      }
-    }, 300);
+  closeModal('siteSettingsModal');
+}
+
+// Session kontrolünü throttle ile optimize et
+function checkAdminSessionThrottled() {
+  const now = Date.now();
+  // Her 5 saniyede bir kontrol et (performans için)
+  if (now - lastSessionCheck < 5000) {
+    return true; // Son kontrol çok yakınsa geç
+  }
+  lastSessionCheck = now;
+  return checkAdminSession();
+}
+
+// Son aktivite zamanını güncelle
+function updateLastActivity() {
+  if (sessionStorage.getItem('adminSession')) {
+    sessionStorage.setItem('adminLastActivity', Date.now().toString());
   }
 }
 
 // Overlay click to close
 // Kullanıcı aktivitesi olduğunda session'ı güncelle
 document.addEventListener('click', (e) => {
-  // Session kontrolü yap
-  if (!checkAdminSession()) {
+  // Session kontrolü yap (throttled)
+  if (!checkAdminSessionThrottled()) {
     e.preventDefault();
     e.stopPropagation();
     return false;
   }
   // Son aktivite zamanını güncelle
-  if (sessionStorage.getItem('adminSession')) {
-    sessionStorage.setItem('adminLastActivity', Date.now().toString());
-  }
+  updateLastActivity();
+  
   if (e.target.classList.contains('modal-overlay')) {
-    closeAppModal();
-    closeSiteModal();
-    closeUserModal();
-    closeChangePasswordModal();
+    closeAllModals();
   }
 });
 
 // ESC key to close modals
 document.addEventListener('keydown', (e) => {
-  // Session kontrolü yap
-  if (!checkAdminSession()) {
+  // Session kontrolü yap (throttled)
+  if (!checkAdminSessionThrottled()) {
     e.preventDefault();
     e.stopPropagation();
     return false;
   }
   // Son aktivite zamanını güncelle
-  if (sessionStorage.getItem('adminSession')) {
-    sessionStorage.setItem('adminLastActivity', Date.now().toString());
-  }
+  updateLastActivity();
+  
   if (e.key === 'Escape') {
-    closeAppModal();
-    closeSiteModal();
-    closeUserModal();
-    closeChangePasswordModal();
+    closeAllModals();
   }
 });
+
+// Tüm modalları kapat (tek bir fonksiyon)
+function closeAllModals() {
+  closeAppModal();
+  closeSiteModal();
+  closeUserModal();
+  closeChangePasswordModal();
+}
 
 // Form iptal
 function cancelForm() {
@@ -1438,7 +1574,7 @@ function cancelForm() {
 }
 
 // Uygulama sil
-function deleteApp(index) {
+async function deleteApp(index) {
   const app = appsData.apps[index];
   if (!app) return;
   
@@ -1450,22 +1586,54 @@ function deleteApp(index) {
   appsData.apps.splice(index, 1);
   logActivity('delete', `"${appTitle}" uygulaması silindi`);
 
-  if (currentMode === 'local') {
-    saveToLocal();
-    showAlert('✅ Uygulama silindi!', 'success');
-  } else {
-    showAlert('✅ Uygulama silindi. GitHub\'a kaydetmek için "GitHub\'a Kaydet" butonuna tıklayın.', 'info');
+  // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
+  try {
+    const response = await fetch('/.netlify/functions/updateApps', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(appsData)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      // GitHub'a başarıyla kaydedildi
+      saveToLocal(); // LocalStorage'a da kaydet (backup)
+      showAlert('✅ Uygulama silindi ve GitHub\'a kaydedildi! Site birkaç saniye içinde güncellenecek.', 'success');
+      // Önizlemeyi otomatik yenile
+      autoRefreshPreview();
+    } else {
+      // Netlify Function çalışmıyorsa fallback
+      throw new Error(result.error || 'GitHub kaydetme başarısız');
+    }
+  } catch (error) {
+    console.error('Netlify Function hatası:', error);
+    // Netlify Function çalışmıyor - kullanıcıyı uyar
+    saveToLocal(); // LocalStorage'a backup olarak kaydet
+    showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+    
+    // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
+    if (currentMode === 'github' && token) {
+      try {
+        await saveToGitHub();
+        showAlert('✅ Uygulama silindi ve GitHub\'a manuel olarak kaydedildi!', 'success');
+      } catch (githubError) {
+        console.error('GitHub kaydetme hatası:', githubError);
+      }
+    }
   }
 
   updateStats();
   renderApps();
-}
-
-// Form iptal
-function cancelForm() {
-  document.getElementById('appFormSection').classList.add('hidden');
-  document.getElementById('appForm').reset();
-  currentFeatures = [];
+  
+  // LocalStorage'a kaydedildiyse önizlemeyi yenile (anında görüntüleme için)
+  if (currentMode === 'local') {
+    setTimeout(() => {
+      refreshPreview(false);
+    }, 500);
+  }
 }
 
 // Özellik ekle
@@ -1589,23 +1757,35 @@ function loadSiteSectionData(section) {
   const site = appsData.site;
   
   if (section === 'header') {
-    document.getElementById('siteHeaderLogo').value = site.header?.logo || '';
-    document.getElementById('siteHeaderTagline').value = site.header?.tagline || '';
+    const logoEl = document.getElementById('siteHeaderLogo');
+    const taglineEl = document.getElementById('siteHeaderTagline');
+    if (logoEl) logoEl.value = site.header?.logo || '';
+    if (taglineEl) taglineEl.value = site.header?.tagline || '';
   } else if (section === 'hero') {
-    document.getElementById('siteHeroTitle').value = site.hero?.title || '';
-    document.getElementById('siteHeroTagline').value = site.hero?.tagline || '';
-    document.getElementById('siteHeroPlayStoreUrl').value = site.hero?.playStoreUrl || '';
-    document.getElementById('siteHeroStats').value = JSON.stringify(site.hero?.stats || [], null, 2);
+    const titleEl = document.getElementById('siteHeroTitle');
+    const taglineEl = document.getElementById('siteHeroTagline');
+    const urlEl = document.getElementById('siteHeroPlayStoreUrl');
+    const statsEl = document.getElementById('siteHeroStats');
+    if (titleEl) titleEl.value = site.hero?.title || '';
+    if (taglineEl) taglineEl.value = site.hero?.tagline || '';
+    if (urlEl) urlEl.value = site.hero?.playStoreUrl || '';
+    if (statsEl) statsEl.value = JSON.stringify(site.hero?.stats || [], null, 2);
   } else if (section === 'about') {
-    document.getElementById('siteAboutTitle').value = site.about?.title || '';
-    document.getElementById('siteAboutTexts').value = site.about?.texts?.join('\n') || '';
-    document.getElementById('siteAboutTech').value = site.about?.technologies?.map(t => `${t.icon}|${t.name}`).join('\n') || '';
+    const titleEl = document.getElementById('siteAboutTitle');
+    const textsEl = document.getElementById('siteAboutTexts');
+    const techEl = document.getElementById('siteAboutTech');
+    if (titleEl) titleEl.value = site.about?.title || '';
+    if (textsEl) textsEl.value = site.about?.texts?.join('\n') || '';
+    if (techEl) techEl.value = site.about?.technologies?.map(t => `${t.icon}|${t.name}`).join('\n') || '';
   } else if (section === 'skills') {
-    document.getElementById('siteSkillsTitle').value = site.skills?.title || '';
+    const titleEl = document.getElementById('siteSkillsTitle');
+    if (titleEl) titleEl.value = site.skills?.title || '';
     renderSkillsList();
   } else if (section === 'contact') {
-    document.getElementById('siteContactTitle').value = site.contact?.title || '';
-    document.getElementById('siteContactSubtitle').value = site.contact?.subtitle || '';
+    const titleEl = document.getElementById('siteContactTitle');
+    const subtitleEl = document.getElementById('siteContactSubtitle');
+    if (titleEl) titleEl.value = site.contact?.title || '';
+    if (subtitleEl) subtitleEl.value = site.contact?.subtitle || '';
     renderContactList();
   }
 }
@@ -1615,68 +1795,121 @@ async function saveSiteSection(section) {
     appsData.site = getDefaultSiteData();
   }
   
+  // Form elemanlarını güvenli şekilde al
   if (section === 'header') {
+    const logoEl = document.getElementById('siteHeaderLogo');
+    const taglineEl = document.getElementById('siteHeaderTagline');
+    if (!logoEl || !taglineEl) {
+      showAlert('❌ Form elemanları bulunamadı!', 'error');
+      return;
+    }
     appsData.site.header = {
-      logo: document.getElementById('siteHeaderLogo').value.trim(),
-      tagline: document.getElementById('siteHeaderTagline').value.trim()
+      logo: logoEl.value.trim(),
+      tagline: taglineEl.value.trim()
     };
   } else if (section === 'hero') {
+    const titleEl = document.getElementById('siteHeroTitle');
+    const taglineEl = document.getElementById('siteHeroTagline');
+    const urlEl = document.getElementById('siteHeroPlayStoreUrl');
+    const statsEl = document.getElementById('siteHeroStats');
+    
+    if (!titleEl || !taglineEl || !urlEl || !statsEl) {
+      showAlert('❌ Form elemanları bulunamadı!', 'error');
+      return;
+    }
+    
     let stats = [];
     try {
-      stats = JSON.parse(document.getElementById('siteHeroStats').value);
+      stats = JSON.parse(statsEl.value);
     } catch (e) {
-      alert('İstatistikler JSON formatında olmalı!');
+      showAlert('❌ İstatistikler JSON formatında olmalı!', 'error');
       return;
     }
     appsData.site.hero = {
-      title: document.getElementById('siteHeroTitle').value.trim(),
-      tagline: document.getElementById('siteHeroTagline').value.trim(),
-      playStoreUrl: document.getElementById('siteHeroPlayStoreUrl').value.trim(),
+      title: titleEl.value.trim(),
+      tagline: taglineEl.value.trim(),
+      playStoreUrl: urlEl.value.trim(),
       stats: stats
     };
   } else if (section === 'about') {
-    const texts = document.getElementById('siteAboutTexts').value.split('\n').filter(t => t.trim());
-    const techLines = document.getElementById('siteAboutTech').value.split('\n').filter(t => t.trim());
+    const titleEl = document.getElementById('siteAboutTitle');
+    const textsEl = document.getElementById('siteAboutTexts');
+    const techEl = document.getElementById('siteAboutTech');
+    
+    if (!titleEl || !textsEl || !techEl) {
+      showAlert('❌ Form elemanları bulunamadı!', 'error');
+      return;
+    }
+    
+    const texts = textsEl.value.split('\n').filter(t => t.trim());
+    const techLines = techEl.value.split('\n').filter(t => t.trim());
     const technologies = techLines.map(line => {
       const [icon, ...nameParts] = line.split('|');
       return { icon: icon.trim(), name: nameParts.join('|').trim() };
     });
     
     appsData.site.about = {
-      title: document.getElementById('siteAboutTitle').value.trim(),
+      title: titleEl.value.trim(),
       texts: texts,
       technologies: technologies
     };
   } else if (section === 'skills') {
+    const titleEl = document.getElementById('siteSkillsTitle');
+    if (!titleEl) {
+      showAlert('❌ Form elemanları bulunamadı!', 'error');
+      return;
+    }
+    
     const skills = [];
     document.querySelectorAll('.skill-edit-item').forEach(item => {
-      skills.push({
-        name: item.querySelector('.skill-name-input').value.trim(),
-        icon: item.querySelector('.skill-icon-input').value.trim(),
-        level: parseInt(item.querySelector('.skill-level-input').value) || 0
-      });
+      const nameInput = item.querySelector('.skill-name-input');
+      const iconInput = item.querySelector('.skill-icon-input');
+      const levelInput = item.querySelector('.skill-level-input');
+      if (nameInput && iconInput && levelInput) {
+        skills.push({
+          name: nameInput.value.trim(),
+          icon: iconInput.value.trim(),
+          level: parseInt(levelInput.value) || 0
+        });
+      }
     });
     
     appsData.site.skills = {
-      title: document.getElementById('siteSkillsTitle').value.trim(),
+      title: titleEl.value.trim(),
       items: skills
     };
   } else if (section === 'contact') {
+    const titleEl = document.getElementById('siteContactTitle');
+    const subtitleEl = document.getElementById('siteContactSubtitle');
+    if (!titleEl || !subtitleEl) {
+      showAlert('❌ Form elemanları bulunamadı!', 'error');
+      return;
+    }
+    
     const contacts = [];
     document.querySelectorAll('.contact-edit-item').forEach(item => {
-      contacts.push({
-        type: item.querySelector('.contact-type-input').value.trim(),
-        icon: item.querySelector('.contact-icon-input').value.trim(),
-        title: item.querySelector('.contact-title-input').value.trim(),
-        value: item.querySelector('.contact-value-input').value.trim(),
-        link: item.querySelector('.contact-link-input').value.trim(),
-        description: item.querySelector('.contact-desc-input').value.trim()
-      });
+      const typeInput = item.querySelector('.contact-type-input');
+      const iconInput = item.querySelector('.contact-icon-input');
+      const titleInput = item.querySelector('.contact-title-input');
+      const valueInput = item.querySelector('.contact-value-input');
+      const linkInput = item.querySelector('.contact-link-input');
+      const descInput = item.querySelector('.contact-desc-input');
+      
+      if (typeInput && iconInput && titleInput && valueInput && linkInput && descInput) {
+        contacts.push({
+          type: typeInput.value.trim(),
+          icon: iconInput.value.trim(),
+          title: titleInput.value.trim(),
+          value: valueInput.value.trim(),
+          link: linkInput.value.trim(),
+          description: descInput.value.trim()
+        });
+      }
     });
     
     appsData.site.contact = {
-      title: document.getElementById('siteContactTitle').value.trim(),
-      subtitle: document.getElementById('siteContactSubtitle').value.trim(),
+      title: titleEl.value.trim(),
+      subtitle: subtitleEl.value.trim(),
       items: contacts
     };
   }
@@ -1697,6 +1930,8 @@ async function saveSiteSection(section) {
       // GitHub'a başarıyla kaydedildi
       saveToLocal(); // LocalStorage'a da kaydet (backup)
       showAlert('✅ Site ayarları GitHub\'a kaydedildi ve deploy edildi! Site birkaç saniye içinde güncellenecek.', 'success');
+      // Önizlemeyi otomatik yenile
+      autoRefreshPreview();
     } else {
       throw new Error(result.error || 'GitHub kaydetme başarısız');
     }
@@ -1716,24 +1951,34 @@ async function saveSiteSection(section) {
       }
     }
   }
+  
+  // LocalStorage'a kaydedildiyse önizlemeyi yenile (anında görüntüleme için)
+  if (currentMode === 'local') {
+    setTimeout(() => {
+      refreshPreview(false);
+    }, 500);
+  }
 }
 
-// Alert göster
+// Alert göster (XSS korumalı)
 function showAlert(message, type = 'success') {
   const container = document.getElementById('alertContainer');
   if (!container) return;
   
   const alert = document.createElement('div');
   alert.className = `alert alert-${type}`;
-  alert.innerHTML = `<span>${message}</span>`;
+  // XSS koruması için textContent kullan
+  const span = document.createElement('span');
+  span.textContent = message;
+  alert.appendChild(span);
   
   container.appendChild(alert);
   
   setTimeout(() => {
     alert.style.opacity = '0';
     alert.style.transform = 'translateX(100px)';
-    setTimeout(() => alert.remove(), 300);
-  }, 3000);
+    setTimeout(() => alert.remove(), CONSTANTS.MODAL_ANIMATION_DURATION);
+  }, CONSTANTS.ALERT_DISPLAY_DURATION);
 }
 
 function renderSkillsList() {
@@ -2021,12 +2266,25 @@ function editUser(index) {
 async function saveUser(event) {
   event.preventDefault();
   
-  const index = parseInt(document.getElementById('userIndex').value);
-  const username = document.getElementById('userName').value.trim();
-  const email = document.getElementById('userEmail').value.trim();
-  const password = document.getElementById('userPassword').value;
-  const passwordConfirm = document.getElementById('userPasswordConfirm').value;
-  const role = document.getElementById('userRole').value;
+  // Form elemanlarını güvenli şekilde al
+  const userIndexEl = document.getElementById('userIndex');
+  const userNameEl = document.getElementById('userName');
+  const userEmailEl = document.getElementById('userEmail');
+  const userPasswordEl = document.getElementById('userPassword');
+  const userPasswordConfirmEl = document.getElementById('userPasswordConfirm');
+  const userRoleEl = document.getElementById('userRole');
+  
+  if (!userIndexEl || !userNameEl || !userEmailEl || !userPasswordEl || !userPasswordConfirmEl || !userRoleEl) {
+    showAlert('❌ Form elemanları bulunamadı!', 'error');
+    return;
+  }
+  
+  const index = parseInt(userIndexEl.value);
+  const username = userNameEl.value.trim();
+  const email = userEmailEl.value.trim();
+  const password = userPasswordEl.value;
+  const passwordConfirm = userPasswordConfirmEl.value;
+  const role = userRoleEl.value;
   
   // Validasyon
   if (!username) {
@@ -2044,8 +2302,8 @@ async function saveUser(event) {
   // Şifre kontrolü
   if (index === -1) {
     // Yeni kullanıcı - şifre zorunlu
-    if (!password || password.length < 6) {
-      showAlert('⚠️ Şifre en az 6 karakter olmalıdır!', 'error');
+    if (!password || password.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
+      showAlert(`⚠️ Şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır!`, 'error');
       return;
     }
     if (password !== passwordConfirm) {
@@ -2055,8 +2313,8 @@ async function saveUser(event) {
   } else {
     // Düzenleme - şifre değiştiriliyorsa kontrol et
     if (password) {
-      if (password.length < 6) {
-        showAlert('⚠️ Şifre en az 6 karakter olmalıdır!', 'error');
+      if (password.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
+        showAlert(`⚠️ Şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır!`, 'error');
         return;
       }
       if (password !== passwordConfirm) {
@@ -2124,27 +2382,9 @@ function deleteUser(index) {
 
 // Kullanıcı modal'ını kapat
 function closeUserModal() {
-  const modal = document.getElementById('userFormModal');
-  if (modal) {
-    const modalContent = modal.querySelector('.modal-content');
-    if (modalContent) {
-      // Kapanış animasyonu
-      modalContent.style.animation = 'modalSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-      modal.style.animation = 'fadeOutOverlay 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-    }
-    
-    setTimeout(() => {
-      modal.classList.remove('active');
-      document.body.classList.remove('modal-open');
-      // Animasyon stillerini sıfırla
-      if (modalContent) {
-        modalContent.style.animation = '';
-        modal.style.animation = '';
-      }
-      document.getElementById('userForm').reset();
-      document.getElementById('userIndex').value = '-1';
-    }, 300);
-  }
+  closeModal('userFormModal', 'userForm');
+  const userIndex = document.getElementById('userIndex');
+  if (userIndex) userIndex.value = '-1';
 }
 
 // Şifre değiştirme modal fonksiyonları
@@ -2159,38 +2399,11 @@ function showChangePasswordModal() {
 }
 
 function closeChangePasswordModal() {
-  const modal = document.getElementById('changePasswordModal');
-  if (modal) {
-    const modalContent = modal.querySelector('.modal-content');
-    if (modalContent) {
-      // Kapanış animasyonu
-      modalContent.style.animation = 'modalSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-      modal.style.animation = 'fadeOutOverlay 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-    }
-    
-    setTimeout(() => {
-      modal.classList.remove('active');
-      document.body.classList.remove('modal-open');
-      const scrollY = document.body.style.top;
-      document.body.style.top = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-      if (modalContent) {
-        modalContent.style.animation = '';
-        modal.style.animation = '';
-      }
-      // Form'u temizle
-      const form = document.getElementById('changePasswordForm');
-      if (form) {
-        form.reset();
-        // Hata mesajlarını temizle
-        document.querySelectorAll('.error-message').forEach(el => {
-          el.textContent = '';
-        });
-      }
-    }, 300);
-  }
+  closeModal('changePasswordModal', 'changePasswordForm');
+  // Hata mesajlarını temizle
+  document.querySelectorAll('.error-message').forEach(el => {
+    el.textContent = '';
+  });
 }
 
 // Şifre değiştirme
@@ -2217,8 +2430,8 @@ async function changePassword(event) {
     return;
   }
   
-  if (!newPassword || newPassword.length < 6) {
-    newPasswordError.textContent = '⚠️ Yeni şifre en az 6 karakter olmalıdır.';
+  if (!newPassword || newPassword.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
+    newPasswordError.textContent = `⚠️ Yeni şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır.`;
     document.getElementById('newPassword').classList.add('error');
     return;
   }
@@ -2258,48 +2471,13 @@ async function changePassword(event) {
   closeChangePasswordModal();
 }
 
-// Şifre göster/gizle (genel)
-function togglePasswordVisibility(inputId, iconId) {
-  const passwordInput = document.getElementById(inputId);
-  const eyeIcon = document.getElementById(iconId);
-  if (passwordInput && eyeIcon) {
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
-    } else {
-      passwordInput.type = 'password';
-      eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-    }
-  }
-}
-
 // Şifre göster/gizle (kullanıcı formu)
 function toggleUserPassword() {
-  const passwordInput = document.getElementById('userPassword');
-  const eyeIcon = document.getElementById('userEyeIcon');
-  if (passwordInput && eyeIcon) {
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
-    } else {
-      passwordInput.type = 'password';
-      eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-    }
-  }
+  togglePasswordVisibility('userPassword', 'userEyeIcon');
 }
 
 function toggleUserPasswordConfirm() {
-  const passwordInput = document.getElementById('userPasswordConfirm');
-  const eyeIcon = document.getElementById('userEyeIconConfirm');
-  if (passwordInput && eyeIcon) {
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
-    } else {
-      passwordInput.type = 'password';
-      eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-    }
-  }
+  togglePasswordVisibility('userPasswordConfirm', 'userEyeIconConfirm');
 }
 
 // ==================== GERİ BİLDİRİM & OY YÖNETİMİ ====================
@@ -2490,19 +2668,47 @@ async function loadNotificationsConfig() {
       };
     }
     
-    // Form alanlarını doldur
-    document.getElementById('latest_version').value = config.latest_version || "1.0.0";
-    document.getElementById('force_update').value = String(config.force_update || false);
-    document.getElementById('update_message').value = config.update_message || "";
-    document.getElementById('broadcast_title').value = config.broadcast_title || "";
-    document.getElementById('broadcast_message').value = config.broadcast_message || "";
-    document.getElementById('broadcast_enabled').value = String(config.broadcast_enabled || false);
-    document.getElementById('maintenance').value = String(config.maintenance || false);
-    document.getElementById('maintenance_message').value = config.maintenance_message || "";
+    // Form alanlarını güvenli şekilde doldur
+    const latestVersionEl = document.getElementById('latest_version');
+    const forceUpdateEl = document.getElementById('force_update');
+    const updateMessageEl = document.getElementById('update_message');
+    const broadcastTitleEl = document.getElementById('broadcast_title');
+    const broadcastMessageEl = document.getElementById('broadcast_message');
+    const broadcastEnabledEl = document.getElementById('broadcast_enabled');
+    const maintenanceEl = document.getElementById('maintenance');
+    const maintenanceMessageEl = document.getElementById('maintenance_message');
+    
+    if (latestVersionEl) latestVersionEl.value = config.latest_version || "1.0.0";
+    if (forceUpdateEl) forceUpdateEl.value = String(config.force_update || false);
+    if (updateMessageEl) updateMessageEl.value = config.update_message || "";
+    if (broadcastTitleEl) broadcastTitleEl.value = config.broadcast_title || "";
+    if (broadcastMessageEl) broadcastMessageEl.value = config.broadcast_message || "";
+    if (broadcastEnabledEl) broadcastEnabledEl.value = String(config.broadcast_enabled || false);
+    if (maintenanceEl) maintenanceEl.value = String(config.maintenance || false);
+    if (maintenanceMessageEl) maintenanceMessageEl.value = config.maintenance_message || "";
     
   } catch (error) {
     console.error('Config yükleme hatası:', error);
     showAlert('⚠️ Config yüklenirken hata oluştu. Varsayılan değerler kullanılıyor.', 'error');
+    
+    // Hata durumunda varsayılan değerleri form'a yükle
+    const latestVersionEl = document.getElementById('latest_version');
+    const forceUpdateEl = document.getElementById('force_update');
+    const updateMessageEl = document.getElementById('update_message');
+    const broadcastTitleEl = document.getElementById('broadcast_title');
+    const broadcastMessageEl = document.getElementById('broadcast_message');
+    const broadcastEnabledEl = document.getElementById('broadcast_enabled');
+    const maintenanceEl = document.getElementById('maintenance');
+    const maintenanceMessageEl = document.getElementById('maintenance_message');
+    
+    if (latestVersionEl) latestVersionEl.value = "1.0.0";
+    if (forceUpdateEl) forceUpdateEl.value = "false";
+    if (updateMessageEl) updateMessageEl.value = "Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.";
+    if (broadcastTitleEl) broadcastTitleEl.value = "Yeni Görev Yayınlandı!";
+    if (broadcastMessageEl) broadcastMessageEl.value = "Yeni bölümler aktif! Hemen kontrol edin.";
+    if (broadcastEnabledEl) broadcastEnabledEl.value = "false";
+    if (maintenanceEl) maintenanceEl.value = "false";
+    if (maintenanceMessageEl) maintenanceMessageEl.value = "Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin.";
   }
 }
 
@@ -2518,21 +2724,35 @@ async function saveNotificationsConfig(event) {
   saveBtn.querySelector('span').textContent = '⏳ Kaydediliyor...';
   
   try {
-    // Form verilerini topla
+    // Form verilerini güvenli şekilde topla
+    const latestVersionEl = document.getElementById('latest_version');
+    const forceUpdateEl = document.getElementById('force_update');
+    const updateMessageEl = document.getElementById('update_message');
+    const broadcastEnabledEl = document.getElementById('broadcast_enabled');
+    const broadcastTitleEl = document.getElementById('broadcast_title');
+    const broadcastMessageEl = document.getElementById('broadcast_message');
+    const maintenanceEl = document.getElementById('maintenance');
+    const maintenanceMessageEl = document.getElementById('maintenance_message');
+    
+    if (!latestVersionEl || !forceUpdateEl || !updateMessageEl || !broadcastEnabledEl || 
+        !broadcastTitleEl || !broadcastMessageEl || !maintenanceEl || !maintenanceMessageEl) {
+      throw new Error('Form elemanları bulunamadı!');
+    }
+    
     const config = {
-      latest_version: document.getElementById('latest_version').value.trim(),
-      force_update: document.getElementById('force_update').value === 'true',
-      update_message: document.getElementById('update_message').value.trim(),
-      broadcast_enabled: document.getElementById('broadcast_enabled').value === 'true',
-      broadcast_title: document.getElementById('broadcast_title').value.trim(),
-      broadcast_message: document.getElementById('broadcast_message').value.trim(),
-      maintenance: document.getElementById('maintenance').value === 'true',
-      maintenance_message: document.getElementById('maintenance_message').value.trim()
+      latest_version: latestVersionEl.value.trim(),
+      force_update: forceUpdateEl.value === 'true',
+      update_message: updateMessageEl.value.trim(),
+      broadcast_enabled: broadcastEnabledEl.value === 'true',
+      broadcast_title: broadcastTitleEl.value.trim(),
+      broadcast_message: broadcastMessageEl.value.trim(),
+      maintenance: maintenanceEl.value === 'true',
+      maintenance_message: maintenanceMessageEl.value.trim()
     };
     
-    // Validasyon
-    if (!config.latest_version || !config.update_message || !config.broadcast_title || 
-        !config.broadcast_message || !config.maintenance_message) {
+    // Validasyon - boş string kontrolü
+    if (!config.latest_version.trim() || !config.update_message.trim() || !config.broadcast_title.trim() || 
+        !config.broadcast_message.trim() || !config.maintenance_message.trim()) {
       throw new Error('Lütfen tüm zorunlu alanları doldurun.');
     }
     
