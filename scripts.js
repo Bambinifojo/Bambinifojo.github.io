@@ -519,6 +519,217 @@ function initLogoAnimation() {
 }
 
 // Search functionality
+let searchData = {
+  apps: [],
+  site: null
+};
+
+// Load search data
+async function loadSearchData() {
+  try {
+    // Load apps
+    const appsRes = await fetch('data/apps.json');
+    if (appsRes.ok) {
+      const appsData = await appsRes.json();
+      searchData.apps = appsData.apps || [];
+    }
+    
+    // Load site data
+    const siteRes = await fetch('data/site.json');
+    if (siteRes.ok) {
+      const siteData = await siteRes.json();
+      searchData.site = siteData.site || null;
+    }
+  } catch (error) {
+    console.error('Arama verileri yüklenirken hata:', error);
+  }
+}
+
+// Search in data
+function searchInData(query) {
+  const results = {
+    apps: [],
+    skills: [],
+    technologies: [],
+    contact: []
+  };
+  
+  const lowerQuery = query.toLowerCase().trim();
+  if (lowerQuery.length < 2) return results;
+  
+  // Search in apps
+  if (searchData.apps) {
+    searchData.apps.forEach(app => {
+      const title = (app.title || '').toLowerCase();
+      const description = (app.description || '').toLowerCase();
+      const category = (app.category || '').toLowerCase();
+      const features = (app.features || []).join(' ').toLowerCase();
+      
+      if (title.includes(lowerQuery) || 
+          description.includes(lowerQuery) || 
+          category.includes(lowerQuery) ||
+          features.includes(lowerQuery)) {
+        results.apps.push(app);
+      }
+    });
+  }
+  
+  // Search in site data
+  if (searchData.site) {
+    // Search in skills
+    if (searchData.site.skills && searchData.site.skills.items) {
+      searchData.site.skills.items.forEach(skill => {
+        const name = (skill.name || '').toLowerCase();
+        if (name.includes(lowerQuery)) {
+          results.skills.push(skill);
+        }
+      });
+    }
+    
+    // Search in technologies
+    if (searchData.site.about && searchData.site.about.technologies) {
+      searchData.site.about.technologies.forEach(tech => {
+        const name = (tech.name || '').toLowerCase();
+        if (name.includes(lowerQuery)) {
+          results.technologies.push(tech);
+        }
+      });
+    }
+    
+    // Search in contact
+    if (searchData.site.contact && searchData.site.contact.items) {
+      searchData.site.contact.items.forEach(contact => {
+        const title = (contact.title || '').toLowerCase();
+        const value = (contact.value || '').toLowerCase();
+        const description = (contact.description || '').toLowerCase();
+        
+        if (title.includes(lowerQuery) || 
+            value.includes(lowerQuery) || 
+            description.includes(lowerQuery)) {
+          results.contact.push(contact);
+        }
+      });
+    }
+  }
+  
+  return results;
+}
+
+// Render search results
+function renderSearchResults(results, query) {
+  const resultsContainer = document.getElementById('searchResults');
+  if (!resultsContainer) return;
+  
+  const totalResults = results.apps.length + results.skills.length + 
+                      results.technologies.length + results.contact.length;
+  
+  if (query.length < 2) {
+    resultsContainer.innerHTML = '';
+    resultsContainer.style.display = 'none';
+    return;
+  }
+  
+  if (totalResults === 0) {
+    resultsContainer.innerHTML = `
+      <div class="search-result-empty">
+        <p>❌ "${query}" için sonuç bulunamadı</p>
+        <p class="search-hint">Farklı bir arama terimi deneyin</p>
+      </div>
+    `;
+    resultsContainer.style.display = 'block';
+    return;
+  }
+  
+  let html = '<div class="search-results-content">';
+  
+  // Apps results
+  if (results.apps.length > 0) {
+    html += '<div class="search-result-group"><h3>📱 Uygulamalar</h3>';
+    results.apps.forEach(app => {
+      const icon = app.icon || '📱';
+      const rating = app.rating || 0;
+      const downloads = app.downloads || '';
+      html += `
+        <div class="search-result-item" onclick="window.location.href='#apps'">
+          <div class="search-result-icon">${icon}</div>
+          <div class="search-result-info">
+            <h4>${escapeHtml(app.title)}</h4>
+            <p>${escapeHtml(app.description || '')}</p>
+            <div class="search-result-meta">
+              ${app.category ? `<span class="search-tag">${escapeHtml(app.category)}</span>` : ''}
+              ${rating > 0 ? `<span class="search-rating">⭐ ${rating}</span>` : ''}
+              ${downloads ? `<span class="search-downloads">${escapeHtml(downloads)}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+  
+  // Skills results
+  if (results.skills.length > 0) {
+    html += '<div class="search-result-group"><h3>⚡ Yetenekler</h3>';
+    results.skills.forEach(skill => {
+      html += `
+        <div class="search-result-item" onclick="window.location.href='#skills'">
+          <div class="search-result-icon">${skill.icon || '⚡'}</div>
+          <div class="search-result-info">
+            <h4>${escapeHtml(skill.name)}</h4>
+            <p>Seviye: ${skill.level || 0}%</p>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+  
+  // Technologies results
+  if (results.technologies.length > 0) {
+    html += '<div class="search-result-group"><h3>🛠️ Teknolojiler</h3>';
+    results.technologies.forEach(tech => {
+      html += `
+        <div class="search-result-item" onclick="window.location.href='#about'">
+          <div class="search-result-icon">${tech.icon || '🛠️'}</div>
+          <div class="search-result-info">
+            <h4>${escapeHtml(tech.name)}</h4>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+  
+  // Contact results
+  if (results.contact.length > 0) {
+    html += '<div class="search-result-group"><h3>📧 İletişim</h3>';
+    results.contact.forEach(contact => {
+      html += `
+        <div class="search-result-item" onclick="window.location.href='${contact.link || '#'}'">
+          <div class="search-result-icon">${contact.icon || '📧'}</div>
+          <div class="search-result-info">
+            <h4>${escapeHtml(contact.title)}</h4>
+            <p>${escapeHtml(contact.value)}</p>
+            ${contact.description ? `<p class="search-result-desc">${escapeHtml(contact.description)}</p>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+  }
+  
+  html += '</div>';
+  resultsContainer.innerHTML = html;
+  resultsContainer.style.display = 'block';
+}
+
+// Escape HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function initSearch() {
   const searchToggle = document.getElementById('searchToggle');
   const searchInput = document.getElementById('searchInput');
@@ -527,11 +738,19 @@ function initSearch() {
   
   if (!searchToggle || !searchInput || !searchClose || !searchContainer) return;
   
+  // Load search data
+  loadSearchData();
+  
   // Toggle search
   searchToggle.addEventListener('click', () => {
     searchContainer.classList.toggle('active');
     if (searchContainer.classList.contains('active')) {
       setTimeout(() => searchInput.focus(), 100);
+    } else {
+      const resultsContainer = document.getElementById('searchResults');
+      if (resultsContainer) {
+        resultsContainer.style.display = 'none';
+      }
     }
   });
   
@@ -540,6 +759,10 @@ function initSearch() {
     searchContainer.classList.remove('active');
     searchInput.value = '';
     searchClose.classList.remove('show');
+    const resultsContainer = document.getElementById('searchResults');
+    if (resultsContainer) {
+      resultsContainer.style.display = 'none';
+    }
   });
   
   // Show/hide close button
@@ -551,26 +774,26 @@ function initSearch() {
     }
   });
   
-  // Search functionality
-  searchInput.addEventListener('keyup', (e) => {
-    const query = e.target.value.toLowerCase().trim();
+  // Search functionality with debounce
+  let searchTimeout;
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.trim();
     
-    if (query.length === 0) {
-      // Clear search results
-      return;
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      const results = searchInData(query);
+      renderSearchResults(results, query);
+    }, 300);
+  });
+  
+  // Search on Enter
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = e.target.value.trim();
+      const results = searchInData(query);
+      renderSearchResults(results, query);
     }
-    
-    // Search in page content
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-      const text = section.textContent.toLowerCase();
-      if (text.includes(query)) {
-        section.style.display = '';
-      } else if (query.length > 2) {
-        // Only hide if query is long enough
-        // section.style.display = 'none';
-      }
-    });
   });
   
   // Keyboard shortcut (Ctrl/Cmd + K)
@@ -580,6 +803,11 @@ function initSearch() {
       searchContainer.classList.toggle('active');
       if (searchContainer.classList.contains('active')) {
         setTimeout(() => searchInput.focus(), 100);
+      } else {
+        const resultsContainer = document.getElementById('searchResults');
+        if (resultsContainer) {
+          resultsContainer.style.display = 'none';
+        }
       }
     }
     
@@ -589,6 +817,10 @@ function initSearch() {
         searchContainer.classList.remove('active');
         searchInput.value = '';
         searchClose.classList.remove('show');
+        const resultsContainer = document.getElementById('searchResults');
+        if (resultsContainer) {
+          resultsContainer.style.display = 'none';
+        }
       }
     }
   });
@@ -596,12 +828,18 @@ function initSearch() {
   // Close search when clicking outside
   document.addEventListener('click', (e) => {
     if (searchContainer.classList.contains('active')) {
-      // Check if click is outside search box
+      // Check if click is outside search box and results
       const searchBox = searchContainer.querySelector('.search-box');
-      if (searchBox && !searchBox.contains(e.target) && !searchToggle.contains(e.target)) {
+      const searchResults = document.getElementById('searchResults');
+      if (searchBox && !searchBox.contains(e.target) && 
+          !searchToggle.contains(e.target) &&
+          (!searchResults || !searchResults.contains(e.target))) {
         searchContainer.classList.remove('active');
         searchInput.value = '';
         searchClose.classList.remove('show');
+        if (searchResults) {
+          searchResults.style.display = 'none';
+        }
       }
     }
   });

@@ -357,6 +357,216 @@ body.menu-open .admin-toggle {
     opacity: 1;
 }
 
+/* Search Results */
+.search-results {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 2001;
+    margin-top: 20px;
+}
+
+[data-theme="dark"] .search-results {
+    background: rgba(30, 30, 46, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-results-content {
+    padding: 20px;
+}
+
+.search-result-group {
+    margin-bottom: 30px;
+}
+
+.search-result-group:last-child {
+    margin-bottom: 0;
+}
+
+.search-result-group h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(106, 90, 205, 0.2);
+}
+
+[data-theme="dark"] .search-result-group h3 {
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-result-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(106, 90, 205, 0.05);
+    border: 1px solid rgba(106, 90, 205, 0.1);
+}
+
+[data-theme="dark"] .search-result-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.search-result-item:hover {
+    background: rgba(106, 90, 205, 0.1);
+    transform: translateX(5px);
+    border-color: rgba(106, 90, 205, 0.3);
+}
+
+[data-theme="dark"] .search-result-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-result-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(106, 90, 205, 0.1);
+    border-radius: 12px;
+}
+
+[data-theme="dark"] .search-result-icon {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.search-result-info {
+    flex: 1;
+}
+
+.search-result-info h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 5px 0;
+}
+
+[data-theme="dark"] .search-result-info h4 {
+    color: white;
+}
+
+.search-result-info p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+}
+
+[data-theme="dark"] .search-result-info p {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-result-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(106, 90, 205, 0.1);
+    color: var(--primary-color);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .search-tag {
+    background: rgba(106, 90, 205, 0.2);
+    color: var(--primary-color);
+}
+
+.search-rating,
+.search-downloads {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+[data-theme="dark"] .search-rating,
+[data-theme="dark"] .search-downloads {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-result-desc {
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 5px;
+}
+
+[data-theme="dark"] .search-result-desc {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-result-empty {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.search-result-empty p {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 10px 0;
+}
+
+[data-theme="dark"] .search-result-empty p {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-hint {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+[data-theme="dark"] .search-hint {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Search results scrollbar */
+.search-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .search-results::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: rgba(106, 90, 205, 0.3);
+    border-radius: 4px;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 90, 205, 0.5);
+}
+
 .search-box {
     display: flex;
     align-items: center;
