@@ -4511,8 +4511,8 @@ html {
 
     /* AI Assistant - iPad */
     .ai-assistant-widget {
-        bottom: 24px;
-        right: 24px;
+        bottom: 20px;
+        right: 20px;
         z-index: 998;
     }
 
@@ -4524,12 +4524,102 @@ html {
     .ai-assistant-modal {
         width: calc(100vw - 80px);
         max-width: 450px;
-        height: calc(100vh - 160px);
+        height: calc(100vh - 140px);
         max-height: 600px;
-        bottom: 90px;
-        right: 30px;
+        bottom: 85px;
+        right: 20px;
         left: auto;
         border-radius: 18px;
+    }
+}
+
+/* iPad Mini Portrait (768x1024) */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+    /* AI Assistant - iPad Mini Portrait */
+    .ai-assistant-widget {
+        bottom: 16px;
+        right: 16px;
+        z-index: 998;
+    }
+
+    .ai-assistant-toggle {
+        width: 52px;
+        height: 52px;
+    }
+
+    .ai-assistant-modal {
+        width: calc(100vw - 60px);
+        max-width: 420px;
+        height: calc(100vh - 120px);
+        max-height: 580px;
+        bottom: 75px;
+        right: 16px;
+        left: auto;
+        border-radius: 16px;
+    }
+
+    .ai-modal-header {
+        padding: 12px 16px;
+    }
+
+    .ai-logo {
+        font-size: 1rem;
+    }
+
+    .ai-chat-messages {
+        padding: 14px 16px;
+    }
+
+    .ai-message-content {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+    }
+
+    .ai-input-area {
+        padding: 10px 16px;
+    }
+
+    .ai-message-input {
+        font-size: 16px;
+        padding: 10px 14px;
+        min-height: 44px;
+    }
+
+    .ai-send-btn {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        min-height: 42px;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5) !important;
+    }
+
+    .ai-send-btn:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6) !important;
+    }
+
+    .ai-send-btn svg {
+        stroke-width: 2.5 !important;
+    }
+
+    .ai-header-btn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .ai-header-btn:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .ai-header-btn svg {
+        stroke-width: 2.5 !important;
     }
 
     .ai-modal-header {
