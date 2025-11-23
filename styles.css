@@ -3049,6 +3049,14 @@ body.ai-modal-open .header-container {
     justify-content: flex-start !important;
 }
 
+/* Modal açıkken header butonlarını otomatik düzenle */
+body.ai-modal-open .search-toggle,
+body.ai-modal-open .theme-toggle,
+body.ai-modal-open .admin-toggle,
+body.ai-modal-open .hamburger {
+    transition: all 0.3s ease;
+}
+
 /* Modal açıkken küçük ve orta ekranlarda header tagline'ı gizle */
 @media (max-width: 1024px) {
     body.ai-modal-open .header-tagline {
@@ -3058,6 +3066,76 @@ body.ai-modal-open .header-container {
     body.ai-modal-open .header-container {
         justify-content: flex-start !important;
         gap: 16px;
+    }
+}
+
+/* Modal açıkken header butonlarını modal'ın soluna kaydır */
+@media (min-width: 1024px) {
+    body.ai-modal-open .ai-assistant-modal {
+        /* Modal genişliğini kontrol et */
+    }
+    
+    /* Modal genişliği 360px-450px arasındaysa butonları kaydır */
+    body.ai-modal-open .search-toggle {
+        right: calc(420px + 20px) !important;
+    }
+    
+    body.ai-modal-open .theme-toggle {
+        right: calc(420px + 80px) !important;
+    }
+    
+    body.ai-modal-open .admin-toggle {
+        right: calc(420px + 140px) !important;
+    }
+    
+    body.ai-modal-open .hamburger {
+        right: calc(420px + 200px) !important;
+    }
+}
+
+/* Tablet ve küçük ekranlarda modal açıkken butonları sola kaydır */
+@media (min-width: 768px) and (max-width: 1024px) {
+    body.ai-modal-open .search-toggle {
+        right: calc(450px + 20px) !important;
+    }
+    
+    body.ai-modal-open .theme-toggle {
+        right: calc(450px + 80px) !important;
+    }
+    
+    body.ai-modal-open .admin-toggle {
+        right: calc(450px + 140px) !important;
+    }
+    
+    body.ai-modal-open .hamburger {
+        right: calc(450px + 200px) !important;
+    }
+}
+
+/* Küçük ekranlarda modal açıkken butonları daha da sola kaydır */
+@media (max-width: 768px) {
+    body.ai-modal-open .search-toggle,
+    body.ai-modal-open .theme-toggle,
+    body.ai-modal-open .admin-toggle {
+        right: auto !important;
+        left: 20px !important;
+        transform: translateX(0);
+    }
+    
+    body.ai-modal-open .search-toggle {
+        top: 70px !important;
+    }
+    
+    body.ai-modal-open .theme-toggle {
+        top: 130px !important;
+    }
+    
+    body.ai-modal-open .admin-toggle {
+        top: 190px !important;
+    }
+    
+    body.ai-modal-open .hamburger {
+        right: 20px !important;
     }
 }
 
