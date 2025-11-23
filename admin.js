@@ -143,11 +143,13 @@ async function handleAdminLogin() {
     // Önce kullanıcı listesinde ara
     authenticatedUser = usersData.find(user => user.passwordHash === hashedPassword);
     
-    // Bulunamazsa varsayılan admin şifresini kontrol et
-    if (!authenticatedUser && hashedPassword === ADMIN_PASSWORD_HASH) {
-      authenticatedUser = usersData.find(user => user.username === 'admin');
-      // Eğer admin kullanıcısı yoksa oluştur
-      if (!authenticatedUser) {
+    // Bulunamazsa ve usersData içinde admin kullanıcısı yoksa, varsayılan admin şifresini kontrol et
+    // Eğer admin kullanıcısı zaten varsa, sadece usersData içindeki hash'i kabul et
+    if (!authenticatedUser) {
+      const adminUserExists = usersData.find(user => user.username === 'admin');
+      
+      if (!adminUserExists && hashedPassword === ADMIN_PASSWORD_HASH) {
+        // Admin kullanıcısı yok ve varsayılan şifre ile giriş yapılıyor - yeni admin kullanıcısı oluştur
         authenticatedUser = {
           id: Date.now().toString(),
           username: 'admin',
@@ -159,6 +161,10 @@ async function handleAdminLogin() {
         };
         usersData.push(authenticatedUser);
         saveUsers();
+        console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
+      } else if (adminUserExists) {
+        // Admin kullanıcısı var ama şifre eşleşmiyor - hata
+        console.log('❌ Admin kullanıcısı mevcut ama şifre eşleşmiyor');
       }
     }
     
