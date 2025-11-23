@@ -73,7 +73,7 @@ function redirectToLogin() {
   sessionStorage.setItem('sessionTimeoutMessage', message);
   
   // Login sayfasına yönlendir (replace kullanarak history'yi temizle)
-  window.location.replace('admin-login.html');
+  window.location.replace('/admin-login.html');
 }
 
 // Admin giriş formunu göster/gizle
@@ -726,7 +726,7 @@ function logout() {
     
     // Login ekranına yönlendir (replace kullanarak history'yi temizle)
     // admin-login.html kullan (redirectToLogin ile tutarlı)
-    window.location.replace('admin-login.html');
+    window.location.replace('/admin-login.html');
   }
 }
 

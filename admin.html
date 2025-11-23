@@ -17,7 +17,7 @@
     if (!adminSession || !adminLoginTime) {
       // Session yok - login sayfasına yönlendir
       if (!window.location.pathname.includes('admin-login.html')) {
-        window.location.replace('admin-login.html');
+        window.location.replace('/admin-login.html');
         return;
       }
     } else {
@@ -35,7 +35,7 @@
         
         if (!window.location.pathname.includes('admin-login.html')) {
           sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-          window.location.replace('admin-login.html');
+          window.location.replace('/admin-login.html');
           return;
         }
       } else {
@@ -48,7 +48,7 @@
             // Session yok - yönlendir
             if (!window.location.pathname.includes('admin-login.html')) {
               sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-              window.location.href = 'admin-login.html';
+              window.location.replace('/admin-login.html');
             }
             return;
           }
@@ -67,7 +67,7 @@
             
             if (!window.location.pathname.includes('admin-login.html')) {
               sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-              window.location.href = 'admin-login.html';
+              window.location.replace('/admin-login.html');
             }
           } else {
             // Session geçerli - son aktivite zamanını güncelle
@@ -95,6 +95,22 @@
     display: flex;
     flex-direction: column;
     position: relative;
+  }
+
+  /* Screen reader only - accessibility için gizli alanlar */
+  .sr-only {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .admin-container::before {
@@ -133,7 +149,9 @@
   }
 
   .admin-menu-toggle {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     cursor: pointer;
@@ -142,7 +160,12 @@
     color: #4b5563;
     transition: all 0.3s ease;
     position: relative;
-    z-index: 201;
+    z-index: 10000 !important;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    pointer-events: auto !important;
   }
 
   .admin-menu-toggle:hover {
@@ -175,6 +198,20 @@
     position: fixed;
     width: 100%;
     height: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  /* Sidebar açıkken body scroll pozisyonunu koru */
+  body.sidebar-open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: -1;
   }
 
   /* Body scroll lock when topbar menu is open */
@@ -192,22 +229,43 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-    z-index: 299;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    z-index: 998;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
   }
 
+  /* Sidebar overlay aktifken görünür - backdrop için (sadece mobilde) */
   .admin-sidebar-overlay.active {
     opacity: 1;
     visibility: visible;
     display: block;
     pointer-events: auto;
+    background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+  
+  /* Desktop'ta overlay'i gizle (sadece mobilde göster) */
+  @media (min-width: 1200px) {
+    .admin-sidebar-overlay {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    
+    .admin-sidebar-overlay.active {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
   }
 
   /* Modal açıkken sidebar overlay'i tamamen gizle - modallar bulanık görünmesin */
@@ -408,6 +466,22 @@
     flex: 1;
   }
 
+  .admin-topbar-menu-section-title {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .admin-topbar-menu-section-divider {
+    margin: 16px 0 8px 0;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
+  }
+
   .admin-user-info {
     display: flex;
     align-items: center;
@@ -468,12 +542,25 @@
     height: calc(100vh - 70px);
     overflow-y: auto;
     flex-shrink: 0;
+    pointer-events: auto;
+    z-index: 100;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Desktop'ta sidebar açık durumu (mobil için de geçerli) */
+  .admin-sidebar.open {
+    pointer-events: auto;
   }
 
   @media (max-width: 768px) {
     .admin-sidebar {
       top: 60px;
       height: calc(100vh - 60px);
+    }
+    
+    /* Mobilde hamburger menüyü gizle */
+    .admin-menu-toggle {
+      display: none !important;
     }
   }
 
@@ -511,6 +598,10 @@
     font-weight: 500;
     font-size: 0.95rem;
     margin-bottom: 4px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
   }
 
   .admin-nav-item:hover {
@@ -539,6 +630,46 @@
 
   .admin-page-header {
     margin-bottom: 30px;
+    position: relative;
+  }
+
+  .admin-page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .admin-page-back-btn,
+  .admin-page-dashboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #4b5563;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+  }
+
+  .admin-page-back-btn:hover,
+  .admin-page-dashboard-btn:hover {
+    background: #f9fafb;
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .admin-page-back-btn svg,
+  .admin-page-dashboard-btn svg {
+    width: 18px;
+    height: 18px;
   }
 
   .admin-page-title {
@@ -766,6 +897,18 @@
     color: #667eea;
   }
 
+  /* Checkbox inline style */
+  .checkbox-inline {
+    width: auto !important;
+    margin-right: 8px;
+  }
+
+  /* Feedback app filter select */
+  .feedback-app-filter {
+    min-width: 150px;
+    padding: 8px 12px;
+  }
+
   .form-group input,
   .form-group textarea,
   .form-group select {
@@ -883,11 +1026,15 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     position: relative;
     overflow: hidden;
     text-decoration: none;
     font-family: inherit;
+    white-space: nowrap;
+    min-height: 44px;
+    box-sizing: border-box;
   }
 
   .btn::before {
@@ -1154,6 +1301,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
   }
 
   .apps-header-icon {
@@ -1171,6 +1319,109 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
+  }
+
+  /* User Item Styles */
+  .user-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e5e7eb;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .user-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+
+  .user-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .user-item:hover::before {
+    transform: scaleY(1);
+  }
+
+  .user-item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .user-item-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .user-item-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .user-item-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .user-item-name {
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+    font-size: 1.1rem;
+  }
+
+  .user-item-email {
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+
+  .user-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .user-item-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .user-item-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
   }
 
   /* Success/Error Messages */
@@ -1293,8 +1544,8 @@
     /* Modal overlay blur'dan etkilenmemesi için */
     isolation: isolate;
     /* GPU hızlandırma */
-    transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   @keyframes fadeInOverlay {
@@ -1325,7 +1576,7 @@
     background: white;
     border-radius: 20px;
     padding: 0;
-    max-width: 800px;
+    max-width: 600px;
     width: 100%;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
@@ -1602,6 +1853,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
   .margin-top-20 {
@@ -1820,7 +2073,7 @@
     }
 
     .modal-content-large {
-      max-width: 95%;
+      max-width: 90%;
     }
   }
 
@@ -1850,6 +2103,25 @@
     .dashboard-grid-1-1 {
       grid-template-columns: 1fr;
       gap: 18px;
+    }
+
+    .admin-page-header-actions {
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .admin-page-back-btn,
+    .admin-page-dashboard-btn {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      min-height: 44px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .admin-page-back-btn span,
+    .admin-page-dashboard-btn span {
+      display: none;
     }
 
     .admin-page-title {
@@ -1893,11 +2165,11 @@
     }
 
     .modal-content {
-      max-width: 92%;
+      max-width: 90%;
     }
 
     .modal-content-large {
-      max-width: 95%;
+      max-width: 90%;
     }
 
     .form-group {
@@ -1906,10 +2178,12 @@
 
     .form-actions {
       flex-direction: column;
+      gap: 10px;
     }
 
     .form-actions .btn {
       width: 100%;
+      min-width: unset;
     }
   }
 
@@ -1917,27 +2191,44 @@
   @media (min-width: 481px) and (max-width: 768px) {
     .admin-sidebar-overlay {
       display: block;
+      z-index: 9998;
+    }
+    
+    .admin-sidebar-overlay.active {
+      z-index: 9998;
     }
 
     .admin-sidebar {
       position: fixed;
-      left: -280px;
+      left: 0;
       top: 60px;
       height: calc(100vh - 60px);
       width: 280px;
       max-width: 85vw;
-      z-index: 300;
-      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 9999;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
       overflow-y: auto;
       background: #ffffff;
-      /* iOS için smooth scrolling - modern tarayıcılarda desteklenmiyor ama iOS için gerekli */
-      /* stylelint-disable-next-line property-no-unknown */
-      -webkit-overflow-scrolling: touch;
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-100%);
     }
 
     .admin-sidebar.open {
-      left: 0;
+      transform: translateX(0) !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    /* Küçük mobilde top değerini düzelt */
+    @media (max-width: 480px) {
+      .admin-sidebar {
+        top: 56px;
+        height: calc(100vh - 56px);
+      }
     }
 
     /* Sidebar scrollbar styling */
@@ -2026,10 +2317,12 @@
 
     .form-actions {
       flex-direction: column;
+      gap: 10px;
     }
 
     .form-actions .btn {
       width: 100%;
+      min-width: unset;
     }
   }
 
@@ -2063,10 +2356,7 @@
     }
 
     .admin-menu-toggle {
-      width: 44px;
-      height: 44px;
-      min-width: 44px;
-      min-height: 44px;
+      display: none !important;
     }
 
     /* Dashboard Grid Optimizasyonları - Tablet */
@@ -2089,12 +2379,14 @@
     /* Preview Container - Tablet */
     .preview-container {
       min-height: 350px;
+      max-height: 450px;
+      height: 400px;
     }
 
     .preview-frame {
       transform: scale(0.7);
       width: 142.86%;
-      height: 714px;
+      height: 142.86%;
     }
 
     /* Quick Actions - Tablet */
@@ -2146,24 +2438,37 @@
 
     /* Modal Optimizasyonları - Tablet */
     .modal-content {
-      max-width: 90%;
-      max-height: calc(100vh - 40px);
+      max-width: 95%;
+      max-height: calc(100vh - 20px);
+      border-radius: 16px;
     }
 
     .modal-content-large {
       max-width: 95%;
+      max-height: calc(100vh - 20px);
     }
 
     .modal-header {
-      padding: 24px 20px;
+      padding: 20px 18px;
     }
 
     .modal-header h2 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
     }
 
     .modal-body {
-      padding: 24px 20px;
+      padding: 20px 18px;
+      overflow-y: auto;
+    }
+
+    /* Form actions mobilde sticky */
+    .modal-body .form-actions {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 16px 0;
+      margin-top: 16px;
+      border-top: 1px solid #e5e7eb;
     }
 
     /* Alert Container - Tablet */
@@ -2183,6 +2488,63 @@
       padding: 0 12px;
       height: 60px;
       min-height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Admin content mobil */
+    .admin-content {
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* Touch-friendly butonlar */
+    button,
+    .btn,
+    .admin-nav-item {
+      min-height: 44px;
+      min-width: 44px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+    }
+
+    /* Admin section mobil */
+    .admin-section {
+      padding: 0;
+    }
+
+    .admin-section h1 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .admin-section p {
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    /* Form input'ları mobil optimizasyonu */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="url"],
+    textarea,
+    select {
+      min-height: 44px;
+      font-size: 16px; /* iOS zoom önleme */
+      padding: 12px 16px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    /* Textarea mobil optimizasyonu */
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
 
     .admin-menu-toggle {
@@ -2257,12 +2619,220 @@
       min-height: 56px;
     }
 
+    /* Dashboard grid mobil */
+    .dashboard-grid-2-1 {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    /* Admin card padding mobil */
+    .admin-card {
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .admin-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+
+    /* Form group mobil */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    /* Button group mobil */
+    .button-group {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .button-group .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Section tabs mobil */
+    .section-tabs {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .section-tab {
+      flex: 1;
+      min-width: calc(50% - 4px);
+      font-size: 0.85rem;
+      padding: 10px 12px;
+    }
+
+    /* App item mobil */
+    .app-item {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .app-item-info {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .app-item-actions {
+      width: 100%;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .app-item-actions .btn {
+      width: 100%;
+    }
+
+    /* User Item Mobil Optimizasyonu */
+    .user-item {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .user-item-info {
+      width: 100%;
+    }
+
+    .user-item-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .user-item-avatar {
+      align-self: flex-start;
+    }
+
+    .user-item-details {
+      width: 100%;
+    }
+
+    .user-item-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .user-item-meta-item {
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    .user-item-actions {
+      width: 100%;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .user-item-actions .btn {
+      width: 100%;
+      min-height: 44px;
+      justify-content: center;
+    }
+
+    /* Distribution items mobil */
+    .distribution-item {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .distribution-label {
+      margin-right: 0;
+      margin-bottom: 4px;
+    }
+
+    .distribution-bar {
+      margin: 0;
+      order: 2;
+    }
+
+    .distribution-value {
+      order: 3;
+      text-align: left;
+      min-width: auto;
+    }
+
+    /* Play Store app card mobil */
+    .playstore-app-card {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .playstore-app-icon {
+      align-self: center;
+    }
+
+    .playstore-app-info {
+      text-align: center;
+    }
+
+    .playstore-app-actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .playstore-app-actions .btn {
+      width: 100%;
+    }
+
+    /* Activity item mobil */
+    .activity-item {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .activity-icon {
+      align-self: flex-start;
+    }
+
+    .activity-content {
+      flex: 1;
+    }
+
+    /* Features list mobil */
+    .features-input {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature-item {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .feature-item .btn {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    /* Add feature mobil */
+    .add-feature {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .add-feature input {
+      width: 100%;
+    }
+
+    .add-feature .btn {
+      width: 100%;
+    }
+
     .admin-menu-toggle {
-      width: 36px;
-      height: 36px;
-      min-width: 36px;
-      min-height: 36px;
-      padding: 6px;
+      display: none !important;
     }
 
     .admin-logo-icon {
@@ -2288,27 +2858,46 @@
 
     .admin-sidebar-overlay {
       display: block;
+      z-index: 9998;
+    }
+    
+    .admin-sidebar-overlay.active {
+      z-index: 9998;
     }
 
     .admin-sidebar {
       position: fixed;
-      left: -280px;
+      left: 0;
       top: 60px;
       height: calc(100vh - 60px);
       width: 280px;
       max-width: 85vw;
-      z-index: 300;
-      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 9999;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
       overflow-y: auto;
       background: #ffffff;
-      /* iOS için smooth scrolling - modern tarayıcılarda desteklenmiyor ama iOS için gerekli */
-      /* stylelint-disable-next-line property-no-unknown */
-      -webkit-overflow-scrolling: touch;
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-100%);
+      /* iOS için smooth scrolling - modern tarayıcılarda desteklenmiyor, kaldırıldı */
+      /* -webkit-overflow-scrolling: touch; */
     }
 
     .admin-sidebar.open {
-      left: 0;
+      transform: translateX(0) !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    /* Küçük mobilde top değerini düzelt */
+    @media (max-width: 480px) {
+      .admin-sidebar {
+        top: 56px;
+        height: calc(100vh - 56px);
+      }
     }
 
     /* Sidebar scrollbar styling */
@@ -2417,6 +3006,53 @@
       gap: 12px;
     }
 
+    /* Apps Header Mobil Optimizasyonu */
+    .apps-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    .apps-header-title {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .apps-add-btn {
+      width: 100%;
+      justify-content: center;
+      min-height: 48px;
+    }
+
+    /* Flex-between mobil optimizasyonu */
+    .flex-between {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    .flex-between > *:not(.apps-add-btn):not(.preview-actions) {
+      width: 100%;
+    }
+
+    /* Preview header mobil optimizasyonu */
+    .preview-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .preview-actions {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .preview-actions .btn {
+      width: 100%;
+    }
+
     /* Dashboard Grid Optimizasyonları - Mobil */
     .dashboard-grid-2-1,
     .dashboard-grid-1-1 {
@@ -2446,13 +3082,15 @@
     /* Preview Container - Mobil */
     .preview-container {
       min-height: 300px;
+      max-height: 400px;
+      height: 350px;
       border-radius: 12px;
     }
 
     .preview-frame {
       transform: scale(0.5);
       width: 200%;
-      height: 1000px;
+      height: 200%;
       transform-origin: top left;
     }
 
@@ -2608,18 +3246,35 @@
     .section-tabs {
       overflow-x: auto;
       margin-bottom: 20px;
+      padding: 8px 4px;
+    }
+
+    .section-tabs::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .section-tabs::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 2px;
     }
 
     .section-tab {
       white-space: nowrap;
       font-size: 0.85rem;
       padding: 10px 16px;
+      min-width: -webkit-fill-available;
+      min-width: max-content;
+      flex-shrink: 0;
     }
 
     .site-form-section h3 {
       font-size: 1.2rem;
       margin-bottom: 20px;
       padding-bottom: 12px;
+    }
+
+    .site-form-section {
+      padding: 16px 0;
     }
 
     .form-group {
@@ -2629,22 +3284,46 @@
     .form-group label {
       font-size: 0.85rem;
       margin-bottom: 6px;
+      display: block;
     }
 
     .form-group input,
     .form-group textarea,
     .form-group select {
       padding: 12px 16px;
-      font-size: 0.95rem;
+      font-size: 16px; /* iOS zoom önleme */
+      min-height: 44px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Site form section butonları */
+    .site-form-section .btn {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 8px;
     }
 
     .form-actions {
       margin-top: 24px;
       flex-direction: column;
+      gap: 12px;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 16px 0;
+      border-top: 1px solid #e5e7eb;
+      z-index: 5;
     }
 
     .form-actions .btn {
       width: 100%;
+      min-height: 48px;
     }
 
     .login-section-inline {
@@ -2676,12 +3355,14 @@
     /* Preview Container - Küçük Mobil */
     .preview-container {
       min-height: 250px;
+      max-height: 350px;
+      height: 300px;
     }
 
     .preview-frame {
       transform: scale(0.4);
       width: 250%;
-      height: 1250px;
+      height: 250%;
     }
 
     /* Distribution Items - Küçük Mobil */
@@ -2765,20 +3446,249 @@
       padding: 16px 14px;
     }
 
+    /* Modal mobil optimizasyonu - Küçük ekranlar */
+    .modal-content-large {
+      max-width: 100%;
+      max-height: 100vh;
+      height: 100vh;
+      border-radius: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 12px 16px;
+      border-radius: 0;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .modal-header h2 {
+      font-size: 1.2rem;
+      padding-right: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+
+    /* Section tabs mobil - Küçük ekranlar */
+    .section-tabs {
+      overflow-x: auto;
+      margin-bottom: 16px;
+      padding: 6px 4px;
+    }
+
+    .section-tabs::-webkit-scrollbar {
+      height: 3px;
+    }
+
+    .section-tabs::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 2px;
+    }
+
     .section-tab {
       font-size: 0.8rem;
-      padding: 8px 12px;
+      padding: 10px 14px;
+      white-space: nowrap;
+      min-width: -webkit-fill-available;
+      min-width: max-content;
+      flex-shrink: 0;
+    }
+
+    .site-form-section {
+      padding: 12px 0;
     }
 
     .site-form-section h3 {
       font-size: 1.1rem;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      display: block;
     }
 
     .form-group input,
     .form-group textarea,
     .form-group select {
-      padding: 10px 14px;
+      padding: 12px 16px;
+      font-size: 16px; /* iOS zoom önleme */
+      min-height: 44px;
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      appearance: none;
+      border-radius: 8px;
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-group small {
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* Site form section butonları mobil */
+    .site-form-section .btn {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    /* Form actions mobil */
+    .form-actions {
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px 0;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      z-index: 5;
+      margin-top: 16px;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+      min-height: 48px;
+      font-size: 0.95rem;
+    }
+
+    /* Skill Edit Item Mobil Optimizasyonu */
+    .skill-edit-item {
+      padding: 12px !important;
+      margin-bottom: 12px !important;
+    }
+
+    .skill-edit-grid {
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+    }
+
+    .skill-edit-grid input,
+    .skill-edit-grid button {
+      width: 100% !important;
+    }
+
+    .skill-remove-btn {
+      width: 100% !important;
+      margin-top: 4px;
+    }
+
+    /* Contact Edit Item Mobil Optimizasyonu */
+    .contact-edit-item {
+      padding: 12px !important;
+      margin-bottom: 12px !important;
+    }
+
+    .contact-edit-row {
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+    }
+
+    .contact-edit-row input {
+      width: 100% !important;
+    }
+
+    .contact-remove-btn {
+      width: 100% !important;
+      margin-top: 8px;
+    }
+
+    /* Skills ve Contact Ekle Butonları Mobil */
+    #skillsListContainer + .form-group .btn,
+    #contactListContainer + .form-group .btn {
+      width: 100%;
+      min-height: 48px;
+      font-size: 0.95rem;
+    }
+
+    /* Feedback & Votes Mobil Optimizasyonu */
+    .feedback-item,
+    .vote-item {
+      padding: 12px !important;
+      margin-bottom: 10px !important;
+    }
+
+    .feedback-header,
+    .vote-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 8px;
+    }
+
+    .feedback-type,
+    .vote-total {
+      align-self: flex-start;
+    }
+
+    .vote-stats {
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .vote-stat {
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+      min-height: 48px;
+      font-size: 1rem;
+    }
+
+    /* Login section mobil */
+    .admin-header {
+      padding: 20px 16px;
+    }
+
+    .admin-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .admin-header p {
       font-size: 0.9rem;
+    }
+
+    /* Mode toggle mobil */
+    .mode-toggle {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mode-toggle button {
+      width: 100%;
+      min-height: 48px;
     }
 
     /* Alert Container - Küçük Mobil */
@@ -2853,10 +3763,32 @@
     padding-top: 24px;
     border-top: 1px solid #e5e7eb;
     animation: fadeInUp 0.5s ease 0.5s both;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .form-actions .btn {
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+  
+  .form-actions .btn:first-child {
+    margin-left: auto;
+  }
+  
+  /* Modal içindeki butonlar için özel stil */
+  .modal-body .form-actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    margin-bottom: -32px;
+    padding-bottom: 32px;
+    z-index: 10;
   }
 
   .modal-content-large {
-    max-width: 900px;
+    max-width: 700px;
   }
 
   .textarea-code {
@@ -2883,7 +3815,9 @@
 
   /* Mobile Menu Toggle */
   .admin-menu-toggle {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     cursor: pointer;
@@ -2919,34 +3853,22 @@
   }
 
   /* Sidebar Overlay (Mobile) */
+  /* Mobil görünüm için sidebar overlay (480px ve altı) */
+  @media (max-width: 480px) {
   .admin-sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 299;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    cursor: pointer;
+      display: block;
+      z-index: 9998;
   }
 
   .admin-sidebar-overlay.active {
+      display: block;
     opacity: 1;
     visibility: visible;
-    display: block;
-  }
-
-  @media (max-width: 768px) {
-    .admin-sidebar-overlay {
-      display: none;
-    }
-    
-    .admin-sidebar-overlay.active {
-      display: block;
+      pointer-events: auto;
+      background: rgba(0, 0, 0, 0.45);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      z-index: 9998;
     }
   }
 
@@ -2983,6 +3905,96 @@
     }
   }
 
+  /* Tablet - 2x2 grid */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .stat-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
+  /* Mobil - 2x2 grid */
+  @media (max-width: 767px) {
+    .stat-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    /* Dashboard section mobil sıralama - Flexbox container */
+    .dashboard-section-mobile {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* İstatistik kartları - En üstte */
+    .stat-cards-grid {
+      order: 1;
+    }
+
+    /* Dashboard grid container - Flexbox olarak düzenle */
+    .dashboard-grid-2-1 {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      order: 2;
+    }
+
+    /* Hızlı İşlemler ve Son Aktiviteler container - Üstte */
+    .dashboard-grid-2-1 > div:last-child {
+      order: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Hızlı İşlemler kartı - En üstte */
+    .quick-actions-card {
+      order: 1;
+    }
+
+    /* Son Aktiviteler kartı - Hızlı işlemlerden sonra */
+    .dashboard-grid-2-1 > div:last-child > .admin-card:not(.quick-actions-card) {
+      order: 2;
+    }
+
+    /* Önizleme kartı - En altta (büyük yer kaplıyor) */
+    .dashboard-grid-2-1 > div:first-child {
+      order: 2;
+    }
+
+    /* Kategori ve Rating grid - Orta sırada */
+    .dashboard-grid-1-1 {
+      order: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Kategori Dağılımı */
+    .dashboard-grid-1-1 > div:first-child {
+      order: 1;
+    }
+
+    /* Rating Dağılımı */
+    .dashboard-grid-1-1 > div:last-child {
+      order: 2;
+    }
+
+    /* Play Store kartı - En altta */
+    #dashboardSection > .admin-card:last-child {
+      order: 4;
+    }
+  }
+
+  /* Küçük mobil - 1 sütun */
+  @media (max-width: 480px) {
+    .stat-cards-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+
   /* Preview Container - Responsive */
   .preview-container {
     position: relative;
@@ -3000,6 +4012,14 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px;
+  }
+
+  /* Mobil - Quick Actions */
+  @media (max-width: 768px) {
+    .quick-actions-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
   }
 
   /* Category & Rating Distribution - Responsive */
@@ -3161,9 +4181,23 @@
 
   .preview-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
     flex-wrap: wrap;
+  }
+  
+  .preview-actions .btn {
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .preview-actions .preview-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
   }
 
   @media (max-width: 768px) {
@@ -3191,49 +4225,69 @@
     overflow: hidden;
     background: #fff;
     min-height: 400px;
+    max-height: 600px;
+    height: 500px;
     position: relative;
   }
 
   .preview-frame {
     width: 100%;
-    height: 500px;
+    height: 100%;
     border: none;
     transform: scale(0.8);
     transform-origin: top left;
     width: 125%;
-    height: 625px;
+    height: 125%;
   }
 
   /* Preview Frame - Responsive Overrides */
   @media (min-width: 1024px) and (max-width: 1366px) {
+    .preview-container {
+      max-height: 550px;
+      height: 500px;
+    }
     .preview-frame {
       transform: scale(0.75);
       width: 133.33%;
-      height: 666px;
+      height: 133.33%;
     }
   }
 
   @media (min-width: 768px) and (max-width: 1024px) {
+    .preview-container {
+      max-height: 500px;
+      height: 450px;
+    }
     .preview-frame {
       transform: scale(0.65);
       width: 153.85%;
-      height: 769px;
+      height: 153.85%;
     }
   }
 
   @media (max-width: 768px) {
+    .preview-container {
+      max-height: 400px;
+      height: 350px;
+      min-height: 300px;
+    }
     .preview-frame {
       transform: scale(0.5);
       width: 200%;
-      height: 1000px;
+      height: 200%;
     }
   }
 
   @media (max-width: 480px) {
+    .preview-container {
+      max-height: 350px;
+      height: 300px;
+      min-height: 250px;
+    }
     .preview-frame {
       transform: scale(0.4);
       width: 250%;
-      height: 1250px;
+      height: 250%;
     }
   }
 
@@ -3479,9 +4533,174 @@
   .notification-section-subtitle {
     color: #6b7280;
     display: block;
+  }
+
+  /* Feedback Item Styles */
+  .feedback-item {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .feedback-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  }
+
+  .feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .feedback-type {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .feedback-date {
+    color: #6b7280;
+    font-size: 0.85rem;
+  }
+
+  .feedback-message {
+    color: #1a1a1a;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    word-wrap: break-word;
+  }
+
+  .feedback-item .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Vote Item Styles */
+  .vote-item {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .vote-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  }
+
+  .vote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .vote-app-name {
+    font-weight: 700;
+    color: #1a1a1a;
+    font-size: 1rem;
+  }
+
+  .vote-total {
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .vote-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .vote-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .vote-stat-label {
+    color: #6b7280;
+    font-size: 0.85rem;
+  }
+
+  .vote-stat-value {
+    font-weight: 700;
+    color: #1a1a1a;
+    font-size: 0.95rem;
+  }
+
+  .vote-item .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Feedback App Group Styles */
+  .feedback-app-group {
+    margin-bottom: 24px;
+  }
+
+  .feedback-app-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .feedback-app-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .feedback-app-header span:last-child {
+    background: #667eea;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  #feedbackAppFilter {
+    min-width: 150px;
+    padding: 8px 12px;
+  }
     margin-bottom: 15px;
   }
 </style>
+<script src="/js/admin-utils.js"></script>
+<script src="/js/admin-state.js"></script>
+<script src="/js/admin-auth.js"></script>
+<script src="/js/admin-data.js"></script>
+<script src="/js/admin-ui.js"></script>
+<script src="/js/admin-apps.js"></script>
+<script src="/js/admin-site.js"></script>
+<script src="/js/admin-dashboard.js"></script>
 <script defer src="/admin.js"></script>
 </head>
 <body>
@@ -3489,14 +4708,14 @@
     <!-- Top Navigation Bar -->
     <div class="admin-topbar">
       <div class="admin-topbar-left">
-        <button class="admin-menu-toggle" onclick="toggleSidebar()" aria-label="Menüyü aç/kapat">
+        <button class="admin-menu-toggle" id="hamburgerMenuBtn" aria-label="Menüyü aç/kapat">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <a href="/" class="admin-logo">
+        <a href="/" target="_blank" class="admin-logo">
           <div class="admin-logo-icon">B</div>
           <div class="admin-logo-text">Admin Panel</div>
         </a>
@@ -3515,7 +4734,7 @@
             </svg>
             <span class="btn-text">Şifre Değiştir</span>
           </button>
-          <a href="/" class="btn btn-secondary btn-sm" title="Ana Sayfa">
+          <a href="/" target="_blank" class="btn btn-secondary btn-sm" title="Ana Sayfa">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="btn-icon">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -3543,13 +4762,13 @@
     </div>
 
     <!-- Sidebar Overlay (Mobile) -->
-    <div class="admin-sidebar-overlay" onclick="closeSidebar()"></div>
+    <div class="admin-sidebar-overlay"></div>
 
     <!-- Topbar Menu Modal (Mobile) -->
     <div class="admin-topbar-menu-overlay" id="topbarMenuOverlay" onclick="toggleTopbarMenu()"></div>
     <div class="admin-topbar-menu-modal" id="topbarMenuModal">
       <div class="admin-topbar-menu-header">
-        <h3>Menü</h3>
+        <h3>Kullanıcı Ayarları</h3>
         <button class="admin-topbar-menu-close" onclick="toggleTopbarMenu()" aria-label="Kapat">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -3558,21 +4777,122 @@
         </button>
       </div>
       <div class="admin-topbar-menu-body">
-        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); showChangePasswordModal();">
+        <!-- Ana Menü Bölümü -->
+        <div class="admin-topbar-menu-section-title">Ana Menü</div>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('dashboard');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('apps');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+          <span>Uygulamalar</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('site');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+          </svg>
+          <span>Site Ayarları</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('users');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Kullanıcılar</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('feedback');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Geri Bildirimler</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('notifications');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Bildirim Ayarları</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('ai-settings');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="9" cy="9" r="1.5"></circle>
+            <circle cx="15" cy="9" r="1.5"></circle>
+            <path d="M9 15h6"></path>
+            <path d="M12 12v3"></path>
+          </svg>
+          <span>🤖 AI Asistan Ayarları</span>
+        </button>
+        
+        <!-- Hızlı İşlemler Bölümü -->
+        <div class="admin-topbar-menu-section-divider"></div>
+        <div class="admin-topbar-menu-section-title">Hızlı İşlemler</div>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showAddForm === 'function') showAddForm();">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Yeni Uygulama</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof exportData === 'function') exportData();">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Dışa Aktar</span>
+        </button>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof importData === 'function') importData();">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>İçe Aktar</span>
+        </button>
+        
+        <!-- Kullanıcı Ayarları Bölümü -->
+        <div class="admin-topbar-menu-section-divider"></div>
+        <div class="admin-topbar-menu-section-title">Kullanıcı Ayarları</div>
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showChangePasswordModal === 'function') showChangePasswordModal();">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
           <span>Şifre Değiştir</span>
         </button>
-        <a href="/" class="admin-topbar-menu-item">
+        
+        <a href="/" target="_blank" class="admin-topbar-menu-item">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
           <span>Ana Sayfa</span>
         </a>
-        <button class="admin-topbar-menu-item hidden" onclick="toggleTopbarMenu(); logout();" id="topbarMenuLogoutBtn">
+        
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof logout === 'function') logout();" id="topbarMenuLogoutBtn">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -3589,7 +4909,7 @@
       <div class="admin-sidebar" id="adminSidebar">
         <div class="admin-sidebar-section">
           <div class="admin-sidebar-title">Ana Menü</div>
-          <a href="/admin/dashboard" class="admin-nav-item active" onclick="showSection('dashboard'); return false;">
+          <a href="#dashboard" class="admin-nav-item active" data-section="dashboard">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="7" height="7"></rect>
               <rect x="14" y="3" width="7" height="7"></rect>
@@ -3598,21 +4918,21 @@
             </svg>
             Dashboard
           </a>
-          <a href="/admin/apps" class="admin-nav-item" onclick="showSection('apps'); return false;">
+          <a href="#apps" class="admin-nav-item" data-section="apps">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="9" y1="3" x2="9" y2="21"></line>
             </svg>
             Uygulamalar
           </a>
-          <a href="/admin/settings" class="admin-nav-item" onclick="showSection('settings'); return false;">
+          <a href="#site" class="admin-nav-item" data-section="site">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
             </svg>
             Site Ayarları
           </a>
-          <a href="/admin/users" class="admin-nav-item" onclick="showSection('users'); return false;">
+          <a href="#users" class="admin-nav-item" data-section="users">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -3621,30 +4941,33 @@
             </svg>
             Kullanıcılar
           </a>
-          <a href="/admin/feedback" class="admin-nav-item" onclick="showSection('feedback'); return false;">
+          <a href="#feedback" class="admin-nav-item" data-section="feedback">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             Geri Bildirimler
           </a>
-          <a href="/admin/notifications" class="admin-nav-item" onclick="showSection('notifications'); return false;">
+          <a href="#notifications" class="admin-nav-item" data-section="notifications">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
             Bildirim Ayarları
           </a>
+          <a href="#ai-settings" class="admin-nav-item" data-section="ai-settings" onclick="event.preventDefault(); if(typeof showSection === 'function') { showSection('ai-settings'); } else { console.error('showSection fonksiyonu bulunamadı'); }">
+            🤖 AI Asistan Ayarları
+          </a>
         </div>
         <div class="admin-sidebar-section">
           <div class="admin-sidebar-title">Hızlı İşlemler</div>
-          <a href="#add-app" class="admin-nav-item" onclick="showAddForm()">
+          <a href="#add-app" class="admin-nav-item" data-action="showAddForm">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
             Yeni Uygulama
           </a>
-          <a href="#export" class="admin-nav-item" onclick="exportData()">
+          <a href="#export" class="admin-nav-item" data-action="exportData">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -3652,7 +4975,7 @@
             </svg>
             Dışa Aktar
           </a>
-          <a href="#import" class="admin-nav-item" onclick="importData()">
+          <a href="#import" class="admin-nav-item" data-action="importData">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
@@ -3668,7 +4991,7 @@
         <!-- Admin Panel -->
         <div id="adminPanel">
           <!-- Dashboard Section -->
-          <div id="dashboardSection" class="admin-section">
+          <div id="dashboardSection" class="admin-section dashboard-section-mobile">
             <div class="admin-page-header">
               <h1 class="admin-page-title">Dashboard</h1>
               <p class="admin-page-subtitle">Genel bakış ve istatistikler</p>
@@ -3857,6 +5180,23 @@
           <!-- Apps Section -->
           <div id="appsSection" class="admin-section hidden">
             <div class="admin-page-header">
+              <div class="admin-page-header-actions">
+                <button class="admin-page-back-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Geri">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Geri</span>
+                </button>
+                <button class="admin-page-dashboard-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Dashboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </div>
               <h1 class="admin-page-title">Uygulamalar</h1>
               <p class="admin-page-subtitle">Uygulamalarınızı yönetin ve düzenleyin</p>
             </div>
@@ -3885,30 +5225,159 @@
             </div>
           </div>
 
-          <!-- Settings Section -->
-          <div id="settingsSection" class="admin-section hidden">
+          <!-- Site Section -->
+          <div id="siteSection" class="admin-section hidden">
             <div class="admin-page-header">
-              <h1 class="admin-page-title">Site Ayarları</h1>
+              <div class="admin-page-header-actions">
+                <button class="admin-page-back-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Geri">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Geri</span>
+                </button>
+                <button class="admin-page-dashboard-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Dashboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </div>
+              <h1 class="admin-page-title">⚙️ Site Ayarları</h1>
               <p class="admin-page-subtitle">Site içeriğini ve görünümünü yönetin</p>
             </div>
 
             <div class="admin-card">
-              <h2>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
-                </svg>
-                Ayarlar
-              </h2>
-              <button class="btn btn-primary" onclick="showSiteSettings()">
-                <span>⚙️ Site Ayarlarını Aç</span>
-              </button>
+              <div class="section-tabs">
+                <button class="section-tab active" onclick="showSiteSection('header')">📝 Header</button>
+                <button class="section-tab" onclick="showSiteSection('hero')">🚀 Hero</button>
+                <button class="section-tab" onclick="showSiteSection('about')">👤 Hakkımda</button>
+                <button class="section-tab" onclick="showSiteSection('skills')">⚡ Yetenekler</button>
+                <button class="section-tab" onclick="showSiteSection('contact')">✉️ İletişim</button>
+              </div>
+
+              <!-- Header Ayarları -->
+              <div id="siteHeaderForm" class="site-form-section">
+                <h3>Header Ayarları</h3>
+                <div class="form-group">
+                  <label>Logo Metni</label>
+                  <input type="text" id="siteHeaderLogo" name="siteHeaderLogo" placeholder="Bambinifojo" autocomplete="off"/>
+                </div>
+                <div class="form-group">
+                  <label>Tagline</label>
+                  <input type="text" id="siteHeaderTagline" name="siteHeaderTagline" placeholder="Mobil Uygulama Geliştirici" autocomplete="off"/>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn btn-primary" onclick="event.preventDefault(); saveSiteSection('header', event);">💾 Kaydet</button>
+                </div>
+              </div>
+
+              <!-- Hero Ayarları -->
+              <div id="siteHeroForm" class="site-form-section hidden">
+                <h3>Hero Bölümü Ayarları</h3>
+                <div class="form-group">
+                  <label>Başlık</label>
+                  <input type="text" id="siteHeroTitle" name="siteHeroTitle" placeholder="Bambinifojo" autocomplete="off"/>
+                </div>
+                <div class="form-group">
+                  <label>Tagline</label>
+                  <textarea id="siteHeroTagline" name="siteHeroTagline" placeholder="Açıklama metni..." autocomplete="off"></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Play Store URL</label>
+                  <input type="url" id="siteHeroPlayStoreUrl" name="siteHeroPlayStoreUrl" placeholder="https://play.google.com/..." autocomplete="url"/>
+                </div>
+                <div class="form-group">
+                  <label>İstatistikler (JSON formatında)</label>
+                  <textarea id="siteHeroStats" class="textarea-code" placeholder='[{"number":"2+","label":"Uygulama"}]'></textarea>
+                  <small>Her istatistik: {"number": "2+", "label": "Uygulama"}</small>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn btn-primary" onclick="event.preventDefault(); saveSiteSection('hero', event);">💾 Kaydet</button>
+                </div>
+              </div>
+
+              <!-- About Ayarları -->
+              <div id="siteAboutForm" class="site-form-section hidden">
+                <h3>Hakkımda Bölümü Ayarları</h3>
+                <div class="form-group">
+                  <label>Başlık</label>
+                  <input type="text" id="siteAboutTitle" name="siteAboutTitle" placeholder="Hakkımda" autocomplete="off"/>
+                </div>
+                <div class="form-group">
+                  <label>Metinler (Her satır bir paragraf)</label>
+                  <textarea id="siteAboutTexts" name="siteAboutTexts" class="textarea-medium" placeholder="Paragraf 1&#10;Paragraf 2" autocomplete="off"></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Teknolojiler (Her satır: icon|isim)</label>
+                  <textarea id="siteAboutTech" name="siteAboutTech" class="textarea-medium" placeholder="🤖|Android&#10;🎨|Flutter" autocomplete="off"></textarea>
+                  <small>Format: Emoji|İsim (her satır bir teknoloji)</small>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn btn-primary" onclick="event.preventDefault(); saveSiteSection('about', event);">💾 Kaydet</button>
+                </div>
+              </div>
+
+              <!-- Skills Ayarları -->
+              <div id="siteSkillsForm" class="site-form-section hidden">
+                <h3>Yetenekler Bölümü Ayarları</h3>
+                <div class="form-group">
+                  <label>Başlık</label>
+                  <input type="text" id="siteSkillsTitle" name="siteSkillsTitle" placeholder="Teknolojiler & Yetenekler" autocomplete="off"/>
+                </div>
+                <div id="skillsListContainer"></div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-secondary" onclick="addSkillItem()">➕ Yetenek Ekle</button>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn btn-primary" onclick="event.preventDefault(); saveSiteSection('skills', event);">💾 Kaydet</button>
+                </div>
+              </div>
+
+              <!-- Contact Ayarları -->
+              <div id="siteContactForm" class="site-form-section hidden">
+                <h3>İletişim Bölümü Ayarları</h3>
+                <div class="form-group">
+                  <label>Başlık</label>
+                  <input type="text" id="siteContactTitle" name="siteContactTitle" placeholder="İletişim" autocomplete="off"/>
+                </div>
+                <div class="form-group">
+                  <label>Alt Başlık</label>
+                  <input type="text" id="siteContactSubtitle" name="siteContactSubtitle" placeholder="Açıklama metni..." autocomplete="off"/>
+                </div>
+                <div id="contactListContainer"></div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-secondary" onclick="addContactItem()">➕ İletişim Ekle</button>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn btn-primary" onclick="event.preventDefault(); saveSiteSection('contact', event);">💾 Kaydet</button>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Feedback Section -->
           <div id="feedbackSection" class="admin-section hidden">
             <div class="admin-page-header">
+              <div class="admin-page-header-actions">
+                <button class="admin-page-back-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Geri">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Geri</span>
+                </button>
+                <button class="admin-page-dashboard-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Dashboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </div>
               <h1 class="admin-page-title">Geri Bildirimler & Oylar</h1>
               <p class="admin-page-subtitle">Kullanıcı geri bildirimlerini ve oylarını görüntüleyin</p>
             </div>
@@ -3916,12 +5385,17 @@
             <div class="admin-grid">
               <!-- Geri Bildirimler -->
               <div class="admin-card">
-                <h2>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <div class="flex-between apps-header">
+                  <h2 class="margin-0 apps-header-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" class="apps-header-icon">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                   </svg>
-                  Geri Bildirimler
+                    <span>Uygulama Geri Bildirimleri</span>
                 </h2>
+                  <select id="feedbackAppFilter" class="btn btn-secondary btn-sm feedback-app-filter" onchange="renderFeedback()" title="Uygulama filtresi seçin">
+                    <option value="all">Tüm Uygulamalar</option>
+                  </select>
+                </div>
                 <div id="feedbackList" class="apps-list">
                   <p class="loading-text">Yükleniyor...</p>
                 </div>
@@ -3945,6 +5419,23 @@
           <!-- Users Section -->
           <div id="usersSection" class="admin-section hidden">
             <div class="admin-page-header">
+              <div class="admin-page-header-actions">
+                <button class="admin-page-back-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Geri">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Geri</span>
+                </button>
+                <button class="admin-page-dashboard-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Dashboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </div>
               <h1 class="admin-page-title">Kullanıcı Yönetimi</h1>
               <p class="admin-page-subtitle">Admin kullanıcılarını yönetin ve düzenleyin</p>
             </div>
@@ -3978,6 +5469,23 @@
           <!-- Notifications Section -->
           <div id="notificationsSection" class="admin-section hidden">
             <div class="admin-page-header">
+              <div class="admin-page-header-actions">
+                <button class="admin-page-back-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Geri">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Geri</span>
+                </button>
+                <button class="admin-page-dashboard-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Dashboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </div>
               <h1 class="admin-page-title">📢 Bildirim & Versiyon Yönetimi</h1>
               <p class="admin-page-subtitle">Uygulama bildirimleri, güncellemeler ve bakım modu ayarlarını yönetin</p>
             </div>
@@ -4074,16 +5582,155 @@
             </div>
           </div>
 
+          <!-- AI Settings Section -->
+          <div id="aiSettingsSection" class="admin-section hidden">
+            <div class="admin-page-header">
+              <div class="admin-page-header-actions">
+                <button class="admin-page-back-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Geri">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Geri</span>
+                </button>
+                <button class="admin-page-dashboard-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Dashboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </div>
+              <h1 class="admin-page-title">🤖 AI Asistan Ayarları</h1>
+              <p class="admin-page-subtitle">AI asistan ayarlarını yönetin ve yapılandırın</p>
+            </div>
+
+            <div class="admin-card">
+              <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                  <path d="M2 17l10 5 10-5"></path>
+                  <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                AI Asistan Konfigürasyonu
+              </h2>
+
+              <form id="aiSettingsForm" onsubmit="saveAISettings(event)">
+                <!-- Temel Ayarlar -->
+                <div class="site-form-section">
+                  <h3>⚙️ Temel Ayarlar</h3>
+                  
+                  <div class="form-group">
+                    <label>
+                      <input type="checkbox" id="ai_enabled" class="checkbox-inline"/>
+                      AI Asistanı Aktif Et
+                    </label>
+                    <small>AI asistanı açık/kapalı yapın</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Model Seçimi *</label>
+                    <select id="ai_model" required title="OpenAI model seçin">
+                      <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                      <option value="gpt-4">gpt-4</option>
+                      <option value="gpt-4-turbo">gpt-4-turbo</option>
+                      <option value="gpt-4o">gpt-4o</option>
+                    </select>
+                    <small>Kullanılacak OpenAI modeli</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>API Anahtarı *</label>
+                    <div class="admin-password-wrapper">
+                      <input type="password" id="ai_api_key" required placeholder="sk-..." autocomplete="off"/>
+                      <button type="button" onclick="toggleAIApiKey()" class="admin-password-toggle" aria-label="API anahtarını göster/gizle">
+                        <svg id="aiApiKeyEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                    <small>OpenAI API anahtarınız (sk- ile başlar)</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Günlük Kredi *</label>
+                    <input type="number" id="ai_daily_credit" required min="1" max="100" placeholder="5" autocomplete="off"/>
+                    <small>Her kullanıcı için günlük mesaj limiti</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Maksimum Token *</label>
+                    <input type="number" id="ai_max_tokens" required min="100" max="4000" placeholder="400" autocomplete="off"/>
+                    <small>Her mesaj için maksimum token sayısı</small>
+                  </div>
+                </div>
+
+                <!-- Sistem Prompt -->
+                <div class="site-form-section">
+                  <h3>💬 Sistem Prompt</h3>
+                  
+                  <div class="form-group">
+                    <label>Sistem Prompt *</label>
+                    <textarea id="ai_system_prompt" required placeholder="Sen Bambinifojo'nun akıllı asistanısın. Kullanıcıya sıcak ve profesyonel şekilde yardım et." class="textarea-medium" autocomplete="off"></textarea>
+                    <small>AI asistanın davranışını belirleyen sistem mesajı</small>
+                  </div>
+                </div>
+
+                <!-- UI Ayarları -->
+                <div class="site-form-section">
+                  <h3>🎨 UI Ayarları</h3>
+                  
+                  <div class="form-group">
+                    <label>
+                      <input type="checkbox" id="ai_floating_button" class="checkbox-inline"/>
+                      Floating Button
+                    </label>
+                    <small>AI asistan butonunu sayfanın sağ alt köşesinde göster</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>
+                      <input type="checkbox" id="ai_show_on_home" class="checkbox-inline"/>
+                      Ana Sayfada Göster
+                    </label>
+                    <small>AI asistanı ana sayfada göster</small>
+                  </div>
+
+                  <div class="form-group">
+                    <label>
+                      <input type="checkbox" id="ai_save_chat_history" class="checkbox-inline"/>
+                      Sohbet Geçmişini Kaydet
+                    </label>
+                    <small>Kullanıcı sohbet geçmişini localStorage'da sakla</small>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" id="saveAISettingsBtn">
+                    <span>💾 Kaydet</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="loadAISettings()">
+                    <span>🔄 Yenile</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
           <!-- Login Section (Session yoksa göster) -->
           <div class="admin-header" id="adminLoginSection">
             <!-- Şifre Girişi (Session yoksa göster) -->
-            <div id="passwordLoginForm" class="hidden">
+            <form id="passwordLoginForm" class="hidden" onsubmit="event.preventDefault(); handleAdminLogin();">
               <h1>Admin Girişi</h1>
               <p>Yönetim paneline erişmek için giriş yapın</p>
+              <!-- Hidden username field for accessibility -->
+              <input type="text" name="username" autocomplete="username" class="sr-only" tabindex="-1" aria-hidden="true"/>
               <div class="form-group margin-top-20">
                 <label class="admin-password-label">Admin Şifresi</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="adminPassword" placeholder="Şifrenizi girin" autocomplete="current-password"/>
+                  <input type="password" id="adminPassword" name="adminPassword" placeholder="Şifrenizi girin" autocomplete="current-password" required/>
                   <button type="button" onclick="toggleAdminPassword()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="adminEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -4094,35 +5741,36 @@
                 <span class="error-message admin-password-error" id="adminPasswordError"></span>
               </div>
               <div class="button-group margin-top-20">
-                <button class="btn btn-primary btn-flex" onclick="handleAdminLogin()" id="adminLoginBtn">
+                <button type="submit" class="btn btn-primary btn-flex" id="adminLoginBtn">
                   <span>🔐 Admin Girişi</span>
                 </button>
-                <a href="admin-login.html" class="btn btn-secondary btn-link admin-login-link">
+                <a href="/admin-login.html" class="btn btn-secondary btn-link admin-login-link">
                   <span>📱 2FA ile Giriş</span>
                 </a>
               </div>
-            </div>
+            </form>
             
             <!-- Veri Yükleme (Session varsa göster) -->
-            <div id="dataLoadSection" class="hidden">
+            <form id="dataLoadSection" class="hidden" onsubmit="event.preventDefault(); login();">
               <h1>Veri Kaynağı</h1>
               <p>Verilerinizi yüklemek için bir kaynak seçin</p>
               <div class="mode-toggle margin-top-20">
-                <button id="localModeBtn" class="active" onclick="setMode('local')">LocalStorage</button>
-                <button id="githubModeBtn" onclick="setMode('github')">GitHub API</button>
+                <button type="button" id="localModeBtn" class="active" onclick="setMode('local')">LocalStorage</button>
+                <button type="button" id="githubModeBtn" onclick="setMode('github')">GitHub API</button>
               </div>
               <div class="form-group margin-top-20">
-                <input type="password" id="token" placeholder="GitHub Token (opsiyonel)"/>
+                <label for="token">GitHub Token</label>
+                <input type="password" id="token" name="token" placeholder="GitHub Token (opsiyonel)" autocomplete="off"/>
               </div>
               <div class="button-group margin-top-20">
-                <button class="btn btn-primary btn-flex" onclick="login()">
+                <button type="submit" class="btn btn-primary btn-flex">
                   <span>🔓 Giriş Yap</span>
                 </button>
-                <button class="btn btn-success hidden margin-top-10" onclick="saveToGitHub()" id="saveGitHubBtn">
+                <button type="button" class="btn btn-success hidden margin-top-10" onclick="saveToGitHub()" id="saveGitHubBtn">
                   <span>💾 GitHub'a Kaydet</span>
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -4141,51 +5789,51 @@
           
           <div class="form-group">
             <label>Uygulama Adı *</label>
-            <input type="text" id="appTitle" required placeholder="Örn: Task Cosmos"/>
+            <input type="text" id="appTitle" name="appTitle" required placeholder="Örn: Task Cosmos" autocomplete="off"/>
           </div>
 
           <div class="form-group">
             <label>Açıklama *</label>
-            <textarea id="appDescription" required placeholder="Uygulamanın kısa açıklaması..."></textarea>
+            <textarea id="appDescription" name="appDescription" required placeholder="Uygulamanın kısa açıklaması..." autocomplete="off"></textarea>
           </div>
 
           <div class="form-group">
             <label>İkon (Emoji) *</label>
-            <input type="text" id="appIcon" required placeholder="📱" maxlength="2"/>
+            <input type="text" id="appIcon" name="appIcon" required placeholder="📱" maxlength="2" autocomplete="off"/>
             <small>Bir emoji girin (örn: 📱, 🌤️, 📝)</small>
           </div>
 
           <div class="form-group">
             <label>Kategori *</label>
-            <input type="text" id="appCategory" required placeholder="Örn: Üretkenlik, Hava Durumu"/>
+            <input type="text" id="appCategory" name="appCategory" required placeholder="Örn: Üretkenlik, Hava Durumu" autocomplete="off"/>
           </div>
 
           <div class="form-group">
             <label>Rating (0-5) *</label>
-            <input type="number" id="appRating" required min="0" max="5" step="0.1" placeholder="4.5"/>
+            <input type="number" id="appRating" name="appRating" required min="0" max="5" step="0.1" placeholder="4.5" autocomplete="off"/>
           </div>
 
           <div class="form-group">
             <label>İndirme Sayısı *</label>
-            <input type="text" id="appDownloads" required placeholder="Örn: 10K+, 5K+"/>
+            <input type="text" id="appDownloads" name="appDownloads" required placeholder="Örn: 10K+, 5K+" autocomplete="off"/>
           </div>
 
           <div class="form-group">
             <label>Google Play Store Linki</label>
-            <input type="url" id="appDetails" placeholder="https://play.google.com/store/apps/details?id=..."/>
+            <input type="url" id="appDetails" name="appDetails" placeholder="https://play.google.com/store/apps/details?id=..." autocomplete="url"/>
             <small>Boş bırakılırsa "Yakında" butonu gösterilir</small>
           </div>
 
           <div class="form-group">
             <label>Gizlilik Politikası Linki</label>
-            <input type="url" id="appPrivacy" placeholder="https://..."/>
+            <input type="url" id="appPrivacy" name="appPrivacy" placeholder="https://..." autocomplete="url"/>
           </div>
 
           <div class="form-group">
             <label>Özellikler</label>
             <div id="featuresList" class="features-input"></div>
             <div class="add-feature">
-              <input type="text" id="newFeature" placeholder="Yeni özellik ekle..."/>
+              <input type="text" id="newFeature" name="newFeature" placeholder="Yeni özellik ekle..." autocomplete="off"/>
               <button type="button" class="btn btn-secondary" onclick="addFeature()">Ekle</button>
             </div>
           </div>
@@ -4205,19 +5853,19 @@
 
           <div class="form-group">
             <label>Uygulama ID (appId)</label>
-            <input type="text" id="appNotificationId" placeholder="Örn: task-cosmos"/>
+            <input type="text" id="appNotificationId" name="appNotificationId" placeholder="Örn: task-cosmos" autocomplete="off"/>
             <small>Bildirim API'sinde kullanılacak benzersiz ID (opsiyonel)</small>
           </div>
 
           <div class="form-group">
             <label>Package Name</label>
-            <input type="text" id="appNotificationPackage" placeholder="Örn: com.bambinifojo.taskcosmos"/>
+            <input type="text" id="appNotificationPackage" name="appNotificationPackage" placeholder="Örn: com.bambinifojo.taskcosmos" autocomplete="off"/>
             <small>Android uygulama package adı (opsiyonel)</small>
           </div>
 
           <div class="form-group">
             <label>Son Sürüm</label>
-            <input type="text" id="appNotificationVersion" placeholder="Örn: 1.0.0" pattern="^\d+\.\d+\.\d+$"/>
+            <input type="text" id="appNotificationVersion" name="appNotificationVersion" placeholder="Örn: 1.0.0" pattern="^\d+\.\d+\.\d+$" autocomplete="off"/>
             <small>Format: X.Y.Z (örn: 1.0.0, 2.1.5)</small>
           </div>
 
@@ -4258,113 +5906,6 @@
       </div>
     </div>
 
-      <!-- Site Ayarları Modal -->
-      <div id="siteSettingsModal" class="modal-overlay">
-        <div class="modal-content modal-content-large">
-          <div class="modal-header">
-            <h2>⚙️ Site Ayarları</h2>
-            <button type="button" class="modal-close" onclick="closeSiteModal()">✖</button>
-          </div>
-          <div class="modal-body">
-            <div class="section-tabs">
-              <button class="section-tab active" onclick="showSiteSection('header')">📝 Header</button>
-              <button class="section-tab" onclick="showSiteSection('hero')">🚀 Hero</button>
-              <button class="section-tab" onclick="showSiteSection('about')">👤 Hakkımda</button>
-              <button class="section-tab" onclick="showSiteSection('skills')">⚡ Yetenekler</button>
-              <button class="section-tab" onclick="showSiteSection('contact')">✉️ İletişim</button>
-            </div>
-
-        <!-- Header Ayarları -->
-        <div id="siteHeaderForm" class="site-form-section">
-          <h3>Header Ayarları</h3>
-          <div class="form-group">
-            <label>Logo Metni</label>
-            <input type="text" id="siteHeaderLogo" placeholder="Bambinifojo"/>
-          </div>
-          <div class="form-group">
-            <label>Tagline</label>
-            <input type="text" id="siteHeaderTagline" placeholder="Mobil Uygulama Geliştirici"/>
-          </div>
-          <button class="btn btn-primary" onclick="saveSiteSection('header')">💾 Kaydet</button>
-        </div>
-
-        <!-- Hero Ayarları -->
-        <div id="siteHeroForm" class="site-form-section hidden">
-          <h3>Hero Bölümü Ayarları</h3>
-          <div class="form-group">
-            <label>Başlık</label>
-            <input type="text" id="siteHeroTitle" placeholder="Bambinifojo"/>
-          </div>
-          <div class="form-group">
-            <label>Tagline</label>
-            <textarea id="siteHeroTagline" placeholder="Açıklama metni..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Play Store URL</label>
-            <input type="url" id="siteHeroPlayStoreUrl" placeholder="https://play.google.com/..."/>
-          </div>
-          <div class="form-group">
-            <label>İstatistikler (JSON formatında)</label>
-            <textarea id="siteHeroStats" class="textarea-code" placeholder='[{"number":"2+","label":"Uygulama"}]'></textarea>
-            <small>Her istatistik: {"number": "2+", "label": "Uygulama"}</small>
-          </div>
-          <button class="btn btn-primary" onclick="saveSiteSection('hero')">💾 Kaydet</button>
-        </div>
-
-        <!-- About Ayarları -->
-        <div id="siteAboutForm" class="site-form-section hidden">
-          <h3>Hakkımda Bölümü Ayarları</h3>
-          <div class="form-group">
-            <label>Başlık</label>
-            <input type="text" id="siteAboutTitle" placeholder="Hakkımda"/>
-          </div>
-          <div class="form-group">
-            <label>Metinler (Her satır bir paragraf)</label>
-            <textarea id="siteAboutTexts" class="textarea-medium" placeholder="Paragraf 1&#10;Paragraf 2"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Teknolojiler (Her satır: icon|isim)</label>
-            <textarea id="siteAboutTech" class="textarea-medium" placeholder="🤖|Android&#10;🎨|Flutter"></textarea>
-            <small>Format: Emoji|İsim (her satır bir teknoloji)</small>
-          </div>
-          <button class="btn btn-primary" onclick="saveSiteSection('about')">💾 Kaydet</button>
-        </div>
-
-        <!-- Skills Ayarları -->
-        <div id="siteSkillsForm" class="site-form-section hidden">
-          <h3>Yetenekler Bölümü Ayarları</h3>
-          <div class="form-group">
-            <label>Başlık</label>
-            <input type="text" id="siteSkillsTitle" placeholder="Teknolojiler & Yetenekler"/>
-          </div>
-          <div id="skillsListContainer"></div>
-          <div class="form-group">
-            <button type="button" class="btn btn-secondary" onclick="addSkillItem()">➕ Yetenek Ekle</button>
-          </div>
-          <button class="btn btn-primary" onclick="saveSiteSection('skills')">💾 Kaydet</button>
-        </div>
-
-        <!-- Contact Ayarları -->
-        <div id="siteContactForm" class="site-form-section hidden">
-          <h3>İletişim Bölümü Ayarları</h3>
-          <div class="form-group">
-            <label>Başlık</label>
-            <input type="text" id="siteContactTitle" placeholder="İletişim"/>
-          </div>
-          <div class="form-group">
-            <label>Alt Başlık</label>
-            <input type="text" id="siteContactSubtitle" placeholder="Açıklama metni..."/>
-          </div>
-          <div id="contactListContainer"></div>
-          <div class="form-group">
-            <button type="button" class="btn btn-secondary" onclick="addContactItem()">➕ İletişim Ekle</button>
-          </div>
-          <button class="btn btn-primary" onclick="saveSiteSection('contact')">💾 Kaydet</button>
-        </div>
-
-          </div>
-        </div>
-      </div>
 
       <!-- Kullanıcı Ekleme/Düzenleme Modal -->
       <div id="userFormModal" class="modal-overlay">
@@ -4379,19 +5920,19 @@
               
               <div class="form-group">
                 <label>Kullanıcı Adı *</label>
-                <input type="text" id="userName" required placeholder="Örn: admin, john_doe"/>
+                <input type="text" id="userName" name="userName" required placeholder="Örn: admin, john_doe" autocomplete="username"/>
                 <small>Kullanıcı adı benzersiz olmalıdır</small>
               </div>
 
               <div class="form-group">
                 <label>E-posta</label>
-                <input type="email" id="userEmail" placeholder="user@example.com"/>
+                <input type="email" id="userEmail" name="userEmail" placeholder="user@example.com" autocomplete="email"/>
               </div>
 
               <div class="form-group">
                 <label>Şifre *</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="userPassword" required placeholder="Güçlü bir şifre girin" minlength="6"/>
+                  <input type="password" id="userPassword" name="userPassword" required placeholder="Güçlü bir şifre girin" minlength="6" autocomplete="new-password"/>
                   <button type="button" onclick="toggleUserPassword()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="userEyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -4405,7 +5946,7 @@
               <div class="form-group" id="userPasswordConfirmGroup">
                 <label>Şifre Tekrar *</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="userPasswordConfirm" required placeholder="Şifreyi tekrar girin" minlength="6"/>
+                  <input type="password" id="userPasswordConfirm" name="userPasswordConfirm" required placeholder="Şifreyi tekrar girin" minlength="6" autocomplete="new-password"/>
                   <button type="button" onclick="toggleUserPasswordConfirm()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="userEyeIconConfirm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -4447,10 +5988,12 @@
           </div>
           <div class="modal-body">
             <form id="changePasswordForm" onsubmit="changePassword(event)">
+              <!-- Hidden username field for accessibility -->
+              <input type="text" name="username" autocomplete="username" class="sr-only" tabindex="-1" aria-hidden="true"/>
               <div class="form-group">
                 <label>Mevcut Şifre *</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="currentPassword" required placeholder="Mevcut şifrenizi girin"/>
+                  <input type="password" id="currentPassword" name="currentPassword" required placeholder="Mevcut şifrenizi girin" autocomplete="current-password"/>
                   <button type="button" onclick="togglePasswordVisibility('currentPassword', 'currentPasswordEye')" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="currentPasswordEye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -4464,7 +6007,7 @@
               <div class="form-group">
                 <label>Yeni Şifre *</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="newPassword" required placeholder="Yeni şifrenizi girin (min. 6 karakter)" minlength="6"/>
+                  <input type="password" id="newPassword" name="newPassword" required placeholder="Yeni şifrenizi girin (min. 6 karakter)" minlength="6" autocomplete="new-password"/>
                   <button type="button" onclick="togglePasswordVisibility('newPassword', 'newPasswordEye')" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="newPasswordEye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -4478,7 +6021,7 @@
               <div class="form-group">
                 <label>Yeni Şifre Tekrar *</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="confirmNewPassword" required placeholder="Yeni şifreyi tekrar girin" minlength="6"/>
+                  <input type="password" id="confirmNewPassword" name="confirmNewPassword" required placeholder="Yeni şifreyi tekrar girin" minlength="6" autocomplete="new-password"/>
                   <button type="button" onclick="togglePasswordVisibility('confirmNewPassword', 'confirmNewPasswordEye')" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="confirmNewPasswordEye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -4506,5 +6049,6 @@
       <div id="alertContainer" class="alert-container"></div>
     </div>
   </div>
+
 </body>
 </html>

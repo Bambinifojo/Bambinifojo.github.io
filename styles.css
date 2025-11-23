@@ -2952,7 +2952,7 @@ html {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 1000;
+    z-index: 998; /* Hamburger menüden (1001) düşük olmalı */
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -3025,7 +3025,7 @@ html {
     display: none;
     flex-direction: column;
     overflow: hidden;
-    z-index: 1001;
+    z-index: 997; /* Hamburger menüden (1001) düşük olmalı */
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
@@ -3467,6 +3467,16 @@ html {
         font-size: 1rem;
     }
 
+    .ai-assistant-modal {
+        width: calc(100vw - 40px);
+        max-width: 380px;
+        height: calc(100vh - 140px);
+        max-height: 550px;
+        bottom: 80px;
+        right: 20px;
+        border-radius: 18px;
+    }
+
     .ai-header-btn {
         width: 40px;
         height: 40px;
@@ -3522,21 +3532,51 @@ html {
 }
 
 @media (max-width: 480px) {
-    .ai-assistant-toggle {
-        width: 52px;
-        height: 52px;
+    .ai-assistant-widget {
         bottom: 12px;
         right: 12px;
+        z-index: 998; /* Hamburger menüden (9999) düşük */
+    }
+
+    .ai-assistant-toggle {
+        width: 44px;
+        height: 44px;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .ai-assistant-toggle svg {
+        width: 20px;
+        height: 20px;
     }
 
     .ai-badge {
-        width: 20px;
-        height: 20px;
-        font-size: 0.65rem;
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+        top: -3px;
+        right: -3px;
+        border-width: 1.5px;
+    }
+
+    .ai-assistant-modal {
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        height: calc(100vw - 24px + 80px); /* Yukarı doğru genişletmek için yüksekliği artır */
+        max-height: calc(100vw - 24px + 80px);
+        /* Ekran çok uzunsa maksimum yükseklik sınırı */
+        min-height: 300px;
+        bottom: 12px;
+        right: 12px;
+        left: 12px;
+        top: auto;
+        margin-top: 40px; /* Header'dan biraz daha yakın */
+        border-radius: 16px;
+        z-index: 997; /* Hamburger menüden düşük */
     }
 
     .ai-modal-header {
         padding: 12px 14px;
+        margin-top: 0;
     }
 
     .ai-logo {
@@ -3544,9 +3584,21 @@ html {
         gap: 8px;
     }
 
+    .ai-logo svg {
+        width: 20px;
+        height: 20px;
+    }
+
     .ai-header-btn {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .ai-header-btn svg {
+        width: 16px;
+        height: 16px;
     }
 
     .ai-chat-messages {
@@ -3556,20 +3608,56 @@ html {
     .ai-message-content {
         padding: 10px 14px;
         font-size: 0.9rem;
+        max-width: 80%;
+    }
+
+    .ai-message-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    .ai-input-area {
+        padding: 10px 12px;
     }
 
     .ai-input-wrapper {
-        padding: 10px;
+        padding: 0;
+        gap: 6px;
     }
 
     .ai-message-input {
         font-size: 16px;
         padding: 10px 14px;
+        min-height: 44px;
     }
 
     .ai-send-btn {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .ai-send-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .ai-status-text {
+        font-size: 0.7rem;
+    }
+
+    .ai-welcome-icon {
+        font-size: 3rem;
+    }
+
+    .ai-welcome-content h3 {
+        font-size: 1.25rem;
+    }
+
+    .ai-welcome-content p {
+        font-size: 0.85rem;
     }
 }
 

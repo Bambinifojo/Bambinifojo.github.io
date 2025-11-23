@@ -91,23 +91,39 @@ function closeMenu() {
 // Site verilerini yükle
 async function loadSiteData() {
   try {
-    const res = await fetch("data/apps.json");
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+    // Önce site.json'dan site verilerini yükle
+    let siteData = null;
+    try {
+      const siteRes = await fetch("data/site.json");
+      if (siteRes.ok) {
+        const siteJson = await siteRes.json();
+        siteData = siteJson.site;
+      }
+    } catch (error) {
+      console.warn('Site verisi yüklenirken hata:', error);
     }
     
-    const data = await res.json();
-    if (!data.site) {
-      // Site verisi yoksa site.json'dan yükle
+    // Eğer site.json'dan yüklenemediyse, apps.json'dan kontrol et (geriye dönük uyumluluk)
+    if (!siteData) {
       try {
-        const siteRes = await fetch("data/site.json");
-        const siteData = await siteRes.json();
-        data.site = siteData.site;
-      } catch {
-        console.warn('Site verisi bulunamadı, varsayılan değerler kullanılıyor');
-        return;
+        const res = await fetch("data/apps.json");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.site) {
+            siteData = data.site;
+          }
+        }
+      } catch (error) {
+        console.warn('Apps.json\'dan site verisi yüklenirken hata:', error);
       }
     }
+    
+    if (!siteData) {
+      console.warn('Site verisi bulunamadı, varsayılan değerler kullanılıyor');
+      return;
+    }
+    
+    const data = { site: siteData };
     
     // Header
     if (data.site.header) {
