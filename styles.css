@@ -3113,28 +3113,29 @@ body.ai-modal-open .header-container {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    border: 1.5px solid rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.35);
     color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 }
 
 .ai-header-btn:hover {
-    background: rgba(255, 255, 255, 0.4);
-    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.8);
     transform: scale(1.1);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .ai-header-btn svg {
     width: 18px;
     height: 18px;
-    stroke-width: 2.5;
+    stroke-width: 3;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 /* Welcome Section */
@@ -4979,12 +4980,12 @@ body.ai-modal-open .header-container {
     }
 
     .ai-assistant-modal {
-        width: calc(100vw - 100px);
-        max-width: 380px;
-        height: calc(100vh - 100px);
-        max-height: 480px;
-        bottom: 75px;
-        right: 20px;
+        width: calc(100vw - 120px);
+        max-width: 360px;
+        height: calc(100vh - 80px);
+        max-height: 500px;
+        bottom: 70px;
+        right: 16px;
         left: auto;
         border-radius: 16px;
     }
@@ -5035,24 +5036,26 @@ body.ai-modal-open .header-container {
     }
 
     .ai-header-btn {
-        width: 30px;
-        height: 30px;
-        min-width: 30px;
-        min-height: 30px;
-        border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
-        background: rgba(255, 255, 255, 0.25) !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        border: 2px solid rgba(255, 255, 255, 0.7) !important;
+        background: rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3) !important;
     }
 
     .ai-header-btn:hover {
-        background: rgba(255, 255, 255, 0.4) !important;
-        border-color: rgba(255, 255, 255, 0.6) !important;
+        background: rgba(255, 255, 255, 0.6) !important;
+        border-color: rgba(255, 255, 255, 0.9) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
     }
 
     .ai-header-btn svg {
-        width: 16px;
-        height: 16px;
-        stroke-width: 2.5 !important;
+        width: 18px;
+        height: 18px;
+        stroke-width: 3 !important;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) !important;
     }
 }
 
@@ -5072,11 +5075,11 @@ body.ai-modal-open .header-container {
 
     .ai-assistant-modal {
         width: calc(100vw - 120px);
-        max-width: 360px;
-        height: calc(100vh - 80px);
-        max-height: 480px;
+        max-width: 350px;
+        height: calc(100vh - 70px);
+        max-height: 500px;
         bottom: 65px;
-        right: 16px;
+        right: 12px;
         left: auto;
         border-radius: 14px;
     }
@@ -5126,19 +5129,26 @@ body.ai-modal-open .header-container {
     }
 
     .ai-header-btn {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-        min-height: 28px;
-        border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
-        background: rgba(255, 255, 255, 0.25) !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        border: 2px solid rgba(255, 255, 255, 0.7) !important;
+        background: rgba(255, 255, 255, 0.4) !important;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .ai-header-btn:hover {
+        background: rgba(255, 255, 255, 0.6) !important;
+        border-color: rgba(255, 255, 255, 0.9) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
     }
 
     .ai-header-btn svg {
-        width: 14px;
-        height: 14px;
-        stroke-width: 2.5 !important;
+        width: 16px;
+        height: 16px;
+        stroke-width: 3 !important;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) !important;
     }
 
     .ai-status-bar {
