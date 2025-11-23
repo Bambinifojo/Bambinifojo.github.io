@@ -156,6 +156,12 @@ function toggleAIModal() {
     const modal = document.getElementById('aiAssistantModal');
     if (modal) {
         modal.classList.toggle('active');
+        // Modal açık/kapalı durumuna göre body'ye class ekle
+        if (modal.classList.contains('active')) {
+            document.body.classList.add('ai-modal-open');
+        } else {
+            document.body.classList.remove('ai-modal-open');
+        }
         if (modal.classList.contains('active')) {
             // Chat messages'ı direkt aktif yap (welcome section yok)
             const chatMessages = document.getElementById('aiChatMessages');
@@ -173,6 +179,7 @@ function closeAIModal() {
     const modal = document.getElementById('aiAssistantModal');
     if (modal) {
         modal.classList.remove('active');
+        document.body.classList.remove('ai-modal-open');
     }
 }
 

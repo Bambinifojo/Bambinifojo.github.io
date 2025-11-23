@@ -3039,6 +3039,28 @@ html {
     display: flex;
 }
 
+/* Modal açıkken header tagline'ı gizle veya sola kaydır */
+body.ai-modal-open .header-tagline {
+    display: none !important;
+}
+
+/* Modal açıkken header container'ı sola hizala */
+body.ai-modal-open .header-container {
+    justify-content: flex-start !important;
+}
+
+/* Modal açıkken küçük ve orta ekranlarda header tagline'ı gizle */
+@media (max-width: 1024px) {
+    body.ai-modal-open .header-tagline {
+        display: none !important;
+    }
+    
+    body.ai-modal-open .header-container {
+        justify-content: flex-start !important;
+        gap: 16px;
+    }
+}
+
 @keyframes slideUp {
     from {
         opacity: 0;
