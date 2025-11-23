@@ -4714,13 +4714,42 @@ body.ai-modal-open .header-container {
         flex-direction: row !important;
         justify-content: space-between;
         align-items: center;
-        padding: 20px 40px;
-        gap: 24px;
+        padding: 18px 30px;
+        gap: 20px;
         flex-wrap: nowrap !important;
     }
 
     .header-tagline {
         display: none !important;
+    }
+
+    /* Header sağ taraf butonları - iPad Pro */
+    .search-toggle {
+        top: 18px;
+        right: 140px;
+        width: 46px;
+        height: 46px;
+    }
+
+    .theme-toggle {
+        top: 18px;
+        right: 195px;
+        width: 46px;
+        height: 46px;
+    }
+
+    .hamburger {
+        top: 18px;
+        right: 30px;
+        width: 46px;
+        height: 46px;
+    }
+
+    .admin-toggle {
+        top: 18px;
+        right: 245px;
+        width: 46px;
+        height: 46px;
     }
 
     .logo-wrapper {
