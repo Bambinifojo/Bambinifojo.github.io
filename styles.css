@@ -567,6 +567,117 @@ body.menu-open .admin-toggle {
     background: rgba(106, 90, 205, 0.5);
 }
 
+/* Autocomplete Suggestions */
+.search-autocomplete {
+    padding: 20px;
+}
+
+.search-autocomplete-header {
+    margin-bottom: 15px;
+}
+
+.search-autocomplete-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #666;
+    margin: 0;
+}
+
+[data-theme="dark"] .search-autocomplete-header h3 {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-autocomplete-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.search-autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: rgba(106, 90, 205, 0.05);
+    border: 1px solid rgba(106, 90, 205, 0.1);
+}
+
+[data-theme="dark"] .search-autocomplete-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.search-autocomplete-item:hover,
+.search-autocomplete-item.selected {
+    background: rgba(106, 90, 205, 0.15);
+    border-color: rgba(106, 90, 205, 0.3);
+    transform: translateX(5px);
+}
+
+[data-theme="dark"] .search-autocomplete-item:hover,
+[data-theme="dark"] .search-autocomplete-item.selected {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-autocomplete-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(106, 90, 205, 0.1);
+    border-radius: 10px;
+}
+
+[data-theme="dark"] .search-autocomplete-icon {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.search-autocomplete-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-autocomplete-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .search-autocomplete-title {
+    color: white;
+}
+
+.search-autocomplete-title mark {
+    background: rgba(106, 90, 205, 0.3);
+    color: var(--primary-color);
+    font-weight: 700;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+[data-theme="dark"] .search-autocomplete-title mark {
+    background: rgba(106, 90, 205, 0.4);
+    color: var(--primary-color);
+}
+
+.search-autocomplete-category {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+[data-theme="dark"] .search-autocomplete-category {
+    color: rgba(255, 255, 255, 0.5);
+}
+
 .search-box {
     display: flex;
     align-items: center;

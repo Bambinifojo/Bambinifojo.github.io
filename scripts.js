@@ -545,6 +545,93 @@ async function loadSearchData() {
   }
 }
 
+// Get autocomplete suggestions
+function getAutocompleteSuggestions(query) {
+  const suggestions = [];
+  const lowerQuery = query.toLowerCase().trim();
+  
+  if (lowerQuery.length < 1) return suggestions;
+  
+  // Get unique suggestions from apps
+  if (searchData.apps) {
+    searchData.apps.forEach(app => {
+      // App titles
+      if (app.title && app.title.toLowerCase().includes(lowerQuery)) {
+        if (!suggestions.find(s => s.text === app.title)) {
+          suggestions.push({
+            text: app.title,
+            type: 'app',
+            icon: app.icon || '📱',
+            category: 'Uygulama'
+          });
+        }
+      }
+      
+      // Categories
+      if (app.category && app.category.toLowerCase().includes(lowerQuery)) {
+        if (!suggestions.find(s => s.text === app.category)) {
+          suggestions.push({
+            text: app.category,
+            type: 'category',
+            icon: '📂',
+            category: 'Kategori'
+          });
+        }
+      }
+      
+      // Features
+      if (app.features) {
+        app.features.forEach(feature => {
+          if (feature.toLowerCase().includes(lowerQuery)) {
+            if (!suggestions.find(s => s.text === feature)) {
+              suggestions.push({
+                text: feature,
+                type: 'feature',
+                icon: '✨',
+                category: 'Özellik'
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+  
+  // Get suggestions from skills
+  if (searchData.site && searchData.site.skills && searchData.site.skills.items) {
+    searchData.site.skills.items.forEach(skill => {
+      if (skill.name && skill.name.toLowerCase().includes(lowerQuery)) {
+        if (!suggestions.find(s => s.text === skill.name)) {
+          suggestions.push({
+            text: skill.name,
+            type: 'skill',
+            icon: skill.icon || '⚡',
+            category: 'Yetenek'
+          });
+        }
+      }
+    });
+  }
+  
+  // Get suggestions from technologies
+  if (searchData.site && searchData.site.about && searchData.site.about.technologies) {
+    searchData.site.about.technologies.forEach(tech => {
+      if (tech.name && tech.name.toLowerCase().includes(lowerQuery)) {
+        if (!suggestions.find(s => s.text === tech.name)) {
+          suggestions.push({
+            text: tech.name,
+            type: 'tech',
+            icon: tech.icon || '🛠️',
+            category: 'Teknoloji'
+          });
+        }
+      }
+    });
+  }
+  
+  return suggestions.slice(0, 8); // Max 8 suggestions
+}
+
 // Search in data
 function searchInData(query) {
   const results = {
@@ -723,6 +810,77 @@ function renderSearchResults(results, query) {
   resultsContainer.style.display = 'block';
 }
 
+// Render autocomplete suggestions
+function renderAutocompleteSuggestions(suggestions, query) {
+  const resultsContainer = document.getElementById('searchResults');
+  if (!resultsContainer) return;
+  
+  if (suggestions.length === 0 || query.length < 1) {
+    resultsContainer.innerHTML = '';
+    resultsContainer.style.display = 'none';
+    return;
+  }
+  
+  let html = '<div class="search-autocomplete">';
+  html += '<div class="search-autocomplete-header"><h3>💡 Öneriler</h3></div>';
+  html += '<div class="search-autocomplete-list">';
+  
+  suggestions.forEach((suggestion, index) => {
+    const highlightedText = highlightMatch(suggestion.text, query);
+    const escapedText = escapeHtml(suggestion.text).replace(/'/g, "\\'");
+    html += `
+      <div class="search-autocomplete-item" data-index="${index}" data-text="${escapedText}">
+        <div class="search-autocomplete-icon">${suggestion.icon}</div>
+        <div class="search-autocomplete-text">
+          <div class="search-autocomplete-title">${highlightedText}</div>
+          <div class="search-autocomplete-category">${suggestion.category}</div>
+        </div>
+      </div>
+    `;
+  });
+  
+  // Add click event listeners after rendering
+  setTimeout(() => {
+    const items = resultsContainer.querySelectorAll('.search-autocomplete-item');
+    items.forEach(item => {
+      item.addEventListener('click', () => {
+        const text = item.getAttribute('data-text');
+        if (text) {
+          selectAutocompleteSuggestion(text);
+        }
+      });
+    });
+  }, 0);
+  
+  html += '</div></div>';
+  resultsContainer.innerHTML = html;
+  resultsContainer.style.display = 'block';
+}
+
+// Highlight matching text
+function highlightMatch(text, query) {
+  if (!query) return escapeHtml(text);
+  const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+  return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+}
+
+// Escape regex special characters
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Select autocomplete suggestion
+function selectAutocompleteSuggestion(text) {
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.value = text;
+    // Trigger search
+    const results = searchInData(text);
+    renderSearchResults(results, text);
+    searchInput.focus();
+  }
+}
+
 // Escape HTML
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -774,27 +932,97 @@ function initSearch() {
     }
   });
   
-  // Search functionality with debounce
+  // Autocomplete and search functionality with debounce
   let searchTimeout;
+  let selectedSuggestionIndex = -1;
+  let currentSuggestions = [];
+  
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.trim();
+    selectedSuggestionIndex = -1;
     
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-      const results = searchInData(query);
-      renderSearchResults(results, query);
-    }, 300);
+      if (query.length >= 2) {
+        // Show full search results
+        const results = searchInData(query);
+        renderSearchResults(results, query);
+      } else if (query.length >= 1) {
+        // Show autocomplete suggestions
+        currentSuggestions = getAutocompleteSuggestions(query);
+        renderAutocompleteSuggestions(currentSuggestions, query);
+      } else {
+        // Clear results
+        const resultsContainer = document.getElementById('searchResults');
+        if (resultsContainer) {
+          resultsContainer.innerHTML = '';
+          resultsContainer.style.display = 'none';
+        }
+      }
+    }, 200);
   });
   
-  // Search on Enter
+  // Keyboard navigation for autocomplete
   searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    const resultsContainer = document.getElementById('searchResults');
+    if (!resultsContainer || resultsContainer.style.display === 'none') {
+      if (e.key === 'Enter') {
+        const query = e.target.value.trim();
+        if (query.length >= 2) {
+          const results = searchInData(query);
+          renderSearchResults(results, query);
+        }
+      }
+      return;
+    }
+    
+    const autocompleteItems = resultsContainer.querySelectorAll('.search-autocomplete-item');
+    
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
+      selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, autocompleteItems.length - 1);
+      updateSelectedSuggestion(autocompleteItems);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+      updateSelectedSuggestion(autocompleteItems);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedSuggestionIndex >= 0 && autocompleteItems[selectedSuggestionIndex]) {
+        const suggestionElement = autocompleteItems[selectedSuggestionIndex];
+        const titleElement = suggestionElement.querySelector('.search-autocomplete-title');
+        if (titleElement) {
+          // Remove mark tags and get clean text
+          const suggestionText = titleElement.textContent.trim();
+          selectAutocompleteSuggestion(suggestionText);
+        }
+      } else {
+        const query = e.target.value.trim();
+        if (query.length >= 2) {
+          const results = searchInData(query);
+          renderSearchResults(results, query);
+        }
+      }
+    } else if (e.key === 'Escape') {
       const query = e.target.value.trim();
-      const results = searchInData(query);
-      renderSearchResults(results, query);
+      if (query.length >= 2) {
+        const results = searchInData(query);
+        renderSearchResults(results, query);
+      }
     }
   });
+  
+  // Update selected suggestion highlight
+  function updateSelectedSuggestion(items) {
+    items.forEach((item, index) => {
+      if (index === selectedSuggestionIndex) {
+        item.classList.add('selected');
+        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } else {
+        item.classList.remove('selected');
+      }
+    });
+  }
   
   // Keyboard shortcut (Ctrl/Cmd + K)
   document.addEventListener('keydown', (e) => {
