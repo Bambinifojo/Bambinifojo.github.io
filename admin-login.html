@@ -2520,8 +2520,63 @@
         // Şifreyi hash'le
         const hashedPassword = await hashPassword(password);
 
-        // Şifre kontrolü
-        if (hashedPassword !== ADMIN_PASSWORD_HASH) {
+        // Kullanıcı verilerini localStorage'dan yükle
+        let usersData = [];
+        const saved = localStorage.getItem('adminUsers');
+        if (saved) {
+          try {
+            usersData = JSON.parse(saved);
+            console.log('📦 usersData yüklendi:', usersData.length, 'kullanıcı');
+            if (usersData.length > 0) {
+              console.log('👤 Kullanıcılar:', usersData.map(u => ({
+                username: u.username,
+                passwordHash: u.passwordHash ? u.passwordHash.substring(0, 10) + '...' : 'null'
+              })));
+            }
+          } catch (e) {
+            console.error('Kullanıcı verileri yüklenirken hata:', e);
+            usersData = [];
+          }
+        } else {
+          console.log('⚠️ localStorage\'da adminUsers bulunamadı');
+        }
+
+        console.log('🔐 Giriş denemesi - Hash:', hashedPassword.substring(0, 10) + '...');
+
+        // Şifre kontrolü - önce usersData içinde ara, sonra varsayılan admin şifresini kontrol et
+        let authenticatedUser = null;
+        
+        // Önce kullanıcı listesinde ara
+        authenticatedUser = usersData.find(user => user.passwordHash === hashedPassword);
+        console.log('🔍 usersData içinde arama sonucu:', authenticatedUser ? '✅ Bulundu' : '❌ Bulunamadı');
+        
+        // Bulunamazsa varsayılan admin şifresini kontrol et
+        if (!authenticatedUser && hashedPassword === ADMIN_PASSWORD_HASH) {
+          authenticatedUser = usersData.find(user => user.username === 'admin');
+          // Eğer admin kullanıcısı yoksa oluştur
+          if (!authenticatedUser) {
+            authenticatedUser = {
+              id: Date.now().toString(),
+              username: 'admin',
+              email: 'admin@example.com',
+              passwordHash: ADMIN_PASSWORD_HASH,
+              role: 'admin',
+              createdAt: new Date().toISOString(),
+              lastLogin: null
+            };
+            usersData.push(authenticatedUser);
+            localStorage.setItem('adminUsers', JSON.stringify(usersData));
+          }
+        }
+
+        // Şifre kontrolü başarısız
+        if (!authenticatedUser) {
+          console.error('❌ Kimlik doğrulama başarısız:', {
+            usersDataLength: usersData.length,
+            hashedPassword: hashedPassword.substring(0, 10) + '...',
+            adminPasswordHash: ADMIN_PASSWORD_HASH.substring(0, 10) + '...',
+            hashMatch: hashedPassword === ADMIN_PASSWORD_HASH
+          });
           const attemptResult = recordFailedLogin();
           
           if (attemptResult.locked) {
@@ -2599,6 +2654,15 @@
         sessionStorage.setItem('adminSession', sessionToken);
         sessionStorage.setItem('adminLoginTime', Date.now().toString());
         sessionStorage.setItem('adminLastActivity', Date.now().toString());
+        sessionStorage.setItem('adminUsername', authenticatedUser.username);
+        sessionStorage.setItem('adminRole', authenticatedUser.role);
+        
+        // Son giriş zamanını güncelle
+        authenticatedUser.lastLogin = new Date().toISOString();
+        usersData = usersData.map(user => 
+          user.id === authenticatedUser.id ? authenticatedUser : user
+        );
+        localStorage.setItem('adminUsers', JSON.stringify(usersData));
 
         // Başarı mesajı
         const loginBtnText = document.getElementById('loginBtnText');

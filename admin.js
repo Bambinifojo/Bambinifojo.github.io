@@ -2626,7 +2626,13 @@ async function changePassword(event) {
   
   try {
     // Kullanıcı şifresini güncelle
+    const oldHash = currentUser.passwordHash;
     currentUser.passwordHash = hashedNewPassword;
+    console.log('🔄 Şifre güncellendi:', {
+      username: currentUser.username,
+      oldHash: oldHash ? oldHash.substring(0, 10) + '...' : 'null',
+      newHash: hashedNewPassword.substring(0, 10) + '...'
+    });
     
     // Değişiklikleri kaydet
     const saveSuccess = saveUsers();
@@ -2638,6 +2644,18 @@ async function changePassword(event) {
     const saved = localStorage.getItem('adminUsers');
     if (!saved) {
       throw new Error('Şifre kaydedilemedi!');
+    }
+    
+    // Kaydedilen veriyi doğrula
+    const savedData = JSON.parse(saved);
+    const savedUser = savedData.find(u => u.id === currentUser.id);
+    if (savedUser && savedUser.passwordHash === hashedNewPassword) {
+      console.log('✅ Şifre localStorage\'a başarıyla kaydedildi ve doğrulandı');
+    } else {
+      console.error('❌ Şifre kaydedildi ama doğrulama başarısız!', {
+        savedUserFound: !!savedUser,
+        hashMatch: savedUser ? savedUser.passwordHash === hashedNewPassword : false
+      });
     }
     
     // Kullanıcı listesini yeniden yükle (güncel veriler için)
