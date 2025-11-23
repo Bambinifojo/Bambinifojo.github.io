@@ -925,6 +925,33 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
+  /* Select özel stilleri */
+  .form-group select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 12px;
+    padding-right: 45px;
+    cursor: pointer;
+  }
+
+  .form-group select::-ms-expand {
+    display: none;
+  }
+
+  .form-group select option {
+    padding: 12px;
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+
+  .form-group select option:hover {
+    background: #f3f4f6;
+  }
+
   .form-group input:focus,
   .form-group textarea:focus,
   .form-group select:focus {
@@ -968,6 +995,12 @@
   .form-group textarea {
     resize: vertical;
     min-height: 100px;
+    line-height: 1.6;
+  }
+
+  /* Textarea rows="3" için özel stil */
+  .form-group textarea[rows="3"] {
+    min-height: 80px;
   }
 
   .form-group small {
@@ -4517,22 +4550,34 @@
   }
   /* Notification Section Styles */
   .notification-section-divider {
-    margin: 30px 0;
+    margin: 32px 0;
     border: none;
     border-top: 2px solid #e5e7eb;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+    height: 1px;
   }
 
   .notification-section-title {
-    margin-top: 0;
-    color: #6C63FF;
+    margin: 0 0 8px 0;
+    color: #667eea;
+    font-size: 1.2rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+  }
+
+  .notification-section-title svg {
+    flex-shrink: 0;
+    color: #667eea;
   }
 
   .notification-section-subtitle {
     color: #6b7280;
+    font-size: 0.875rem;
     display: block;
+    margin-top: 4px;
+    line-height: 1.5;
   }
 
   /* Feedback Item Styles */

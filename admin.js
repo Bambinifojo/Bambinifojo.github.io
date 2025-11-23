@@ -1275,12 +1275,25 @@ function showAddForm() {
   
   // Kısa bir gecikme ile modal'ı aç (section değişimi animasyonu için)
   setTimeout(() => {
-  document.getElementById('formTitle').textContent = 'Yeni Uygulama Ekle';
-  document.getElementById('appForm').reset();
-  document.getElementById('appIndex').value = '-1';
-  currentFeatures = [];
-  renderFeatures();
-  showAppModal();
+    document.getElementById('formTitle').textContent = 'Yeni Uygulama Ekle';
+    document.getElementById('appForm').reset();
+    document.getElementById('appIndex').value = '-1';
+    currentFeatures = [];
+    renderFeatures();
+    
+    // Select elementlerini varsayılan değerlere sıfırla
+    const appNotificationForceUpdateEl = document.getElementById('appNotificationForceUpdate');
+    const appNotificationEnabledEl = document.getElementById('appNotificationEnabled');
+    if (appNotificationForceUpdateEl) appNotificationForceUpdateEl.value = 'false';
+    if (appNotificationEnabledEl) appNotificationEnabledEl.value = 'false';
+    
+    // Textarea'yı varsayılan mesajla doldur
+    const appNotificationMessageEl = document.getElementById('appNotificationMessage');
+    if (appNotificationMessageEl) {
+      appNotificationMessageEl.value = 'Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.';
+    }
+    
+    showAppModal();
   }, 100);
 }
 
