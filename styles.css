@@ -3070,7 +3070,7 @@ body.ai-modal-open .hamburger {
 }
 
 /* Modal açıkken header butonlarını modal'ın soluna kaydır */
-@media (min-width: 1024px) {
+@media (min-width: 1367px) {
     body.ai-modal-open .ai-assistant-modal {
         /* Modal genişliğini kontrol et */
     }
@@ -3090,6 +3090,25 @@ body.ai-modal-open .hamburger {
     
     body.ai-modal-open .hamburger {
         right: calc(420px + 200px) !important;
+    }
+}
+
+/* iPad Pro için modal açıkken header butonlarını düzenle */
+@media (min-width: 1024px) and (max-width: 1366px) {
+    body.ai-modal-open .search-toggle {
+        right: calc(500px + 20px) !important;
+    }
+    
+    body.ai-modal-open .theme-toggle {
+        right: calc(500px + 80px) !important;
+    }
+    
+    body.ai-modal-open .admin-toggle {
+        right: calc(500px + 140px) !important;
+    }
+    
+    body.ai-modal-open .hamburger {
+        right: calc(500px + 200px) !important;
     }
 }
 
