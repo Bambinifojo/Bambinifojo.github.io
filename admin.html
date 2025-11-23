@@ -354,7 +354,7 @@
     background: rgba(0, 0, 0, 0.5);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
-    z-index: 250;
+    z-index: 5000; /* Modal'dan düşük ama sidebar'dan yüksek */
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -374,7 +374,7 @@
     background: white;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-    z-index: 251;
+    z-index: 5001; /* Overlay'den yüksek */
     max-height: 60vh;
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -384,6 +384,14 @@
   .admin-topbar-menu-modal.active {
     display: block;
     transform: translateY(0);
+  }
+
+  /* Modal açıkken topbar menu'yu gizle */
+  body.modal-open .admin-topbar-menu-overlay,
+  body.modal-open .admin-topbar-menu-modal {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
 
   .admin-topbar-menu-header {
@@ -1564,7 +1572,7 @@
     /* Blur'u kaldırdık - sidebar overlay blur'u modalları etkilemesin */
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    z-index: 2000; /* Sidebar overlay'den (299) çok daha yüksek */
+    z-index: 10000; /* En üstte olmalı - tüm diğer elementlerden yüksek */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1624,7 +1632,7 @@
     margin: auto;
     border: 1px solid rgba(255, 255, 255, 0.2);
     animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    z-index: 2001; /* Modal overlay'den daha yüksek */
+    z-index: 10001; /* Modal overlay'den daha yüksek */
     /* Blur'dan etkilenmemesi için */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
@@ -1903,8 +1911,12 @@
   }
 
   .site-form-section {
-    padding: 20px 0;
+    padding: 24px 0;
     animation: fadeIn 0.4s ease;
+  }
+
+  .site-form-section:not(.hidden) {
+    display: block;
   }
 
   @keyframes fadeIn {
@@ -1933,9 +1945,10 @@
     flex-wrap: wrap;
     border-bottom: 2px solid #e5e7eb;
     padding-bottom: 0;
-    background: #f8f9fa;
-    padding: 8px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 12px;
     border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   }
 
   .section-tab {
@@ -1975,8 +1988,10 @@
 
   .section-tab.active {
     color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
+    font-weight: 700;
+    transform: translateY(-2px);
   }
 
   .section-tab.active::before {
@@ -2199,10 +2214,22 @@
 
     .modal-content {
       max-width: 90%;
+      max-height: calc(100vh - 40px);
     }
 
     .modal-content-large {
       max-width: 90%;
+      max-height: calc(100vh - 40px);
+    }
+
+    /* Skill ve Contact Item - Tablet */
+    .skill-edit-grid {
+      grid-template-columns: 1fr 70px 90px auto !important;
+      gap: 10px !important;
+    }
+
+    .contact-edit-row {
+      grid-template-columns: 1fr 1fr !important;
     }
 
     .form-group {
@@ -3450,13 +3477,29 @@
 
     /* Modal Optimizasyonları - Küçük Mobil */
     .modal-overlay {
-      padding: 5px;
-      padding-top: 10px;
+      padding: 0;
+      align-items: flex-start;
+      padding-top: 0;
     }
 
     .modal-content {
-      max-height: calc(100vh - 10px);
-      border-radius: 16px;
+      max-height: 100vh;
+      max-width: 100%;
+      width: 100%;
+      border-radius: 0;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      flex-shrink: 0;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
     }
 
     .modal-header {
@@ -3616,6 +3659,7 @@
     }
 
     /* Skill Edit Item Mobil Optimizasyonu */
+    /* Skill Edit Item Mobil Optimizasyonu */
     .skill-edit-item {
       padding: 12px !important;
       margin-bottom: 12px !important;
@@ -3626,13 +3670,12 @@
       gap: 10px !important;
     }
 
-    .skill-edit-grid input,
-    .skill-edit-grid button {
+    .skill-edit-item input,
+    .skill-edit-item button {
       width: 100% !important;
     }
 
-    .skill-remove-btn {
-      width: 100% !important;
+    .skill-edit-item .btn-danger {
       margin-top: 4px;
     }
 
@@ -3647,12 +3690,13 @@
       gap: 10px !important;
     }
 
-    .contact-edit-row input {
+    .contact-edit-item input,
+    .contact-edit-item textarea,
+    .contact-edit-item button {
       width: 100% !important;
     }
 
-    .contact-remove-btn {
-      width: 100% !important;
+    .contact-edit-item .btn-danger {
       margin-top: 8px;
     }
 
@@ -3825,12 +3869,87 @@
   }
 
   .textarea-code {
-    font-family: monospace;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
     min-height: 120px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    background: #f8f9fa;
+    border: 2px solid #e5e7eb;
+  }
+
+  .textarea-code:focus {
+    background: #ffffff;
+    border-color: #667eea;
   }
 
   .textarea-medium {
     min-height: 100px;
+    resize: vertical;
+  }
+
+  /* Skill ve Contact Edit Item Stilleri */
+  .skill-edit-item,
+  .contact-edit-item {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+  }
+
+  .skill-edit-item:hover,
+  .contact-edit-item:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .skill-edit-item input,
+  .contact-edit-item input,
+  .contact-edit-item textarea {
+    padding: 10px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+
+  .skill-edit-item input:focus,
+  .contact-edit-item input:focus,
+  .contact-edit-item textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .skill-edit-item .skill-icon-input {
+    text-align: center;
+    font-size: 1.2rem;
+  }
+
+  .skill-edit-item .skill-level-input {
+    text-align: center;
+  }
+
+  /* Skill ve Contact Item Grid Layout */
+  .skill-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 80px 100px auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .contact-edit-container {
+    display: grid;
+    gap: 12px;
+  }
+
+  .contact-edit-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
   .alert-container {

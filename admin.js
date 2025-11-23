@@ -1454,7 +1454,18 @@ async function saveApp(event) {
       body: JSON.stringify(appsData)
     });
     
-    const result = await response.json();
+    // Response'un JSON olup olmadığını kontrol et
+    const contentType = response.headers.get('content-type');
+    let result;
+    
+    if (contentType && contentType.includes('application/json')) {
+      result = await response.json();
+    } else {
+      // HTML response alındıysa (404, 405 gibi hatalar)
+      const text = await response.text();
+      console.error('Netlify Function HTML response:', text.substring(0, 200));
+      throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
+    }
     
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
@@ -1464,7 +1475,7 @@ async function saveApp(event) {
       autoRefreshPreview();
     } else {
       // Netlify Function çalışmıyorsa fallback
-      throw new Error(result.error || 'GitHub kaydetme başarısız');
+      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
     }
   } catch (error) {
     // Hata yönetimi - kullanıcı dostu mesajlar
@@ -1473,7 +1484,13 @@ async function saveApp(event) {
     
     // Netlify Function çalışmıyor - kullanıcıyı uyar
     saveToLocal(); // LocalStorage'a backup olarak kaydet
-    showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin veya manuel olarak GitHub\'a push yapın.', 'error');
+    
+    // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
+    if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
+      showAlert('ℹ️ GitHub Pages üzerinde Netlify Functions çalışmaz. Değişiklikler LocalStorage\'a kaydedildi. Manuel olarak GitHub\'a push yapmanız gerekiyor.', 'info');
+    } else {
+      showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin veya manuel olarak GitHub\'a push yapın.', 'error');
+    }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
     if (currentMode === 'github' && token) {
@@ -1674,7 +1691,18 @@ async function deleteApp(index) {
       body: JSON.stringify(appsData)
     });
     
-    const result = await response.json();
+    // Response'un JSON olup olmadığını kontrol et
+    const contentType = response.headers.get('content-type');
+    let result;
+    
+    if (contentType && contentType.includes('application/json')) {
+      result = await response.json();
+    } else {
+      // HTML response alındıysa (404, 405 gibi hatalar)
+      const text = await response.text();
+      console.error('Netlify Function HTML response:', text.substring(0, 200));
+      throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
+    }
     
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
@@ -1684,13 +1712,20 @@ async function deleteApp(index) {
       autoRefreshPreview();
     } else {
       // Netlify Function çalışmıyorsa fallback
-      throw new Error(result.error || 'GitHub kaydetme başarısız');
+      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
     }
   } catch (error) {
     console.error('Netlify Function hatası:', error);
     // Netlify Function çalışmıyor - kullanıcıyı uyar
     saveToLocal(); // LocalStorage'a backup olarak kaydet
-    showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+    
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
+    if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
+      showAlert('ℹ️ GitHub Pages üzerinde Netlify Functions çalışmaz. Değişiklikler LocalStorage\'a kaydedildi. Manuel olarak GitHub\'a push yapmanız gerekiyor.', 'info');
+    } else {
+      showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+    }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
     if (currentMode === 'github' && token) {
@@ -2002,7 +2037,18 @@ async function saveSiteSection(section) {
       body: JSON.stringify(appsData)
     });
     
-    const result = await response.json();
+    // Response'un JSON olup olmadığını kontrol et
+    const contentType = response.headers.get('content-type');
+    let result;
+    
+    if (contentType && contentType.includes('application/json')) {
+      result = await response.json();
+    } else {
+      // HTML response alındıysa (404, 405 gibi hatalar)
+      const text = await response.text();
+      console.error('Netlify Function HTML response:', text.substring(0, 200));
+      throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
+    }
     
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
@@ -2011,13 +2057,19 @@ async function saveSiteSection(section) {
       // Önizlemeyi otomatik yenile
       autoRefreshPreview();
     } else {
-      throw new Error(result.error || 'GitHub kaydetme başarısız');
+      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
     }
   } catch (error) {
     console.error('Netlify Function hatası:', error);
     // Netlify Function çalışmıyor - kullanıcıyı uyar
     saveToLocal(); // LocalStorage'a backup olarak kaydet
-    showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+    
+    // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
+    if (error.message.includes('405') || error.message.includes('404')) {
+      showAlert('ℹ️ GitHub Pages üzerinde Netlify Functions çalışmaz. Değişiklikler LocalStorage\'a kaydedildi. Manuel olarak GitHub\'a push yapmanız gerekiyor.', 'info');
+    } else {
+      showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+    }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
     if (currentMode === 'github' && token) {
@@ -2063,13 +2115,18 @@ function renderSkillsList() {
   const container = document.getElementById('skillsListContainer');
   const skills = appsData.site?.skills?.items || [];
   
+  if (skills.length === 0) {
+    container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 20px;">Henüz yetenek eklenmemiş. "Yetenek Ekle" butonuna tıklayarak ekleyebilirsiniz.</p>';
+    return;
+  }
+  
   container.innerHTML = skills.map((skill, index) => `
-    <div class="skill-edit-item" style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
-      <div style="display: grid; grid-template-columns: 1fr 80px 100px auto; gap: 10px; align-items: center;">
-        <input type="text" class="skill-name-input" value="${skill.name || ''}" placeholder="Yetenek adı" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-        <input type="text" class="skill-icon-input" value="${skill.icon || ''}" placeholder="Icon" maxlength="2" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; text-align: center;"/>
-        <input type="number" class="skill-level-input" value="${skill.level || 0}" min="0" max="100" placeholder="Seviye" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-        <button type="button" class="btn btn-danger btn-sm" onclick="removeSkillItem(${index})">🗑️</button>
+    <div class="skill-edit-item">
+      <div class="skill-edit-grid" style="display: grid; grid-template-columns: 1fr 80px 100px auto; gap: 12px; align-items: center;">
+        <input type="text" class="skill-name-input" value="${escapeHtml(skill.name || '')}" placeholder="Yetenek adı"/>
+        <input type="text" class="skill-icon-input" value="${escapeHtml(skill.icon || '')}" placeholder="Icon" maxlength="2"/>
+        <input type="number" class="skill-level-input" value="${skill.level || 0}" min="0" max="100" placeholder="Seviye"/>
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeSkillItem(${index})" title="Sil">🗑️</button>
       </div>
     </div>
   `).join('');
@@ -2079,16 +2136,21 @@ function addSkillItem() {
   const container = document.getElementById('skillsListContainer');
   const newItem = document.createElement('div');
   newItem.className = 'skill-edit-item';
-  newItem.style.cssText = 'background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 10px;';
   newItem.innerHTML = `
-    <div style="display: grid; grid-template-columns: 1fr 80px 100px auto; gap: 10px; align-items: center;">
-      <input type="text" class="skill-name-input" placeholder="Yetenek adı" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-      <input type="text" class="skill-icon-input" placeholder="Icon" maxlength="2" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; text-align: center;"/>
-      <input type="number" class="skill-level-input" value="0" min="0" max="100" placeholder="Seviye" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-      <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.skill-edit-item').remove()">🗑️</button>
+    <div class="skill-edit-grid" style="display: grid; grid-template-columns: 1fr 80px 100px auto; gap: 12px; align-items: center;">
+      <input type="text" class="skill-name-input" placeholder="Yetenek adı"/>
+      <input type="text" class="skill-icon-input" placeholder="Icon" maxlength="2"/>
+      <input type="number" class="skill-level-input" value="0" min="0" max="100" placeholder="Seviye"/>
+      <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.skill-edit-item').remove()" title="Sil">🗑️</button>
     </div>
   `;
   container.appendChild(newItem);
+  
+  // İlk input'a focus
+  const firstInput = newItem.querySelector('.skill-name-input');
+  if (firstInput) {
+    setTimeout(() => firstInput.focus(), 100);
+  }
 }
 
 function removeSkillItem(index) {
@@ -2100,44 +2162,80 @@ function removeSkillItem(index) {
 
 function renderContactList() {
   const container = document.getElementById('contactListContainer');
+  if (!container) return;
+  
+  // appsData'dan oku (tek kaynak)
+  if (!appsData.site) {
+    appsData.site = getDefaultSiteData();
+  }
   const contacts = appsData.site?.contact?.items || [];
   
+  if (contacts.length === 0) {
+    container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 20px;">Henüz iletişim bilgisi eklenmemiş. "İletişim Ekle" butonuna tıklayarak ekleyebilirsiniz.</p>';
+    return;
+  }
+  
   container.innerHTML = contacts.map((contact, index) => `
-    <div class="contact-edit-item" style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
-      <div style="display: grid; gap: 10px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <input type="text" class="contact-type-input" value="${contact.type || ''}" placeholder="Tip (email, github, vb.)" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-          <input type="text" class="contact-icon-input" value="${contact.icon || ''}" placeholder="Icon" maxlength="2" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; text-align: center;"/>
+    <div class="contact-edit-item" data-index="${index}">
+      <div class="contact-edit-container" style="display: grid; gap: 12px;">
+        <div class="contact-edit-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <input type="text" class="contact-type-input" value="${escapeHtml(contact.type || '')}" placeholder="Tip (email, github, vb.)"/>
+          <input type="text" class="contact-icon-input" value="${escapeHtml(contact.icon || '')}" placeholder="Icon" maxlength="2" style="text-align: center; font-size: 1.2rem;"/>
         </div>
-        <input type="text" class="contact-title-input" value="${contact.title || ''}" placeholder="Başlık" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-        <input type="text" class="contact-value-input" value="${contact.value || ''}" placeholder="Değer (örn: email adresi)" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-        <input type="url" class="contact-link-input" value="${contact.link || ''}" placeholder="Link URL" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-        <textarea class="contact-desc-input" placeholder="Açıklama" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; min-height: 60px;">${contact.description || ''}</textarea>
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.contact-edit-item').remove()">🗑️ Sil</button>
+        <input type="text" class="contact-title-input" value="${escapeHtml(contact.title || '')}" placeholder="Başlık"/>
+        <input type="text" class="contact-value-input" value="${escapeHtml(contact.value || '')}" placeholder="Değer (örn: email adresi)"/>
+        <input type="url" class="contact-link-input" value="${escapeHtml(contact.link || '')}" placeholder="Link URL"/>
+        <textarea class="contact-desc-input" placeholder="Açıklama" style="min-height: 80px; resize: vertical;">${escapeHtml(contact.description || '')}</textarea>
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeContactItem(${index})" title="Sil">🗑️ Sil</button>
       </div>
     </div>
   `).join('');
 }
 
+function removeContactItem(index) {
+  if (!appsData.site?.contact?.items) return;
+  
+  // appsData'dan sil
+  appsData.site.contact.items.splice(index, 1);
+  
+  // Listeyi yeniden render et
+  renderContactList();
+}
+
 function addContactItem() {
-  const container = document.getElementById('contactListContainer');
-  const newItem = document.createElement('div');
-  newItem.className = 'contact-edit-item';
-  newItem.style.cssText = 'background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 10px;';
-  newItem.innerHTML = `
-    <div style="display: grid; gap: 10px;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <input type="text" class="contact-type-input" placeholder="Tip (email, github, vb.)" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-        <input type="text" class="contact-icon-input" placeholder="Icon" maxlength="2" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; text-align: center;"/>
-      </div>
-      <input type="text" class="contact-title-input" placeholder="Başlık" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-      <input type="text" class="contact-value-input" placeholder="Değer (örn: email adresi)" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-      <input type="url" class="contact-link-input" placeholder="Link URL" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;"/>
-      <textarea class="contact-desc-input" placeholder="Açıklama" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px; min-height: 60px;"></textarea>
-      <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.contact-edit-item').remove()">🗑️ Sil</button>
-    </div>
-  `;
-  container.appendChild(newItem);
+  // appsData.site.contact.items array'ine yeni boş item ekle
+  if (!appsData.site) {
+    appsData.site = getDefaultSiteData();
+  }
+  if (!appsData.site.contact) {
+    appsData.site.contact = { title: '', subtitle: '', items: [] };
+  }
+  if (!appsData.site.contact.items) {
+    appsData.site.contact.items = [];
+  }
+  
+  // Yeni boş contact item ekle
+  appsData.site.contact.items.push({
+    type: '',
+    icon: '',
+    title: '',
+    value: '',
+    link: '',
+    description: ''
+  });
+  
+  // Listeyi yeniden render et (tek kaynak olarak appsData kullan)
+  renderContactList();
+  
+  // Son eklenen item'ın ilk input'una focus
+  const items = document.querySelectorAll('.contact-edit-item');
+  if (items.length > 0) {
+    const lastItem = items[items.length - 1];
+    const firstInput = lastItem.querySelector('.contact-type-input');
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 100);
+    }
+  }
 }
 
 // Enter tuşu ile özellik ekleme
