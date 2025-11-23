@@ -678,6 +678,279 @@ body.menu-open .admin-toggle {
     color: rgba(255, 255, 255, 0.5);
 }
 
+/* ============================================
+   ARAMA MODALI RESPONSIVE İYİLEŞTİRMELERİ
+   ============================================ */
+
+/* Tablet (481px - 1024px) */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .search-container {
+        padding-top: 80px;
+    }
+
+    .search-box {
+        min-width: calc(100vw - 40px);
+        max-width: 600px;
+        padding: 14px 20px;
+    }
+
+    .search-input {
+        font-size: 16px; /* iOS zoom önleme */
+    }
+
+    .search-results {
+        top: 80px;
+        width: calc(100vw - 40px);
+        max-width: 600px;
+        max-height: calc(100vh - 160px);
+        border-radius: 14px;
+    }
+
+    .search-results-content {
+        padding: 16px;
+    }
+
+    .search-result-group {
+        margin-bottom: 24px;
+    }
+
+    .search-result-group h3 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .search-result-item {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .search-result-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.8rem;
+    }
+
+    .search-result-info h4 {
+        font-size: 1rem;
+    }
+
+    .search-result-info p {
+        font-size: 0.85rem;
+    }
+
+    .search-autocomplete {
+        padding: 16px;
+    }
+
+    .search-autocomplete-item {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .search-autocomplete-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.3rem;
+    }
+
+    .search-autocomplete-title {
+        font-size: 0.95rem;
+    }
+
+    .search-autocomplete-category {
+        font-size: 0.75rem;
+    }
+}
+
+/* Mobil (max-width: 480px) */
+@media (max-width: 480px) {
+    .search-container {
+        padding-top: 60px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .search-box {
+        min-width: 100%;
+        max-width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+    }
+
+    .search-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .search-input {
+        font-size: 16px; /* iOS zoom önleme */
+        padding: 0;
+    }
+
+    .search-close {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .search-results {
+        top: 70px;
+        left: 16px;
+        right: 16px;
+        width: calc(100vw - 32px);
+        max-width: calc(100vw - 32px);
+        max-height: calc(100vh - 140px);
+        border-radius: 12px;
+        margin-top: 12px;
+        transform: none;
+    }
+
+    .search-results-content {
+        padding: 12px;
+    }
+
+    .search-result-group {
+        margin-bottom: 20px;
+    }
+
+    .search-result-group h3 {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+
+    .search-result-item {
+        padding: 10px;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .search-result-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+        border-radius: 10px;
+    }
+
+    .search-result-info h4 {
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+
+    .search-result-info p {
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+
+    .search-result-meta {
+        gap: 8px;
+    }
+
+    .search-tag {
+        padding: 3px 10px;
+        font-size: 0.75rem;
+    }
+
+    .search-rating,
+    .search-downloads {
+        font-size: 0.8rem;
+    }
+
+    .search-result-empty {
+        padding: 40px 16px;
+    }
+
+    .search-result-empty p {
+        font-size: 1rem;
+    }
+
+    .search-hint {
+        font-size: 0.85rem;
+    }
+
+    .search-autocomplete {
+        padding: 12px;
+    }
+
+    .search-autocomplete-header {
+        margin-bottom: 12px;
+    }
+
+    .search-autocomplete-header h3 {
+        font-size: 0.9rem;
+    }
+
+    .search-autocomplete-list {
+        gap: 6px;
+    }
+
+    .search-autocomplete-item {
+        padding: 10px 12px;
+        gap: 10px;
+        border-radius: 8px;
+    }
+
+    .search-autocomplete-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1.2rem;
+        border-radius: 8px;
+    }
+
+    .search-autocomplete-title {
+        font-size: 0.9rem;
+    }
+
+    .search-autocomplete-category {
+        font-size: 0.7rem;
+    }
+}
+
+/* Küçük Mobil (max-width: 360px) */
+@media (max-width: 360px) {
+    .search-container {
+        padding-top: 50px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .search-box {
+        padding: 10px 14px;
+    }
+
+    .search-results {
+        left: 12px;
+        right: 12px;
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        top: 65px;
+    }
+
+    .search-results-content {
+        padding: 10px;
+    }
+
+    .search-result-item {
+        padding: 8px;
+    }
+
+    .search-result-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.3rem;
+    }
+
+    .search-result-info h4 {
+        font-size: 0.9rem;
+    }
+
+    .search-result-info p {
+        font-size: 0.75rem;
+    }
+}
+
 .search-box {
     display: flex;
     align-items: center;
