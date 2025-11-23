@@ -138,7 +138,7 @@
     justify-content: space-between;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 10002; /* Modal'lardan yüksek olmalı (modal: 10001) */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
@@ -146,6 +146,8 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    position: relative;
+    z-index: 10003; /* Topbar'dan yüksek */
   }
 
   .admin-menu-toggle {
@@ -160,7 +162,7 @@
     color: #4b5563;
     transition: all 0.3s ease;
     position: relative;
-    z-index: 10000 !important;
+    z-index: 10003 !important; /* Topbar'dan da yüksek */
     width: 40px;
     height: 40px;
     min-width: 40px;
@@ -284,6 +286,8 @@
     gap: 12px;
     text-decoration: none;
     color: #1a1a1a;
+    position: relative;
+    z-index: 10004; /* En üstte */
   }
 
   .admin-logo-icon {
@@ -2125,15 +2129,70 @@
     }
   }
 
-  /* iPad (768px - 1024px) */
+  /* iPad / iPad Air (768px - 1024px) */
   @media (min-width: 768px) and (max-width: 1024px) {
+    .admin-topbar {
+      z-index: 10002 !important; /* Modal'lardan yüksek */
+      padding: 0 20px;
+      height: 70px;
+    }
+
+    .admin-topbar-left {
+      z-index: 10003 !important;
+      gap: 16px;
+    }
+
+    .admin-logo {
+      z-index: 10004 !important;
+    }
+
+    .admin-logo-text {
+      font-size: 1.2rem;
+    }
+
     .admin-sidebar {
       width: 240px;
+      position: sticky;
+      top: 70px;
+      height: calc(100vh - 70px);
     }
 
     .admin-content {
       max-width: calc(100vw - 240px);
       padding: 24px 20px;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Topbar right optimizasyonu - iPad */
+    .admin-topbar-right {
+      gap: 12px;
+    }
+
+    .admin-user-info {
+      display: flex;
+    }
+
+    .admin-user-name {
+      display: none; /* iPad'de sadece avatar göster */
+    }
+
+    /* Hamburger menü butonu iPad modunda gizle (sidebar her zaman görünür) */
+    .admin-menu-toggle {
+      display: none !important;
+    }
+
+    /* Topbar right optimizasyonu */
+    .admin-topbar-right {
+      gap: 12px;
+    }
+
+    .admin-user-info {
+      display: flex;
+    }
+
+    .admin-user-name {
+      display: none; /* iPad'de sadece avatar göster */
     }
 
     .admin-grid {
@@ -2213,42 +2272,145 @@
     }
 
     .modal-content {
-      max-width: 90%;
+      max-width: 85%;
       max-height: calc(100vh - 40px);
+      padding: 0;
     }
 
     .modal-content-large {
-      max-width: 90%;
-      max-height: calc(100vh - 40px);
+      max-width: 88%;
+      max-height: calc(100vh - 30px);
+      padding: 0;
     }
 
-    /* Skill ve Contact Item - Tablet */
+    .modal-header {
+      padding: 20px 24px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .modal-body {
+      padding: 24px;
+      max-height: calc(100vh - 180px);
+      overflow-y: auto;
+    }
+
+    /* Skill ve Contact Item - iPad */
     .skill-edit-grid {
-      grid-template-columns: 1fr 70px 90px auto !important;
-      gap: 10px !important;
+      grid-template-columns: 1fr 80px 100px auto !important;
+      gap: 12px !important;
     }
 
     .contact-edit-row {
       grid-template-columns: 1fr 1fr !important;
+      gap: 14px !important;
+    }
+
+    .contact-edit-container {
+      gap: 16px !important;
+    }
+
+    .contact-edit-item {
+      padding: 18px !important;
+      margin-bottom: 18px !important;
+    }
+
+    .contact-edit-item input,
+    .contact-edit-item textarea {
+      min-height: 44px;
+      font-size: 16px;
+      padding: 12px 16px;
+    }
+
+    .contact-edit-item textarea {
+      min-height: 110px;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
     }
 
     .form-actions {
-      flex-direction: column;
-      gap: 10px;
+      flex-direction: row;
+      gap: 12px;
+      justify-content: flex-end;
     }
 
     .form-actions .btn {
-      width: 100%;
-      min-width: unset;
+      min-width: 120px;
+      flex: 0 0 auto;
+    }
+
+    /* App Item - iPad */
+    .app-item-actions {
+      flex-direction: row;
+      gap: 10px;
+    }
+
+    .app-item-actions .btn {
+      flex: 0 0 auto;
+      min-width: 100px;
+    }
+
+    /* Section Tabs - Tablet */
+    .section-tabs {
+      flex-wrap: wrap;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .section-tab {
+      min-width: 120px;
+      font-size: 0.9rem;
+      padding: 12px 16px;
+    }
+
+    /* Site Form Section - Tablet */
+    .site-form-section {
+      padding: 16px 0;
+    }
+
+    .site-form-section h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+
+    /* Modal - Tablet */
+    .modal-content {
+      max-width: 90%;
+      max-height: calc(100vh - 40px);
+      padding: 24px;
+    }
+
+    .modal-content-large {
+      max-width: 92%;
+      max-height: calc(100vh - 30px);
     }
   }
 
   /* Tablet Portrait (481px - 768px) */
   @media (min-width: 481px) and (max-width: 768px) {
+    .admin-topbar {
+      z-index: 10002 !important; /* Modal'lardan yüksek */
+    }
+
+    .admin-topbar-left {
+      z-index: 10003 !important;
+    }
+
+    .admin-logo {
+      z-index: 10004 !important;
+    }
+
     .admin-sidebar-overlay {
       display: block;
       z-index: 9998;
@@ -2281,6 +2443,35 @@
       visibility: visible !important;
       opacity: 1 !important;
       pointer-events: auto !important;
+    }
+
+    /* Hamburger menü butonu tablet portrait'te göster */
+    .admin-menu-toggle {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .admin-sidebar.open {
+      transform: translateX(0) !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    /* Hamburger menü butonu tablet portrait'te göster */
+    .admin-menu-toggle {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
     }
 
     /* Küçük mobilde top değerini düzelt */
@@ -2415,8 +2606,17 @@
       padding: 12px 16px;
     }
 
-    .admin-menu-toggle {
-      display: none !important;
+    /* Hamburger menü butonu tablet modunda göster (481-768px arası) */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .admin-menu-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+      }
     }
 
     /* Dashboard Grid Optimizasyonları - Tablet */
@@ -2550,7 +2750,7 @@
       min-height: 60px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 10002; /* Modal'lardan yüksek olmalı (modal: 10001) */
       background: white;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
@@ -2677,6 +2877,7 @@
       padding: 0 8px;
       height: 56px;
       min-height: 56px;
+      z-index: 10002; /* Modal'lardan yüksek olmalı */
     }
 
     /* Dashboard grid mobil */
@@ -2721,6 +2922,68 @@
     .section-tabs {
       flex-wrap: wrap;
       gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    /* Contact Form Section 480px Özel Optimizasyonları */
+    #siteContactForm {
+      padding: 0;
+    }
+
+    #siteContactForm h3 {
+      font-size: 1.15rem;
+      margin-bottom: 18px;
+      padding: 0 4px;
+    }
+
+    #siteContactForm .form-group {
+      margin-bottom: 18px;
+    }
+
+    #siteContactForm .form-group label {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    #siteContactForm .form-group input[type="text"] {
+      width: 100%;
+      min-height: 44px;
+      font-size: 16px; /* iOS zoom önleme */
+      padding: 12px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    #siteContactForm .form-group input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Contact Edit Items 480px */
+    .contact-edit-item {
+      padding: 14px 10px !important;
+      margin-bottom: 14px !important;
+    }
+
+    .contact-edit-container {
+      gap: 12px !important;
+    }
+
+    .contact-edit-item input,
+    .contact-edit-item textarea {
+      padding: 11px 12px !important;
+      font-size: 16px !important;
+    }
+
+    .contact-edit-item .btn-danger {
+      padding: 11px !important;
+      font-size: 0.9rem !important;
     }
 
     .section-tab {
@@ -3681,31 +3944,93 @@
 
     /* Contact Edit Item Mobil Optimizasyonu */
     .contact-edit-item {
-      padding: 12px !important;
-      margin-bottom: 12px !important;
+      padding: 16px 12px !important;
+      margin-bottom: 16px !important;
+      border-radius: 12px;
+    }
+
+    .contact-edit-container {
+      gap: 14px !important;
     }
 
     .contact-edit-row {
       grid-template-columns: 1fr !important;
-      gap: 10px !important;
+      gap: 12px !important;
     }
 
     .contact-edit-item input,
-    .contact-edit-item textarea,
-    .contact-edit-item button {
+    .contact-edit-item textarea {
       width: 100% !important;
+      min-height: 44px;
+      font-size: 16px; /* iOS zoom önleme */
+      padding: 12px 14px;
+      border-radius: 8px;
+    }
+
+    .contact-edit-item textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .contact-edit-item .contact-icon-input {
+      font-size: 1.4rem !important;
+      text-align: center;
     }
 
     .contact-edit-item .btn-danger {
+      width: 100% !important;
       margin-top: 8px;
+      min-height: 44px;
+      padding: 12px;
+      font-size: 0.95rem;
+    }
+
+    /* Contact List Container Mobil */
+    #contactListContainer {
+      margin-bottom: 16px;
+    }
+
+    #contactListContainer > p {
+      padding: 20px 12px !important;
+      font-size: 0.9rem;
+      line-height: 1.5;
     }
 
     /* Skills ve Contact Ekle Butonları Mobil */
+    #skillsListContainer + .form-group,
+    #contactListContainer + .form-group {
+      margin-bottom: 20px;
+    }
+
     #skillsListContainer + .form-group .btn,
     #contactListContainer + .form-group .btn {
       width: 100%;
       min-height: 48px;
+      font-size: 1rem;
+      padding: 14px 20px;
+      border-radius: 10px;
+    }
+
+    /* Contact Form Section Mobil */
+    #siteContactForm {
+      padding: 0;
+    }
+
+    #siteContactForm .form-group {
+      margin-bottom: 20px;
+    }
+
+    #siteContactForm .form-group label {
       font-size: 0.95rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    #siteContactForm .form-group input[type="text"] {
+      width: 100%;
+      min-height: 44px;
+      font-size: 16px;
+      padding: 12px 16px;
     }
 
     /* Feedback & Votes Mobil Optimizasyonu */
@@ -4872,7 +5197,7 @@
     <!-- Top Navigation Bar -->
     <div class="admin-topbar">
       <div class="admin-topbar-left">
-        <button class="admin-menu-toggle" id="hamburgerMenuBtn" aria-label="Menüyü aç/kapat">
+        <button class="admin-menu-toggle" id="hamburgerMenuBtn" onclick="toggleSidebar()" aria-label="Menüyü aç/kapat">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>

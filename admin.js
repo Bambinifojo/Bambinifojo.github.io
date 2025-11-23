@@ -332,28 +332,50 @@ function isSidebarOpen() {
 
 // Sidebar toggle (Mobile)
 function toggleSidebar() {
+  console.log('🔵 toggleSidebar çağrıldı');
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.querySelector('.admin-sidebar-overlay');
-  const menuToggle = document.querySelector('.admin-menu-toggle');
+  const menuToggle = document.querySelector('.admin-menu-toggle') || document.getElementById('hamburgerMenuBtn');
   
-  if (sidebar && overlay) {
-    const isOpen = sidebar.classList.toggle('open');
-    overlay.classList.toggle('active');
-    
-    // Body scroll lock
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('sidebar-open');
-    } else {
-      document.body.style.overflow = '';
-      document.body.classList.remove('sidebar-open');
-    }
-    
-    // Menu toggle button active state
-    if (menuToggle) {
-      menuToggle.classList.toggle('active');
-    }
+  if (!sidebar) {
+    console.error('❌ Sidebar bulunamadı (adminSidebar)');
+    return;
   }
+  
+  if (!overlay) {
+    console.warn('⚠️ Overlay bulunamadı (.admin-sidebar-overlay)');
+  }
+  
+  const isOpen = sidebar.classList.contains('open');
+  console.log('📊 Sidebar durumu:', isOpen ? 'Açık' : 'Kapalı');
+  
+  if (isOpen) {
+    // Kapat
+    console.log('🔴 Sidebar kapatılıyor...');
+    sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.classList.remove('sidebar-open');
+    if (menuToggle) menuToggle.classList.remove('active');
+  } else {
+    // Aç
+    console.log('🟢 Sidebar açılıyor...');
+    sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('sidebar-open');
+    if (menuToggle) menuToggle.classList.add('active');
+  }
+  
+  console.log('✅ Sidebar durumu güncellendi:', sidebar.classList.contains('open') ? 'Açık' : 'Kapalı');
+}
+
+// Global scope'a ekle (HTML onclick için)
+if (typeof window !== 'undefined') {
+  window.toggleSidebar = toggleSidebar;
+  window.openSidebar = openSidebar;
+  window.closeSidebar = closeSidebar;
+  console.log('✅ toggleSidebar global scope\'a eklendi');
 }
 
 // Sidebar'ı aç
@@ -446,8 +468,51 @@ function closeTopbarMenu() {
   }
 }
 
+// Hamburger menü event listener'larını ekle (her zaman çalışmalı)
+function setupHamburgerMenu() {
+  // Overlay'e tıklandığında sidebar'ı kapat
+  const overlay = document.querySelector('.admin-sidebar-overlay');
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      toggleSidebar();
+    });
+  }
+  
+  // Hamburger menü butonuna event listener ekle
+  const hamburgerMenuBtn = document.getElementById('hamburgerMenuBtn');
+  if (hamburgerMenuBtn) {
+    console.log('✅ Hamburger menü butonu bulundu, event listener ekleniyor...');
+    hamburgerMenuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🖱️ Hamburger menü butonuna tıklandı');
+      toggleSidebar();
+    });
+  } else {
+    console.warn('⚠️ Hamburger menü butonu bulunamadı (hamburgerMenuBtn)');
+  }
+  
+  // Alternatif olarak class ile de bul
+  const adminMenuToggle = document.querySelector('.admin-menu-toggle');
+  if (adminMenuToggle) {
+    // Eğer zaten event listener eklenmemişse ekle
+    if (!adminMenuToggle.hasAttribute('data-listener-added')) {
+      adminMenuToggle.setAttribute('data-listener-added', 'true');
+      adminMenuToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🖱️ Admin menu toggle butonuna tıklandı');
+        toggleSidebar();
+      });
+    }
+  }
+}
+
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
 document.addEventListener('DOMContentLoaded', () => {
+  // Hamburger menü event listener'larını hemen ekle (session kontrolünden önce)
+  setupHamburgerMenu();
+  
   // Önce session kontrolü yap - eğer timeout varsa yönlendir
   if (!checkAdminSession()) {
     return; // checkAdminSession içinde yönlendirme yapıldı
@@ -501,13 +566,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Overlay'e tıklandığında sidebar'ı kapat
-  const overlay = document.querySelector('.admin-sidebar-overlay');
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      toggleSidebar();
-    });
-  }
+  // Hamburger menü event listener'larını tekrar ekle (güvenlik için)
+  setupHamburgerMenu();
 });
 
 // Otomatik giriş (event olmadan)
@@ -1899,7 +1959,13 @@ function loadSiteSectionData(section) {
     const subtitleEl = document.getElementById('siteContactSubtitle');
     if (titleEl) titleEl.value = site.contact?.title || '';
     if (subtitleEl) subtitleEl.value = site.contact?.subtitle || '';
-    renderContactList();
+    
+    // Container'ın var olduğundan emin ol (modal açılmış olmalı)
+    const container = document.getElementById('contactListContainer');
+    if (container) {
+      // Sadece appsData'dan oku ve render et (duplicate'leri önlemek için)
+      renderContactList();
+    }
   }
 }
 
@@ -1973,17 +2039,39 @@ async function saveSiteSection(section) {
       return;
     }
     
+    // Sadece skillsListContainer içindeki item'ları oku (duplicate'leri önlemek için)
+    const container = document.getElementById('skillsListContainer');
+    if (!container) {
+      showAlert('❌ Yetenek listesi container\'ı bulunamadı!', 'error');
+      return;
+    }
+    
     const skills = [];
-    document.querySelectorAll('.skill-edit-item').forEach(item => {
+    // Container içindeki item'ları data-index'e göre sıralı oku
+    const skillItems = Array.from(container.querySelectorAll('.skill-edit-item'))
+      .sort((a, b) => {
+        const indexA = parseInt(a.getAttribute('data-index') || '999999');
+        const indexB = parseInt(b.getAttribute('data-index') || '999999');
+        return indexA - indexB;
+      });
+    
+    skillItems.forEach((item) => {
       const nameInput = item.querySelector('.skill-name-input');
       const iconInput = item.querySelector('.skill-icon-input');
       const levelInput = item.querySelector('.skill-level-input');
       if (nameInput && iconInput && levelInput) {
-        skills.push({
-          name: nameInput.value.trim(),
-          icon: iconInput.value.trim(),
-          level: parseInt(levelInput.value) || 0
-        });
+        // Boş item'ları atla (tüm alanlar boşsa)
+        const isEmpty = !nameInput.value.trim() && 
+                       !iconInput.value.trim() && 
+                       (!levelInput.value || parseInt(levelInput.value) === 0);
+        
+        if (!isEmpty) {
+          skills.push({
+            name: nameInput.value.trim(),
+            icon: iconInput.value.trim(),
+            level: parseInt(levelInput.value) || 0
+          });
+        }
       }
     });
     
@@ -1991,6 +2079,9 @@ async function saveSiteSection(section) {
       title: titleEl.value.trim(),
       items: skills
     };
+    
+    // appsData güncellendi, DOM'u da güncelle (duplicate'leri temizle ve sıralamayı düzelt)
+    renderSkillsList();
   } else if (section === 'contact') {
     const titleEl = document.getElementById('siteContactTitle');
     const subtitleEl = document.getElementById('siteContactSubtitle');
@@ -1999,8 +2090,25 @@ async function saveSiteSection(section) {
       return;
     }
     
+    // DOM'dan oku ama duplicate kontrolü yap
+    // data-index attribute'u ile sıralı okuma yap
+    // Sadece contactListContainer içindeki item'ları oku (duplicate'leri önlemek için)
+    const container = document.getElementById('contactListContainer');
+    if (!container) {
+      showAlert('❌ İletişim listesi container\'ı bulunamadı!', 'error');
+      return;
+    }
+    
     const contacts = [];
-    document.querySelectorAll('.contact-edit-item').forEach(item => {
+    // Container içindeki item'ları data-index'e göre sıralı oku
+    const contactItems = Array.from(container.querySelectorAll('.contact-edit-item'))
+      .sort((a, b) => {
+        const indexA = parseInt(a.getAttribute('data-index') || '999999');
+        const indexB = parseInt(b.getAttribute('data-index') || '999999');
+        return indexA - indexB;
+      });
+    
+    contactItems.forEach((item) => {
       const typeInput = item.querySelector('.contact-type-input');
       const iconInput = item.querySelector('.contact-icon-input');
       const titleInput = item.querySelector('.contact-title-input');
@@ -2009,14 +2117,24 @@ async function saveSiteSection(section) {
       const descInput = item.querySelector('.contact-desc-input');
       
       if (typeInput && iconInput && titleInput && valueInput && linkInput && descInput) {
-        contacts.push({
-          type: typeInput.value.trim(),
-          icon: iconInput.value.trim(),
-          title: titleInput.value.trim(),
-          value: valueInput.value.trim(),
-          link: linkInput.value.trim(),
-          description: descInput.value.trim()
-        });
+        // Boş item'ları atla (tüm alanlar boşsa)
+        const isEmpty = !typeInput.value.trim() && 
+                       !iconInput.value.trim() && 
+                       !titleInput.value.trim() && 
+                       !valueInput.value.trim() && 
+                       !linkInput.value.trim() && 
+                       !descInput.value.trim();
+        
+        if (!isEmpty) {
+          contacts.push({
+            type: typeInput.value.trim(),
+            icon: iconInput.value.trim(),
+            title: titleInput.value.trim(),
+            value: valueInput.value.trim(),
+            link: linkInput.value.trim(),
+            description: descInput.value.trim()
+          });
+        }
       }
     });
     
@@ -2025,6 +2143,9 @@ async function saveSiteSection(section) {
       subtitle: subtitleEl.value.trim(),
       items: contacts
     };
+    
+    // appsData güncellendi, DOM'u da güncelle (duplicate'leri temizle ve sıralamayı düzelt)
+    renderContactList();
   }
   
   // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
@@ -2113,6 +2234,12 @@ function showAlert(message, type = 'success') {
 
 function renderSkillsList() {
   const container = document.getElementById('skillsListContainer');
+  if (!container) return;
+  
+  // appsData'dan oku (tek kaynak)
+  if (!appsData.site) {
+    appsData.site = getDefaultSiteData();
+  }
   const skills = appsData.site?.skills?.items || [];
   
   if (skills.length === 0) {
@@ -2121,7 +2248,7 @@ function renderSkillsList() {
   }
   
   container.innerHTML = skills.map((skill, index) => `
-    <div class="skill-edit-item">
+    <div class="skill-edit-item" data-index="${index}">
       <div class="skill-edit-grid" style="display: grid; grid-template-columns: 1fr 80px 100px auto; gap: 12px; align-items: center;">
         <input type="text" class="skill-name-input" value="${escapeHtml(skill.name || '')}" placeholder="Yetenek adı"/>
         <input type="text" class="skill-icon-input" value="${escapeHtml(skill.icon || '')}" placeholder="Icon" maxlength="2"/>
@@ -2133,23 +2260,35 @@ function renderSkillsList() {
 }
 
 function addSkillItem() {
-  const container = document.getElementById('skillsListContainer');
-  const newItem = document.createElement('div');
-  newItem.className = 'skill-edit-item';
-  newItem.innerHTML = `
-    <div class="skill-edit-grid" style="display: grid; grid-template-columns: 1fr 80px 100px auto; gap: 12px; align-items: center;">
-      <input type="text" class="skill-name-input" placeholder="Yetenek adı"/>
-      <input type="text" class="skill-icon-input" placeholder="Icon" maxlength="2"/>
-      <input type="number" class="skill-level-input" value="0" min="0" max="100" placeholder="Seviye"/>
-      <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.skill-edit-item').remove()" title="Sil">🗑️</button>
-    </div>
-  `;
-  container.appendChild(newItem);
+  // appsData.site.skills.items array'ine yeni boş item ekle
+  if (!appsData.site) {
+    appsData.site = getDefaultSiteData();
+  }
+  if (!appsData.site.skills) {
+    appsData.site.skills = { title: '', items: [] };
+  }
+  if (!appsData.site.skills.items) {
+    appsData.site.skills.items = [];
+  }
   
-  // İlk input'a focus
-  const firstInput = newItem.querySelector('.skill-name-input');
-  if (firstInput) {
-    setTimeout(() => firstInput.focus(), 100);
+  // Yeni boş skill item ekle
+  appsData.site.skills.items.push({
+    name: '',
+    icon: '',
+    level: 0
+  });
+  
+  // Listeyi yeniden render et (tek kaynak olarak appsData kullan)
+  renderSkillsList();
+  
+  // Son eklenen item'ın ilk input'una focus
+  const items = document.querySelectorAll('.skill-edit-item');
+  if (items.length > 0) {
+    const lastItem = items[items.length - 1];
+    const firstInput = lastItem.querySelector('.skill-name-input');
+    if (firstInput) {
+      setTimeout(() => firstInput.focus(), 100);
+    }
   }
 }
 
@@ -2160,36 +2299,88 @@ function removeSkillItem(index) {
   }
 }
 
+// renderContactList için debounce kontrolü (çoklu çağrıları önlemek için)
+let renderContactListTimeout = null;
+
 function renderContactList() {
   const container = document.getElementById('contactListContainer');
-  if (!container) return;
-  
-  // appsData'dan oku (tek kaynak)
-  if (!appsData.site) {
-    appsData.site = getDefaultSiteData();
-  }
-  const contacts = appsData.site?.contact?.items || [];
-  
-  if (contacts.length === 0) {
-    container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 20px;">Henüz iletişim bilgisi eklenmemiş. "İletişim Ekle" butonuna tıklayarak ekleyebilirsiniz.</p>';
+  if (!container) {
+    console.warn('⚠️ contactListContainer bulunamadı, renderContactList atlanıyor');
     return;
   }
   
-  container.innerHTML = contacts.map((contact, index) => `
-    <div class="contact-edit-item" data-index="${index}">
-      <div class="contact-edit-container" style="display: grid; gap: 12px;">
-        <div class="contact-edit-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <input type="text" class="contact-type-input" value="${escapeHtml(contact.type || '')}" placeholder="Tip (email, github, vb.)"/>
-          <input type="text" class="contact-icon-input" value="${escapeHtml(contact.icon || '')}" placeholder="Icon" maxlength="2" style="text-align: center; font-size: 1.2rem;"/>
+  // Eğer zaten bir render işlemi bekliyorsa, onu iptal et
+  if (renderContactListTimeout) {
+    clearTimeout(renderContactListTimeout);
+  }
+  
+  // Kısa bir gecikme ile render et (çoklu çağrıları birleştir)
+  renderContactListTimeout = setTimeout(() => {
+    renderContactListTimeout = null;
+    
+    // appsData'dan oku (tek kaynak)
+    if (!appsData.site) {
+      appsData.site = getDefaultSiteData();
+    }
+    if (!appsData.site.contact) {
+      appsData.site.contact = { title: '', subtitle: '', items: [] };
+    }
+    let contacts = appsData.site.contact.items || [];
+    
+    // Duplicate kontrolü - aynı item'ları filtrele (sadece boş olmayan item'lar için)
+    const uniqueContacts = [];
+    const seen = new Set();
+    contacts.forEach((contact, originalIndex) => {
+      // Boş item'lar için özel kontrol (birden fazla boş item olabilir, ama duplicate olmamalı)
+      const isEmpty = !contact.type && !contact.icon && !contact.title && 
+                     !contact.value && !contact.link && !contact.description;
+      
+      if (isEmpty) {
+        // Boş item'lar için sadece bir tane ekle
+        if (!seen.has('__empty__')) {
+          seen.add('__empty__');
+          uniqueContacts.push(contact);
+        }
+      } else {
+        // Dolu item'lar için unique key kontrolü
+        const key = `${contact.type || ''}_${contact.title || ''}_${contact.value || ''}_${contact.link || ''}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          uniqueContacts.push(contact);
+        } else {
+          console.log(`⚠️ Duplicate contact item atlandı: ${key}`);
+        }
+      }
+    });
+    
+    // Eğer uniqueContacts farklıysa, appsData'yı güncelle
+    if (uniqueContacts.length !== contacts.length) {
+      console.log(`⚠️ Duplicate contact item'lar temizlendi: ${contacts.length} -> ${uniqueContacts.length}`);
+      appsData.site.contact.items = uniqueContacts;
+      contacts = uniqueContacts;
+    }
+    
+    if (contacts.length === 0) {
+      container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 20px;">Henüz iletişim bilgisi eklenmemiş. "İletişim Ekle" butonuna tıklayarak ekleyebilirsiniz.</p>';
+      return;
+    }
+    
+    container.innerHTML = contacts.map((contact, index) => `
+      <div class="contact-edit-item" data-index="${index}">
+        <div class="contact-edit-container" style="display: grid; gap: 12px;">
+          <div class="contact-edit-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <input type="text" class="contact-type-input" value="${escapeHtml(contact.type || '')}" placeholder="Tip (email, github, vb.)"/>
+            <input type="text" class="contact-icon-input" value="${escapeHtml(contact.icon || '')}" placeholder="Icon" maxlength="2" style="text-align: center; font-size: 1.2rem;"/>
+          </div>
+          <input type="text" class="contact-title-input" value="${escapeHtml(contact.title || '')}" placeholder="Başlık"/>
+          <input type="text" class="contact-value-input" value="${escapeHtml(contact.value || '')}" placeholder="Değer (örn: email adresi)"/>
+          <input type="url" class="contact-link-input" value="${escapeHtml(contact.link || '')}" placeholder="Link URL"/>
+          <textarea class="contact-desc-input" placeholder="Açıklama" style="min-height: 80px; resize: vertical;">${escapeHtml(contact.description || '')}</textarea>
+          <button type="button" class="btn btn-danger btn-sm" onclick="removeContactItem(${index})" title="Sil">🗑️ Sil</button>
         </div>
-        <input type="text" class="contact-title-input" value="${escapeHtml(contact.title || '')}" placeholder="Başlık"/>
-        <input type="text" class="contact-value-input" value="${escapeHtml(contact.value || '')}" placeholder="Değer (örn: email adresi)"/>
-        <input type="url" class="contact-link-input" value="${escapeHtml(contact.link || '')}" placeholder="Link URL"/>
-        <textarea class="contact-desc-input" placeholder="Açıklama" style="min-height: 80px; resize: vertical;">${escapeHtml(contact.description || '')}</textarea>
-        <button type="button" class="btn btn-danger btn-sm" onclick="removeContactItem(${index})" title="Sil">🗑️ Sil</button>
       </div>
-    </div>
-  `).join('');
+    `).join('');
+  }, 50); // 50ms debounce
 }
 
 function removeContactItem(index) {
@@ -2202,7 +2393,19 @@ function removeContactItem(index) {
   renderContactList();
 }
 
+// addContactItem için debounce kontrolü (çift tıklamayı önlemek için)
+let addContactItemLastCall = 0;
+const ADD_CONTACT_ITEM_DEBOUNCE = 500; // 500ms
+
 function addContactItem() {
+  // Debounce kontrolü - çift tıklamayı önle
+  const now = Date.now();
+  if (now - addContactItemLastCall < ADD_CONTACT_ITEM_DEBOUNCE) {
+    console.log('⚠️ addContactItem çok hızlı çağrıldı, atlanıyor...');
+    return;
+  }
+  addContactItemLastCall = now;
+  
   // appsData.site.contact.items array'ine yeni boş item ekle
   if (!appsData.site) {
     appsData.site = getDefaultSiteData();

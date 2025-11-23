@@ -4146,6 +4146,35 @@ html {
 
 /* Tablet ve Küçük Ekranlar (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
+    /* Header Container - Tablet Portrait'te yan yana kalmalı */
+    .header-container {
+        flex-direction: row !important;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        gap: 16px;
+    }
+
+    .header-tagline {
+        display: block !important;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .logo-wrapper {
+        flex-shrink: 0;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+    }
+
     .hero-section {
         padding: 140px 24px 50px;
     }
@@ -4238,8 +4267,36 @@ html {
    TABLET & iPad RESPONSIVE İYİLEŞTİRMELERİ
    ============================================ */
 
-/* iPad (768px - 1024px) */
+/* iPad / iPad Air (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
+    /* Header Container - iPad'de yan yana kalmalı */
+    .header-container {
+        flex-direction: row !important;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 30px;
+        gap: 20px;
+    }
+
+    .header-tagline {
+        display: block !important;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .logo-wrapper {
+        flex-shrink: 0;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .logo-icon {
+        width: 42px;
+        height: 42px;
+    }
     /* Hero Section */
     .hero-section {
         padding: 120px 40px 60px;
