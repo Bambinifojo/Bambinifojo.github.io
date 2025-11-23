@@ -2177,7 +2177,16 @@ function loadUsers() {
 
 // Kullanıcıları LocalStorage'a kaydet
 function saveUsers() {
-  localStorage.setItem('adminUsers', JSON.stringify(usersData));
+  try {
+    const jsonData = JSON.stringify(usersData);
+    localStorage.setItem('adminUsers', jsonData);
+    console.log('✅ Kullanıcılar kaydedildi:', usersData.length, 'kullanıcı');
+    return true;
+  } catch (error) {
+    console.error('❌ Kullanıcılar kaydedilemedi:', error);
+    showAlert('❌ Veriler kaydedilemedi. Lütfen tekrar deneyin.', 'error');
+    return false;
+  }
 }
 
 // Kullanıcıları listele
@@ -2482,9 +2491,24 @@ function closeChangePasswordModal() {
 async function changePassword(event) {
   event.preventDefault();
   
+  console.log('🔐 Şifre değiştirme işlemi başlatıldı');
+  
+  // usersData'nın yüklendiğinden emin ol
+  if (!usersData || usersData.length === 0) {
+    console.log('⚠️ usersData boş, yükleniyor...');
+    loadUsers();
+  }
+  
   const currentPassword = document.getElementById('currentPassword').value;
   const newPassword = document.getElementById('newPassword').value;
   const confirmPassword = document.getElementById('confirmNewPassword').value;
+  
+  console.log('📝 Form verileri:', {
+    currentPasswordLength: currentPassword.length,
+    newPasswordLength: newPassword.length,
+    confirmPasswordLength: confirmPassword.length,
+    usersDataLength: usersData ? usersData.length : 0
+  });
   
   const currentPasswordError = document.getElementById('currentPasswordError');
   const newPasswordError = document.getElementById('newPasswordError');
@@ -2520,6 +2544,7 @@ async function changePassword(event) {
   // Önce session'dan giriş yapan kullanıcıyı bul
   const loggedInUsername = sessionStorage.getItem('adminUsername');
   let currentUser = null;
+  let isPasswordValid = false;
   
   if (loggedInUsername) {
     // Session'dan kullanıcı adını al ve kullanıcıyı bul
@@ -2527,48 +2552,40 @@ async function changePassword(event) {
     
     // Eğer kullanıcı bulunduysa, mevcut şifresini kontrol et
     if (currentUser) {
-      if (currentUser.passwordHash !== hashedCurrentPassword) {
+      if (currentUser.passwordHash === hashedCurrentPassword) {
+        isPasswordValid = true;
+      } else if (hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
         // Varsayılan admin şifresi kontrolü (geriye dönük uyumluluk için)
-        if (hashedCurrentPassword !== ADMIN_PASSWORD_HASH) {
-          currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
-          document.getElementById('currentPassword').classList.add('error');
-          return;
-        }
+        isPasswordValid = true;
       }
     } else {
       // Kullanıcı bulunamadıysa, varsayılan admin şifresi kontrolü
-      if (hashedCurrentPassword !== ADMIN_PASSWORD_HASH) {
-        currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
-        document.getElementById('currentPassword').classList.add('error');
-        return;
-      }
-      // Varsayılan admin kullanıcısını oluştur veya bul
-      currentUser = usersData.find(user => user.username === 'admin');
-      if (!currentUser) {
-        currentUser = {
-          id: Date.now().toString(),
-          username: 'admin',
-          email: 'admin@example.com',
-          passwordHash: ADMIN_PASSWORD_HASH,
-          role: 'admin',
-          createdAt: new Date().toISOString(),
-          lastLogin: null
-        };
-        usersData.push(currentUser);
+      if (hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
+        // Varsayılan admin kullanıcısını oluştur veya bul
+        currentUser = usersData.find(user => user.username === 'admin');
+        if (!currentUser) {
+          currentUser = {
+            id: Date.now().toString(),
+            username: 'admin',
+            email: 'admin@example.com',
+            passwordHash: ADMIN_PASSWORD_HASH,
+            role: 'admin',
+            createdAt: new Date().toISOString(),
+            lastLogin: null
+          };
+          usersData.push(currentUser);
+        }
+        isPasswordValid = true;
       }
     }
   } else {
-    // Session yoksa, şifre hash'ine göre kullanıcıyı bul
+    // Session yoksa, önce şifre hash'ine göre kullanıcıyı bul
     currentUser = usersData.find(user => user.passwordHash === hashedCurrentPassword);
     
-    if (!currentUser && hashedCurrentPassword !== ADMIN_PASSWORD_HASH) {
-      currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
-      document.getElementById('currentPassword').classList.add('error');
-      return;
-    }
-    
-    // Varsayılan admin şifresi kontrolü
-    if (!currentUser && hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
+    if (currentUser) {
+      isPasswordValid = true;
+    } else if (hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
+      // Varsayılan admin şifresi kontrolü
       currentUser = usersData.find(user => user.username === 'admin');
       if (!currentUser) {
         currentUser = {
@@ -2582,15 +2599,46 @@ async function changePassword(event) {
         };
         usersData.push(currentUser);
       }
+      isPasswordValid = true;
     }
   }
   
+  // Şifre kontrolü başarısızsa hata ver
+  if (!isPasswordValid || !currentUser) {
+    console.error('❌ Şifre kontrolü başarısız:', {
+      isPasswordValid,
+      currentUser: currentUser ? currentUser.username : null,
+      loggedInUsername
+    });
+    currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
+    document.getElementById('currentPassword').classList.add('error');
+    return;
+  }
+  
+  console.log('✅ Kullanıcı bulundu ve şifre doğrulandı:', {
+    username: currentUser.username,
+    userId: currentUser.id
+  });
+  
   // Şifreyi güncelle
   const hashedNewPassword = await hashPassword(newPassword);
+  console.log('🔐 Yeni şifre hash\'lendi');
   
-  if (currentUser) {
+  try {
+    // Kullanıcı şifresini güncelle
     currentUser.passwordHash = hashedNewPassword;
-    saveUsers();
+    
+    // Değişiklikleri kaydet
+    const saveSuccess = saveUsers();
+    if (!saveSuccess) {
+      throw new Error('Şifre kaydedilemedi!');
+    }
+    
+    // Kayıt başarılı mı kontrol et
+    const saved = localStorage.getItem('adminUsers');
+    if (!saved) {
+      throw new Error('Şifre kaydedilemedi!');
+    }
     
     // Kullanıcı listesini yeniden yükle (güncel veriler için)
     loadUsers();
@@ -2603,10 +2651,12 @@ async function changePassword(event) {
     document.getElementById('newPassword').classList.remove('error');
     document.getElementById('confirmNewPassword').classList.remove('error');
     
+    console.log('✅ Şifre başarıyla değiştirildi. Kullanıcı:', currentUser.username);
     showAlert('✅ Şifre başarıyla değiştirildi! Yeni şifrenizle giriş yapabilirsiniz.', 'success');
     closeChangePasswordModal();
-  } else {
-    currentPasswordError.textContent = '❌ Kullanıcı bulunamadı.';
+  } catch (error) {
+    console.error('❌ Şifre değiştirme hatası:', error);
+    currentPasswordError.textContent = '❌ Şifre değiştirilemedi. Lütfen tekrar deneyin.';
     document.getElementById('currentPassword').classList.add('error');
   }
 }
@@ -3000,3 +3050,4 @@ async function saveConfigToGitHub(config) {
     throw error;
   }
 }
+
