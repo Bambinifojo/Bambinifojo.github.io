@@ -4836,6 +4836,23 @@ body.ai-modal-open .hamburger {
         height: 46px;
     }
 
+    .admin-toggle {
+        top: 18px;
+        right: 250px;
+        width: 46px;
+        height: 46px;
+    }
+
+    .hamburger {
+        top: 18px;
+        right: 30px;
+        width: 46px;
+        height: 46px;
+    }
+        width: 46px;
+        height: 46px;
+    }
+
     .hamburger {
         top: 18px;
         right: 30px;
