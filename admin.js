@@ -477,7 +477,8 @@ document.addEventListener('DOMContentLoaded', () => {
       autoLogin();
     } else {
       // İlk kez, apps.json'dan yükle
-      fetch('data/apps.json')
+      const dataPath = '/data/apps.json';
+      fetch(dataPath)
         .then(res => res.json())
         .then(data => {
           appsData = data;
@@ -516,13 +517,15 @@ function autoLogin() {
     appsData = JSON.parse(saved);
   } else {
     // İlk kez, apps.json'dan yükle
-    fetch('data/apps.json')
+    const dataPath = '/data/apps.json';
+    const sitePath = '/data/site.json';
+    fetch(dataPath)
       .then(res => res.json())
       .then(data => {
         appsData = data;
         if (!appsData.site) {
           // Eski format, site verisi yok, site.json'dan yükle
-          fetch('data/site.json')
+          fetch(sitePath)
             .then(res => res.json())
             .then(siteData => {
               appsData.site = siteData.site;
@@ -657,12 +660,14 @@ async function login() {
     } else {
       // İlk kez, data/apps.json'dan yükle
       try {
-        const res = await fetch('data/apps.json');
+        const dataPath = '/data/apps.json';
+        const sitePath = '/data/site.json';
+        const res = await fetch(dataPath);
         appsData = await res.json();
         if (!appsData.site) {
           // Site verisi yoksa site.json'dan yükle
           try {
-            const siteRes = await fetch('data/site.json');
+            const siteRes = await fetch(sitePath);
             const siteData = await siteRes.json();
             appsData.site = siteData.site;
           } catch {
