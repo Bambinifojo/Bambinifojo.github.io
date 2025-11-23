@@ -219,10 +219,7 @@ body::before {
 
 /* Search Toggle Button */
 .search-toggle {
-    position: fixed;
-    top: 20px;
-    right: 80px;
-    z-index: 1000; /* Hamburger'den düşük ama sidebar'dan yüksek */
+    position: relative;
     background: rgba(255, 255, 255, 0.9);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -230,6 +227,8 @@ body::before {
     border-radius: 12px;
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -237,6 +236,8 @@ body::before {
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     color: #333;
+    padding: 0;
+    margin: 0;
 }
 
 /* Menü açıkken body scroll lock (desktop) */
@@ -250,14 +251,9 @@ body.menu-open {
 }
 
 /* Menü açıkken search ve theme toggle'ı gizle (desktop) */
-body.menu-open .search-toggle,
-body.menu-open .theme-toggle,
-body.menu-open .admin-toggle {
-    opacity: 0;
+body.menu-open .header-buttons {
+    opacity: 0.5;
     pointer-events: none;
-    transform: scale(0.8);
-    z-index: 500 !important; /* Sidebar'ın arkasında kalmalı */
-    visibility: hidden;
 }
 
 .search-toggle:hover {
@@ -282,10 +278,7 @@ body.menu-open .admin-toggle {
 
 /* Admin Toggle Button */
 .admin-toggle {
-    position: fixed;
-    top: 20px;
-    right: 200px;
-    z-index: 1000;
+    position: relative;
     background: rgba(255, 255, 255, 0.9);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -293,6 +286,8 @@ body.menu-open .admin-toggle {
     border-radius: 12px;
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -301,6 +296,8 @@ body.menu-open .admin-toggle {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     text-decoration: none;
     color: #333;
+    padding: 0;
+    margin: 0;
 }
 
 .admin-toggle:hover {
@@ -1049,10 +1046,7 @@ body.menu-open .admin-toggle {
 
 /* Theme Toggle */
 .theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 140px;
-    z-index: 1000; /* Hamburger'den düşük ama sidebar'dan yüksek */
+    position: relative;
     background: rgba(255, 255, 255, 0.9);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -1060,12 +1054,16 @@ body.menu-open .admin-toggle {
     border-radius: 12px;
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    margin: 0;
 }
 
 .theme-toggle:hover {
@@ -1117,14 +1115,13 @@ body.menu-open .admin-toggle {
 .hamburger {
     width: 50px;
     height: 50px;
+    min-width: 50px;
+    min-height: 50px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1001; /* Sidebar'dan yüksek olmalı */
+    position: relative;
     background: rgba(255, 255, 255, 0.9);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -1133,6 +1130,7 @@ body.menu-open .admin-toggle {
     padding: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    margin: 0;
 }
 
 .hamburger:hover {
@@ -1473,6 +1471,13 @@ body.menu-open .admin-toggle {
     overflow: visible;
     width: 100%;
     box-sizing: border-box;
+}
+
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
 }
 
 .logo-wrapper {
@@ -3484,15 +3489,9 @@ html {
     }
     
     /* Menü açıkken search, theme ve admin toggle'ı gizle (mobil) */
-    body.menu-open .search-toggle,
-    body.menu-open .theme-toggle,
-    body.menu-open .admin-toggle {
-        opacity: 0;
+    body.menu-open .header-buttons {
+        opacity: 0.5;
         pointer-events: none;
-        transform: scale(0.8);
-        z-index: 500 !important; /* Sidebar'ın arkasında kalmalı */
-        visibility: hidden;
-        transition: all 0.3s ease;
     }
     
     .admin-toggle {
@@ -4908,32 +4907,18 @@ body.ai-modal-open .hamburger {
         display: none;
     }
 
-    /* Top Butonlar - Mobil Düzeni */
-    .search-toggle {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        min-height: 44px;
-        top: 12px;
-        right: 60px;
+    /* Header Butonlar - Mobil Düzeni */
+    .header-buttons {
+        gap: 8px;
     }
 
-    .theme-toggle {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        min-height: 44px;
-        top: 12px;
-        right: 108px;
-    }
-
+    .search-toggle,
+    .theme-toggle,
     .hamburger {
         width: 44px;
         height: 44px;
         min-width: 44px;
         min-height: 44px;
-        top: 12px;
-        right: 12px;
     }
 
     .admin-toggle {
