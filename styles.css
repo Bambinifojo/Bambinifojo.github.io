@@ -4251,15 +4251,7 @@ body.ai-modal-open .header-container {
     }
 
     .header-tagline {
-        display: block !important;
-        font-size: 0.7rem;
-        white-space: nowrap !important;
-        flex-shrink: 0 !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        margin-left: auto;
-        margin-right: 0;
-        max-width: none !important;
+        display: none !important;
     }
 
     .logo-wrapper {
@@ -4442,16 +4434,7 @@ body.ai-modal-open .header-container {
     }
 
     .header-tagline {
-        display: block !important;
-        font-size: 0.75rem;
-        white-space: nowrap !important;
-        flex-shrink: 0 !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        margin-left: auto;
-        margin-right: 0;
-        max-width: none !important;
-        letter-spacing: 0.5px;
+        display: none !important;
     }
 
     .logo-wrapper {
@@ -4737,15 +4720,7 @@ body.ai-modal-open .header-container {
     }
 
     .header-tagline {
-        display: block !important;
-        font-size: 0.85rem;
-        white-space: nowrap !important;
-        flex-shrink: 0 !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        margin-left: auto;
-        margin-right: 0;
-        max-width: none !important;
+        display: none !important;
     }
 
     .logo-wrapper {
