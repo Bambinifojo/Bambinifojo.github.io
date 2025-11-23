@@ -3091,19 +3091,28 @@ html {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    border: none;
-    background: rgba(255, 255, 255, 0.2);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.25);
     color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .ai-header-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.6);
     transform: scale(1.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.ai-header-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5;
 }
 
 /* Welcome Section */
@@ -3411,7 +3420,7 @@ html {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     cursor: pointer;
@@ -3420,12 +3429,19 @@ html {
     justify-content: center;
     transition: all 0.2s ease;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5);
 }
 
 .ai-send-btn:hover:not(:disabled) {
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.ai-send-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
 }
 
 .ai-send-btn:disabled {
@@ -3487,6 +3503,18 @@ html {
         height: 40px;
         min-width: 40px;
         min-height: 40px;
+        border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .ai-header-btn:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .ai-header-btn svg {
+        stroke-width: 2.5 !important;
     }
 
     .ai-chat-messages {
@@ -3599,6 +3627,32 @@ html {
         height: 32px;
         min-width: 32px;
         min-height: 32px;
+        border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .ai-header-btn:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .ai-header-btn svg {
+        stroke-width: 2.5 !important;
+    }
+
+    .ai-send-btn {
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5) !important;
+    }
+
+    .ai-send-btn:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6) !important;
+    }
+
+    .ai-send-btn svg {
+        stroke-width: 2.5 !important;
     }
 
     .ai-header-btn svg {
@@ -3782,11 +3836,24 @@ html {
 
 [data-theme="dark"] .ai-send-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5);
 }
 
 [data-theme="dark"] .ai-send-btn:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6);
+}
+
+[data-theme="dark"] .ai-header-btn {
+    border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .ai-header-btn:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
 }
 
 [data-theme="dark"] .ai-assistant-toggle {
@@ -4504,6 +4571,32 @@ html {
         height: 32px;
         min-width: 32px;
         min-height: 32px;
+        border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .ai-header-btn:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .ai-header-btn svg {
+        stroke-width: 2.5 !important;
+    }
+
+    .ai-send-btn {
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5) !important;
+    }
+
+    .ai-send-btn:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6) !important;
+    }
+
+    .ai-send-btn svg {
+        stroke-width: 2.5 !important;
     }
 
     /* Contact Form */
