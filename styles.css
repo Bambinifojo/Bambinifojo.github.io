@@ -1643,9 +1643,9 @@ body.menu-open .hamburger {
 .logo-letter:nth-child(11) { transition-delay: 0.5s; }
 
 .header-tagline {
-    color: #666;
-    font-size: 0.85rem;
-    font-weight: 600;
+    color: #444;
+    font-size: 0.9rem;
+    font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
     white-space: nowrap;
@@ -1654,10 +1654,12 @@ body.menu-open .hamburger {
     flex-shrink: 1;
     min-width: 0;
     max-width: 200px;
+    opacity: 1;
 }
 
 [data-theme="dark"] .header-tagline {
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.95);
+    opacity: 1;
 }
 
 [data-theme="dark"] .main-header {
