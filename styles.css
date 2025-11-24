@@ -1137,7 +1137,7 @@ body.menu-open .header-buttons {
     backdrop-filter: blur(10px);
     border: 2px solid rgba(106, 90, 205, 0.2);
     border-radius: 12px;
-    padding: 14px 12px;
+    padding: 0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     margin: 0;
@@ -1154,13 +1154,12 @@ body.menu-open .header-buttons {
 
 .hamburger span {
     height: 3px;
-    width: 100%;
-    max-width: 24px;
+    width: 24px;
     background: #333;
     border-radius: 3px;
     transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: block;
-    margin: 0 auto;
+    margin: 0;
 }
 
 [data-theme="dark"] .hamburger {
@@ -4976,7 +4975,7 @@ body.ai-modal-open .hamburger {
     }
 
     .hamburger {
-        padding: 12px 10px;
+        padding: 0;
         gap: 4px;
         justify-content: center;
         align-items: center;
@@ -4984,7 +4983,7 @@ body.ai-modal-open .hamburger {
 
     .hamburger span {
         height: 3px;
-        max-width: 20px;
+        width: 20px;
     }
 
     .admin-toggle {
@@ -5205,8 +5204,20 @@ body.ai-modal-open .hamburger {
         height: 46px;
         min-width: 46px;
         min-height: 46px;
+        max-width: 46px;
+        max-height: 46px;
         flex-shrink: 0;
         position: relative;
+    }
+
+    .hamburger {
+        padding: 0;
+        gap: 4px;
+    }
+
+    .hamburger span {
+        width: 22px;
+        height: 3px;
     }
 
     .header-tagline {
