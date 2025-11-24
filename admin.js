@@ -144,27 +144,41 @@ async function handleAdminLogin() {
     authenticatedUser = usersData.find(user => user.passwordHash === hashedPassword);
     
     // Bulunamazsa ve usersData içinde admin kullanıcısı yoksa, varsayılan admin şifresini kontrol et
-    // Eğer admin kullanıcısı zaten varsa, sadece usersData içindeki hash'i kabul et
+    // Eğer admin kullanıcısı zaten varsa, varsayılan şifre ile giriş yapıldığında şifresini güncelle
     if (!authenticatedUser) {
       const adminUserExists = usersData.find(user => user.username === 'admin');
       
-      if (!adminUserExists && hashedPassword === ADMIN_PASSWORD_HASH) {
-        // Admin kullanıcısı yok ve varsayılan şifre ile giriş yapılıyor - yeni admin kullanıcısı oluştur
-        authenticatedUser = {
-          id: Date.now().toString(),
-          username: 'admin',
-          email: 'admin@example.com',
-          passwordHash: ADMIN_PASSWORD_HASH,
-          role: 'admin',
-          createdAt: new Date().toISOString(),
-          lastLogin: null
-        };
-        usersData.push(authenticatedUser);
-        saveUsers();
-        console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
+      if (hashedPassword === ADMIN_PASSWORD_HASH) {
+        // Varsayılan şifre ile giriş yapılıyor
+        if (!adminUserExists) {
+          // Admin kullanıcısı yok - yeni admin kullanıcısı oluştur
+          authenticatedUser = {
+            id: Date.now().toString(),
+            username: 'admin',
+            email: 'admin@example.com',
+            passwordHash: ADMIN_PASSWORD_HASH,
+            role: 'admin',
+            createdAt: new Date().toISOString(),
+            lastLogin: null
+          };
+          usersData.push(authenticatedUser);
+          saveUsers();
+          console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
+        } else {
+          // Admin kullanıcısı var ama şifre eşleşmiyor - varsayılan şifre ile giriş yapıldığında şifresini güncelle
+          console.log('⚠️ Admin kullanıcısı mevcut ama şifre eşleşmiyor - varsayılan şifre ile güncelleniyor');
+          adminUserExists.passwordHash = ADMIN_PASSWORD_HASH;
+          usersData = usersData.map(user => 
+            user.username === 'admin' ? adminUserExists : user
+          );
+          saveUsers();
+          authenticatedUser = adminUserExists;
+          console.log('✅ Admin kullanıcısı şifresi varsayılan şifre ile güncellendi');
+        }
       } else if (adminUserExists) {
-        // Admin kullanıcısı var ama şifre eşleşmiyor - hata
+        // Admin kullanıcısı var ama şifre eşleşmiyor ve varsayılan şifre değil - hata
         console.log('❌ Admin kullanıcısı mevcut ama şifre eşleşmiyor');
+        console.log('💡 İpucu: Varsayılan şifre "admin123" ile giriş yaparak şifrenizi sıfırlayabilirsiniz');
       }
     }
     

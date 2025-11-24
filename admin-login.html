@@ -2598,32 +2598,50 @@
         console.log('🔍 usersData içinde arama sonucu:', authenticatedUser ? '✅ Bulundu' : '❌ Bulunamadı');
         
         // Bulunamazsa ve usersData içinde admin kullanıcısı yoksa, varsayılan admin şifresini kontrol et
-        // Eğer admin kullanıcısı zaten varsa, sadece usersData içindeki hash'i kabul et
+        // Eğer admin kullanıcısı zaten varsa, varsayılan şifre ile giriş yapıldığında şifresini güncelle
         if (!authenticatedUser) {
           const adminUserExists = usersData.find(user => user.username === 'admin');
           console.log('🔍 Admin kullanıcısı mevcut mu:', adminUserExists ? '✅ Evet' : '❌ Hayır');
           
-          if (!adminUserExists && hashedPassword === ADMIN_PASSWORD_HASH) {
-            // Admin kullanıcısı yok ve varsayılan şifre ile giriş yapılıyor - yeni admin kullanıcısı oluştur
-            authenticatedUser = {
-              id: Date.now().toString(),
-              username: 'admin',
-              email: 'admin@example.com',
-              passwordHash: ADMIN_PASSWORD_HASH,
-              role: 'admin',
-              createdAt: new Date().toISOString(),
-              lastLogin: null
-            };
-            usersData.push(authenticatedUser);
-            localStorage.setItem('adminUsers', JSON.stringify(usersData));
-            console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
+          if (hashedPassword === ADMIN_PASSWORD_HASH) {
+            // Varsayılan şifre ile giriş yapılıyor
+            if (!adminUserExists) {
+              // Admin kullanıcısı yok - yeni admin kullanıcısı oluştur
+              authenticatedUser = {
+                id: Date.now().toString(),
+                username: 'admin',
+                email: 'admin@example.com',
+                passwordHash: ADMIN_PASSWORD_HASH,
+                role: 'admin',
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+              };
+              usersData.push(authenticatedUser);
+              localStorage.setItem('adminUsers', JSON.stringify(usersData));
+              console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
+            } else {
+              // Admin kullanıcısı var ama şifre eşleşmiyor - varsayılan şifre ile giriş yapıldığında şifresini güncelle
+              console.log('⚠️ Admin kullanıcısı mevcut ama şifre eşleşmiyor - varsayılan şifre ile güncelleniyor');
+              console.log('🔍 Eski admin hash:', adminUserExists.passwordHash);
+              console.log('🔍 Yeni admin hash:', hashedPassword);
+              
+              // Admin kullanıcısının şifresini varsayılan şifre ile güncelle
+              adminUserExists.passwordHash = ADMIN_PASSWORD_HASH;
+              usersData = usersData.map(user => 
+                user.username === 'admin' ? adminUserExists : user
+              );
+              localStorage.setItem('adminUsers', JSON.stringify(usersData));
+              authenticatedUser = adminUserExists;
+              console.log('✅ Admin kullanıcısı şifresi varsayılan şifre ile güncellendi');
+            }
           } else if (adminUserExists) {
-            // Admin kullanıcısı var ama şifre eşleşmiyor - hata
+            // Admin kullanıcısı var ama şifre eşleşmiyor ve varsayılan şifre değil - hata
             console.log('❌ Admin kullanıcısı mevcut ama şifre eşleşmiyor');
             console.log('🔍 Mevcut admin hash:', adminUserExists.passwordHash);
             console.log('🔍 Girilen hash:', hashedPassword);
-          } else if (hashedPassword !== ADMIN_PASSWORD_HASH) {
-            console.log('❌ Varsayılan admin şifresi ile eşleşmiyor');
+            console.log('💡 İpucu: Varsayılan şifre "admin123" ile giriş yaparak şifrenizi sıfırlayabilirsiniz');
+          } else {
+            console.log('❌ Varsayılan admin şifresi ile eşleşmiyor ve admin kullanıcısı yok');
           }
         }
 
