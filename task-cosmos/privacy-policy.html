@@ -545,16 +545,29 @@ function initSearch() {
   });
 }
 
-// Initialize search on page load
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-  initSearch();
+  // Hamburger menü event listener'larını ekle
+  if (typeof setupHamburgerMenu === 'function') {
+    setupHamburgerMenu();
+  }
+  
+  // Search initialization
+  if (typeof initSearch === 'function') {
+    initSearch();
+  } else {
+    // Fallback: local initSearch
+    initSearch();
+  }
   
   // ESC tuşu ile menüyü kapat
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       const sidebar = document.getElementById('sidebar');
       if (sidebar && sidebar.classList.contains('active')) {
-        toggleMenu();
+        if (typeof toggleMenu === 'function') {
+          toggleMenu();
+        }
       }
     }
   });
@@ -567,12 +580,16 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Admin linki ise direkt git (preventDefault yok)
       if (href && (href.includes('admin.html') || href.includes('admin-login.html'))) {
-        toggleMenu();
+        if (typeof toggleMenu === 'function') {
+          toggleMenu();
+        }
         return; // Sayfa değişecek, preventDefault yapma
       }
       
       // Diğer linkler için menüyü kapat
-      toggleMenu();
+      if (typeof toggleMenu === 'function') {
+        toggleMenu();
+      }
     });
   });
 });
