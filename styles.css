@@ -271,6 +271,27 @@ body::before {
     margin: 0;
     flex-shrink: 0;
     box-sizing: border-box;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.hamburger {
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hamburger:focus {
+    outline: 2px solid rgba(106, 90, 205, 0.5);
+    outline-offset: 2px;
+}
+
+.hamburger:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.hamburger:focus-visible {
+    outline: 2px solid rgba(106, 90, 205, 0.8);
+    outline-offset: 2px;
 }
 
 /* Menü açıkken body scroll lock (desktop) */
@@ -287,6 +308,13 @@ body.menu-open {
 body.menu-open .header-buttons {
     opacity: 0.5;
     pointer-events: none;
+}
+
+body.menu-open .hamburger {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 1002;
+    position: relative;
 }
 
 .header-btn:hover,
@@ -1130,11 +1158,6 @@ body.menu-open .header-buttons {
     transform: rotate(0deg);
 }
 
-/* Hamburger - flex-direction column ile span'ler için */
-.hamburger {
-    flex-direction: column;
-    gap: 5px;
-}
 
 
 .hamburger span {
@@ -1232,17 +1255,15 @@ body.menu-open .header-buttons {
     padding: 25px;
     border-radius: 12px 0 0 12px;
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-    transition: right 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55), transform 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 1000; /* Overlay'den yüksek, hamburger'den düşük */
+    transition: right 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 999; /* Overlay'den yüksek, hamburger'den düşük */
     overflow-y: auto;
     overflow-x: hidden;
-    transform: translateX(0);
 }
 
 /* Menü açılınca */
 .sidebar.active {
     right: 0;
-    transform: translateX(0);
 }
 
 /* Dark tema */
@@ -1427,7 +1448,7 @@ body.menu-open .header-buttons {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: 1000;
     padding: 0;
     background: rgba(255, 255, 255, 0.8);
     -webkit-backdrop-filter: blur(20px);
@@ -1496,10 +1517,13 @@ body.menu-open .header-buttons {
     flex-shrink: 0;
     margin-left: auto;
     flex-wrap: nowrap;
+    position: relative;
+    z-index: 1001;
 }
 
 .header-buttons > * {
     flex-shrink: 0;
+    position: relative;
 }
 
 
@@ -4932,10 +4956,12 @@ body.ai-modal-open .hamburger {
         flex-shrink: 0;
         margin-left: auto;
         flex-wrap: nowrap;
+        z-index: 1001;
     }
 
     .header-buttons > * {
         flex-shrink: 0;
+        position: relative;
     }
 
     .search-toggle,
@@ -4961,6 +4987,12 @@ body.ai-modal-open .hamburger {
     .hamburger span {
         height: 3px;
         width: 20px;
+    }
+
+    body.menu-open .hamburger {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        z-index: 1002;
     }
 
     .admin-toggle {
@@ -5172,6 +5204,12 @@ body.ai-modal-open .hamburger {
         flex-shrink: 0;
         margin-left: auto;
         flex-wrap: nowrap;
+        z-index: 1001;
+    }
+
+    .header-buttons > * {
+        flex-shrink: 0;
+        position: relative;
     }
 
     .search-toggle,
@@ -5195,6 +5233,12 @@ body.ai-modal-open .hamburger {
     .hamburger span {
         width: 22px;
         height: 3px;
+    }
+
+    body.menu-open .hamburger {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        z-index: 1002;
     }
 
     .header-tagline {
