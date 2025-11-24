@@ -291,6 +291,7 @@ body::before {
     gap: 5px;
     cursor: pointer;
     pointer-events: auto;
+    -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
 }
