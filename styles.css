@@ -18,6 +18,17 @@
     --item-bg-light: rgba(0, 0, 0, 0.08);
     --txt-dark: #fff;
     --txt-light: #000;
+    
+    /* Z-Index Hiyerarşisi - Ana Sayfa */
+    --z-background: 0;
+    --z-content: 1;
+    --z-sidebar: 98; /* Header'ın üstünde olmalı */
+    --z-overlay: 99; /* Sidebar'ın üstünde olmalı */
+    --z-header: 97;
+    --z-header-buttons: 98;
+    --z-search-container: 100;
+    --z-search-results: 101;
+    --z-ai-modal: 98;
 }
 
 [data-theme="dark"] {
@@ -313,7 +324,7 @@ body.menu-open .header-buttons {
 body.menu-open .hamburger {
     opacity: 1 !important;
     pointer-events: auto !important;
-    z-index: 102;
+    z-index: var(--z-header-buttons);
     position: relative;
 }
 
@@ -398,7 +409,7 @@ body.menu-open .hamburger {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 99;
+    z-index: var(--z-search-container);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -438,7 +449,7 @@ body.menu-open .hamburger {
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     display: none;
-    z-index: 2001;
+    z-index: var(--z-search-results);
     margin-top: 20px;
 }
 
@@ -1221,7 +1232,7 @@ body.menu-open .hamburger {
     visibility: hidden;
     pointer-events: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 97;
+    z-index: var(--z-overlay);
     cursor: pointer;
 }
 
@@ -1256,7 +1267,7 @@ body.menu-open .hamburger {
     border-radius: 12px 0 0 12px;
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
     transition: right 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 96; /* Header'dan düşük olmalı */
+    z-index: var(--z-sidebar); /* Overlay'in altında, header'ın üstünde */
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -1448,7 +1459,7 @@ body.menu-open .hamburger {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: var(--z-header);
     padding: 0;
     background: rgba(255, 255, 255, 0.8);
     -webkit-backdrop-filter: blur(20px);
@@ -1518,7 +1529,7 @@ body.menu-open .hamburger {
     margin-left: auto;
     flex-wrap: nowrap;
     position: relative;
-    z-index: 101;
+    z-index: var(--z-header-buttons);
 }
 
 .header-buttons > * {
@@ -1638,9 +1649,11 @@ body.menu-open .hamburger {
     letter-spacing: 1px;
     text-transform: uppercase;
     white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
-    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
+    max-width: 200px;
 }
 
 [data-theme="dark"] .header-tagline {
@@ -3639,7 +3652,7 @@ html {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 95; /* Header'dan düşük olmalı */
+    z-index: var(--z-ai-modal);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -3712,7 +3725,7 @@ html {
     display: none;
     flex-direction: column;
     overflow: hidden;
-    z-index: 98; /* Header'dan düşük olmalı */
+    z-index: var(--z-ai-modal);
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
@@ -4373,7 +4386,7 @@ body.ai-modal-open .hamburger {
     .ai-assistant-widget {
         bottom: 12px;
         right: 12px;
-        z-index: 95; /* Header'dan düşük */
+        z-index: var(--z-ai-modal);
     }
 
     .ai-assistant-toggle {
@@ -4959,7 +4972,7 @@ body.ai-modal-open .hamburger {
         flex-shrink: 0;
         margin-left: auto;
         flex-wrap: nowrap;
-        z-index: 101;
+        z-index: var(--z-header-buttons);
     }
 
     .header-buttons > * {
@@ -4995,7 +5008,7 @@ body.ai-modal-open .hamburger {
     body.menu-open .hamburger {
         opacity: 1 !important;
         pointer-events: auto !important;
-        z-index: 1002;
+        z-index: var(--z-header-buttons);
     }
 
     .admin-toggle {
@@ -5207,7 +5220,7 @@ body.ai-modal-open .hamburger {
         flex-shrink: 0;
         margin-left: auto;
         flex-wrap: nowrap;
-        z-index: 101;
+        z-index: var(--z-header-buttons);
     }
 
     .header-buttons > * {
@@ -5241,7 +5254,7 @@ body.ai-modal-open .hamburger {
     body.menu-open .hamburger {
         opacity: 1 !important;
         pointer-events: auto !important;
-        z-index: 1002;
+        z-index: var(--z-header-buttons);
     }
 
     .header-tagline {
@@ -5270,7 +5283,7 @@ body.ai-modal-open .hamburger {
     .ai-assistant-widget {
         bottom: 20px;
         right: 20px;
-        z-index: 95;
+        z-index: var(--z-ai-modal);
     }
 
     .ai-assistant-toggle {
@@ -5512,7 +5525,7 @@ body.ai-modal-open .hamburger {
     .ai-assistant-widget {
         bottom: 20px;
         right: 20px;
-        z-index: 95;
+        z-index: var(--z-ai-modal);
     }
 
     .ai-assistant-toggle {
@@ -5538,7 +5551,7 @@ body.ai-modal-open .hamburger {
     .ai-assistant-widget {
         bottom: 16px;
         right: 16px;
-        z-index: 95;
+        z-index: var(--z-ai-modal);
     }
 
     .ai-assistant-toggle {
@@ -5799,7 +5812,7 @@ body.ai-modal-open .hamburger {
     .ai-assistant-widget {
         bottom: 30px;
         right: 30px;
-        z-index: 95;
+        z-index: var(--z-ai-modal);
     }
 
     .ai-assistant-toggle {
@@ -5981,7 +5994,7 @@ body.ai-modal-open .hamburger {
     .ai-assistant-widget {
         bottom: 16px;
         right: 16px;
-        z-index: 95;
+        z-index: var(--z-ai-modal);
     }
 
     .ai-assistant-toggle {
@@ -6075,7 +6088,7 @@ body.ai-modal-open .hamburger {
     .ai-assistant-widget {
         bottom: 12px;
         right: 12px;
-        z-index: 95;
+        z-index: var(--z-ai-modal);
     }
 
     .ai-assistant-toggle {

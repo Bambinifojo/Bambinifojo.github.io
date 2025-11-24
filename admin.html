@@ -1573,9 +1573,9 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.65);
-    /* Blur'u kaldırdık - sidebar overlay blur'u modalları etkilemesin */
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+    /* Modal overlay için hafif blur - sidebar overlay'den bağımsız */
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     z-index: 10000; /* En üstte olmalı - tüm diğer elementlerden yüksek */
     display: flex;
     align-items: center;
