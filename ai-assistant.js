@@ -141,12 +141,19 @@ function initializeAIAssistant() {
 
     // Kategori butonları kaldırıldı - direkt sohbet modu
 
-    // Modal dışına tıklayınca kapatma (opsiyonel)
+    // Backdrop'a tıklayınca modal'ı kapat
+    const backdrop = document.getElementById('aiModalBackdrop');
+    if (backdrop) {
+        backdrop.addEventListener('click', () => {
+            closeAIModal();
+        });
+    }
+
+    // Modal dışına tıklayınca kapatma (opsiyonel - backdrop kullanıyoruz artık)
     if (modal) {
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeAIModal();
-            }
+            // Sadece modal içeriğine tıklanırsa kapatma (backdrop zaten var)
+            e.stopPropagation();
         });
     }
 }
@@ -154,32 +161,80 @@ function initializeAIAssistant() {
 // Modal'ı aç/kapat
 function toggleAIModal() {
     const modal = document.getElementById('aiAssistantModal');
+    const backdrop = document.getElementById('aiModalBackdrop');
+    
     if (modal) {
-        modal.classList.toggle('active');
-        // Modal açık/kapalı durumuna göre body'ye class ekle
-        if (modal.classList.contains('active')) {
-            document.body.classList.add('ai-modal-open');
+        const isActive = modal.classList.contains('active');
+        
+        if (isActive) {
+            // Modal açık - kapat
+            closeAIModal();
         } else {
-            document.body.classList.remove('ai-modal-open');
+            // Modal kapalı - aç
+            openAIModal();
         }
-        if (modal.classList.contains('active')) {
-            // Chat messages'ı direkt aktif yap (welcome section yok)
-            const chatMessages = document.getElementById('aiChatMessages');
-            if (chatMessages) chatMessages.classList.add('active');
-            
-            const input = document.getElementById('aiMessageInput');
-            if (input) {
-                setTimeout(() => input.focus(), 100);
-            }
+    }
+}
+
+function openAIModal() {
+    const modal = document.getElementById('aiAssistantModal');
+    const backdrop = document.getElementById('aiModalBackdrop');
+    
+    if (modal) {
+        // Kapanış animasyonunu kaldır
+        modal.classList.remove('closing');
+        
+        // Backdrop'u göster
+        if (backdrop) {
+            backdrop.classList.add('active');
+        }
+        
+        // Modal'ı göster
+        modal.classList.add('active');
+        
+        // Body scroll lock
+        const scrollY = window.scrollY;
+        document.body.style.top = `-${scrollY}px`;
+        document.body.classList.add('ai-modal-open');
+        
+        // Chat messages'ı direkt aktif yap
+        const chatMessages = document.getElementById('aiChatMessages');
+        if (chatMessages) chatMessages.classList.add('active');
+        
+        // Input'a focus
+        const input = document.getElementById('aiMessageInput');
+        if (input) {
+            setTimeout(() => input.focus(), 100);
         }
     }
 }
 
 function closeAIModal() {
     const modal = document.getElementById('aiAssistantModal');
+    const backdrop = document.getElementById('aiModalBackdrop');
+    
     if (modal) {
-        modal.classList.remove('active');
-        document.body.classList.remove('ai-modal-open');
+        // Kapanış animasyonunu başlat
+        modal.classList.add('closing');
+        
+        // Backdrop'u gizle
+        if (backdrop) {
+            backdrop.classList.remove('active');
+        }
+        
+        // Animasyon tamamlanana kadar bekle
+        setTimeout(() => {
+            modal.classList.remove('active', 'closing');
+            
+            // Body scroll lock'u kaldır
+            const scrollY = document.body.style.top;
+            document.body.style.top = '';
+            document.body.classList.remove('ai-modal-open');
+            
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            }
+        }, 300); // Animasyon süresi ile eşleşmeli
     }
 }
 

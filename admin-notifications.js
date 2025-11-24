@@ -30,6 +30,7 @@ async function loadConfig() {
     document.getElementById("latest_version").value = data.latest_version || "1.0.0";
     document.getElementById("force_update").value = String(data.force_update || false);
     document.getElementById("update_message").value = data.update_message || "";
+    document.getElementById("play_store_url").value = data.play_store_url || "https://play.google.com/store/apps/details?id=com.taskcosmos.app";
 
     document.getElementById("broadcast_enabled").value = String(data.broadcast_enabled || false);
     document.getElementById("broadcast_title").value = data.broadcast_title || "";
@@ -48,6 +49,7 @@ async function loadConfig() {
     document.getElementById("latest_version").value = "1.0.0";
     document.getElementById("force_update").value = "false";
     document.getElementById("update_message").value = "Yeni sürüm mevcut! Daha iyi performans için güncelleyin.";
+    document.getElementById("play_store_url").value = "https://play.google.com/store/apps/details?id=com.taskcosmos.app";
     document.getElementById("broadcast_enabled").value = "false";
     document.getElementById("broadcast_title").value = "Yeni Görev Yayınlandı!";
     document.getElementById("broadcast_message").value = "Yeni gezegen görevleri seni bekliyor!";
@@ -71,6 +73,7 @@ async function saveConfig() {
       latest_version: document.getElementById("latest_version").value.trim(),
       force_update: document.getElementById("force_update").value === "true",
       update_message: document.getElementById("update_message").value.trim(),
+      play_store_url: document.getElementById("play_store_url").value.trim() || "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
       broadcast_enabled: document.getElementById("broadcast_enabled").value === "true",
       broadcast_title: document.getElementById("broadcast_title").value.trim(),
       broadcast_message: document.getElementById("broadcast_message").value.trim(),

@@ -3710,6 +3710,29 @@ html {
     }
 }
 
+/* AI Modal Backdrop/Overlay */
+.ai-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    z-index: calc(var(--z-ai-modal) - 1);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
 /* Chat Modal */
 .ai-assistant-modal {
     position: fixed;
@@ -3732,6 +3755,20 @@ html {
 
 .ai-assistant-modal.active {
     display: flex;
+}
+
+.ai-assistant-modal.closing {
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Modal açıkken body scroll lock */
+body.ai-modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    right: 0;
 }
 
 /* Modal açıkken header tagline'ı gizle veya sola kaydır */
@@ -3861,6 +3898,17 @@ body.ai-modal-open .hamburger {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
     }
 }
 
@@ -4281,6 +4329,10 @@ body.ai-modal-open .hamburger {
         border-radius: 0;
     }
 
+    .ai-modal-backdrop {
+        background: rgba(0, 0, 0, 0.7);
+    }
+
     .ai-assistant-toggle {
         width: 56px;
         height: 56px;
@@ -4304,16 +4356,6 @@ body.ai-modal-open .hamburger {
 
     .ai-logo {
         font-size: 1rem;
-    }
-
-    .ai-assistant-modal {
-        width: calc(100vw - 40px);
-        max-width: 380px;
-        height: calc(100vh - 140px);
-        max-height: 550px;
-        bottom: 80px;
-        right: 20px;
-        border-radius: 18px;
     }
 
     .ai-header-btn {
@@ -4539,6 +4581,10 @@ body.ai-modal-open .hamburger {
 }
 
 /* Dark Mode Support - İyileştirilmiş */
+[data-theme="dark"] .ai-modal-backdrop {
+    background: rgba(0, 0, 0, 0.7);
+}
+
 [data-theme="dark"] .ai-assistant-modal {
     background: #1e1e2e;
     border-color: rgba(255, 255, 255, 0.15);

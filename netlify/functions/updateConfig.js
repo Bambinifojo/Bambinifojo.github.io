@@ -50,35 +50,59 @@ exports.handler = async (event, context) => {
 
     const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-    let sha = null;
-    
-    // Eski dosyanın sha değerini al (varsa)
-    try {
-      const { data: fileData } = await octokit.repos.getContent({
+    // Helper function: Dosya güncelle veya oluştur
+    const updateFile = async (filePath, content, message) => {
+      let sha = null;
+      
+      // Eski dosyanın sha değerini al (varsa)
+      try {
+        const { data: fileData } = await octokit.repos.getContent({
+          owner: REPO_OWNER,
+          repo: REPO_NAME,
+          path: filePath,
+        });
+        
+        if (fileData && fileData.sha) {
+          sha = fileData.sha;
+        }
+      } catch (error) {
+        // Dosya yoksa sha null kalır (yeni dosya oluşturulacak)
+        if (error.status !== 404) {
+          throw error;
+        }
+      }
+
+      // Dosyayı güncelle veya oluştur
+      await octokit.repos.createOrUpdateFileContents({
         owner: REPO_OWNER,
         repo: REPO_NAME,
-        path: CONFIG_FILE,
+        path: filePath,
+        message: message,
+        content: Buffer.from(content).toString("base64"),
+        sha: sha, // null ise yeni dosya oluşturulur
       });
-      
-      if (fileData && fileData.sha) {
-        sha = fileData.sha;
-      }
-    } catch (error) {
-      // Dosya yoksa sha null kalır (yeni dosya oluşturulacak)
-      if (error.status !== 404) {
-        throw error;
-      }
-    }
+    };
 
-    // Dosyayı güncelle veya oluştur
-    await octokit.repos.createOrUpdateFileContents({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path: CONFIG_FILE,
-      message: `Bildirim ayarları güncellendi - ${new Date().toLocaleString('tr-TR')}`,
-      content: Buffer.from(newConfig).toString("base64"),
-      sha: sha, // null ise yeni dosya oluşturulur
-    });
+    // 1. app_config.json dosyasını güncelle
+    await updateFile(
+      CONFIG_FILE,
+      newConfig,
+      `Bildirim ayarları güncellendi - ${new Date().toLocaleString('tr-TR')}`
+    );
+
+    // 2. version.json dosyasını oluştur/güncelle (sadece güncelleme bilgileri)
+    const versionJson = {
+      latest_version: body.latest_version || "1.0.0",
+      update_message: body.update_message || "Yeni sürüm mevcut!",
+      force_update: body.force_update || false,
+      play_store_url: body.play_store_url || "https://play.google.com/store/apps/details?id=com.taskcosmos.app"
+    };
+    
+    await updateFile(
+      "task-cosmos/version.json",
+      JSON.stringify(versionJson, null, 2),
+      `Version.json güncellendi - ${new Date().toLocaleString('tr-TR')}`
+    );
 
     return {
       statusCode: 200,

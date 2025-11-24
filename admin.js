@@ -3205,6 +3205,7 @@ async function loadNotificationsConfig() {
     const latestVersionEl = document.getElementById('latest_version');
     const forceUpdateEl = document.getElementById('force_update');
     const updateMessageEl = document.getElementById('update_message');
+    const playStoreUrlEl = document.getElementById('play_store_url');
     const broadcastTitleEl = document.getElementById('broadcast_title');
     const broadcastMessageEl = document.getElementById('broadcast_message');
     const broadcastEnabledEl = document.getElementById('broadcast_enabled');
@@ -3214,6 +3215,7 @@ async function loadNotificationsConfig() {
     if (latestVersionEl) latestVersionEl.value = config.latest_version || "1.0.0";
     if (forceUpdateEl) forceUpdateEl.value = String(config.force_update || false);
     if (updateMessageEl) updateMessageEl.value = config.update_message || "";
+    if (playStoreUrlEl) playStoreUrlEl.value = config.play_store_url || "https://play.google.com/store/apps/details?id=com.taskcosmos.app";
     if (broadcastTitleEl) broadcastTitleEl.value = config.broadcast_title || "";
     if (broadcastMessageEl) broadcastMessageEl.value = config.broadcast_message || "";
     if (broadcastEnabledEl) broadcastEnabledEl.value = String(config.broadcast_enabled || false);
@@ -3228,6 +3230,7 @@ async function loadNotificationsConfig() {
     const latestVersionEl = document.getElementById('latest_version');
     const forceUpdateEl = document.getElementById('force_update');
     const updateMessageEl = document.getElementById('update_message');
+    const playStoreUrlEl = document.getElementById('play_store_url');
     const broadcastTitleEl = document.getElementById('broadcast_title');
     const broadcastMessageEl = document.getElementById('broadcast_message');
     const broadcastEnabledEl = document.getElementById('broadcast_enabled');
@@ -3237,6 +3240,7 @@ async function loadNotificationsConfig() {
     if (latestVersionEl) latestVersionEl.value = "1.0.0";
     if (forceUpdateEl) forceUpdateEl.value = "false";
     if (updateMessageEl) updateMessageEl.value = "Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.";
+    if (playStoreUrlEl) playStoreUrlEl.value = "https://play.google.com/store/apps/details?id=com.taskcosmos.app";
     if (broadcastTitleEl) broadcastTitleEl.value = "Yeni Görev Yayınlandı!";
     if (broadcastMessageEl) broadcastMessageEl.value = "Yeni bölümler aktif! Hemen kontrol edin.";
     if (broadcastEnabledEl) broadcastEnabledEl.value = "false";
@@ -3261,6 +3265,7 @@ async function saveNotificationsConfig(event) {
     const latestVersionEl = document.getElementById('latest_version');
     const forceUpdateEl = document.getElementById('force_update');
     const updateMessageEl = document.getElementById('update_message');
+    const playStoreUrlEl = document.getElementById('play_store_url');
     const broadcastEnabledEl = document.getElementById('broadcast_enabled');
     const broadcastTitleEl = document.getElementById('broadcast_title');
     const broadcastMessageEl = document.getElementById('broadcast_message');
@@ -3276,6 +3281,7 @@ async function saveNotificationsConfig(event) {
       latest_version: latestVersionEl.value.trim(),
       force_update: forceUpdateEl.value === 'true',
       update_message: updateMessageEl.value.trim(),
+      play_store_url: playStoreUrlEl ? playStoreUrlEl.value.trim() || "https://play.google.com/store/apps/details?id=com.taskcosmos.app" : "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
       broadcast_enabled: broadcastEnabledEl.value === 'true',
       broadcast_title: broadcastTitleEl.value.trim(),
       broadcast_message: broadcastMessageEl.value.trim(),

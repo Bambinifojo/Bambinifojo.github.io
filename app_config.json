@@ -2,6 +2,7 @@
   "latest_version": "1.0.0",
   "force_update": false,
   "update_message": "Yeni sürüm mevcut! Daha iyi performans için güncelleyin.",
+  "play_store_url": "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
   "broadcast_enabled": false,
   "broadcast_title": "Yeni Görev Yayınlandı!",
   "broadcast_message": "Yeni gezegen görevleri seni bekliyor!",
