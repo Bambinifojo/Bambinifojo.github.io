@@ -215,14 +215,6 @@
     </style>
 </head>
 <body>
-<!-- Search Toggle Button -->
-<button class="search-toggle" id="searchToggle" title="Ara" aria-label="Arama">
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <path d="m21 21-4.35-4.35"></path>
-  </svg>
-</button>
-
 <!-- Search Bar -->
 <div class="search-container" id="searchContainer">
   <div class="search-box">
@@ -230,7 +222,7 @@
       <circle cx="11" cy="11" r="8"></circle>
       <path d="m21 21-4.35-4.35"></path>
     </svg>
-    <input type="text" class="search-input" id="searchInput" placeholder="Ara...">
+    <input type="text" class="search-input" id="searchInput" placeholder="Uygulama, kategori veya özellik ara...">
     <button class="search-close" id="searchClose" title="Kapat" aria-label="Aramayı kapat">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -238,37 +230,11 @@
       </svg>
     </button>
   </div>
-</div>
-
-<!-- Admin Panel Button -->
-
-<!-- Dark/Light Mode Toggle -->
-<div class="theme-toggle" id="themeToggle" title="Tema Değiştir">
-  <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="12" cy="12" r="5"></circle>
-    <line x1="12" y1="1" x2="12" y2="3"></line>
-    <line x1="12" y1="21" x2="12" y2="23"></line>
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-    <line x1="1" y1="12" x2="3" y2="12"></line>
-    <line x1="21" y1="12" x2="23" y2="12"></line>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-  </svg>
-  <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-  </svg>
-</div>
-
-<!-- Hamburger -->
-<div class="hamburger" id="hamburger" onclick="toggleMenu()">
-  <span></span>
-  <span></span>
-  <span></span>
+  <div class="search-results" id="searchResults"></div>
 </div>
 
 <!-- Koyu Blur Arkaplan -->
-<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
 
 <!-- Menü Paneli -->
 <div id="sidebar" class="sidebar">
@@ -278,7 +244,7 @@
   <a href="../#about" class="menu-item">👤 Hakkımda</a>
   <a href="../#skills" class="menu-item">⚡ Yetenekler</a>
   <a href="../#apps" class="menu-item">📱 Uygulamalar</a>
-  <a href="../#contact-section" class="menu-item">✉️ İletişim</a>
+  <a href="../contact.html" class="menu-item">✉️ İletişim</a>
   <a href="../admin-login.html" class="menu-item">⚙️ Admin Paneli</a>
 </div>
 
@@ -317,6 +283,37 @@
         <span class="logo-letter">o</span>
       </h1>
     </a>
+    <div class="header-tagline">Mobil Uygulama Geliştirici</div>
+    <div class="header-buttons">
+      <button class="search-toggle" id="searchToggle" title="Ara" aria-label="Arama">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+      </button>
+      <div class="theme-toggle" id="themeToggle" title="Tema Değiştir">
+        <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" type="button" aria-label="Menüyü aç/kapat" title="Menü">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
     <div class="header-tagline">Mobil Uygulama Geliştirici</div>
   </div>
 </header>
