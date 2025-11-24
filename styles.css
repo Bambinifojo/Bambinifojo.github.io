@@ -4926,9 +4926,13 @@ body.ai-modal-open .hamburger {
 
     /* Header Butonlar - Mobil Düzeni */
     .header-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
         gap: 8px;
         flex-shrink: 0;
         margin-left: auto;
+        flex-wrap: nowrap;
     }
 
     .search-toggle,
@@ -4938,6 +4942,16 @@ body.ai-modal-open .hamburger {
         height: 44px;
         min-width: 44px;
         min-height: 44px;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .hamburger {
+        padding: 10px;
+    }
+
+    .hamburger span {
+        height: 3px;
     }
 
     .admin-toggle {
@@ -5139,6 +5153,27 @@ body.ai-modal-open .hamburger {
         padding: 16px 24px;
         gap: 16px;
         flex-wrap: nowrap !important;
+    }
+
+    .header-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-shrink: 0;
+        margin-left: auto;
+        flex-wrap: nowrap;
+    }
+
+    .search-toggle,
+    .theme-toggle,
+    .hamburger {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        min-height: 46px;
+        flex-shrink: 0;
+        position: relative;
     }
 
     .header-tagline {
