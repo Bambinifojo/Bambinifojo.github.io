@@ -3803,7 +3803,7 @@ body.ai-modal-open .hamburger {
     }
 }
 
-/* Modal açıkken header butonlarını modal'ın soluna kaydır */
+/* Modal açıkken header butonlarını modal'ın soluna kaydır - Sadece desktop için */
 @media (min-width: 1367px) {
     body.ai-modal-open .ai-assistant-modal {
         /* Modal genişliğini kontrol et */
@@ -3827,41 +3827,41 @@ body.ai-modal-open .hamburger {
     }
 }
 
-/* iPad Pro için modal açıkken header butonlarını düzenle */
+/* iPad Pro için modal açıkken header butonlarını düzenle - Flex layout korunmalı */
 @media (min-width: 1024px) and (max-width: 1366px) {
-    body.ai-modal-open .search-toggle {
-        right: calc(500px + 20px) !important;
+    /* Tablet modunda flex layout kullanıldığı için position absolute kullanmıyoruz */
+    body.ai-modal-open .header-buttons {
+        position: relative !important;
+        right: auto !important;
     }
     
-    body.ai-modal-open .theme-toggle {
-        right: calc(500px + 80px) !important;
-    }
-    
-    body.ai-modal-open .admin-toggle {
-        right: calc(500px + 140px) !important;
-    }
-    
+    body.ai-modal-open .search-toggle,
+    body.ai-modal-open .theme-toggle,
+    body.ai-modal-open .admin-toggle,
     body.ai-modal-open .hamburger {
-        right: calc(500px + 200px) !important;
+        position: relative !important;
+        right: auto !important;
+        left: auto !important;
+        top: auto !important;
     }
 }
 
-/* Tablet ve küçük ekranlarda modal açıkken butonları sola kaydır */
+/* Tablet ve küçük ekranlarda modal açıkken butonları flex layout ile bırak */
 @media (min-width: 768px) and (max-width: 1024px) {
-    body.ai-modal-open .search-toggle {
-        right: calc(450px + 20px) !important;
+    /* Tablet modunda flex layout kullanıldığı için position absolute kullanmıyoruz */
+    body.ai-modal-open .header-buttons {
+        position: relative !important;
+        right: auto !important;
     }
     
-    body.ai-modal-open .theme-toggle {
-        right: calc(450px + 80px) !important;
-    }
-    
-    body.ai-modal-open .admin-toggle {
-        right: calc(450px + 140px) !important;
-    }
-    
+    body.ai-modal-open .search-toggle,
+    body.ai-modal-open .theme-toggle,
+    body.ai-modal-open .admin-toggle,
     body.ai-modal-open .hamburger {
-        right: calc(450px + 200px) !important;
+        position: relative !important;
+        right: auto !important;
+        left: auto !important;
+        top: auto !important;
     }
 }
 
@@ -5598,6 +5598,21 @@ body.ai-modal-open .hamburger {
     .hamburger {
         width: 44px;
         height: 44px;
+    }
+
+    /* Search Container - iPad */
+    .search-container {
+        z-index: var(--z-search-container);
+    }
+
+    /* Sidebar - iPad */
+    .sidebar {
+        z-index: var(--z-sidebar);
+    }
+
+    /* Overlay - iPad */
+    .overlay {
+        z-index: var(--z-overlay);
     }
 
     /* AI Assistant - iPad */
