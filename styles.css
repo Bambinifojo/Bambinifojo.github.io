@@ -641,8 +641,11 @@ body.menu-open .hamburger {
     border-radius: 4px;
 }
 
-.search-results::-webkit-scrollbar-thumb:hover {
-    background: rgba(106, 90, 205, 0.5);
+/* Webkit scrollbar thumb hover - sadece destekleyen tarayıcılarda */
+@supports selector(::-webkit-scrollbar-thumb:hover) {
+    .search-results::-webkit-scrollbar-thumb:hover {
+        background: rgba(106, 90, 205, 0.5);
+    }
 }
 
 /* Autocomplete Suggestions */
@@ -5794,16 +5797,6 @@ body.ai-modal-open .hamburger {
     .admin-toggle {
         top: 18px;
         right: 250px;
-        width: 46px;
-        height: 46px;
-    }
-
-    .hamburger {
-        top: 18px;
-        right: 30px;
-        width: 46px;
-        height: 46px;
-    }
         width: 46px;
         height: 46px;
     }
