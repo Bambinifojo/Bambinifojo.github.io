@@ -3,21 +3,49 @@
 // Config yükleme
 async function loadConfig() {
   try {
-    // Sadece Netlify'dan yükle (CORS sorunu nedeniyle GitHub'dan yükleme kaldırıldı)
-    const url = "https://bambinifojo.netlify.app/app_config.json?t=" + Date.now();
-    const res = await fetch(url);
+    // Hem app_config.json hem de version.json'ı yükle
+    const configUrl = "https://bambinifojo.netlify.app/app_config.json?t=" + Date.now();
+    const versionUrl = "https://bambinifojo.github.io/task-cosmos/version.json?t=" + Date.now();
     
     let data = {};
+    let versionData = {};
     
-    if (res.ok) {
-      data = await res.json();
-    } else {
-      // Eğer Netlify'da yoksa varsayılan değerleri kullan
-      console.warn('Config dosyası Netlify\'da bulunamadı, varsayılan değerler kullanılıyor');
+    // app_config.json'ı yükle
+    try {
+      const configRes = await fetch(configUrl);
+      if (configRes.ok) {
+        data = await configRes.json();
+        console.log('✅ app_config.json yüklendi');
+      }
+    } catch (error) {
+      console.warn('app_config.json yüklenemedi:', error);
+    }
+    
+    // version.json'ı yükle (öncelikli)
+    try {
+      const versionRes = await fetch(versionUrl);
+      if (versionRes.ok) {
+        versionData = await versionRes.json();
+        console.log('✅ version.json yüklendi');
+        
+        // version.json'dan gelen verileri öncelikli olarak kullan
+        if (versionData.latest_version) data.latest_version = versionData.latest_version;
+        if (versionData.update_message) data.update_message = versionData.update_message;
+        if (versionData.force_update !== undefined) data.force_update = versionData.force_update;
+        if (versionData.play_store_url) data.play_store_url = versionData.play_store_url;
+      }
+    } catch (error) {
+      console.warn('version.json yüklenemedi (opsiyonel):', error);
+    }
+    
+    // Eğer hiçbir dosya yüklenemediyse varsayılan değerleri kullan
+    if (!data.latest_version) {
+      console.warn('Config dosyası bulunamadı, varsayılan değerler kullanılıyor');
       data = {
         latest_version: "1.0.0",
         force_update: false,
         update_message: "Yeni sürüm mevcut! Daha iyi performans için güncelleyin.",
+        play_store_url: "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
         broadcast_enabled: false,
         broadcast_title: "Yeni Görev Yayınlandı!",
         broadcast_message: "Yeni gezegen görevleri seni bekliyor!",
