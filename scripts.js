@@ -15,20 +15,14 @@ function toggleMenu() {
     return;
   }
   
-  const isActive = sidebar.classList.toggle('active');
-  overlay.classList.toggle('active');
-  hamburger.classList.toggle('active');
+  const isOpen = sidebar.classList.contains('active');
   
-  // Body scroll lock ve menu-open class
-  if (isActive) {
-    // Scroll pozisyonunu kaydet
-    const scrollY = window.scrollY;
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.classList.add('menu-open');
-  } else {
+  if (isOpen) {
+    // Kapat
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    hamburger.classList.remove('active');
+    
     // Scroll pozisyonunu geri yükle
     const scrollY = document.body.style.top;
     document.body.style.top = '';
@@ -39,6 +33,19 @@ function toggleMenu() {
     if (scrollY) {
       window.scrollTo(0, parseInt(scrollY || '0') * -1);
     }
+  } else {
+    // Aç
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+    hamburger.classList.add('active');
+    
+    // Scroll pozisyonunu kaydet
+    const scrollY = window.scrollY;
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.classList.add('menu-open');
   }
 }
 
