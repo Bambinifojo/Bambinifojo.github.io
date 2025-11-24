@@ -2731,7 +2731,7 @@ footer p {
 
     .hero-section {
         padding: 140px 20px 60px;
-        min-height: auto;
+        min-height: 0;
     }
     
     .hero-brand {
@@ -4118,6 +4118,7 @@ body.ai-modal-open .hamburger {
     overflow-x: auto;
     flex-wrap: wrap;
     /* Firefox için scrollbar stilleri - Chrome/Safari için -webkit-scrollbar kullanılıyor */
+    /* Bu özellikler sadece Firefox'ta destekleniyor, diğer tarayıcılar için -webkit-scrollbar kullanılıyor */
     /* stylelint-disable-next-line property-no-unknown */
     scrollbar-width: thin;
     /* stylelint-disable-next-line property-no-unknown */
