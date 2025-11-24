@@ -1524,6 +1524,28 @@
     // Sayfa yüklendiğinde kontrol et
     window.addEventListener('DOMContentLoaded', () => {
       console.log('✅ DOMContentLoaded tetiklendi');
+      
+      // URL parametrelerinden şifre ve 2FA kodunu al ve form alanlarına doldur
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPassword = urlParams.get('password');
+      const urlTwoFactorCode = urlParams.get('twoFactorCode');
+      
+      if (urlPassword) {
+        const passwordInput = document.getElementById('password');
+        if (passwordInput) {
+          passwordInput.value = urlPassword;
+          console.log('🔗 URL\'den şifre form alanına dolduruldu');
+        }
+      }
+      
+      if (urlTwoFactorCode) {
+        const twoFactorInput = document.getElementById('twoFactorCode');
+        if (twoFactorInput) {
+          twoFactorInput.value = urlTwoFactorCode;
+          console.log('🔗 URL\'den 2FA kodu form alanına dolduruldu');
+        }
+      }
+      
       try {
         // Accordion'ı başlat
         console.log('🔍 initAccordion fonksiyonu kontrol ediliyor...');
@@ -2465,6 +2487,27 @@
       const loginBtn = document.getElementById('loginBtn');
       let password = passwordInput.value.trim();
       let twoFactorCode = twoFactorInput ? twoFactorInput.value.trim() : '';
+      
+      // URL parametrelerinden şifre ve 2FA kodu al (eğer varsa)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPassword = urlParams.get('password');
+      const urlTwoFactorCode = urlParams.get('twoFactorCode');
+      
+      if (urlPassword && !password) {
+        password = urlPassword;
+        if (passwordInput) {
+          passwordInput.value = password;
+        }
+        console.log('🔗 URL\'den şifre alındı');
+      }
+      
+      if (urlTwoFactorCode && !twoFactorCode) {
+        twoFactorCode = urlTwoFactorCode;
+        if (twoFactorInput) {
+          twoFactorInput.value = twoFactorCode;
+        }
+        console.log('🔗 URL\'den 2FA kodu alındı');
+      }
 
       // Hata mesajlarını temizle
       errorMessage.textContent = '';
@@ -2542,7 +2585,10 @@
           console.log('⚠️ localStorage\'da adminUsers bulunamadı');
         }
 
-        console.log('🔐 Giriş denemesi - Hash:', hashedPassword.substring(0, 10) + '...');
+        console.log('🔐 Giriş denemesi - Şifre:', password.substring(0, 3) + '***');
+        console.log('🔐 Giriş denemesi - Hash:', hashedPassword);
+        console.log('🔐 Varsayılan admin hash:', ADMIN_PASSWORD_HASH);
+        console.log('🔐 Hash eşleşmesi:', hashedPassword === ADMIN_PASSWORD_HASH);
 
         // Şifre kontrolü - önce usersData içinde ara, sonra varsayılan admin şifresini kontrol et
         let authenticatedUser = null;
@@ -2555,6 +2601,7 @@
         // Eğer admin kullanıcısı zaten varsa, sadece usersData içindeki hash'i kabul et
         if (!authenticatedUser) {
           const adminUserExists = usersData.find(user => user.username === 'admin');
+          console.log('🔍 Admin kullanıcısı mevcut mu:', adminUserExists ? '✅ Evet' : '❌ Hayır');
           
           if (!adminUserExists && hashedPassword === ADMIN_PASSWORD_HASH) {
             // Admin kullanıcısı yok ve varsayılan şifre ile giriş yapılıyor - yeni admin kullanıcısı oluştur
@@ -2573,6 +2620,10 @@
           } else if (adminUserExists) {
             // Admin kullanıcısı var ama şifre eşleşmiyor - hata
             console.log('❌ Admin kullanıcısı mevcut ama şifre eşleşmiyor');
+            console.log('🔍 Mevcut admin hash:', adminUserExists.passwordHash);
+            console.log('🔍 Girilen hash:', hashedPassword);
+          } else if (hashedPassword !== ADMIN_PASSWORD_HASH) {
+            console.log('❌ Varsayılan admin şifresi ile eşleşmiyor');
           }
         }
 
