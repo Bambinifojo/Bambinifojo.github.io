@@ -1119,7 +1119,9 @@ body.menu-open .header-buttons {
     min-height: 50px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
     cursor: pointer;
     position: relative;
     background: rgba(255, 255, 255, 0.9);
@@ -1127,10 +1129,11 @@ body.menu-open .header-buttons {
     backdrop-filter: blur(10px);
     border: 2px solid rgba(106, 90, 205, 0.2);
     border-radius: 12px;
-    padding: 12px;
+    padding: 14px 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     margin: 0;
+    box-sizing: border-box;
 }
 
 .hamburger:hover {
@@ -1141,12 +1144,14 @@ body.menu-open .header-buttons {
 }
 
 .hamburger span {
-    height: 4px;
+    height: 3px;
     width: 100%;
+    max-width: 24px;
     background: #333;
-    border-radius: 5px;
+    border-radius: 3px;
     transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: block;
+    margin: 0 auto;
 }
 
 [data-theme="dark"] .hamburger {
@@ -1169,17 +1174,21 @@ body.menu-open .header-buttons {
 }
 
 /* Hamburger → X animasyonu (Premium) */
+.hamburger.active {
+    gap: 0;
+}
+
 .hamburger.active span:nth-child(1) {
-    transform: translateY(10px) rotate(45deg);
+    transform: translateY(8px) rotate(45deg);
 }
 
 .hamburger.active span:nth-child(2) {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: scale(0);
 }
 
 .hamburger.active span:nth-child(3) {
-    transform: translateY(-10px) rotate(-45deg);
+    transform: translateY(-8px) rotate(-45deg);
 }
 
 /* Hamburger animasyonu için span'lerin başlangıç pozisyonu */
@@ -4947,11 +4956,15 @@ body.ai-modal-open .hamburger {
     }
 
     .hamburger {
-        padding: 10px;
+        padding: 12px 10px;
+        gap: 4px;
+        justify-content: center;
+        align-items: center;
     }
 
     .hamburger span {
         height: 3px;
+        max-width: 20px;
     }
 
     .admin-toggle {
