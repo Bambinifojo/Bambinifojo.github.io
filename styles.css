@@ -1507,10 +1507,7 @@ body.menu-open .hamburger {
     min-width: 0;
 }
 
-.header-tagline {
-    flex-shrink: 1;
-    min-width: 0;
-}
+/* Header tagline - duplicate removed, see line 1648 */
 
 .logo-wrapper {
     display: flex;

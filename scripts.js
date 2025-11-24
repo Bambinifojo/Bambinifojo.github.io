@@ -6,16 +6,22 @@ function isMenuOpen() {
 
 // Hamburger Menu Toggle
 function toggleMenu() {
+  console.log('🖱️ toggleMenu çağrıldı');
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('overlay');
   const hamburger = document.getElementById('hamburger');
   
   if (!sidebar || !overlay || !hamburger) {
-    console.warn('⚠️ Sidebar, overlay veya hamburger bulunamadı');
+    console.warn('⚠️ Sidebar, overlay veya hamburger bulunamadı', {
+      sidebar: !!sidebar,
+      overlay: !!overlay,
+      hamburger: !!hamburger
+    });
     return;
   }
   
   const isOpen = sidebar.classList.contains('active');
+  console.log('📊 Menü durumu:', isOpen ? 'Açık' : 'Kapalı');
   
   if (isOpen) {
     // Kapat
@@ -107,18 +113,26 @@ function closeMenu() {
 
 // Hamburger menü event listener'larını ekle
 function setupHamburgerMenu() {
+  console.log('🔧 setupHamburgerMenu çağrıldı');
   // Hamburger butonuna event listener ekle (onclick yedek olarak)
   const hamburger = document.getElementById('hamburger');
   if (hamburger) {
+    console.log('✅ Hamburger butonu bulundu');
     // Eğer zaten event listener eklenmemişse ekle
     if (!hamburger.hasAttribute('data-listener-added')) {
       hamburger.setAttribute('data-listener-added', 'true');
       hamburger.addEventListener('click', (e) => {
+        console.log('🖱️ Hamburger butonuna tıklandı (event listener)');
         e.preventDefault();
         e.stopPropagation();
         toggleMenu();
       });
+      console.log('✅ Event listener eklendi');
+    } else {
+      console.log('ℹ️ Event listener zaten eklenmiş');
     }
+  } else {
+    console.warn('⚠️ Hamburger butonu bulunamadı');
   }
   
   // Overlay'e tıklandığında menüyü kapat
