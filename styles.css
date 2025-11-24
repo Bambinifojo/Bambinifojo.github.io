@@ -218,7 +218,8 @@ body::before {
 }
 
 /* Search Toggle Button */
-.search-toggle {
+/* Ortak Header Buton Stilleri */
+.header-btn {
     position: relative;
     background: rgba(255, 255, 255, 0.9);
     -webkit-backdrop-filter: blur(10px);
@@ -241,6 +242,35 @@ body::before {
     padding: 0;
     margin: 0;
     flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.search-toggle,
+.theme-toggle,
+.hamburger {
+    position: relative;
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(106, 90, 205, 0.2);
+    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 /* Menü açıkken body scroll lock (desktop) */
@@ -259,7 +289,10 @@ body.menu-open .header-buttons {
     pointer-events: none;
 }
 
-.search-toggle:hover {
+.header-btn:hover,
+.search-toggle:hover,
+.theme-toggle:hover,
+.hamburger:hover {
     background: rgba(106, 90, 205, 0.1);
     border-color: var(--primary-color);
     transform: scale(1.05);
@@ -267,14 +300,20 @@ body.menu-open .header-buttons {
     color: var(--primary-color);
 }
 
-[data-theme="dark"] .search-toggle {
+[data-theme="dark"] .header-btn,
+[data-theme="dark"] .search-toggle,
+[data-theme="dark"] .theme-toggle,
+[data-theme="dark"] .hamburger {
     background: rgba(30, 30, 46, 0.9);
     border: 2px solid rgba(255, 255, 255, 0.2);
     color: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="dark"] .search-toggle:hover {
+[data-theme="dark"] .header-btn:hover,
+[data-theme="dark"] .search-toggle:hover,
+[data-theme="dark"] .theme-toggle:hover,
+[data-theme="dark"] .hamburger:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.3);
 }
@@ -1048,35 +1087,9 @@ body.menu-open .header-buttons {
 }
 
 /* Theme Toggle */
-.theme-toggle {
-    position: relative;
-    background: rgba(255, 255, 255, 0.9);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(106, 90, 205, 0.2);
-    border-radius: 12px;
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
-    min-height: 50px;
-    max-width: 50px;
-    max-height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 0;
-    margin: 0;
-    flex-shrink: 0;
-}
 
 .theme-toggle:hover {
-    background: rgba(106, 90, 205, 0.1);
-    border-color: var(--primary-color);
-    transform: scale(1.1) rotate(15deg);
-    box-shadow: 0 6px 20px rgba(106, 90, 205, 0.2);
+    transform: scale(1.05) rotate(15deg);
 }
 
 .theme-icon {
@@ -1117,40 +1130,12 @@ body.menu-open .header-buttons {
     transform: rotate(0deg);
 }
 
-/* Hamburger */
+/* Hamburger - flex-direction column ile span'ler için */
 .hamburger {
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
-    min-height: 50px;
-    max-width: 50px;
-    max-height: 50px;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     gap: 5px;
-    cursor: pointer;
-    position: relative;
-    background: rgba(255, 255, 255, 0.9);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(106, 90, 205, 0.2);
-    border-radius: 12px;
-    padding: 0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    margin: 0;
-    box-sizing: border-box;
-    flex-shrink: 0;
 }
 
-.hamburger:hover {
-    background: rgba(106, 90, 205, 0.1);
-    border-color: var(--primary-color);
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(106, 90, 205, 0.2);
-}
 
 .hamburger span {
     height: 3px;
@@ -1162,16 +1147,6 @@ body.menu-open .header-buttons {
     margin: 0;
 }
 
-[data-theme="dark"] .hamburger {
-    background: rgba(30, 30, 46, 0.9);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .hamburger:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-}
 
 [data-theme="dark"] .hamburger span {
     background: white;
