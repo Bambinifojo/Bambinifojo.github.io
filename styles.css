@@ -1473,11 +1473,14 @@ body.menu-open .header-buttons {
     box-sizing: border-box;
 }
 
-.header-buttons {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.logo-wrapper {
     flex-shrink: 0;
+    min-width: 0;
+}
+
+.header-tagline {
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .logo-wrapper {
@@ -1487,7 +1490,19 @@ body.menu-open .header-buttons {
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    flex-shrink: 0;
+    min-width: 0;
 }
+
+.header-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
 
 .logo-wrapper:hover {
     transform: translateY(-2px);
@@ -4882,6 +4897,7 @@ body.ai-modal-open .hamburger {
         gap: 8px;
         max-width: 100%;
         width: 100%;
+        justify-content: space-between;
     }
 
     .main-header {
@@ -4891,6 +4907,7 @@ body.ai-modal-open .hamburger {
 
     .logo-wrapper {
         gap: 8px;
+        flex-shrink: 0;
     }
 
     .logo-icon {
@@ -4910,6 +4927,8 @@ body.ai-modal-open .hamburger {
     /* Header Butonlar - Mobil Düzeni */
     .header-buttons {
         gap: 8px;
+        flex-shrink: 0;
+        margin-left: auto;
     }
 
     .search-toggle,
