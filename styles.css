@@ -5306,7 +5306,10 @@ body.ai-modal-open .hamburger {
     }
 
     .header-tagline {
-        display: none !important;
+        display: block !important;
+        font-size: 0.75rem;
+        max-width: 150px;
+        opacity: 1;
     }
 
     .logo-wrapper {
@@ -5478,7 +5481,7 @@ body.ai-modal-open .hamburger {
 
 /* iPad / iPad Air (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
-    /* Header Container - iPad'de yan yana kalmalı */
+    /* Header Container - iPad'de yan yana kalmalı, otomatik yerleşim */
     .header-container {
         flex-direction: row !important;
         justify-content: space-between;
@@ -5486,10 +5489,14 @@ body.ai-modal-open .hamburger {
         padding: 18px 30px;
         gap: 20px;
         flex-wrap: nowrap !important;
+        position: relative;
     }
 
     .header-tagline {
-        display: none !important;
+        display: block !important;
+        font-size: 0.8rem;
+        max-width: 180px;
+        opacity: 1;
     }
 
     .logo-wrapper {
@@ -5508,6 +5515,30 @@ body.ai-modal-open .hamburger {
         width: 40px;
         height: 40px;
         flex-shrink: 0;
+    }
+
+    /* Header butonları - otomatik yerleşim, position absolute değil */
+    .header-buttons {
+        position: relative !important;
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+        margin-left: auto;
+        top: auto !important;
+        right: auto !important;
+    }
+
+    .search-toggle,
+    .theme-toggle,
+    .hamburger {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        width: 44px;
+        height: 44px;
+        margin: 0;
     }
     /* Hero Section */
     .hero-section {
@@ -5764,7 +5795,7 @@ body.ai-modal-open .hamburger {
 
 /* iPad Pro (1024px - 1366px) */
 @media (min-width: 1024px) and (max-width: 1366px) {
-    /* Header Container - iPad Pro'da yan yana kalmalı */
+    /* Header Container - iPad Pro'da yan yana kalmalı, otomatik yerleşim */
     .header-container {
         flex-direction: row !important;
         justify-content: space-between;
@@ -5772,46 +5803,39 @@ body.ai-modal-open .hamburger {
         padding: 18px 30px;
         gap: 20px;
         flex-wrap: nowrap !important;
+        position: relative;
     }
 
     .header-tagline {
-        display: none !important;
+        display: block !important;
+        font-size: 0.85rem;
+        max-width: 200px;
+        opacity: 1;
     }
 
-    /* Header sağ taraf butonları - iPad Pro */
-    .search-toggle {
-        top: 18px;
-        right: 140px;
-        width: 46px;
-        height: 46px;
+    /* Header butonları - otomatik yerleşim, position absolute değil */
+    .header-buttons {
+        position: relative !important;
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+        margin-left: auto;
+        top: auto !important;
+        right: auto !important;
     }
 
-    .theme-toggle {
-        top: 18px;
-        right: 195px;
-        width: 46px;
-        height: 46px;
-    }
-
-    .admin-toggle {
-        top: 18px;
-        right: 250px;
-        width: 46px;
-        height: 46px;
-    }
-
+    .search-toggle,
+    .theme-toggle,
+    .admin-toggle,
     .hamburger {
-        top: 18px;
-        right: 30px;
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
         width: 46px;
         height: 46px;
-    }
-
-    .admin-toggle {
-        top: 18px;
-        right: 245px;
-        width: 46px;
-        height: 46px;
+        margin: 0;
     }
 
     .logo-wrapper {
