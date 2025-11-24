@@ -229,6 +229,8 @@ body::before {
     height: 50px;
     min-width: 50px;
     min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -238,6 +240,7 @@ body::before {
     color: #333;
     padding: 0;
     margin: 0;
+    flex-shrink: 0;
 }
 
 /* Menü açıkken body scroll lock (desktop) */
@@ -1056,6 +1059,8 @@ body.menu-open .header-buttons {
     height: 50px;
     min-width: 50px;
     min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1064,6 +1069,7 @@ body.menu-open .header-buttons {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     padding: 0;
     margin: 0;
+    flex-shrink: 0;
 }
 
 .theme-toggle:hover {
@@ -1117,6 +1123,8 @@ body.menu-open .header-buttons {
     height: 50px;
     min-width: 50px;
     min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1134,6 +1142,7 @@ body.menu-open .header-buttons {
     transition: all 0.3s ease;
     margin: 0;
     box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .hamburger:hover {
@@ -1510,6 +1519,11 @@ body.menu-open .header-buttons {
     gap: 12px;
     flex-shrink: 0;
     margin-left: auto;
+    flex-wrap: nowrap;
+}
+
+.header-buttons > * {
+    flex-shrink: 0;
 }
 
 
@@ -4944,6 +4958,10 @@ body.ai-modal-open .hamburger {
         flex-wrap: nowrap;
     }
 
+    .header-buttons > * {
+        flex-shrink: 0;
+    }
+
     .search-toggle,
     .theme-toggle,
     .hamburger {
@@ -4951,6 +4969,8 @@ body.ai-modal-open .hamburger {
         height: 44px;
         min-width: 44px;
         min-height: 44px;
+        max-width: 44px;
+        max-height: 44px;
         flex-shrink: 0;
         position: relative;
     }
