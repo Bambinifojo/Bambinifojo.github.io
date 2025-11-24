@@ -841,7 +841,18 @@ function initSearch() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initSearch();
+  // Hamburger menü event listener'larını ekle
+  if (typeof setupHamburgerMenu === 'function') {
+    setupHamburgerMenu();
+  }
+  
+  // Search initialization
+  if (typeof initSearch === 'function') {
+    initSearch();
+  } else {
+    // Fallback: local initSearch
+    initSearch();
+  }
   
   // ESC tuşu ile menüyü kapat
   document.addEventListener('keydown', (e) => {
@@ -860,6 +871,18 @@ document.addEventListener('DOMContentLoaded', () => {
       toggleMenu();
     });
   });
+  
+  // Header scroll effect
+  const header = document.querySelector('.main-header');
+  if (header) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  }
 });
 </script>
 </body>
