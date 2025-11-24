@@ -10,33 +10,43 @@ function toggleMenu() {
   const overlay = document.getElementById('overlay');
   const hamburger = document.getElementById('hamburger');
   
-  if (sidebar && overlay && hamburger) {
-    const isActive = sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-    hamburger.classList.toggle('active');
-    
-    // Body scroll lock ve menu-open class
-    if (isActive) {
-      // Scroll pozisyonunu kaydet
-      const scrollY = window.scrollY;
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.classList.add('menu-open');
-    } else {
-      // Scroll pozisyonunu geri yükle
-      const scrollY = document.body.style.top;
-      document.body.style.top = '';
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.classList.remove('menu-open');
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
+  if (!sidebar || !overlay || !hamburger) {
+    console.warn('⚠️ Sidebar, overlay veya hamburger bulunamadı');
+    return;
+  }
+  
+  const isActive = sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
+  hamburger.classList.toggle('active');
+  
+  // Body scroll lock ve menu-open class
+  if (isActive) {
+    // Scroll pozisyonunu kaydet
+    const scrollY = window.scrollY;
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.classList.add('menu-open');
+  } else {
+    // Scroll pozisyonunu geri yükle
+    const scrollY = document.body.style.top;
+    document.body.style.top = '';
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.classList.remove('menu-open');
+    if (scrollY) {
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
     }
   }
+}
+
+// Global scope'a ekle (HTML onclick için)
+if (typeof window !== 'undefined') {
+  window.toggleMenu = toggleMenu;
+  window.openMenu = openMenu;
+  window.closeMenu = closeMenu;
 }
 
 // Menüyü aç
@@ -85,6 +95,31 @@ function closeMenu() {
         window.scrollTo(0, parseInt(scrollY || '0') * -1);
       }
     }
+  }
+}
+
+// Hamburger menü event listener'larını ekle
+function setupHamburgerMenu() {
+  // Hamburger butonuna event listener ekle (onclick yedek olarak)
+  const hamburger = document.getElementById('hamburger');
+  if (hamburger) {
+    // Eğer zaten event listener eklenmemişse ekle
+    if (!hamburger.hasAttribute('data-listener-added')) {
+      hamburger.setAttribute('data-listener-added', 'true');
+      hamburger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMenu();
+      });
+    }
+  }
+  
+  // Overlay'e tıklandığında menüyü kapat
+  const overlay = document.getElementById('overlay');
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      closeMenu();
+    });
   }
 }
 
@@ -1140,6 +1175,9 @@ function initContactForm() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Hamburger menü event listener'larını ekle
+  setupHamburgerMenu();
+  
   // Search initialization
   initSearch();
   
