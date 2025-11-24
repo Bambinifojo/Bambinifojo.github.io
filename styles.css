@@ -5871,6 +5871,21 @@ body.ai-modal-open .hamburger {
         flex-shrink: 0;
     }
 
+    /* Search Container - iPad Pro */
+    .search-container {
+        z-index: var(--z-search-container);
+    }
+
+    /* Sidebar - iPad Pro */
+    .sidebar {
+        z-index: var(--z-sidebar);
+    }
+
+    /* Overlay - iPad Pro */
+    .overlay {
+        z-index: var(--z-overlay);
+    }
+
     /* Hero Section */
     .hero-section {
         padding: 140px 60px 80px;
