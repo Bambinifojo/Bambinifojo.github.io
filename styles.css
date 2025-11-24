@@ -3516,8 +3516,12 @@ html {
     }
     
     .header-container {
+        flex-direction: row !important;
+        justify-content: space-between;
+        align-items: center;
         padding: 15px 20px;
         gap: 15px;
+        flex-wrap: nowrap !important;
     }
     
     .logo-wrapper {
@@ -3539,11 +3543,30 @@ html {
         display: none;
     }
     
-    .search-toggle {
+    /* Header butonları - flex layout ile otomatik yerleşim */
+    .header-buttons {
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+        margin-left: auto;
+        flex-wrap: nowrap;
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+    }
+    
+    .search-toggle,
+    .theme-toggle,
+    .hamburger {
         width: 45px;
         height: 45px;
-        top: 15px;
-        right: 70px;
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        margin: 0;
     }
     
     /* Menü açıkken search, theme ve admin toggle'ı gizle (mobil) */
@@ -3555,8 +3578,11 @@ html {
     .admin-toggle {
         width: 45px;
         height: 45px;
-        top: 15px;
-        right: 170px;
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        margin: 0;
     }
     
     .search-container {
@@ -3574,13 +3600,6 @@ html {
         font-size: 0.95rem;
     }
     
-    .theme-toggle {
-        width: 45px;
-        height: 45px;
-        top: 15px;
-        right: 120px;
-    }
-    
     .logo-icon {
         width: 45px;
         height: 45px;
@@ -3593,11 +3612,14 @@ html {
     }
     
     .hamburger {
-        top: 15px;
-        right: 15px;
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
         width: 45px;
         height: 45px;
-        z-index: 9999; /* Mobilde de en üstte */
+        margin: 0;
+        z-index: var(--z-header-buttons);
     }
     
     .sidebar {
