@@ -4117,12 +4117,14 @@ body.ai-modal-open .hamburger {
     border-top: 1px solid #e5e7eb;
     overflow-x: auto;
     flex-wrap: wrap;
-    /* Firefox için scrollbar stilleri - Chrome/Safari için -webkit-scrollbar kullanılıyor */
-    /* Bu özellikler sadece Firefox'ta destekleniyor, diğer tarayıcılar için -webkit-scrollbar kullanılıyor */
-    /* stylelint-disable-next-line property-no-unknown */
-    scrollbar-width: thin;
-    /* stylelint-disable-next-line property-no-unknown */
-    scrollbar-color: #667eea #f8f9fa;
+}
+
+/* Firefox için scrollbar stilleri - Chrome/Safari için -webkit-scrollbar kullanılıyor */
+@supports (scrollbar-width: thin) {
+    .ai-content-types {
+        scrollbar-width: thin;
+        scrollbar-color: #667eea #f8f9fa;
+    }
 }
 
 .ai-content-types::-webkit-scrollbar {
