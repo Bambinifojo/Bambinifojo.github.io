@@ -55,13 +55,6 @@ function toggleMenu() {
   }
 }
 
-// Global scope'a ekle (HTML onclick için)
-if (typeof window !== 'undefined') {
-  window.toggleMenu = toggleMenu;
-  window.openMenu = openMenu;
-  window.closeMenu = closeMenu;
-}
-
 // Menüyü aç
 function openMenu() {
   const sidebar = document.getElementById('sidebar');
@@ -572,6 +565,13 @@ function initLogoAnimation() {
       });
     });
   });
+}
+
+// Global scope'a ekle (HTML onclick için) - Fonksiyonlar tanımlandıktan sonra
+if (typeof window !== 'undefined') {
+  window.toggleMenu = toggleMenu;
+  window.openMenu = openMenu;
+  window.closeMenu = closeMenu;
 }
 
 // Search functionality

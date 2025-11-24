@@ -289,6 +289,10 @@ body::before {
 .hamburger {
     flex-direction: column;
     gap: 5px;
+    cursor: pointer;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger:focus {
@@ -5539,6 +5543,8 @@ body.ai-modal-open .hamburger {
         width: 44px;
         height: 44px;
         margin: 0;
+        cursor: pointer !important;
+        pointer-events: auto !important;
     }
     /* Hero Section */
     .hero-section {
@@ -5851,6 +5857,8 @@ body.ai-modal-open .hamburger {
         width: 46px;
         height: 46px;
         margin: 0;
+        cursor: pointer !important;
+        pointer-events: auto !important;
     }
 
     .logo-wrapper {
