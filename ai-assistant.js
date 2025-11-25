@@ -8,13 +8,32 @@ let feedbackData = [];
 let votesData = {};
 const AI_CREDIT_RESET_TIME = 60 * 60 * 1000; // 1 saat
 
-// Uygulamaları yükle
+// Uygulamaları ve site verilerini yükle
 async function loadAppsData() {
     try {
-        const res = await fetch('data/apps.json');
-        const data = await res.json();
-        appsData = data;
-        return data;
+        // Apps verisini yükle
+        const appsRes = await fetch('data/apps.json');
+        const appsDataJson = await appsRes.json();
+        
+        // Site verisini yükle
+        let siteData = null;
+        try {
+            const siteRes = await fetch('data/site.json');
+            if (siteRes.ok) {
+                const siteDataJson = await siteRes.json();
+                siteData = siteDataJson.site;
+            }
+        } catch (error) {
+            console.warn('Site verisi yüklenirken hata:', error);
+        }
+        
+        // Her iki veriyi de appsData'ya ekle
+        appsData = {
+            apps: appsDataJson.apps || [],
+            site: siteData
+        };
+        
+        return appsData;
     } catch (error) {
         console.error('Uygulamalar yüklenirken hata:', error);
         return null;
@@ -214,7 +233,8 @@ function closeAIModal() {
     const backdrop = document.getElementById('aiModalBackdrop');
     
     if (modal) {
-        // Kapanış animasyonunu başlat
+        // Active class'ını kaldır (transition otomatik çalışacak)
+        modal.classList.remove('active');
         modal.classList.add('closing');
         
         // Backdrop'u gizle
@@ -224,7 +244,7 @@ function closeAIModal() {
         
         // Animasyon tamamlanana kadar bekle
         setTimeout(() => {
-            modal.classList.remove('active', 'closing');
+            modal.classList.remove('closing');
             
             // Body scroll lock'u kaldır
             const scrollY = document.body.style.top;

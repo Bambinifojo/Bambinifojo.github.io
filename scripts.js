@@ -455,47 +455,50 @@ function initParallax() {
   const heroSection = document.querySelector('.hero-section');
   const heroIcon = document.querySelector('.hero-icon');
   
-  if (heroSection && heroIcon) {
-    let isAnimated = false;
-    let parallaxOffset = 0;
-    let startTime = Date.now();
+  // Hero icon yoksa fonksiyonu sonlandır
+  if (!heroSection || !heroIcon) {
+    return;
+  }
+  
+  let isAnimated = false;
+  let parallaxOffset = 0;
+  let startTime = Date.now();
+  
+  // Wait for initial animation to complete
+  setTimeout(() => {
+    isAnimated = true;
+    startTime = Date.now();
+  }, 1000);
+  
+  // Float animation function
+  function updateFloat() {
+    if (!isAnimated) return;
     
-    // Wait for initial animation to complete
-    setTimeout(() => {
-      isAnimated = true;
-      startTime = Date.now();
-    }, 1000);
+    const scrolled = window.pageYOffset;
+    parallaxOffset = scrolled * 0.2;
     
-    // Float animation function
-    function updateFloat() {
-      if (!isAnimated) return;
+    if (scrolled < window.innerHeight) {
+      // Smooth float animation using sine wave
+      const elapsed = (Date.now() - startTime) / 1000;
+      const floatOffset = Math.sin(elapsed * 2) * 5; // 2 seconds per cycle, 5px amplitude
       
-      const scrolled = window.pageYOffset;
-      parallaxOffset = scrolled * 0.2;
-      
-      if (scrolled < window.innerHeight) {
-        // Smooth float animation using sine wave
-        const elapsed = (Date.now() - startTime) / 1000;
-        const floatOffset = Math.sin(elapsed * 2) * 5; // 2 seconds per cycle, 5px amplitude
-        
-        heroIcon.style.transform = `scale(1) translateY(${parallaxOffset + floatOffset}px)`;
-      } else {
-        // Reset when scrolled past hero section
-        heroIcon.style.transform = `scale(1) translateY(${parallaxOffset}px)`;
-      }
-      
-      requestAnimationFrame(updateFloat);
+      heroIcon.style.transform = `scale(1) translateY(${parallaxOffset + floatOffset}px)`;
+    } else {
+      // Reset when scrolled past hero section
+      heroIcon.style.transform = `scale(1) translateY(${parallaxOffset}px)`;
     }
     
-    // Start animation loop
-    updateFloat();
-    
-    // Update parallax on scroll
-    window.addEventListener('scroll', () => {
-      if (!isAnimated) return;
-      parallaxOffset = window.pageYOffset * 0.2;
-    });
+    requestAnimationFrame(updateFloat);
   }
+  
+  // Start animation loop
+  updateFloat();
+  
+  // Update parallax on scroll
+  window.addEventListener('scroll', () => {
+    if (!isAnimated) return;
+    parallaxOffset = window.pageYOffset * 0.2;
+  });
 }
 
 // Enhanced App Card Animations
@@ -1199,6 +1202,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hamburger menü event listener'larını ekle
   setupHamburgerMenu();
   
+  // Site verilerini yükle
+  loadSiteData();
+  
   // Search initialization
   initSearch();
   
@@ -1208,8 +1214,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Logo animation
   initLogoAnimation();
   
-  // ESC tuşu ile menüyü kapat
-  // ESC tuşu ile menüyü kapat
+  // ESC tuşu ile menüyü kapat (sadece menü açıkken)
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isMenuOpen()) {
       closeMenu();
