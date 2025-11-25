@@ -5,6 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>404 - Sayfa Bulunamadı | Bambinifojo</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<script>
+  // SPA Routing Support - Admin panel route'larını yakala (CSS'den önce çalışmalı)
+  (function() {
+    const path = window.location.pathname;
+    
+    // Admin panel route'larını kontrol et
+    if (path.includes('/admin/')) {
+      // Admin panel route'u - admin.html'e hash ile yönlendir
+      const pathParts = path.split('/');
+      const section = pathParts[pathParts.length - 1] || 'dashboard';
+      // Hash-based routing kullan (GitHub Pages uyumlu)
+      window.location.replace('/admin.html#' + section);
+      return;
+    }
+    
+    // Diğer bilinen route'lar için kontrol
+    const knownRoutes = {
+      '/contact': '/contact.html',
+      '/task-cosmos': '/task-cosmos/',
+      '/task-cosmos/privacy-policy': '/task-cosmos/privacy-policy.html'
+    };
+    
+    if (knownRoutes[path]) {
+      window.location.replace(knownRoutes[path]);
+      return;
+    }
+  })();
+</script>
 <link rel="stylesheet" href="styles.css"/>
 <style>
   .error-page {

@@ -269,22 +269,27 @@ function showSection(section) {
     sec.classList.add('hidden');
   });
   
-  // Tüm nav item'ları pasif yap
-  document.querySelectorAll('.admin-nav-item').forEach(item => {
-    item.classList.remove('active');
-  });
+  // Seçilen section'ı göster (section ID'sini oluştur)
+  let sectionId = section + 'Section';
+  if (section === 'ai-settings') {
+    sectionId = 'aiSettingsSection';
+  }
   
-  // Seçilen section'ı göster
-  const targetSection = document.getElementById(section + 'Section');
+  const targetSection = document.getElementById(sectionId);
   if (targetSection) {
     targetSection.classList.remove('hidden');
   }
   
-  // Seçilen nav item'ı aktif yap
-  const navItem = document.querySelector(`.admin-nav-item[onclick="showSection('${section}')"]`);
-  if (navItem) {
-    navItem.classList.add('active');
-  }
+  // Tüm nav item'ları pasif yap ve seçileni aktif yap (hash-based routing için)
+  document.querySelectorAll('.admin-nav-item').forEach(item => {
+    item.classList.remove('active');
+    // Hash-based link kontrolü
+    const href = item.getAttribute('href');
+    const dataSection = item.getAttribute('data-section');
+    if (href === `#${section}` || dataSection === section) {
+      item.classList.add('active');
+    }
+  });
   
   // Kullanıcılar bölümüne geçildiğinde listeyi yenile
   if (section === 'users') {
@@ -316,26 +321,36 @@ function showSection(section) {
     closeSidebar();
   }
   
-  // Path-based routing kullan (admin/dashboard formatı)
-  const currentPath = window.location.pathname;
-  const newPath = `/admin/${section}`;
+  // Hash-based routing kullan (GitHub Pages uyumlu)
+  const currentHash = window.location.hash.replace('#', '');
+  const newHash = section;
   
-  // History API ile path'i güncelle (sayfa yenilenmeden)
-  if (currentPath !== newPath) {
-    window.history.pushState({ section: section }, '', newPath);
+  // Hash değişikliği sadece gerekirse yap
+  if (currentHash !== newHash) {
+    window.location.hash = newHash;
   }
 }
 
-// Path-based routing: URL'den section'ı oku
+// Hash-based routing: URL'den section'ı oku (GitHub Pages uyumlu)
 function getSectionFromPath() {
+  // Önce hash'i kontrol et (öncelikli)
+  const hash = window.location.hash.replace('#', '');
+  if (hash) {
+    return hash;
+  }
+  
+  // Hash yoksa path'ten oku (geriye dönük uyumluluk)
   const path = window.location.pathname;
   const pathMatch = path.match(/\/admin\/([^\/]+)/);
   if (pathMatch) {
-    return pathMatch[1];
+    // Path'ten section bulundu, hash'e çevir
+    const section = pathMatch[1];
+    window.location.hash = section;
+    return section;
   }
-  // Hash fallback
-  const hash = window.location.hash.replace('#', '');
-  return hash || 'dashboard';
+  
+  // Varsayılan olarak dashboard
+  return 'dashboard';
 }
 
 // Sidebar state kontrolü
@@ -556,11 +571,53 @@ document.addEventListener('DOMContentLoaded', () => {
     showSection(section);
   }
   
-  // Browser back/forward butonları için
-  window.addEventListener('popstate', (e) => {
+  // Browser back/forward butonları için (hash-based routing)
+  window.addEventListener('hashchange', (e) => {
     const section = getSectionFromPath();
     if (section) {
-      showSection(section);
+      // showSection'ı çağırmadan sadece section'ı göster (sonsuz döngüyü önle)
+      let sectionId = section + 'Section';
+      if (section === 'ai-settings') {
+        sectionId = 'aiSettingsSection';
+      }
+      
+      const sectionEl = document.getElementById(sectionId);
+      if (sectionEl) {
+        // Tüm section'ları gizle
+        document.querySelectorAll('.admin-section').forEach(sec => {
+          sec.classList.add('hidden');
+        });
+        // Seçilen section'ı göster
+        sectionEl.classList.remove('hidden');
+        
+        // Nav item'ları güncelle
+        document.querySelectorAll('.admin-nav-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        // Nav item'ı aktif yap (hash-based routing için)
+        document.querySelectorAll('.admin-nav-item').forEach(item => {
+          const href = item.getAttribute('href');
+          const dataSection = item.getAttribute('data-section');
+          if (href === `#${section}` || dataSection === section) {
+            item.classList.add('active');
+          }
+        });
+        
+        // Section'a özel işlemler
+        if (section === 'users') {
+          renderUsers();
+        } else if (section === 'feedback') {
+          renderFeedback();
+          renderVotes();
+        } else if (section === 'notifications') {
+          loadNotificationsConfig();
+        } else if (section === 'dashboard') {
+          updateStats();
+          setTimeout(() => {
+            refreshPreview(false);
+          }, 500);
+        }
+      }
     }
   });
   
@@ -1450,6 +1507,16 @@ function editApp(index) {
 async function saveApp(event) {
   event.preventDefault();
   
+  // Loading state başlat
+  const submitBtn = event.target.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.querySelector('span')?.textContent || 'Kaydet' : 'Kaydet';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    if (submitBtn.querySelector('span')) {
+      submitBtn.querySelector('span').innerHTML = '<span class="spinner"></span> Kaydediliyor...';
+    }
+  }
+  
   // Form elemanlarını güvenli şekilde al
   const appIndexEl = document.getElementById('appIndex');
   const appTitleEl = document.getElementById('appTitle');
@@ -1603,6 +1670,14 @@ async function saveApp(event) {
     setTimeout(() => {
       refreshPreview(false);
     }, 500);
+  }
+  
+  // Loading state bitir
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    if (submitBtn.querySelector('span')) {
+      submitBtn.querySelector('span').textContent = originalBtnText;
+    }
   }
 }
 
@@ -1998,7 +2073,26 @@ function loadSiteSectionData(section) {
   }
 }
 
-async function saveSiteSection(section) {
+async function saveSiteSection(section, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  
+  // Loading state başlat
+  let saveBtn = null;
+  let originalBtnText = '💾 Kaydet';
+  if (event && event.target) {
+    saveBtn = event.target;
+    if (saveBtn.tagName === 'SPAN') {
+      saveBtn = saveBtn.closest('button');
+    }
+    if (saveBtn) {
+      originalBtnText = saveBtn.textContent || '💾 Kaydet';
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner"></span> Kaydediliyor...';
+    }
+  }
+  
   if (!appsData.site) {
     appsData.site = getDefaultSiteData();
   }
@@ -2237,6 +2331,12 @@ async function saveSiteSection(section) {
     setTimeout(() => {
       refreshPreview(false);
     }, 500);
+  }
+  
+  // Loading state bitir
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = originalBtnText;
   }
 }
 

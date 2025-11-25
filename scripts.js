@@ -310,6 +310,9 @@ async function loadApps(){
       return;
     }
     
+    // Loading state göster
+    container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 20px; color: #666; opacity: 0.8;">Uygulamalar yükleniyor...</p></div>';
+    
     const res = await fetch("data/apps.json");
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
