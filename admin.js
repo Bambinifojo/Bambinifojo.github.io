@@ -349,7 +349,7 @@ function toggleSidebar() {
   console.log('🔵 toggleSidebar çağrıldı');
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.querySelector('.admin-sidebar-overlay');
-  const menuToggle = document.querySelector('.admin-menu-toggle') || document.getElementById('hamburgerMenuBtn');
+  const menuToggle = document.querySelector('.admin-menu-toggle') || document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
   
   if (!sidebar) {
     console.error('❌ Sidebar bulunamadı (adminSidebar)');
@@ -504,6 +504,21 @@ function setupHamburgerMenu() {
     });
   } else {
     console.warn('⚠️ Hamburger menü butonu bulunamadı (hamburgerMenuBtn)');
+  }
+  
+  // Topbar menu butonuna event listener ekle (mobil hamburger menü)
+  const topbarMenuBtn = document.getElementById('topbarMenuBtn');
+  if (topbarMenuBtn) {
+    // Eğer zaten event listener eklenmemişse ekle
+    if (!topbarMenuBtn.hasAttribute('data-listener-added')) {
+      topbarMenuBtn.setAttribute('data-listener-added', 'true');
+      topbarMenuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🖱️ Topbar menu butonuna tıklandı (hamburger)');
+        toggleSidebar();
+      });
+    }
   }
   
   // Alternatif olarak class ile de bul

@@ -325,27 +325,73 @@
   /* Mobile Menu Button - Hidden by default */
   .admin-mobile-menu-btn {
     display: none;
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(106, 90, 205, 0.2);
+    border-radius: 12px;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    color: #4b5563;
+    padding: 0;
     transition: all 0.2s ease;
     width: 40px;
     height: 40px;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+  }
+
+  .admin-mobile-menu-btn.hamburger-menu span {
+    height: 3px;
+    width: 24px;
+    background: #333;
+    border-radius: 3px;
+    transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: block;
+    margin: 0;
+  }
+
+  [data-theme="dark"] .admin-mobile-menu-btn.hamburger-menu span {
+    background: white;
+  }
+
+  .admin-mobile-menu-btn.hamburger-menu.active {
+    gap: 0;
+  }
+
+  .admin-mobile-menu-btn.hamburger-menu.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+
+  .admin-mobile-menu-btn.hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .admin-mobile-menu-btn.hamburger-menu.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  .admin-mobile-menu-btn.hamburger-menu span:nth-child(1),
+  .admin-mobile-menu-btn.hamburger-menu span:nth-child(2),
+  .admin-mobile-menu-btn.hamburger-menu span:nth-child(3) {
+    transform-origin: center;
   }
 
   .admin-mobile-menu-btn:hover {
-    background: #f3f4f6;
-    color: #667eea;
+    background: rgba(106, 90, 205, 0.1);
+    border-color: #667eea;
+    transform: scale(1.05);
   }
 
   .admin-mobile-menu-btn.active {
     background: #667eea;
-    color: white;
+    border-color: #667eea;
+  }
+
+  .admin-mobile-menu-btn.active span {
+    background: white !important;
   }
 
   /* Topbar Menu Modal (Mobile) */
@@ -5240,13 +5286,11 @@
             <span class="btn-text">Çıkış</span>
           </button>
         </div>
-        <!-- Mobile Menu Button -->
-        <button class="admin-mobile-menu-btn" onclick="toggleTopbarMenu()" title="Menü" id="topbarMenuBtn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-            <circle cx="12" cy="12" r="1"></circle>
-            <circle cx="19" cy="12" r="1"></circle>
-            <circle cx="5" cy="12" r="1"></circle>
-          </svg>
+        <!-- Mobile Menu Button (Hamburger) -->
+        <button class="admin-mobile-menu-btn hamburger-menu" onclick="toggleSidebar()" title="Menü" id="topbarMenuBtn" aria-label="Menüyü aç/kapat">
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </div>
     </div>
@@ -5258,7 +5302,7 @@
     <div class="admin-topbar-menu-overlay" id="topbarMenuOverlay" onclick="toggleTopbarMenu()"></div>
     <div class="admin-topbar-menu-modal" id="topbarMenuModal">
       <div class="admin-topbar-menu-header">
-        <h3>Kullanıcı Ayarları</h3>
+        <h3>Menü Ayarları</h3>
         <button class="admin-topbar-menu-close" onclick="toggleTopbarMenu()" aria-label="Kapat">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -5364,7 +5408,7 @@
         
         <!-- Kullanıcı Ayarları Bölümü -->
         <div class="admin-topbar-menu-section-divider"></div>
-        <div class="admin-topbar-menu-section-title">Kullanıcı Ayarları</div>
+        <div class="admin-topbar-menu-section-title">Menü Ayarları</div>
         
         <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showChangePasswordModal === 'function') showChangePasswordModal();">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
