@@ -1,0 +1,15 @@
+# robots.txt for bambinifojo.github.io
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin-login.html
+Disallow: /admin-notifications.html
+Disallow: /netlify/
+
+# Sitemap location
+Sitemap: https://bambinifojo.github.io/sitemap.xml
+
+# Crawl-delay (optional)
+Crawl-delay: 1
+

@@ -135,7 +135,7 @@ async function saveConfig() {
       throw new Error(result.error || 'Kaydetme başarısız oldu');
     }
     
-    showAlert('✅ Ayarlar başarıyla GitHub\'a kaydedildi!', 'success');
+    showAlert('✅ Kaydedildi!', 'success');
     
     saveBtn.textContent = '✅ Kaydedildi!';
     setTimeout(() => {

@@ -1155,46 +1155,54 @@ function initContactForm() {
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = {
-      name: document.getElementById('contactName').value.trim(),
-      email: document.getElementById('contactEmail').value.trim(),
-      subject: document.getElementById('contactSubject').value.trim(),
-      message: document.getElementById('contactMessage').value.trim()
-    };
-    
     const messageDiv = document.getElementById('contactFormMessage');
     
-    // Validation
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      messageDiv.textContent = 'Lütfen tüm alanları doldurun.';
-      messageDiv.className = 'contact-form-message error';
-      return;
+    try {
+      const formData = {
+        name: document.getElementById('contactName').value.trim(),
+        email: document.getElementById('contactEmail').value.trim(),
+        subject: document.getElementById('contactSubject').value.trim(),
+        message: document.getElementById('contactMessage').value.trim()
+      };
+      
+      // Validation
+      if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        messageDiv.textContent = 'Lütfen tüm alanları doldurun.';
+        messageDiv.className = 'contact-form-message error';
+        return;
+      }
+      
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        messageDiv.textContent = 'Lütfen geçerli bir e-posta adresi girin.';
+        messageDiv.className = 'contact-form-message error';
+        return;
+      }
+      
+      // Create mailto link
+      const mailtoLink = `mailto:bambinifojo@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Ad: ${formData.name}\nE-posta: ${formData.email}\n\nMesaj:\n${formData.message}`)}`;
+      
+      // Open email client
+      window.location.href = mailtoLink;
+      
+      // Show success message
+      messageDiv.textContent = 'E-posta uygulamanız açılıyor... Mesajınızı gönderebilirsiniz.';
+      messageDiv.className = 'contact-form-message success';
+      
+      // Reset form after 5 seconds
+      setTimeout(() => {
+        contactForm.reset();
+        messageDiv.className = 'contact-form-message';
+        messageDiv.textContent = '';
+      }, 5000);
+    } catch (error) {
+      console.error('İletişim formu gönderilirken hata:', error);
+      if (messageDiv) {
+        messageDiv.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+        messageDiv.className = 'contact-form-message error';
+      }
     }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      messageDiv.textContent = 'Lütfen geçerli bir e-posta adresi girin.';
-      messageDiv.className = 'contact-form-message error';
-      return;
-    }
-    
-    // Create mailto link
-    const mailtoLink = `mailto:bambinifojo@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Ad: ${formData.name}\nE-posta: ${formData.email}\n\nMesaj:\n${formData.message}`)}`;
-    
-    // Open email client
-    window.location.href = mailtoLink;
-    
-    // Show success message
-    messageDiv.textContent = 'E-posta uygulamanız açılıyor... Mesajınızı gönderebilirsiniz.';
-    messageDiv.className = 'contact-form-message success';
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      contactForm.reset();
-      messageDiv.className = 'contact-form-message';
-      messageDiv.textContent = '';
-    }, 5000);
   });
 }
 

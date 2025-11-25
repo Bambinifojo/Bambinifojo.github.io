@@ -900,7 +900,7 @@ async function saveToGitHub() {
     const result = await res.json();
     window.githubSha = result.content.sha;
 
-    showAlert('✅ GitHub\'a başarıyla kaydedildi!', 'success');
+    showAlert('✅ Kaydedildi!', 'success');
     await loadFromGitHub();
     updateStats();
     renderApps();
@@ -1559,7 +1559,7 @@ async function saveApp(event) {
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
       saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Değişiklikler GitHub\'a kaydedildi ve deploy edildi! Site birkaç saniye içinde güncellenecek.', 'success');
+      showAlert('✅ Kaydedildi!', 'success');
       // Önizlemeyi otomatik yenile
       autoRefreshPreview();
     } else {
@@ -1576,9 +1576,9 @@ async function saveApp(event) {
     
     // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
     if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
-      showAlert('ℹ️ GitHub Pages üzerinde Netlify Functions çalışmaz. Değişiklikler LocalStorage\'a kaydedildi. Manuel olarak GitHub\'a push yapmanız gerekiyor.', 'info');
+      showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
     } else {
-      showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin veya manuel olarak GitHub\'a push yapın.', 'error');
+      showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
     }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
@@ -1796,7 +1796,7 @@ async function deleteApp(index) {
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
       saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Uygulama silindi ve GitHub\'a kaydedildi! Site birkaç saniye içinde güncellenecek.', 'success');
+      showAlert('✅ Silindi!', 'success');
       // Önizlemeyi otomatik yenile
       autoRefreshPreview();
     } else {
@@ -1811,9 +1811,9 @@ async function deleteApp(index) {
     const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
     // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
     if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
-      showAlert('ℹ️ GitHub Pages üzerinde Netlify Functions çalışmaz. Değişiklikler LocalStorage\'a kaydedildi. Manuel olarak GitHub\'a push yapmanız gerekiyor.', 'info');
+      showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
     } else {
-      showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+      showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
     }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
@@ -2203,7 +2203,7 @@ async function saveSiteSection(section) {
     if (response.ok) {
       // GitHub'a başarıyla kaydedildi
       saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Site ayarları GitHub\'a kaydedildi ve deploy edildi! Site birkaç saniye içinde güncellenecek.', 'success');
+      showAlert('✅ Kaydedildi!', 'success');
       // Önizlemeyi otomatik yenile
       autoRefreshPreview();
     } else {
@@ -2216,9 +2216,9 @@ async function saveSiteSection(section) {
     
     // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
     if (error.message.includes('405') || error.message.includes('404')) {
-      showAlert('ℹ️ GitHub Pages üzerinde Netlify Functions çalışmaz. Değişiklikler LocalStorage\'a kaydedildi. Manuel olarak GitHub\'a push yapmanız gerekiyor.', 'info');
+      showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
     } else {
-      showAlert('⚠️ Otomatik deploy çalışmıyor! Değişiklikler sadece LocalStorage\'a kaydedildi. Site güncellenmeyecek. Lütfen Netlify Function ayarlarını kontrol edin.', 'error');
+      showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
     }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
@@ -2774,11 +2774,11 @@ async function saveUser(event) {
     if (index === -1) {
       // Yeni kullanıcı ekle
       usersData.push(userData);
-      showAlert('✅ Kullanıcı başarıyla eklendi!', 'success');
+      showAlert('✅ Eklendi!', 'success');
     } else {
       // Kullanıcı güncelle
       usersData[index] = userData;
-      showAlert('✅ Kullanıcı başarıyla güncellendi!', 'success');
+      showAlert('✅ Güncellendi!', 'success');
     }
     
     saveUsers();
@@ -2805,7 +2805,7 @@ function deleteUser(index) {
     usersData.splice(index, 1);
     saveUsers();
     renderUsers();
-    showAlert('✅ Kullanıcı başarıyla silindi!', 'success');
+    showAlert('✅ Silindi!', 'success');
   }
 }
 
@@ -3024,7 +3024,7 @@ async function changePassword(event) {
     document.getElementById('confirmNewPassword').classList.remove('error');
     
     console.log('✅ Şifre başarıyla değiştirildi. Kullanıcı:', currentUser.username);
-    showAlert('✅ Şifre başarıyla değiştirildi! Yeni şifrenizle giriş yapabilirsiniz.', 'success');
+    showAlert('✅ Şifre değiştirildi!', 'success');
     closeChangePasswordModal();
   } catch (error) {
     console.error('❌ Şifre değiştirme hatası:', error);
@@ -3345,7 +3345,7 @@ async function saveNotificationsConfig(event) {
         throw new Error(result.error || 'Kaydetme başarısız oldu');
       }
       
-      showAlert('✅ Ayarlar başarıyla GitHub\'a kaydedildi!', 'success');
+      showAlert('✅ Kaydedildi!', 'success');
     } catch (error) {
       // Netlify Function çalışmıyorsa fallback
       console.warn('Netlify Function hatası, fallback kullanılıyor:', error);
@@ -3353,7 +3353,7 @@ async function saveNotificationsConfig(event) {
         await saveConfigToGitHub(config);
       } else {
         localStorage.setItem('app_config', JSON.stringify(config));
-        showAlert('⚠️ Netlify Function kullanılamıyor. LocalStorage\'a kaydedildi.', 'info');
+        showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
       }
     }
     
@@ -3421,7 +3421,7 @@ async function saveConfigToGitHub(config) {
       throw new Error(errorData.message || 'GitHub\'a kaydetme başarısız oldu.');
     }
     
-    showAlert('✅ Ayarlar GitHub\'a başarıyla kaydedildi!', 'success');
+    showAlert('✅ Kaydedildi!', 'success');
     
   } catch (error) {
     console.error('GitHub kaydetme hatası:', error);
