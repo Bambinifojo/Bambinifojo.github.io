@@ -155,65 +155,23 @@ function isSidebarOpen() {
  * @param {boolean|null} forceState - null: toggle, true: aç, false: kapat
  */
 function toggleSidebar(forceState = null) {
-  console.log('🔵 toggleSidebar çağrıldı', { forceState });
-  
+  // Basit versiyon - admin.js'deki versiyon kullanılacak
   const sidebar = document.getElementById('adminSidebar');
-  const overlay = document.querySelector('.admin-sidebar-overlay');
-  const menuToggle = document.querySelector('.admin-menu-toggle') || document.getElementById('hamburgerMenuBtn');
+  const overlay = document.getElementById('adminSidebarOverlay');
   
-  if (!sidebar) {
-    console.error('❌ Sidebar bulunamadı');
+  if (!sidebar || !overlay) {
+    // Fallback: Eski yöntem
+    const oldOverlay = document.querySelector('.admin-sidebar-overlay');
+    if (oldOverlay) {
+      sidebar.classList.toggle('active');
+      oldOverlay.classList.toggle('active');
+    }
     return;
   }
   
-  const isOpen = sidebar.classList.contains('open');
-  
-  // forceState varsa onu kullan, yoksa toggle yap
-  const willOpen = forceState !== null ? forceState : !isOpen;
-  
-  if (willOpen) {
-    // Aç
-    console.log('🟢 Sidebar açılıyor...');
-    sidebar.classList.add('open');
-    
-    // Transform'u manuel olarak uygula (CSS'in çalışması için)
-    sidebar.style.transform = 'translateX(0)';
-    
-    if (overlay) {
-      overlay.classList.add('active');
-    }
-    document.body.style.overflow = 'hidden';
-    document.body.classList.add('sidebar-open');
-    if (menuToggle) {
-      menuToggle.classList.add('active');
-    }
-    
-    // CSS'in uygulanması için kısa bir gecikme
-    setTimeout(() => {
-      const computedStyle = window.getComputedStyle(sidebar);
-      // Eğer hala translateX(-280px) veya translateX(-100%) ise, manuel olarak düzelt
-      if (computedStyle.transform && (computedStyle.transform.includes('translateX(-280') || computedStyle.transform.includes('translateX(-100%)'))) {
-        console.warn('⚠️ Sidebar hala translateX(-280px) veya translateX(-100%)\'de, manuel düzeltme yapılıyor...');
-        sidebar.style.transform = 'translateX(0)';
-      }
-    }, 50);
-  } else {
-    // Kapat
-    console.log('🔴 Sidebar kapatılıyor...');
-    sidebar.classList.remove('open');
-    
-    // Transform'u manuel olarak uygula (CSS'in çalışması için)
-    sidebar.style.transform = 'translateX(-100%)';
-    
-    if (overlay) {
-      overlay.classList.remove('active');
-    }
-    document.body.style.overflow = '';
-    document.body.classList.remove('sidebar-open');
-    if (menuToggle) {
-      menuToggle.classList.remove('active');
-    }
-  }
+  // Basit toggle - active class kullan
+  sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
 }
 
 /**
