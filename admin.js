@@ -359,44 +359,19 @@ function isSidebarOpen() {
   return sidebar && sidebar.classList.contains('open');
 }
 
-// Sidebar toggle (Mobile)
+// Sidebar toggle (Mobile) - Basit versiyon
 function toggleSidebar() {
-  console.log('🔵 toggleSidebar çağrıldı');
   const sidebar = document.getElementById('adminSidebar');
-  const overlay = document.querySelector('.admin-sidebar-overlay');
-  const menuToggle = document.querySelector('.admin-menu-toggle') || document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
+  const overlay = document.getElementById('adminSidebarOverlay');
+  const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
   
-  if (!sidebar) {
-    console.error('❌ Sidebar bulunamadı (adminSidebar)');
+  if (!sidebar || !overlay) {
+    console.error('❌ Sidebar veya overlay bulunamadı');
     return;
   }
   
-  if (!overlay) {
-    console.warn('⚠️ Overlay bulunamadı (.admin-sidebar-overlay)');
-  }
-  
-  const isOpen = sidebar.classList.contains('open');
-  console.log('📊 Sidebar durumu:', isOpen ? 'Açık' : 'Kapalı');
-  
-  if (isOpen) {
-    // Kapat
-    console.log('🔴 Sidebar kapatılıyor...');
-    sidebar.classList.remove('open');
-    if (overlay) overlay.classList.remove('active');
-    document.body.style.overflow = '';
-    document.body.classList.remove('sidebar-open');
-    if (menuToggle) menuToggle.classList.remove('active');
-  } else {
-    // Aç
-    console.log('🟢 Sidebar açılıyor...');
-    sidebar.classList.add('open');
-    if (overlay) overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    document.body.classList.add('sidebar-open');
-    if (menuToggle) menuToggle.classList.add('active');
-  }
-  
-  console.log('✅ Sidebar durumu güncellendi:', sidebar.classList.contains('open') ? 'Açık' : 'Kapalı');
+  sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
 }
 
 // Global scope'a ekle (HTML onclick için)
@@ -499,63 +474,40 @@ function closeTopbarMenu() {
 
 // Hamburger menü event listener'larını ekle (her zaman çalışmalı)
 function setupHamburgerMenu() {
+  const sidebar = document.getElementById('adminSidebar');
+  const overlay = document.getElementById('adminSidebarOverlay');
+  const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
+  
+  if (!sidebar || !overlay) {
+    console.warn('⚠️ Sidebar veya overlay bulunamadı');
+    return;
+  }
+  
+  // Hamburger butonuna event listener ekle
+  if (hamburger) {
+    hamburger.addEventListener('click', toggleSidebar);
+  }
+  
   // Overlay'e tıklandığında sidebar'ı kapat
-  const overlay = document.querySelector('.admin-sidebar-overlay');
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      toggleSidebar();
-    });
-  }
-  
-  // Hamburger menü butonuna event listener ekle
-  const hamburgerMenuBtn = document.getElementById('hamburgerMenuBtn');
-  if (hamburgerMenuBtn) {
-    console.log('✅ Hamburger menü butonu bulundu, event listener ekleniyor...');
-    hamburgerMenuBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('🖱️ Hamburger menü butonuna tıklandı');
-      toggleSidebar();
-    });
-  } else {
-    console.warn('⚠️ Hamburger menü butonu bulunamadı (hamburgerMenuBtn)');
-  }
-  
-  // Topbar menu butonuna event listener ekle (mobil hamburger menü)
-  const topbarMenuBtn = document.getElementById('topbarMenuBtn');
-  if (topbarMenuBtn) {
-    // Eğer zaten event listener eklenmemişse ekle
-    if (!topbarMenuBtn.hasAttribute('data-listener-added')) {
-      topbarMenuBtn.setAttribute('data-listener-added', 'true');
-      topbarMenuBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('🖱️ Topbar menu butonuna tıklandı (hamburger)');
-        toggleSidebar();
-      });
-    }
-  }
-  
-  // Alternatif olarak class ile de bul
-  const adminMenuToggle = document.querySelector('.admin-menu-toggle');
-  if (adminMenuToggle) {
-    // Eğer zaten event listener eklenmemişse ekle
-    if (!adminMenuToggle.hasAttribute('data-listener-added')) {
-      adminMenuToggle.setAttribute('data-listener-added', 'true');
-      adminMenuToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('🖱️ Admin menu toggle butonuna tıklandı');
-        toggleSidebar();
-      });
-    }
-  }
+  overlay.addEventListener('click', toggleSidebar);
 }
 
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('📄 DOMContentLoaded event tetiklendi');
   // Hamburger menü event listener'larını hemen ekle (session kontrolünden önce)
-  setupHamburgerMenu();
+  // Biraz gecikme ile ekle ki DOM tamamen yüklensin
+  setTimeout(() => {
+    console.log('⏱️ setupHamburgerMenu çağrılıyor (100ms gecikme ile)');
+    setupHamburgerMenu();
+    // Global scope'a toggleSidebar'ı ekle (js/admin-ui.js'den sonra override et)
+    if (typeof window !== 'undefined') {
+      window.toggleSidebar = toggleSidebar;
+      window.openSidebar = openSidebar;
+      window.closeSidebar = closeSidebar;
+      console.log('✅ toggleSidebar admin.js versiyonu ile override edildi');
+    }
+  }, 100);
   
   // Önce session kontrolü yap - eğer timeout varsa yönlendir
   if (!checkAdminSession()) {
@@ -654,6 +606,34 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Hamburger menü event listener'larını tekrar ekle (güvenlik için)
   setupHamburgerMenu();
+  
+  // Sidebar linklerine click event listener ekle (hash-based routing için)
+  document.querySelectorAll('.admin-nav-item[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        const section = href.replace('#', '');
+        // Hash değişikliği otomatik olarak hashchange event'ini tetikleyecek
+        // Ancak preventDefault yapmıyoruz, böylece hash değişikliği normal şekilde çalışır
+        // showSection fonksiyonu hashchange event'inde çağrılacak
+      }
+    });
+  });
+  
+  // Hızlı işlemler linklerine click event listener ekle
+  document.querySelectorAll('.admin-nav-item[data-action]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const action = link.getAttribute('data-action');
+      if (action === 'showAddForm' && typeof showAddForm === 'function') {
+        showAddForm();
+      } else if (action === 'exportData' && typeof exportData === 'function') {
+        exportData();
+      } else if (action === 'importData' && typeof importData === 'function') {
+        importData();
+      }
+    });
+  });
 });
 
 // Otomatik giriş (event olmadan)
@@ -1309,6 +1289,16 @@ function autoRefreshPreview() {
 // Uygulamaları listele
 function renderApps() {
   const container = document.getElementById('appsList');
+  if (!container) {
+    console.warn('⚠️ appsList container bulunamadı');
+    return;
+  }
+  
+  // appsData kontrolü
+  if (!appsData || !appsData.apps) {
+    container.innerHTML = '<p class="loading-text">Yükleniyor...</p>';
+    return;
+  }
   
   if (appsData.apps.length === 0) {
     container.innerHTML = `
@@ -1328,7 +1318,8 @@ function renderApps() {
     return;
   }
 
-  container.innerHTML = appsData.apps.map((app, index) => {
+  // Uygulamaları render et
+  const appsHTML = appsData.apps.map((app, index) => {
     const icon = app.icon || '📱';
     const title = app.title || 'İsimsiz';
     const description = app.description || 'Açıklama yok';
@@ -1412,6 +1403,8 @@ function renderApps() {
     </div>
     `;
   }).join('');
+  
+  container.innerHTML = appsHTML;
 }
 
 // Form göster
@@ -2648,7 +2641,22 @@ function renderUsers() {
   const container = document.getElementById('usersList');
   const countEl = document.getElementById('usersCount');
   
-  if (!container) return;
+  if (!container) {
+    console.warn('⚠️ usersList container bulunamadı');
+    return;
+  }
+  
+  // Loading state
+  if (!usersData || usersData.length === 0) {
+    container.innerHTML = '<p class="loading-text">Yükleniyor...</p>';
+    // usersData yüklenene kadar bekle
+    setTimeout(() => {
+      if (usersData && usersData.length > 0) {
+        renderUsers();
+      }
+    }, 100);
+    return;
+  }
   
   if (usersData.length === 0) {
     container.innerHTML = `
@@ -3147,7 +3155,13 @@ function toggleUserPasswordConfirm() {
 // Geri bildirimleri göster
 function renderFeedback() {
   const container = document.getElementById('feedbackList');
-  if (!container) return;
+  if (!container) {
+    console.warn('⚠️ feedbackList container bulunamadı');
+    return;
+  }
+  
+  // Loading state
+  container.innerHTML = '<p class="loading-text">Yükleniyor...</p>';
   
   const feedback = JSON.parse(localStorage.getItem('aiFeedback') || '[]');
   
@@ -3211,7 +3225,13 @@ function renderFeedback() {
 // Oyları göster
 function renderVotes() {
   const container = document.getElementById('votesList');
-  if (!container) return;
+  if (!container) {
+    console.warn('⚠️ votesList container bulunamadı');
+    return;
+  }
+  
+  // Loading state
+  container.innerHTML = '<p class="loading-text">Yükleniyor...</p>';
   
   const votes = JSON.parse(localStorage.getItem('aiVotes') || '{}');
   const voteEntries = Object.entries(votes);

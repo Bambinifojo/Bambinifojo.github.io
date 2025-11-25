@@ -225,33 +225,28 @@
     height: 100%;
   }
 
-  .admin-sidebar-overlay {
+  .admin-sidebar-overlay,
+  #adminSidebarOverlay {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: transparent;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    z-index: 998;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
     opacity: 0;
-    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.3s ease;
     cursor: pointer;
   }
 
   /* Sidebar overlay aktifken görünür - backdrop için (sadece mobilde) */
-  .admin-sidebar-overlay.active {
-    opacity: 1;
-    visibility: visible;
+  .admin-sidebar-overlay.active,
+  #adminSidebarOverlay.active {
     display: block;
-    pointer-events: auto;
-    background: rgba(0, 0, 0, 0.45);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    opacity: 1;
+    pointer-events: all;
   }
   
   /* Desktop'ta overlay'i gizle (sadece mobilde göster) */
@@ -268,6 +263,34 @@
       opacity: 0 !important;
       visibility: hidden !important;
       pointer-events: none !important;
+    }
+  }
+  
+  /* Mobilde overlay'i göster */
+  @media (max-width: 768px) {
+    .admin-sidebar-overlay {
+      display: block !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      z-index: 9998 !important;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      background: transparent;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .admin-sidebar-overlay.active {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      background: rgba(0, 0, 0, 0.5) !important;
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
     }
   }
 
@@ -607,14 +630,42 @@
   }
   
   /* Desktop'ta sidebar açık durumu (mobil için de geçerli) */
-  .admin-sidebar.open {
+  .admin-sidebar.active {
     pointer-events: auto;
   }
 
   @media (max-width: 768px) {
     .admin-sidebar {
-      top: 60px;
-      height: calc(100vh - 60px);
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100%;
+      background: #fff;
+      transform: translateX(-260px);
+      transition: transform 0.3s ease;
+      z-index: 9999;
+      overflow-y: auto;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .admin-sidebar.active {
+      transform: translateX(0);
+    }
+    
+    #adminSidebarOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 9998;
+    }
+    
+    #adminSidebarOverlay.active {
+      opacity: 1;
+      pointer-events: all;
     }
     
     /* Mobilde hamburger menüyü gizle */
@@ -2801,6 +2852,21 @@
       background: white;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+    
+    /* Mobilde hamburger menü butonunu göster */
+    .admin-mobile-menu-btn {
+      display: flex !important;
+    }
+    
+    /* Desktop butonları mobilde gizle */
+    .admin-topbar-buttons-desktop {
+      display: none !important;
+    }
+    
+    /* Kullanıcı bilgilerini mobilde gizle */
+    .admin-user-info {
+      display: none !important;
+    }
 
     /* Admin content mobil */
     .admin-content {
@@ -2925,6 +2991,13 @@
       height: 56px;
       min-height: 56px;
       z-index: 10002; /* Modal'lardan yüksek olmalı */
+    }
+    
+    /* Küçük mobilde hamburger menü butonunu göster */
+    .admin-mobile-menu-btn {
+      display: flex !important;
+      width: 40px;
+      height: 40px;
     }
 
     /* Dashboard grid mobil */
@@ -5244,7 +5317,7 @@
     <!-- Top Navigation Bar -->
     <div class="admin-topbar">
       <div class="admin-topbar-left">
-        <button class="admin-menu-toggle" id="hamburgerMenuBtn" onclick="toggleSidebar()" aria-label="Menüyü aç/kapat">
+        <button class="admin-menu-toggle" id="hamburgerMenuBtn" aria-label="Menüyü aç/kapat">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -5287,7 +5360,7 @@
           </button>
         </div>
         <!-- Mobile Menu Button (Hamburger) -->
-        <button class="admin-mobile-menu-btn hamburger-menu" onclick="toggleSidebar()" title="Menü" id="topbarMenuBtn" aria-label="Menüyü aç/kapat">
+        <button class="admin-mobile-menu-btn hamburger-menu" title="Menü" id="topbarMenuBtn" aria-label="Menüyü aç/kapat">
           <span></span>
           <span></span>
           <span></span>
@@ -5296,7 +5369,7 @@
     </div>
 
     <!-- Sidebar Overlay (Mobile) -->
-    <div class="admin-sidebar-overlay"></div>
+    <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
 
     <!-- Topbar Menu Modal (Mobile) -->
     <div class="admin-topbar-menu-overlay" id="topbarMenuOverlay" onclick="toggleTopbarMenu()"></div>
