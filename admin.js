@@ -305,6 +305,12 @@ function showSection(section) {
   // Bildirim ayarları bölümüne geçildiğinde config'i yükle
   if (section === 'notifications') {
     loadNotificationsConfig();
+    populateAppNotificationSelect();
+    // Süre tipi değişikliği için event listener ekle
+    const durationTypeEl = document.getElementById('notification_duration_type');
+    if (durationTypeEl) {
+      durationTypeEl.addEventListener('change', onNotificationDurationTypeChange);
+    }
   }
   
   // Dashboard'a geçildiğinde istatistikleri güncelle ve önizlemeyi yenile
@@ -606,6 +612,12 @@ document.addEventListener('DOMContentLoaded', () => {
           renderVotes();
         } else if (section === 'notifications') {
           loadNotificationsConfig();
+          populateAppNotificationSelect();
+          // Süre tipi değişikliği için event listener ekle
+          const durationTypeEl = document.getElementById('notification_duration_type');
+          if (durationTypeEl) {
+            durationTypeEl.addEventListener('change', onNotificationDurationTypeChange);
+          }
         } else if (section === 'dashboard') {
           updateStats();
           setTimeout(() => {
@@ -1466,8 +1478,12 @@ function showAddForm() {
     // Select elementlerini varsayılan değerlere sıfırla
     const appNotificationForceUpdateEl = document.getElementById('appNotificationForceUpdate');
     const appNotificationEnabledEl = document.getElementById('appNotificationEnabled');
+    const appNotificationDurationTypeEl = document.getElementById('appNotificationDurationType');
+    const appNotificationDurationValueGroup = document.getElementById('appNotificationDurationValueGroup');
     if (appNotificationForceUpdateEl) appNotificationForceUpdateEl.value = 'false';
     if (appNotificationEnabledEl) appNotificationEnabledEl.value = 'false';
+    if (appNotificationDurationTypeEl) appNotificationDurationTypeEl.value = 'none';
+    if (appNotificationDurationValueGroup) appNotificationDurationValueGroup.style.display = 'none';
     
     // Textarea'yı varsayılan mesajla doldur
     const appNotificationMessageEl = document.getElementById('appNotificationMessage');
@@ -1523,6 +1539,10 @@ function editApp(index) {
   const appNotificationForceUpdateEl = document.getElementById('appNotificationForceUpdate');
   const appNotificationMessageEl = document.getElementById('appNotificationMessage');
   const appNotificationEnabledEl = document.getElementById('appNotificationEnabled');
+  const appNotificationDurationTypeEl = document.getElementById('appNotificationDurationType');
+  const appNotificationDurationValueEl = document.getElementById('appNotificationDurationValue');
+  const appNotificationDurationValueGroup = document.getElementById('appNotificationDurationValueGroup');
+  const appNotificationDurationHint = document.getElementById('appNotificationDurationHint');
   
   if (appNotificationIdEl) appNotificationIdEl.value = app.appId || '';
   if (appNotificationPackageEl) appNotificationPackageEl.value = app.package || '';
@@ -1530,6 +1550,27 @@ function editApp(index) {
   if (appNotificationForceUpdateEl) appNotificationForceUpdateEl.value = String(notification.force_update || false);
   if (appNotificationMessageEl) appNotificationMessageEl.value = notification.update_message || '';
   if (appNotificationEnabledEl) appNotificationEnabledEl.value = String(notification.enabled || false);
+  
+  // Süreli bildirim ayarları
+  if (notification.duration) {
+    if (notification.duration.type === 'hours') {
+      if (appNotificationDurationTypeEl) appNotificationDurationTypeEl.value = 'hours';
+      if (appNotificationDurationValueEl) appNotificationDurationValueEl.value = notification.duration.value || '';
+      if (appNotificationDurationValueGroup) appNotificationDurationValueGroup.style.display = 'block';
+      if (appNotificationDurationHint) appNotificationDurationHint.textContent = 'Bildirimin kaç saat gösterileceğini girin';
+    } else if (notification.duration.type === 'days') {
+      if (appNotificationDurationTypeEl) appNotificationDurationTypeEl.value = 'days';
+      if (appNotificationDurationValueEl) appNotificationDurationValueEl.value = notification.duration.value || '';
+      if (appNotificationDurationValueGroup) appNotificationDurationValueGroup.style.display = 'block';
+      if (appNotificationDurationHint) appNotificationDurationHint.textContent = 'Bildirimin kaç gün gösterileceğini girin';
+    } else {
+      if (appNotificationDurationTypeEl) appNotificationDurationTypeEl.value = 'none';
+      if (appNotificationDurationValueGroup) appNotificationDurationValueGroup.style.display = 'none';
+    }
+  } else {
+    if (appNotificationDurationTypeEl) appNotificationDurationTypeEl.value = 'none';
+    if (appNotificationDurationValueGroup) appNotificationDurationValueGroup.style.display = 'none';
+  }
   
   if (formTitleEl) formTitleEl.textContent = 'Uygulama Düzenle';
   
@@ -1609,6 +1650,8 @@ async function saveApp(event) {
   const notificationVersion = appNotificationVersionEl?.value.trim() || '';
   const notificationMessage = appNotificationMessageEl?.value.trim() || '';
   const notificationEnabled = appNotificationEnabledEl?.value === 'true';
+  const notificationDurationType = document.getElementById('appNotificationDurationType')?.value || 'none';
+  const notificationDurationValue = document.getElementById('appNotificationDurationValue')?.value || '';
   
   if (notificationEnabled && (notificationVersion || notificationMessage)) {
     // Bildirim aktif ve bilgiler doluysa ekle
@@ -1618,6 +1661,15 @@ async function saveApp(event) {
       update_message: notificationMessage || 'Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.',
       enabled: true
     };
+    
+    // Süreli bildirim ayarları
+    if (notificationDurationType !== 'none' && notificationDurationValue) {
+      app.notification.duration = {
+        type: notificationDurationType,
+        value: parseInt(notificationDurationValue),
+        start_time: new Date().toISOString() // Bildirim başlangıç zamanı
+      };
+    }
   } else if (index !== -1 && appsData.apps?.[index]?.notification) {
     // Düzenleme modunda ve bildirim kapatıldıysa veya boşsa, mevcut bildirimi sil
     if (!notificationEnabled || (!notificationVersion && !notificationMessage)) {
@@ -3590,5 +3642,330 @@ async function saveConfigToGitHub(config) {
     console.error('GitHub kaydetme hatası:', error);
     throw error;
   }
+}
+
+// ==================== UYGULAMA BAZLI BİLDİRİM YÖNETİMİ ====================
+
+// Uygulamalar listesini dropdown'a yükle
+function populateAppNotificationSelect() {
+  const select = document.getElementById('notification_app_select');
+  if (!select) return;
+  
+  // Mevcut seçenekleri temizle (ilk seçenek hariç)
+  while (select.children.length > 1) {
+    select.removeChild(select.lastChild);
+  }
+  
+  // Uygulamaları ekle
+  if (appsData && appsData.apps && appsData.apps.length > 0) {
+    appsData.apps.forEach((app, index) => {
+      const option = document.createElement('option');
+      option.value = index;
+      option.textContent = `${app.icon || '📱'} ${app.title || 'İsimsiz'}`;
+      select.appendChild(option);
+    });
+  } else {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'Henüz uygulama yok';
+    option.disabled = true;
+    select.appendChild(option);
+  }
+}
+
+// Seçilen uygulama için bildirim ayarlarını yükle
+function loadAppNotificationSettings(appIndex) {
+  const settingsDiv = document.getElementById('appNotificationSettings');
+  const actionsDiv = document.getElementById('appNotificationActions');
+  
+  if (!appIndex || appIndex === '') {
+    if (settingsDiv) settingsDiv.style.display = 'none';
+    if (actionsDiv) actionsDiv.style.display = 'none';
+    return;
+  }
+  
+  const app = appsData.apps[parseInt(appIndex)];
+  if (!app) {
+    showAlert('❌ Uygulama bulunamadı!', 'error');
+    return;
+  }
+  
+  // Form alanlarını göster
+  if (settingsDiv) settingsDiv.style.display = 'block';
+  if (actionsDiv) actionsDiv.style.display = 'flex';
+  
+  // Mevcut bildirim ayarlarını yükle
+  const notification = app.notification || {};
+  
+  const latestVersionEl = document.getElementById('latest_version');
+  const forceUpdateEl = document.getElementById('force_update');
+  const updateMessageEl = document.getElementById('update_message');
+  const playStoreUrlEl = document.getElementById('play_store_url');
+  const notificationEnabledEl = document.getElementById('notification_enabled');
+  const durationTypeEl = document.getElementById('notification_duration_type');
+  const durationValueEl = document.getElementById('notification_duration_value');
+  const durationValueGroup = document.getElementById('notification_duration_value_group');
+  const durationHint = document.getElementById('notification_duration_hint');
+  
+  if (latestVersionEl) latestVersionEl.value = notification.latest_version || '';
+  if (forceUpdateEl) forceUpdateEl.value = String(notification.force_update || false);
+  if (updateMessageEl) updateMessageEl.value = notification.update_message || '';
+  if (playStoreUrlEl) playStoreUrlEl.value = app.details && app.details !== '#' ? app.details : '';
+  if (notificationEnabledEl) notificationEnabledEl.value = String(notification.enabled || false);
+  
+  // Süreli bildirim ayarları
+  if (notification.duration) {
+    if (notification.duration.type === 'hours') {
+      if (durationTypeEl) durationTypeEl.value = 'hours';
+      if (durationValueEl) durationValueEl.value = notification.duration.value || '';
+      if (durationValueGroup) durationValueGroup.style.display = 'block';
+      if (durationHint) durationHint.textContent = 'Bildirimin kaç saat gösterileceğini girin';
+    } else if (notification.duration.type === 'days') {
+      if (durationTypeEl) durationTypeEl.value = 'days';
+      if (durationValueEl) durationValueEl.value = notification.duration.value || '';
+      if (durationValueGroup) durationValueGroup.style.display = 'block';
+      if (durationHint) durationHint.textContent = 'Bildirimin kaç gün gösterileceğini girin';
+    } else {
+      if (durationTypeEl) durationTypeEl.value = 'none';
+      if (durationValueGroup) durationValueGroup.style.display = 'none';
+    }
+  } else {
+    if (durationTypeEl) durationTypeEl.value = 'none';
+    if (durationValueGroup) durationValueGroup.style.display = 'none';
+  }
+}
+
+// Uygulama formu için süre tipi değiştiğinde input'u göster/gizle
+function onAppNotificationDurationTypeChange() {
+  const durationTypeEl = document.getElementById('appNotificationDurationType');
+  const durationValueGroup = document.getElementById('appNotificationDurationValueGroup');
+  const durationHint = document.getElementById('appNotificationDurationHint');
+  const durationValueEl = document.getElementById('appNotificationDurationValue');
+  
+  if (!durationTypeEl || !durationValueGroup) return;
+  
+  const type = durationTypeEl.value;
+  
+  if (type === 'none') {
+    durationValueGroup.style.display = 'none';
+    if (durationValueEl) durationValueEl.required = false;
+  } else {
+    durationValueGroup.style.display = 'block';
+    if (durationValueEl) durationValueEl.required = true;
+    
+    if (type === 'hours') {
+      if (durationHint) durationHint.textContent = 'Bildirimin kaç saat gösterileceğini girin';
+      if (durationValueEl) durationValueEl.placeholder = 'Örn: 24';
+    } else if (type === 'days') {
+      if (durationHint) durationHint.textContent = 'Bildirimin kaç gün gösterileceğini girin';
+      if (durationValueEl) durationValueEl.placeholder = 'Örn: 7';
+    }
+  }
+}
+
+// Süre tipi değiştiğinde input'u göster/gizle
+function onNotificationDurationTypeChange() {
+  const durationTypeEl = document.getElementById('notification_duration_type');
+  const durationValueGroup = document.getElementById('notification_duration_value_group');
+  const durationHint = document.getElementById('notification_duration_hint');
+  const durationValueEl = document.getElementById('notification_duration_value');
+  
+  if (!durationTypeEl || !durationValueGroup) return;
+  
+  const type = durationTypeEl.value;
+  
+  if (type === 'none') {
+    durationValueGroup.style.display = 'none';
+    if (durationValueEl) durationValueEl.required = false;
+  } else {
+    durationValueGroup.style.display = 'block';
+    if (durationValueEl) durationValueEl.required = true;
+    
+    if (type === 'hours') {
+      if (durationHint) durationHint.textContent = 'Bildirimin kaç saat gösterileceğini girin';
+      if (durationValueEl) durationValueEl.placeholder = 'Örn: 24';
+    } else if (type === 'days') {
+      if (durationHint) durationHint.textContent = 'Bildirimin kaç gün gösterileceğini girin';
+      if (durationValueEl) durationValueEl.placeholder = 'Örn: 7';
+    }
+  }
+}
+
+// Uygulama bildirim ayarlarını kaydet
+async function saveAppNotification(event) {
+  event.preventDefault();
+  
+  const appSelect = document.getElementById('notification_app_select');
+  if (!appSelect || !appSelect.value) {
+    showAlert('⚠️ Lütfen bir uygulama seçin!', 'error');
+    return;
+  }
+  
+  const appIndex = parseInt(appSelect.value);
+  const app = appsData.apps[appIndex];
+  if (!app) {
+    showAlert('❌ Uygulama bulunamadı!', 'error');
+    return;
+  }
+  
+  const saveBtn = document.getElementById('saveAppNotificationBtn');
+  const originalText = saveBtn.querySelector('span')?.textContent || '💾 Kaydet';
+  
+  // Loading state
+  saveBtn.disabled = true;
+  saveBtn.querySelector('span').textContent = '⏳ Kaydediliyor...';
+  
+  try {
+    // Form verilerini topla
+    const latestVersionEl = document.getElementById('latest_version');
+    const forceUpdateEl = document.getElementById('force_update');
+    const updateMessageEl = document.getElementById('update_message');
+    const playStoreUrlEl = document.getElementById('play_store_url');
+    const notificationEnabledEl = document.getElementById('notification_enabled');
+    const durationTypeEl = document.getElementById('notification_duration_type');
+    const durationValueEl = document.getElementById('notification_duration_value');
+    
+    if (!latestVersionEl || !forceUpdateEl || !updateMessageEl || !notificationEnabledEl) {
+      throw new Error('Form elemanları bulunamadı!');
+    }
+    
+    const latestVersion = latestVersionEl.value.trim();
+    const updateMessage = updateMessageEl.value.trim();
+    const notificationEnabled = notificationEnabledEl.value === 'true';
+    
+    // Validasyon
+    if (!latestVersion || !updateMessage) {
+      throw new Error('Lütfen tüm zorunlu alanları doldurun.');
+    }
+    
+    // Versiyon format kontrolü
+    if (!/^\d+\.\d+\.\d+$/.test(latestVersion)) {
+      throw new Error('Versiyon formatı hatalı. Format: X.Y.Z (örn: 1.0.0)');
+    }
+    
+    // Süreli bildirim kontrolü
+    const durationType = durationTypeEl?.value || 'none';
+    const durationValue = durationValueEl?.value || '';
+    
+    if ((durationType === 'hours' || durationType === 'days') && !durationValue) {
+      throw new Error('Lütfen bildirim süresini girin.');
+    }
+    
+    // Bildirim objesi oluştur
+    const notification = {
+      latest_version: latestVersion,
+      force_update: forceUpdateEl.value === 'true',
+      update_message: updateMessage,
+      enabled: notificationEnabled
+    };
+    
+    // Süreli bildirim ayarları
+    if (durationType !== 'none' && durationValue) {
+      notification.duration = {
+        type: durationType,
+        value: parseInt(durationValue),
+        start_time: new Date().toISOString() // Bildirim başlangıç zamanı
+      };
+    }
+    
+    // Play Store URL'i güncelle
+    if (playStoreUrlEl && playStoreUrlEl.value.trim()) {
+      app.details = playStoreUrlEl.value.trim();
+    }
+    
+    // Uygulama bildirim ayarlarını güncelle
+    if (notificationEnabled) {
+      app.notification = notification;
+    } else {
+      // Bildirim kapalıysa, sadece enabled false yap, diğer ayarları koru
+      if (app.notification) {
+        app.notification.enabled = false;
+      } else {
+        app.notification = { enabled: false };
+      }
+    }
+    
+    // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
+    try {
+      const response = await fetch('/.netlify/functions/updateApps', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appsData)
+      });
+      
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const text = await response.text();
+        console.error('Netlify Function HTML response:', text.substring(0, 200));
+        throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
+      }
+      
+      if (response.ok) {
+        saveToLocal();
+        showAlert('✅ Bildirim ayarları kaydedildi!', 'success');
+        autoRefreshPreview();
+      } else {
+        throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
+      }
+    } catch (error) {
+      console.error('Netlify Function hatası:', error);
+      saveToLocal();
+      
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
+        showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
+      } else {
+        showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
+      }
+      
+      if (currentMode === 'github' && token) {
+        try {
+          await saveToGitHub();
+          showAlert('✅ GitHub\'a manuel olarak kaydedildi!', 'success');
+        } catch (githubError) {
+          console.error('GitHub kaydetme hatası:', githubError);
+        }
+      }
+    }
+    
+    saveBtn.querySelector('span').textContent = '✅ Kaydedildi!';
+    setTimeout(() => {
+    saveBtn.querySelector('span').textContent = originalText;
+    saveBtn.disabled = false;
+  }, 2000);
+  
+} catch (error) {
+    console.error('Bildirim kaydetme hatası:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
+    showAlert(`❌ ${errorMessage}`, 'error');
+    saveBtn.querySelector('span').textContent = originalText;
+    saveBtn.disabled = false;
+  }
+}
+
+// Bildirim formunu sıfırla
+function resetAppNotificationForm() {
+  const appSelect = document.getElementById('notification_app_select');
+  if (appSelect) appSelect.value = '';
+  
+  const settingsDiv = document.getElementById('appNotificationSettings');
+  const actionsDiv = document.getElementById('appNotificationActions');
+  
+  if (settingsDiv) settingsDiv.style.display = 'none';
+  if (actionsDiv) actionsDiv.style.display = 'none';
+  
+  // Form'u temizle
+  const form = document.getElementById('notificationsForm');
+  if (form) form.reset();
+  
+  // Süre input'unu gizle
+  const durationValueGroup = document.getElementById('notification_duration_value_group');
+  if (durationValueGroup) durationValueGroup.style.display = 'none';
 }
 

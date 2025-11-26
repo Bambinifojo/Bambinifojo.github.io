@@ -6107,9 +6107,22 @@
                 Bildirim Ayarları
               </h2>
 
-              <form id="notificationsForm" onsubmit="saveNotificationsConfig(event)">
-                <!-- Versiyon Yönetimi -->
+              <form id="notificationsForm" onsubmit="saveAppNotification(event)">
+                <!-- Uygulama Seçimi -->
                 <div class="site-form-section">
+                  <h3>📱 Uygulama Seçimi</h3>
+                  
+                  <div class="form-group">
+                    <label for="notification_app_select">Uygulama Seç *</label>
+                    <select id="notification_app_select" name="notification_app_select" required onchange="loadAppNotificationSettings(this.value)">
+                      <option value="">-- Uygulama Seçin --</option>
+                    </select>
+                    <small>Bildirim göndermek istediğiniz uygulamayı seçin</small>
+                  </div>
+                </div>
+
+                <!-- Versiyon Yönetimi -->
+                <div class="site-form-section" id="appNotificationSettings" style="display: none;">
                   <h3>📦 Versiyon Yönetimi</h3>
                   
                   <div class="form-group">
@@ -6138,61 +6151,109 @@
                     <input type="url" id="play_store_url" name="play_store_url" placeholder="https://play.google.com/store/apps/details?id=com.taskcosmos.app"/>
                     <small>Güncelleme modalında kullanılacak Play Store linki</small>
                   </div>
-                </div>
 
-                <!-- Genel Yayın (Broadcast) -->
-                <div class="site-form-section">
-                  <h3>📢 Genel Yayın (Broadcast)</h3>
-                  
+                  <!-- Süreli Bildirim Ayarları -->
                   <div class="form-group">
-                    <label for="broadcast_title">Yayın Başlığı *</label>
-                    <input type="text" id="broadcast_title" name="broadcast_title" required placeholder="Örn: Yeni Görev Yayınlandı!"/>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="broadcast_message">Yayın Mesajı *</label>
-                    <textarea id="broadcast_message" name="broadcast_message" required placeholder="Yeni bölümler aktif! Hemen kontrol edin." class="textarea-medium"></textarea>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="broadcast_enabled">Yayın Durumu</label>
-                    <select id="broadcast_enabled" name="broadcast_enabled" required title="Yayın durumunu seçin">
-                      <option value="true">Açık</option>
-                      <option value="false">Kapalı</option>
-                    </select>
-                    <small>Yayın açıkken kullanıcılara gösterilir</small>
-                  </div>
-                </div>
-
-                <!-- Bakım Modu -->
-                <div class="site-form-section">
-                  <h3>🔧 Bakım Modu</h3>
-                  
-                  <div class="form-group">
-                    <label for="maintenance">Bakım Modu</label>
-                    <select id="maintenance" name="maintenance" required title="Bakım modu durumunu seçin">
+                    <label for="notification_enabled">Bildirim Aktif mi? *</label>
+                    <select id="notification_enabled" name="notification_enabled" required>
                       <option value="false">Kapalı</option>
                       <option value="true">Açık</option>
                     </select>
-                    <small>Bakım modu açıkken kullanıcılara bakım mesajı gösterilir</small>
+                    <small>Bildirim açıkken kullanıcılara gösterilir</small>
                   </div>
 
                   <div class="form-group">
-                    <label for="maintenance_message">Bakım Mesajı *</label>
-                    <textarea id="maintenance_message" name="maintenance_message" required placeholder="Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin." class="textarea-medium"></textarea>
-                    <small>Bakım modu açıkken gösterilecek mesaj</small>
+                    <label for="notification_duration_type">Bildirim Süresi Tipi</label>
+                    <select id="notification_duration_type" name="notification_duration_type" onchange="onNotificationDurationTypeChange()">
+                      <option value="none">Süresiz</option>
+                      <option value="hours">Saat</option>
+                      <option value="days">Gün</option>
+                    </select>
+                    <small>Bildirimin ne kadar süre gösterileceğini seçin</small>
+                  </div>
+
+                  <div class="form-group" id="notification_duration_value_group" style="display: none;">
+                    <label for="notification_duration_value">Bildirim Süresi *</label>
+                    <input type="number" id="notification_duration_value" name="notification_duration_value" min="1" placeholder="Örn: 24"/>
+                    <small id="notification_duration_hint">Bildirimin kaç saat gösterileceğini girin</small>
                   </div>
                 </div>
 
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-primary" id="saveNotificationsBtn">
+                <div class="form-actions" id="appNotificationActions" style="display: none;">
+                  <button type="submit" class="btn btn-primary" id="saveAppNotificationBtn">
                     <span>💾 Kaydet</span>
                   </button>
-                  <button type="button" class="btn btn-secondary" onclick="loadNotificationsConfig()">
-                    <span>🔄 Yenile</span>
+                  <button type="button" class="btn btn-secondary" onclick="resetAppNotificationForm()">
+                    <span>🔄 Sıfırla</span>
                   </button>
                 </div>
               </form>
+
+              <!-- Genel Bildirim Ayarları (Eski Form) -->
+              <div class="admin-card" style="margin-top: 30px;">
+                <h2>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                  </svg>
+                  Genel Bildirim Ayarları
+                </h2>
+
+                <form id="generalNotificationsForm" onsubmit="saveNotificationsConfig(event)">
+                  <!-- Genel Yayın (Broadcast) -->
+                  <div class="site-form-section">
+                    <h3>📢 Genel Yayın (Broadcast)</h3>
+                    
+                    <div class="form-group">
+                      <label for="broadcast_title">Yayın Başlığı *</label>
+                      <input type="text" id="broadcast_title" name="broadcast_title" required placeholder="Örn: Yeni Görev Yayınlandı!"/>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="broadcast_message">Yayın Mesajı *</label>
+                      <textarea id="broadcast_message" name="broadcast_message" required placeholder="Yeni bölümler aktif! Hemen kontrol edin." class="textarea-medium"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="broadcast_enabled">Yayın Durumu</label>
+                      <select id="broadcast_enabled" name="broadcast_enabled" required title="Yayın durumunu seçin">
+                        <option value="true">Açık</option>
+                        <option value="false">Kapalı</option>
+                      </select>
+                      <small>Yayın açıkken kullanıcılara gösterilir</small>
+                    </div>
+                  </div>
+
+                  <!-- Bakım Modu -->
+                  <div class="site-form-section">
+                    <h3>🔧 Bakım Modu</h3>
+                    
+                    <div class="form-group">
+                      <label for="maintenance">Bakım Modu</label>
+                      <select id="maintenance" name="maintenance" required title="Bakım modu durumunu seçin">
+                        <option value="false">Kapalı</option>
+                        <option value="true">Açık</option>
+                      </select>
+                      <small>Bakım modu açıkken kullanıcılara bakım mesajı gösterilir</small>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="maintenance_message">Bakım Mesajı *</label>
+                      <textarea id="maintenance_message" name="maintenance_message" required placeholder="Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin." class="textarea-medium"></textarea>
+                      <small>Bakım modu açıkken gösterilecek mesaj</small>
+                    </div>
+                  </div>
+
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="saveNotificationsBtn">
+                      <span>💾 Kaydet</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="loadNotificationsConfig()">
+                      <span>🔄 Yenile</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
 
@@ -6505,6 +6566,23 @@
               <option value="true">Açık</option>
             </select>
             <small>Bildirim açıkken kullanıcılara gösterilir</small>
+          </div>
+
+          <!-- Süreli Bildirim Ayarları -->
+          <div class="form-group">
+            <label for="appNotificationDurationType">Bildirim Süresi Tipi</label>
+            <select id="appNotificationDurationType" name="appNotificationDurationType" onchange="onAppNotificationDurationTypeChange()">
+              <option value="none">Süresiz</option>
+              <option value="hours">Saat</option>
+              <option value="days">Gün</option>
+            </select>
+            <small>Bildirimin ne kadar süre gösterileceğini seçin</small>
+          </div>
+
+          <div class="form-group" id="appNotificationDurationValueGroup" style="display: none;">
+            <label for="appNotificationDurationValue">Bildirim Süresi *</label>
+            <input type="number" id="appNotificationDurationValue" name="appNotificationDurationValue" min="1" placeholder="Örn: 24"/>
+            <small id="appNotificationDurationHint">Bildirimin kaç saat gösterileceğini girin</small>
           </div>
 
           <div class="form-actions">
