@@ -4057,31 +4057,48 @@ async function saveAppNotification(event) {
         throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
       }
     } catch (error) {
-      console.error('Netlify Function hatası:', error);
-      saveToLocal();
-      
+      // Hata yönetimi - kullanıcı dostu mesajlar
       const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      
+      // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal, sadece localhost'ta logla
+      if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.warn('ℹ️ Netlify Function çalışmıyor (GitHub Pages modu):', errorMessage);
+        }
+      } else {
+        console.error('Netlify Function hatası:', error);
+      }
+      
+      saveToLocal(); // LocalStorage'a backup olarak kaydet
+      
+      // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
       if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
         showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
       } else {
         showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
       }
       
+      // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
       if (currentMode === 'github' && token) {
         try {
           await saveToGitHub();
           showAlert('✅ GitHub\'a manuel olarak kaydedildi!', 'success');
         } catch (githubError) {
+          const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
           console.error('GitHub kaydetme hatası:', githubError);
+          showAlert(`❌ GitHub kaydetme hatası: ${githubErrorMessage}`, 'error');
         }
       }
     }
     
+    // Aktif bildirimler listesini güncelle
+    renderActiveNotifications();
+    
     saveBtn.querySelector('span').textContent = '✅ Kaydedildi!';
     setTimeout(() => {
-    saveBtn.querySelector('span').textContent = originalText;
-    saveBtn.disabled = false;
-  }, 2000);
+      saveBtn.querySelector('span').textContent = originalText;
+      saveBtn.disabled = false;
+    }, 2000);
   
 } catch (error) {
     console.error('Bildirim kaydetme hatası:', error);
