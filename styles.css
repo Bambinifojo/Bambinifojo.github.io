@@ -1236,8 +1236,6 @@ body.menu-open .hamburger {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -3356,8 +3354,7 @@ footer p {
     
     /* Overlay mobilde tam ekran */
     .overlay {
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
+        /* Blur efekti kaldırıldı */
     }
     
     /* Mobilde body scroll lock */
