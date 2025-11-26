@@ -211,8 +211,7 @@
         }
 
         /* Privacy policy sayfasında header-tagline'ı gizle */
-        .privacy-section ~ * .header-tagline,
-        body:has(.privacy-section) .header-tagline {
+        body.privacy-page .header-tagline {
             display: none !important;
         }
 
@@ -294,7 +293,7 @@
         }
     </style>
 </head>
-<body>
+<body class="privacy-page">
 <!-- Search Bar -->
 <div class="search-container" id="searchContainer">
   <div class="search-box">
