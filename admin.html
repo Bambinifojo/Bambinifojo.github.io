@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://bambinifojo.netlify.app https://bambinifojo.github.io; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://bambinifojo.netlify.app https://bambinifojo.github.io; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <title>Admin Paneli - Bambinifojo</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <link rel="stylesheet" href="/styles.css"/>
@@ -5869,11 +5869,11 @@
               <div id="siteHeaderForm" class="site-form-section">
                 <h3>Header Ayarları</h3>
                 <div class="form-group">
-                  <label>Logo Metni</label>
+                  <label for="siteHeaderLogo">Logo Metni</label>
                   <input type="text" id="siteHeaderLogo" name="siteHeaderLogo" placeholder="Bambinifojo" autocomplete="off"/>
                 </div>
                 <div class="form-group">
-                  <label>Tagline</label>
+                  <label for="siteHeaderTagline">Tagline</label>
                   <input type="text" id="siteHeaderTagline" name="siteHeaderTagline" placeholder="Mobil Uygulama Geliştirici" autocomplete="off"/>
                 </div>
                 <div class="form-actions">
@@ -5885,20 +5885,20 @@
               <div id="siteHeroForm" class="site-form-section hidden">
                 <h3>Hero Bölümü Ayarları</h3>
                 <div class="form-group">
-                  <label>Başlık</label>
+                  <label for="siteHeroTitle">Başlık</label>
                   <input type="text" id="siteHeroTitle" name="siteHeroTitle" placeholder="Bambinifojo" autocomplete="off"/>
                 </div>
                 <div class="form-group">
-                  <label>Tagline</label>
+                  <label for="siteHeroTagline">Tagline</label>
                   <textarea id="siteHeroTagline" name="siteHeroTagline" placeholder="Açıklama metni..." autocomplete="off"></textarea>
                 </div>
                 <div class="form-group">
-                  <label>Play Store URL</label>
+                  <label for="siteHeroPlayStoreUrl">Play Store URL</label>
                   <input type="url" id="siteHeroPlayStoreUrl" name="siteHeroPlayStoreUrl" placeholder="https://play.google.com/..." autocomplete="url"/>
                 </div>
                 <div class="form-group">
-                  <label>İstatistikler (JSON formatında)</label>
-                  <textarea id="siteHeroStats" class="textarea-code" placeholder='[{"number":"2+","label":"Uygulama"}]'></textarea>
+                  <label for="siteHeroStats">İstatistikler (JSON formatında)</label>
+                  <textarea id="siteHeroStats" name="siteHeroStats" class="textarea-code" placeholder='[{"number":"2+","label":"Uygulama"}]'></textarea>
                   <small>Her istatistik: {"number": "2+", "label": "Uygulama"}</small>
                 </div>
                 <div class="form-actions">
@@ -5910,15 +5910,15 @@
               <div id="siteAboutForm" class="site-form-section hidden">
                 <h3>Hakkımda Bölümü Ayarları</h3>
                 <div class="form-group">
-                  <label>Başlık</label>
+                  <label for="siteAboutTitle">Başlık</label>
                   <input type="text" id="siteAboutTitle" name="siteAboutTitle" placeholder="Hakkımda" autocomplete="off"/>
                 </div>
                 <div class="form-group">
-                  <label>Metinler (Her satır bir paragraf)</label>
+                  <label for="siteAboutTexts">Metinler (Her satır bir paragraf)</label>
                   <textarea id="siteAboutTexts" name="siteAboutTexts" class="textarea-medium" placeholder="Paragraf 1&#10;Paragraf 2" autocomplete="off"></textarea>
                 </div>
                 <div class="form-group">
-                  <label>Teknolojiler (Her satır: icon|isim)</label>
+                  <label for="siteAboutTech">Teknolojiler (Her satır: icon|isim)</label>
                   <textarea id="siteAboutTech" name="siteAboutTech" class="textarea-medium" placeholder="🤖|Android&#10;🎨|Flutter" autocomplete="off"></textarea>
                   <small>Format: Emoji|İsim (her satır bir teknoloji)</small>
                 </div>
@@ -5931,7 +5931,7 @@
               <div id="siteSkillsForm" class="site-form-section hidden">
                 <h3>Yetenekler Bölümü Ayarları</h3>
                 <div class="form-group">
-                  <label>Başlık</label>
+                  <label for="siteSkillsTitle">Başlık</label>
                   <input type="text" id="siteSkillsTitle" name="siteSkillsTitle" placeholder="Teknolojiler & Yetenekler" autocomplete="off"/>
                 </div>
                 <div id="skillsListContainer"></div>
@@ -5947,11 +5947,11 @@
               <div id="siteContactForm" class="site-form-section hidden">
                 <h3>İletişim Bölümü Ayarları</h3>
                 <div class="form-group">
-                  <label>Başlık</label>
+                  <label for="siteContactTitle">Başlık</label>
                   <input type="text" id="siteContactTitle" name="siteContactTitle" placeholder="İletişim" autocomplete="off"/>
                 </div>
                 <div class="form-group">
-                  <label>Alt Başlık</label>
+                  <label for="siteContactSubtitle">Alt Başlık</label>
                   <input type="text" id="siteContactSubtitle" name="siteContactSubtitle" placeholder="Açıklama metni..." autocomplete="off"/>
                 </div>
                 <div id="contactListContainer"></div>
@@ -6112,14 +6112,14 @@
                   <h3>📦 Versiyon Yönetimi</h3>
                   
                   <div class="form-group">
-                    <label>Son Sürüm *</label>
-                    <input type="text" id="latest_version" required placeholder="Örn: 1.0.0" pattern="^\d+\.\d+\.\d+$"/>
+                    <label for="latest_version">Son Sürüm *</label>
+                    <input type="text" id="latest_version" name="latest_version" required placeholder="Örn: 1.0.0" pattern="^\d+\.\d+\.\d+$"/>
                     <small>Format: X.Y.Z (örn: 1.0.0, 2.1.5)</small>
                   </div>
 
                   <div class="form-group">
-                    <label>Zorunlu Güncelleme</label>
-                    <select id="force_update" required title="Zorunlu güncelleme durumunu seçin">
+                    <label for="force_update">Zorunlu Güncelleme</label>
+                    <select id="force_update" name="force_update" required title="Zorunlu güncelleme durumunu seçin">
                       <option value="false">Hayır</option>
                       <option value="true">Evet</option>
                     </select>
@@ -6127,14 +6127,14 @@
                   </div>
 
                   <div class="form-group">
-                    <label>Güncelleme Mesajı *</label>
-                    <textarea id="update_message" required placeholder="Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin." class="textarea-medium"></textarea>
+                    <label for="update_message">Güncelleme Mesajı *</label>
+                    <textarea id="update_message" name="update_message" required placeholder="Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin." class="textarea-medium"></textarea>
                     <small>Kullanıcılara gösterilecek güncelleme mesajı</small>
                   </div>
 
                   <div class="form-group">
-                    <label>Play Store URL</label>
-                    <input type="url" id="play_store_url" placeholder="https://play.google.com/store/apps/details?id=com.taskcosmos.app"/>
+                    <label for="play_store_url">Play Store URL</label>
+                    <input type="url" id="play_store_url" name="play_store_url" placeholder="https://play.google.com/store/apps/details?id=com.taskcosmos.app"/>
                     <small>Güncelleme modalında kullanılacak Play Store linki</small>
                   </div>
                 </div>
@@ -6144,18 +6144,18 @@
                   <h3>📢 Genel Yayın (Broadcast)</h3>
                   
                   <div class="form-group">
-                    <label>Yayın Başlığı *</label>
-                    <input type="text" id="broadcast_title" required placeholder="Örn: Yeni Görev Yayınlandı!"/>
+                    <label for="broadcast_title">Yayın Başlığı *</label>
+                    <input type="text" id="broadcast_title" name="broadcast_title" required placeholder="Örn: Yeni Görev Yayınlandı!"/>
                   </div>
 
                   <div class="form-group">
-                    <label>Yayın Mesajı *</label>
-                    <textarea id="broadcast_message" required placeholder="Yeni bölümler aktif! Hemen kontrol edin." class="textarea-medium"></textarea>
+                    <label for="broadcast_message">Yayın Mesajı *</label>
+                    <textarea id="broadcast_message" name="broadcast_message" required placeholder="Yeni bölümler aktif! Hemen kontrol edin." class="textarea-medium"></textarea>
                   </div>
 
                   <div class="form-group">
-                    <label>Yayın Durumu</label>
-                    <select id="broadcast_enabled" required title="Yayın durumunu seçin">
+                    <label for="broadcast_enabled">Yayın Durumu</label>
+                    <select id="broadcast_enabled" name="broadcast_enabled" required title="Yayın durumunu seçin">
                       <option value="true">Açık</option>
                       <option value="false">Kapalı</option>
                     </select>
@@ -6168,8 +6168,8 @@
                   <h3>🔧 Bakım Modu</h3>
                   
                   <div class="form-group">
-                    <label>Bakım Modu</label>
-                    <select id="maintenance" required title="Bakım modu durumunu seçin">
+                    <label for="maintenance">Bakım Modu</label>
+                    <select id="maintenance" name="maintenance" required title="Bakım modu durumunu seçin">
                       <option value="false">Kapalı</option>
                       <option value="true">Açık</option>
                     </select>
@@ -6177,8 +6177,8 @@
                   </div>
 
                   <div class="form-group">
-                    <label>Bakım Mesajı *</label>
-                    <textarea id="maintenance_message" required placeholder="Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin." class="textarea-medium"></textarea>
+                    <label for="maintenance_message">Bakım Mesajı *</label>
+                    <textarea id="maintenance_message" name="maintenance_message" required placeholder="Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin." class="textarea-medium"></textarea>
                     <small>Bakım modu açıkken gösterilecek mesaj</small>
                   </div>
                 </div>
@@ -6341,7 +6341,7 @@
               <!-- Hidden username field for accessibility -->
               <input type="text" name="username" autocomplete="username" class="sr-only" tabindex="-1" aria-hidden="true"/>
               <div class="form-group margin-top-20">
-                <label class="admin-password-label">Admin Şifresi</label>
+                <label for="adminPassword" class="admin-password-label">Admin Şifresi</label>
                 <div class="admin-password-wrapper">
                   <input type="password" id="adminPassword" name="adminPassword" placeholder="Şifrenizi girin" autocomplete="current-password" required/>
                   <button type="button" onclick="toggleAdminPassword()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
@@ -6401,49 +6401,49 @@
           <input type="hidden" id="appIndex" value="-1">
           
           <div class="form-group">
-            <label>Uygulama Adı *</label>
+            <label for="appTitle">Uygulama Adı *</label>
             <input type="text" id="appTitle" name="appTitle" required placeholder="Örn: Task Cosmos" autocomplete="off"/>
           </div>
 
           <div class="form-group">
-            <label>Açıklama *</label>
+            <label for="appDescription">Açıklama *</label>
             <textarea id="appDescription" name="appDescription" required placeholder="Uygulamanın kısa açıklaması..." autocomplete="off"></textarea>
           </div>
 
           <div class="form-group">
-            <label>İkon (Emoji) *</label>
+            <label for="appIcon">İkon (Emoji) *</label>
             <input type="text" id="appIcon" name="appIcon" required placeholder="📱" maxlength="2" autocomplete="off"/>
             <small>Bir emoji girin (örn: 📱, 🌤️, 📝)</small>
           </div>
 
           <div class="form-group">
-            <label>Kategori *</label>
+            <label for="appCategory">Kategori *</label>
             <input type="text" id="appCategory" name="appCategory" required placeholder="Örn: Üretkenlik, Hava Durumu" autocomplete="off"/>
           </div>
 
           <div class="form-group">
-            <label>Rating (0-5) *</label>
+            <label for="appRating">Rating (0-5) *</label>
             <input type="number" id="appRating" name="appRating" required min="0" max="5" step="0.1" placeholder="4.5" autocomplete="off"/>
           </div>
 
           <div class="form-group">
-            <label>İndirme Sayısı *</label>
+            <label for="appDownloads">İndirme Sayısı *</label>
             <input type="text" id="appDownloads" name="appDownloads" required placeholder="Örn: 10K+, 5K+" autocomplete="off"/>
           </div>
 
           <div class="form-group">
-            <label>Google Play Store Linki</label>
+            <label for="appDetails">Google Play Store Linki</label>
             <input type="url" id="appDetails" name="appDetails" placeholder="https://play.google.com/store/apps/details?id=..." autocomplete="url"/>
             <small>Boş bırakılırsa "Yakında" butonu gösterilir</small>
           </div>
 
           <div class="form-group">
-            <label>Gizlilik Politikası Linki</label>
+            <label for="appPrivacy">Gizlilik Politikası Linki</label>
             <input type="url" id="appPrivacy" name="appPrivacy" placeholder="https://..." autocomplete="url"/>
           </div>
 
           <div class="form-group">
-            <label>Özellikler</label>
+            <label for="newFeature">Özellikler</label>
             <div id="featuresList" class="features-input"></div>
             <div class="add-feature">
               <input type="text" id="newFeature" name="newFeature" placeholder="Yeni özellik ekle..." autocomplete="off"/>
@@ -6465,26 +6465,26 @@
           </div>
 
           <div class="form-group">
-            <label>Uygulama ID (appId)</label>
+            <label for="appNotificationId">Uygulama ID (appId)</label>
             <input type="text" id="appNotificationId" name="appNotificationId" placeholder="Örn: task-cosmos" autocomplete="off"/>
             <small>Bildirim API'sinde kullanılacak benzersiz ID (opsiyonel)</small>
           </div>
 
           <div class="form-group">
-            <label>Package Name</label>
+            <label for="appNotificationPackage">Package Name</label>
             <input type="text" id="appNotificationPackage" name="appNotificationPackage" placeholder="Örn: com.bambinifojo.taskcosmos" autocomplete="off"/>
             <small>Android uygulama package adı (opsiyonel)</small>
           </div>
 
           <div class="form-group">
-            <label>Son Sürüm</label>
+            <label for="appNotificationVersion">Son Sürüm</label>
             <input type="text" id="appNotificationVersion" name="appNotificationVersion" placeholder="Örn: 1.0.0" pattern="^\d+\.\d+\.\d+$" autocomplete="off"/>
             <small>Format: X.Y.Z (örn: 1.0.0, 2.1.5)</small>
           </div>
 
           <div class="form-group">
-            <label>Zorunlu Güncelleme</label>
-            <select id="appNotificationForceUpdate" title="Uygulama için zorunlu güncelleme durumunu seçin">
+            <label for="appNotificationForceUpdate">Zorunlu Güncelleme</label>
+            <select id="appNotificationForceUpdate" name="appNotificationForceUpdate" title="Uygulama için zorunlu güncelleme durumunu seçin">
               <option value="false">Hayır</option>
               <option value="true">Evet</option>
             </select>
@@ -6492,14 +6492,14 @@
           </div>
 
           <div class="form-group">
-            <label>Güncelleme Mesajı</label>
-            <textarea id="appNotificationMessage" rows="3" placeholder="Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin."></textarea>
+            <label for="appNotificationMessage">Güncelleme Mesajı</label>
+            <textarea id="appNotificationMessage" name="appNotificationMessage" rows="3" placeholder="Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin."></textarea>
             <small>Kullanıcılara gösterilecek güncelleme mesajı</small>
           </div>
 
           <div class="form-group">
-            <label>Bildirim Aktif mi?</label>
-            <select id="appNotificationEnabled" title="Uygulama bildirim durumunu seçin">
+            <label for="appNotificationEnabled">Bildirim Aktif mi?</label>
+            <select id="appNotificationEnabled" name="appNotificationEnabled" title="Uygulama bildirim durumunu seçin">
               <option value="false">Kapalı</option>
               <option value="true">Açık</option>
             </select>
@@ -6532,18 +6532,18 @@
               <input type="hidden" id="userIndex" value="-1">
               
               <div class="form-group">
-                <label>Kullanıcı Adı *</label>
+                <label for="userName">Kullanıcı Adı *</label>
                 <input type="text" id="userName" name="userName" required placeholder="Örn: admin, john_doe" autocomplete="username"/>
                 <small>Kullanıcı adı benzersiz olmalıdır</small>
               </div>
 
               <div class="form-group">
-                <label>E-posta</label>
+                <label for="userEmail">E-posta</label>
                 <input type="email" id="userEmail" name="userEmail" placeholder="user@example.com" autocomplete="email"/>
               </div>
 
               <div class="form-group">
-                <label>Şifre *</label>
+                <label for="userPassword">Şifre *</label>
                 <div class="admin-password-wrapper">
                   <input type="password" id="userPassword" name="userPassword" required placeholder="Güçlü bir şifre girin" minlength="6" autocomplete="new-password"/>
                   <button type="button" onclick="toggleUserPassword()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
@@ -6557,7 +6557,7 @@
               </div>
 
               <div class="form-group" id="userPasswordConfirmGroup">
-                <label>Şifre Tekrar *</label>
+                <label for="userPasswordConfirm">Şifre Tekrar *</label>
                 <div class="admin-password-wrapper">
                   <input type="password" id="userPasswordConfirm" name="userPasswordConfirm" required placeholder="Şifreyi tekrar girin" minlength="6" autocomplete="new-password"/>
                   <button type="button" onclick="toggleUserPasswordConfirm()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
@@ -6570,8 +6570,8 @@
               </div>
 
               <div class="form-group">
-                <label>Rol</label>
-                <select id="userRole" title="Kullanıcı rolünü seçin">
+                <label for="userRole">Rol</label>
+                <select id="userRole" name="userRole" title="Kullanıcı rolünü seçin">
                   <option value="admin">Admin</option>
                   <option value="editor">Editör</option>
                   <option value="viewer">Görüntüleyici</option>
