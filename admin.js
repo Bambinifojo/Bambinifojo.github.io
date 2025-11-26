@@ -305,8 +305,11 @@ function showSection(section) {
   // Bildirim ayarları bölümüne geçildiğinde config'i yükle
   if (section === 'notifications') {
     loadNotificationsConfig();
-    populateAppNotificationSelect();
-    renderActiveNotifications();
+    // appsData yüklenmesini bekle, sonra dropdown'ı doldur
+    setTimeout(() => {
+      populateAppNotificationSelect();
+      renderActiveNotifications();
+    }, 100);
     // Süre tipi değişikliği için event listener ekle
     const durationTypeEl = document.getElementById('notification_duration_type');
     if (durationTypeEl) {
@@ -613,7 +616,11 @@ document.addEventListener('DOMContentLoaded', () => {
           renderVotes();
         } else if (section === 'notifications') {
           loadNotificationsConfig();
-          populateAppNotificationSelect();
+          // appsData yüklenmesini bekle, sonra dropdown'ı doldur
+          setTimeout(() => {
+            populateAppNotificationSelect();
+            renderActiveNotifications();
+          }, 100);
           // Süre tipi değişikliği için event listener ekle
           const durationTypeEl = document.getElementById('notification_duration_type');
           if (durationTypeEl) {
@@ -732,6 +739,12 @@ function autoLogin() {
   
   updateStats();
   renderApps();
+  // Bildirim ayarları bölümündeyse dropdown'ı da güncelle
+  const notificationsSection = document.getElementById('notificationsSection');
+  if (notificationsSection && !notificationsSection.classList.contains('hidden')) {
+    populateAppNotificationSelect();
+    renderActiveNotifications();
+  }
 }
 
 // Varsayılan site verisi
@@ -3488,8 +3501,23 @@ async function loadNotificationsConfig() {
     if (maintenanceMessageEl) maintenanceMessageEl.value = config.maintenance_message || "";
     
   } catch (error) {
-    console.warn('Config yükleme hatası (varsayılan değerler kullanılıyor):', error);
     // Hata durumunda sessizce varsayılan değerleri kullan (kullanıcıyı rahatsız etme)
+    // Sadece geliştirme modunda log göster
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.warn('Config yükleme hatası (varsayılan değerler kullanılıyor):', error);
+    }
+    
+    // Varsayılan config değerleri
+    const config = {
+      latest_version: "1.0.0",
+      force_update: false,
+      update_message: "Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.",
+      broadcast_enabled: false,
+      broadcast_title: "Yeni Görev Yayınlandı!",
+      broadcast_message: "Yeni bölümler aktif! Hemen kontrol edin.",
+      maintenance: false,
+      maintenance_message: "Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin."
+    };
     
     // Hata durumunda varsayılan değerleri form'a yükle
     const latestVersionEl = document.getElementById('latest_version');
@@ -3502,15 +3530,16 @@ async function loadNotificationsConfig() {
     const maintenanceEl = document.getElementById('maintenance');
     const maintenanceMessageEl = document.getElementById('maintenance_message');
     
-    if (latestVersionEl) latestVersionEl.value = "1.0.0";
-    if (forceUpdateEl) forceUpdateEl.value = "false";
-    if (updateMessageEl) updateMessageEl.value = "Yeni sürüm mevcut! Lütfen uygulamayı güncelleyin.";
-    if (playStoreUrlEl) playStoreUrlEl.value = "https://play.google.com/store/apps/details?id=com.taskcosmos.app";
-    if (broadcastTitleEl) broadcastTitleEl.value = "Yeni Görev Yayınlandı!";
-    if (broadcastMessageEl) broadcastMessageEl.value = "Yeni bölümler aktif! Hemen kontrol edin.";
-    if (broadcastEnabledEl) broadcastEnabledEl.value = "false";
-    if (maintenanceEl) maintenanceEl.value = "false";
-    if (maintenanceMessageEl) maintenanceMessageEl.value = "Bakım çalışmaları sürüyor. Lütfen daha sonra tekrar deneyin.";
+    // Form alanlarını varsayılan değerlerle doldur
+    if (latestVersionEl) latestVersionEl.value = config.latest_version || "1.0.0";
+    if (forceUpdateEl) forceUpdateEl.value = String(config.force_update || false);
+    if (updateMessageEl) updateMessageEl.value = config.update_message || "";
+    if (playStoreUrlEl) playStoreUrlEl.value = config.play_store_url || "https://play.google.com/store/apps/details?id=com.taskcosmos.app";
+    if (broadcastTitleEl) broadcastTitleEl.value = config.broadcast_title || "";
+    if (broadcastMessageEl) broadcastMessageEl.value = config.broadcast_message || "";
+    if (broadcastEnabledEl) broadcastEnabledEl.value = String(config.broadcast_enabled || false);
+    if (maintenanceEl) maintenanceEl.value = String(config.maintenance || false);
+    if (maintenanceMessageEl) maintenanceMessageEl.value = config.maintenance_message || "";
   }
 }
 
@@ -3670,11 +3699,47 @@ async function saveConfigToGitHub(config) {
 // Uygulamalar listesini dropdown'a yükle
 function populateAppNotificationSelect() {
   const select = document.getElementById('notification_app_select');
-  if (!select) return;
+  if (!select) {
+    console.warn('⚠️ notification_app_select elementi bulunamadı');
+    return;
+  }
   
   // Mevcut seçenekleri temizle (ilk seçenek hariç)
   while (select.children.length > 1) {
     select.removeChild(select.lastChild);
+  }
+  
+  // appsData yüklenmemişse, yüklemeyi dene
+  if (!appsData || !appsData.apps) {
+    console.warn('⚠️ appsData henüz yüklenmemiş, yükleniyor...');
+    
+    // LocalStorage'dan yükle
+    const saved = localStorage.getItem('appsData');
+    if (saved) {
+      try {
+        appsData = JSON.parse(saved);
+      } catch (e) {
+        console.error('LocalStorage\'dan appsData parse edilemedi:', e);
+        appsData = { apps: [] };
+      }
+    }
+    
+    // Hala yoksa, JSON dosyasından yükle
+    if (!appsData || !appsData.apps || appsData.apps.length === 0) {
+      fetch('/data/apps.json')
+        .then(res => res.json())
+        .then(data => {
+          appsData = data;
+          saveToLocal();
+          populateAppNotificationSelect(); // Tekrar çağır
+        })
+        .catch(error => {
+          console.error('apps.json yüklenirken hata:', error);
+          appsData = { apps: [] };
+          populateAppNotificationSelect(); // Tekrar çağır (boş liste ile)
+        });
+      return; // Async işlem devam ediyor, şimdilik çık
+    }
   }
   
   // Uygulamaları ekle
@@ -3685,12 +3750,14 @@ function populateAppNotificationSelect() {
       option.textContent = `${app.icon || '📱'} ${app.title || 'İsimsiz'}`;
       select.appendChild(option);
     });
+    console.log(`✅ ${appsData.apps.length} uygulama dropdown'a eklendi`);
   } else {
     const option = document.createElement('option');
     option.value = '';
     option.textContent = 'Henüz uygulama yok';
     option.disabled = true;
     select.appendChild(option);
+    console.warn('⚠️ Uygulama bulunamadı, dropdown boş');
   }
 }
 
