@@ -370,8 +370,31 @@ function toggleSidebar() {
     return;
   }
   
-  sidebar.classList.toggle('active');
-  overlay.classList.toggle('active');
+  const isOpen = sidebar.classList.contains('open');
+  
+  if (isOpen) {
+    // Sidebar açık - kapat
+    sidebar.classList.remove('open');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.classList.remove('sidebar-open');
+    
+    // Hamburger butonunu güncelle
+    if (hamburger) {
+      hamburger.classList.remove('active');
+    }
+  } else {
+    // Sidebar kapalı - aç
+    sidebar.classList.add('open');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('sidebar-open');
+    
+    // Hamburger butonunu güncelle
+    if (hamburger) {
+      hamburger.classList.add('active');
+    }
+  }
 }
 
 // Global scope'a ekle (HTML onclick için)
@@ -385,8 +408,8 @@ if (typeof window !== 'undefined') {
 // Sidebar'ı aç
 function openSidebar() {
   const sidebar = document.getElementById('adminSidebar');
-  const overlay = document.querySelector('.admin-sidebar-overlay');
-  const menuToggle = document.querySelector('.admin-menu-toggle');
+  const overlay = document.getElementById('adminSidebarOverlay');
+  const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
   
   if (sidebar && overlay) {
     if (!sidebar.classList.contains('open')) {
@@ -395,8 +418,8 @@ function openSidebar() {
       document.body.style.overflow = 'hidden';
       document.body.classList.add('sidebar-open');
       
-      if (menuToggle) {
-        menuToggle.classList.add('active');
+      if (hamburger) {
+        hamburger.classList.add('active');
       }
     }
   }
@@ -405,8 +428,8 @@ function openSidebar() {
 // Sidebar'ı kapat (dışarıdan çağrılabilir)
 function closeSidebar() {
   const sidebar = document.getElementById('adminSidebar');
-  const overlay = document.querySelector('.admin-sidebar-overlay');
-  const menuToggle = document.querySelector('.admin-menu-toggle');
+  const overlay = document.getElementById('adminSidebarOverlay');
+  const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
   
   if (sidebar && overlay) {
     sidebar.classList.remove('open');
@@ -414,8 +437,8 @@ function closeSidebar() {
     document.body.style.overflow = '';
     document.body.classList.remove('sidebar-open');
     
-    if (menuToggle) {
-      menuToggle.classList.remove('active');
+    if (hamburger) {
+      hamburger.classList.remove('active');
     }
   }
 }
@@ -473,6 +496,8 @@ function closeTopbarMenu() {
 }
 
 // Hamburger menü event listener'larını ekle (her zaman çalışmalı)
+let hamburgerMenuSetup = false; // Çift event listener eklenmesini önle
+
 function setupHamburgerMenu() {
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
@@ -483,13 +508,31 @@ function setupHamburgerMenu() {
     return;
   }
   
-  // Hamburger butonuna event listener ekle
-  if (hamburger) {
-    hamburger.addEventListener('click', toggleSidebar);
+  // Çift event listener eklenmesini önle
+  if (hamburgerMenuSetup) {
+    return;
   }
   
-  // Overlay'e tıklandığında sidebar'ı kapat
-  overlay.addEventListener('click', toggleSidebar);
+  // Hamburger butonuna event listener ekle
+  if (hamburger) {
+    hamburger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleSidebar();
+    });
+  }
+  
+  // Overlay'e tıklandığında sidebar'ı kapat (sadece kapat, toggle değil)
+  overlay.addEventListener('click', (e) => {
+    // Overlay'e tıklandığında sidebar'ı kapat
+    if (sidebar.classList.contains('open')) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeSidebar();
+    }
+  });
+  
+  hamburgerMenuSetup = true;
 }
 
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
