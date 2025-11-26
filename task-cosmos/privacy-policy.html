@@ -10,7 +10,7 @@
         .privacy-section {
             position: relative;
             z-index: 1;
-            padding: 200px 20px 100px;
+            padding: 120px 20px 60px;
             min-height: 100vh;
             background: #ffffff;
         }
@@ -165,22 +165,31 @@
         }
 
         [data-theme="dark"] .privacy-section {
-            background: var(--background-gradient);
+            background: var(--background-gradient, linear-gradient(135deg, #1a1a2e 0%, #16213e 100%));
         }
 
         [data-theme="dark"] .privacy-container {
-            background: rgba(30, 30, 46, 0.8);
+            background: rgba(30, 30, 46, 0.95);
             border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="dark"] .privacy-header h1 {
+            color: var(--primary-color, #667eea);
         }
 
         [data-theme="dark"] .privacy-content h2 {
-            color: var(--primary-color);
+            color: var(--primary-color, #667eea);
             border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .privacy-content h3 {
+            color: var(--primary-color, #667eea);
         }
 
         [data-theme="dark"] .privacy-content p,
         [data-theme="dark"] .privacy-content li {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.85);
         }
 
         [data-theme="dark"] .privacy-header p {
@@ -189,6 +198,7 @@
 
         [data-theme="dark"] .highlight-box {
             background: rgba(106, 90, 205, 0.2);
+            border-left-color: var(--primary-color, #667eea);
         }
 
         [data-theme="dark"] .last-updated {
@@ -196,21 +206,84 @@
             border-top-color: rgba(255, 255, 255, 0.1);
         }
 
+        [data-theme="dark"] .back-link {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
         @media (max-width: 768px) {
             .privacy-section {
-                padding: 160px 20px 60px;
+                padding: 100px 15px 40px;
             }
 
             .privacy-container {
-                padding: 30px 20px;
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            .privacy-header {
+                margin-bottom: 30px;
+                padding-bottom: 20px;
             }
 
             .privacy-header h1 {
-                font-size: 2rem;
+                font-size: 1.75rem;
+            }
+
+            .privacy-header p {
+                font-size: 1rem;
             }
 
             .privacy-content h2 {
+                font-size: 1.4rem;
+                margin-top: 25px;
+            }
+
+            .privacy-content h3 {
+                font-size: 1.2rem;
+                margin-top: 20px;
+            }
+
+            .privacy-content p,
+            .privacy-content li {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .highlight-box {
+                padding: 15px;
+                margin: 20px 0;
+            }
+
+            .contact-info {
+                padding: 20px;
+            }
+
+            .back-link {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .privacy-section {
+                padding: 90px 10px 30px;
+            }
+
+            .privacy-container {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+
+            .privacy-header h1 {
                 font-size: 1.5rem;
+            }
+
+            .privacy-content h2 {
+                font-size: 1.25rem;
+            }
+
+            .privacy-content h3 {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -314,8 +387,6 @@
         <span></span>
       </button>
     </div>
-  </div>
-    <div class="header-tagline">Mobil Uygulama Geliştirici</div>
   </div>
 </header>
 
