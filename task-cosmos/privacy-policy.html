@@ -210,6 +210,12 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
+        /* Privacy policy sayfasında header-tagline'ı gizle */
+        .privacy-section ~ * .header-tagline,
+        body:has(.privacy-section) .header-tagline {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             .privacy-section {
                 padding: 100px 15px 40px;
