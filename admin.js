@@ -3426,14 +3426,34 @@ function deleteVote(appName) {
 // Bildirim config'ini yükle
 async function loadNotificationsConfig() {
   try {
-    // Sadece Netlify'dan yükle (CORS sorunu nedeniyle GitHub'dan yükleme kaldırıldı)
-    const response = await fetch('https://bambinifojo.netlify.app/app_config.json?t=' + Date.now());
+    // GitHub Pages'den yükle (öncelikli)
     let config = {};
+    let response = null;
     
-    if (response.ok) {
-      config = await response.json();
-    } else {
-      // Eğer Netlify'da yoksa varsayılan değerleri kullan
+    // Önce GitHub Pages'den dene
+    try {
+      response = await fetch('https://bambinifojo.github.io/app_config.json?t=' + Date.now());
+      if (response.ok) {
+        config = await response.json();
+      }
+    } catch (githubError) {
+      console.warn('GitHub Pages\'den config yüklenemedi, Netlify deneniyor...', githubError);
+    }
+    
+    // Eğer GitHub Pages'den yüklenemediyse Netlify'dan dene
+    if (!config.latest_version) {
+      try {
+        response = await fetch('https://bambinifojo.netlify.app/app_config.json?t=' + Date.now());
+        if (response && response.ok) {
+          config = await response.json();
+        }
+      } catch (netlifyError) {
+        console.warn('Netlify\'dan config yüklenemedi, varsayılan değerler kullanılıyor...', netlifyError);
+      }
+    }
+    
+    // Eğer hiçbirinden yüklenemediyse varsayılan değerleri kullan
+    if (!config.latest_version) {
       config = {
         latest_version: "1.0.0",
         force_update: false,
@@ -3468,8 +3488,8 @@ async function loadNotificationsConfig() {
     if (maintenanceMessageEl) maintenanceMessageEl.value = config.maintenance_message || "";
     
   } catch (error) {
-    console.error('Config yükleme hatası:', error);
-    showAlert('⚠️ Config yüklenirken hata oluştu. Varsayılan değerler kullanılıyor.', 'error');
+    console.warn('Config yükleme hatası (varsayılan değerler kullanılıyor):', error);
+    // Hata durumunda sessizce varsayılan değerleri kullan (kullanıcıyı rahatsız etme)
     
     // Hata durumunda varsayılan değerleri form'a yükle
     const latestVersionEl = document.getElementById('latest_version');
