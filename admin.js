@@ -4325,6 +4325,23 @@ function renderActiveNotifications() {
 
 // Bildirimi düzenle
 function editAppNotification(appIndex) {
+  console.log('🔧 editAppNotification çağrıldı, appIndex:', appIndex, typeof appIndex);
+  
+  // appIndex'i integer'a çevir
+  const index = parseInt(appIndex);
+  if (isNaN(index)) {
+    console.error('❌ Geçersiz appIndex:', appIndex);
+    showAlert('❌ Geçersiz uygulama indeksi!', 'error');
+    return;
+  }
+  
+  // Uygulama var mı kontrol et
+  if (!appsData || !appsData.apps || !appsData.apps[index]) {
+    console.error('❌ Uygulama bulunamadı, index:', index, 'toplam uygulama:', appsData?.apps?.length || 0);
+    showAlert('❌ Uygulama bulunamadı!', 'error');
+    return;
+  }
+  
   // Bildirim ayarları formuna geç ve uygulamayı seç
   showSection('notifications');
   
@@ -4332,15 +4349,17 @@ function editAppNotification(appIndex) {
   setTimeout(() => {
     const appSelect = document.getElementById('notification_app_select');
     if (appSelect) {
+      console.log('✅ notification_app_select bulundu, değer ayarlanıyor:', index);
+      
       // Uygulamayı seç
-      appSelect.value = appIndex;
+      appSelect.value = String(index);
       
       // onchange event'ini manuel tetikle (dropdown değişikliği için)
       const changeEvent = new Event('change', { bubbles: true });
       appSelect.dispatchEvent(changeEvent);
       
       // Ayarları yükle
-      loadAppNotificationSettings(appIndex);
+      loadAppNotificationSettings(String(index));
       
       // Süre tipi değişikliği event'ini de tetikle
       setTimeout(() => {
@@ -4360,6 +4379,13 @@ function editAppNotification(appIndex) {
       console.warn('⚠️ notification_app_select elementi bulunamadı');
     }
   }, 300);
+}
+
+// Global scope'a ekle (HTML onclick için)
+if (typeof window !== 'undefined') {
+  window.editAppNotification = editAppNotification;
+  window.deactivateNotification = deactivateNotification;
+  console.log('✅ editAppNotification ve deactivateNotification global scope\'a eklendi');
 }
 
 // Bildirimi devre dışı bırak
