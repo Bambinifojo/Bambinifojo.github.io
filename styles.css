@@ -22,8 +22,8 @@
     /* Z-Index Hiyerarşisi - Ana Sayfa */
     --z-background: 0;
     --z-content: 1;
-    --z-sidebar: 98; /* Header'ın üstünde olmalı */
-    --z-overlay: 99; /* Sidebar'ın üstünde olmalı */
+    --z-overlay: 99; /* Ekranı opak yapar, sidebar'ın altında */
+    --z-sidebar: 100; /* Overlay'in üstünde, görünür olmalı */
     --z-header: 97;
     --z-header-buttons: 98;
     --z-search-container: 100;
@@ -331,7 +331,7 @@ body.menu-open .header-buttons {
 body.menu-open .hamburger {
     opacity: 1 !important;
     pointer-events: auto !important;
-    z-index: calc(var(--z-overlay) + 1) !important;
+    z-index: calc(var(--z-sidebar) + 1) !important;
     position: relative;
 }
 
@@ -1235,9 +1235,9 @@ body.menu-open .hamburger {
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.7);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -1253,11 +1253,11 @@ body.menu-open .hamburger {
 }
 
 [data-theme="dark"] .overlay {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.75);
 }
 
 [data-theme="light"] .overlay {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.6);
 }
 
 /* Sidebar Menü - Premium */
@@ -1277,7 +1277,7 @@ body.menu-open .hamburger {
     border-radius: 12px 0 0 12px;
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
     transition: right 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: var(--z-sidebar); /* Overlay'in altında, header'ın üstünde */
+    z-index: var(--z-sidebar); /* Overlay'in üstünde, görünür olmalı */
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -5097,7 +5097,7 @@ body.ai-modal-open .hamburger {
     body.menu-open .hamburger {
         opacity: 1 !important;
         pointer-events: auto !important;
-        z-index: calc(var(--z-overlay) + 1) !important;
+        z-index: calc(var(--z-sidebar) + 1) !important;
     }
 
     .admin-toggle {
@@ -5343,7 +5343,7 @@ body.ai-modal-open .hamburger {
     body.menu-open .hamburger {
         opacity: 1 !important;
         pointer-events: auto !important;
-        z-index: calc(var(--z-overlay) + 1) !important;
+        z-index: calc(var(--z-sidebar) + 1) !important;
     }
 
     .header-tagline {
