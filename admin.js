@@ -617,10 +617,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (section === 'notifications') {
           loadNotificationsConfig();
           // appsData yüklenmesini bekle, sonra dropdown'ı doldur
+          // Önce appsData'nın yüklendiğinden emin ol
+          if (!appsData || !appsData.apps || appsData.apps.length === 0) {
+            const saved = localStorage.getItem('appsData');
+            if (saved) {
+              try {
+                appsData = JSON.parse(saved);
+              } catch (e) {
+                console.error('LocalStorage\'dan appsData parse edilemedi:', e);
+              }
+            }
+          }
           setTimeout(() => {
             populateAppNotificationSelect();
             renderActiveNotifications();
-          }, 100);
+          }, 200);
           // Süre tipi değişikliği için event listener ekle
           const durationTypeEl = document.getElementById('notification_duration_type');
           if (durationTypeEl) {
@@ -899,6 +910,12 @@ async function login() {
   
   updateStats();
   renderApps();
+  
+  // Bildirim bölümündeyse dropdown'ı da güncelle
+  setTimeout(() => {
+    populateAppNotificationSelect();
+    renderActiveNotifications();
+  }, 100);
   
   // Başarı mesajı
   const btn = document.querySelector('button[onclick="login()"]');
@@ -1765,6 +1782,15 @@ async function saveApp(event) {
 
   updateStats();
   renderApps();
+  
+  // Tüm bölümleri otomatik güncelle
+  setTimeout(() => {
+    populateAppNotificationSelect(); // Bildirim bölümü dropdown'ını güncelle
+    renderActiveNotifications(); // Aktif bildirimler listesini güncelle
+    renderFeedback(); // Geri bildirimler bölümünü güncelle
+    renderVotes(); // Oylar bölümünü güncelle
+  }, 100);
+  
   closeAppModal();
   
   // LocalStorage'a kaydedildiyse önizlemeyi yenile (anında görüntüleme için)
@@ -1946,6 +1972,12 @@ async function deleteApp(index) {
   const appTitle = app.title || 'İsimsiz';
   appsData.apps.splice(index, 1);
   logActivity('delete', `"${appTitle}" uygulaması silindi`);
+  
+  // Tüm bölümleri otomatik güncelle
+  populateAppNotificationSelect(); // Bildirim bölümü dropdown'ını güncelle
+  renderActiveNotifications(); // Aktif bildirimler listesini güncelle
+  renderFeedback(); // Geri bildirimler bölümünü güncelle
+  renderVotes(); // Oylar bölümünü güncelle
 
   // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
   try {
@@ -2006,6 +2038,14 @@ async function deleteApp(index) {
 
   updateStats();
   renderApps();
+  
+  // Tüm bölümleri otomatik güncelle
+  setTimeout(() => {
+    populateAppNotificationSelect(); // Bildirim bölümü dropdown'ını güncelle
+    renderActiveNotifications(); // Aktif bildirimler listesini güncelle
+    renderFeedback(); // Geri bildirimler bölümünü güncelle
+    renderVotes(); // Oylar bölümünü güncelle
+  }, 100);
   
   // LocalStorage'a kaydedildiyse önizlemeyi yenile (anında görüntüleme için)
   if (currentMode === 'local') {
@@ -3726,21 +3766,36 @@ function populateAppNotificationSelect() {
     
     // Hala yoksa, JSON dosyasından yükle
     if (!appsData || !appsData.apps || appsData.apps.length === 0) {
+      console.log('📥 apps.json dosyasından yükleniyor...');
       fetch('/data/apps.json')
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then(data => {
+          console.log('✅ apps.json yüklendi:', data.apps?.length || 0, 'uygulama');
           appsData = data;
           saveToLocal();
           populateAppNotificationSelect(); // Tekrar çağır
         })
         .catch(error => {
-          console.error('apps.json yüklenirken hata:', error);
+          console.error('❌ apps.json yüklenirken hata:', error);
           appsData = { apps: [] };
           populateAppNotificationSelect(); // Tekrar çağır (boş liste ile)
         });
       return; // Async işlem devam ediyor, şimdilik çık
     }
   }
+  
+  // appsData yüklü, kontrol et
+  console.log('📊 appsData durumu:', {
+    appsDataVar: !!appsData,
+    appsArray: !!appsData?.apps,
+    appsCount: appsData?.apps?.length || 0,
+    apps: appsData?.apps?.map(a => a.title) || []
+  });
   
   // Uygulamaları ekle
   if (appsData && appsData.apps && appsData.apps.length > 0) {
@@ -3750,14 +3805,14 @@ function populateAppNotificationSelect() {
       option.textContent = `${app.icon || '📱'} ${app.title || 'İsimsiz'}`;
       select.appendChild(option);
     });
-    console.log(`✅ ${appsData.apps.length} uygulama dropdown'a eklendi`);
+    console.log(`✅ ${appsData.apps.length} uygulama dropdown'a eklendi:`, appsData.apps.map(a => a.title));
   } else {
     const option = document.createElement('option');
     option.value = '';
     option.textContent = 'Henüz uygulama yok';
     option.disabled = true;
     select.appendChild(option);
-    console.warn('⚠️ Uygulama bulunamadı, dropdown boş');
+    console.warn('⚠️ Uygulama bulunamadı, dropdown boş. appsData:', appsData);
   }
 }
 
