@@ -30,11 +30,11 @@
 
 
 <!-- Koyu Blur Arkaplan -->
-<div id="overlay" class="overlay" onclick="closeMenu()"></div>
+<div id="overlay" class="overlay"></div>
 
 <!-- Menü Paneli -->
 <div id="sidebar" class="sidebar">
-  <button class="close-btn" onclick="toggleMenu()">✖</button>
+  <button class="close-btn" id="closeMenuBtn">✖</button>
 
   <a href="#home" class="menu-item">🏠 Ana Sayfa</a>
   <a href="#about" class="menu-item">👤 Hakkımda</a>
@@ -103,7 +103,7 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </div>
-      <button class="hamburger" id="hamburger" onclick="toggleMenu()" type="button" aria-label="Menüyü aç/kapat" title="Menü">
+      <button class="hamburger" id="hamburger" type="button" aria-label="Menüyü aç/kapat" title="Menü">
         <span></span>
         <span></span>
         <span></span>
