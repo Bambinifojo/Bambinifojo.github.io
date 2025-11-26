@@ -1258,11 +1258,26 @@
   <script>
     // Tracking Prevention uyarılarını gizle (zararsız uyarılar)
     const originalWarn = console.warn;
+    const originalError = console.error;
+    
     console.warn = function(...args) {
-      if (args[0] && typeof args[0] === 'string' && args[0].includes('Tracking Prevention')) {
+      const message = args[0];
+      if (message && typeof message === 'string' && 
+          (message.includes('Tracking Prevention') || 
+           message.includes('blocked access to storage'))) {
         return; // Bu uyarıları gizle
       }
       originalWarn.apply(console, args);
+    };
+    
+    console.error = function(...args) {
+      const message = args[0];
+      if (message && typeof message === 'string' && 
+          (message.includes('Tracking Prevention') || 
+           message.includes('blocked access to storage'))) {
+        return; // Bu hataları gizle
+      }
+      originalError.apply(console, args);
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js" onerror="console.error('❌ QRCode CDN yüklenemedi!')"></script>
