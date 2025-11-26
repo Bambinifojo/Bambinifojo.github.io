@@ -290,10 +290,12 @@ body::before {
     flex-direction: column;
     gap: 5px;
     cursor: pointer;
-    pointer-events: auto;
+    pointer-events: auto !important;
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    z-index: var(--z-header-buttons);
+    position: relative;
 }
 
 .hamburger:focus {
@@ -329,7 +331,7 @@ body.menu-open .header-buttons {
 body.menu-open .hamburger {
     opacity: 1 !important;
     pointer-events: auto !important;
-    z-index: var(--z-header-buttons);
+    z-index: calc(var(--z-overlay) + 1) !important;
     position: relative;
 }
 
@@ -5095,7 +5097,7 @@ body.ai-modal-open .hamburger {
     body.menu-open .hamburger {
         opacity: 1 !important;
         pointer-events: auto !important;
-        z-index: var(--z-header-buttons);
+        z-index: calc(var(--z-overlay) + 1) !important;
     }
 
     .admin-toggle {
@@ -5341,7 +5343,7 @@ body.ai-modal-open .hamburger {
     body.menu-open .hamburger {
         opacity: 1 !important;
         pointer-events: auto !important;
-        z-index: var(--z-header-buttons);
+        z-index: calc(var(--z-overlay) + 1) !important;
     }
 
     .header-tagline {

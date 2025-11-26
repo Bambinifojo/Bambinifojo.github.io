@@ -128,10 +128,15 @@ function setupHamburgerMenu() {
     console.warn('⚠️ Hamburger butonu bulunamadı');
   }
   
-  // Overlay'e tıklandığında menüyü kapat
+  // Overlay'e tıklandığında menüyü kapat (hamburger butonunun üzerine gelmemesi için)
   const overlay = document.getElementById('overlay');
   if (overlay) {
-    overlay.addEventListener('click', () => {
+    overlay.addEventListener('click', (e) => {
+      // Hamburger butonuna tıklanırsa menüyü kapatma
+      const hamburger = document.getElementById('hamburger');
+      if (hamburger && hamburger.contains(e.target)) {
+        return;
+      }
       closeMenu();
     });
   }
