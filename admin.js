@@ -1719,53 +1719,15 @@ async function saveApp(event) {
     logActivity('update', `"${app.title}" uygulaması güncellendi`);
   }
 
-  // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
-  try {
-    const response = await fetch('/.netlify/functions/updateApps', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(appsData)
-    });
-    
-    // Response'un JSON olup olmadığını kontrol et
-    const contentType = response.headers.get('content-type');
-    let result;
-    
-    if (contentType && contentType.includes('application/json')) {
-      result = await response.json();
-    } else {
-      // HTML response alındıysa (404, 405 gibi hatalar)
-      const text = await response.text();
-      console.error('Netlify Function HTML response:', text.substring(0, 200));
-      throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
-    }
-    
-    if (response.ok) {
-      // GitHub'a başarıyla kaydedildi
-      saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Kaydedildi!', 'success');
-      // Önizlemeyi otomatik yenile
-      autoRefreshPreview();
-    } else {
-      // Netlify Function çalışmıyorsa fallback
-      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
-    }
-  } catch (error) {
-    // Hata yönetimi - kullanıcı dostu mesajlar
-    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
-    console.error('Netlify Function hatası:', error);
-    
-    // Netlify Function çalışmıyor - kullanıcıyı uyar
-    saveToLocal(); // LocalStorage'a backup olarak kaydet
-    
-    // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
-    if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
-      showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
-    } else {
-      showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
-    }
+  // GitHub Pages kontrolü - Netlify Functions çalışmaz, direkt LocalStorage'a kaydet
+  const isGitHubPages = window.location.hostname.includes('github.io') || 
+                        window.location.hostname.includes('github.com') ||
+                        currentMode === 'local';
+  
+  if (isGitHubPages) {
+    // GitHub Pages'deyse direkt LocalStorage'a kaydet
+    saveToLocal();
+    showAlert('✅ Kaydedildi!', 'success');
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
     if (currentMode === 'github' && token) {
@@ -1776,6 +1738,60 @@ async function saveApp(event) {
         const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
         console.error('GitHub kaydetme hatası:', githubError);
         showAlert(`❌ GitHub kaydetme hatası: ${githubErrorMessage}`, 'error');
+      }
+    }
+    
+    // Önizlemeyi otomatik yenile
+    autoRefreshPreview();
+  } else {
+    // Netlify'da ise Netlify Function'ı kullan
+    try {
+      const response = await fetch('/.netlify/functions/updateApps', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appsData)
+      });
+      
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const text = await response.text();
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.warn('Netlify Function HTML response:', text.substring(0, 200));
+        }
+        throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}`);
+      }
+      
+      if (response.ok) {
+        saveToLocal();
+        showAlert('✅ Kaydedildi!', 'success');
+        autoRefreshPreview();
+      } else {
+        throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.warn('Netlify Function hatası:', errorMessage);
+      }
+      
+      saveToLocal();
+      showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
+      
+      if (currentMode === 'github' && token) {
+        try {
+          await saveToGitHub();
+          showAlert('✅ GitHub\'a manuel olarak kaydedildi!', 'success');
+        } catch (githubError) {
+          const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
+          console.error('GitHub kaydetme hatası:', githubError);
+          showAlert(`❌ GitHub kaydetme hatası: ${githubErrorMessage}`, 'error');
+        }
       }
     }
   }
@@ -1979,51 +1995,15 @@ async function deleteApp(index) {
   renderFeedback(); // Geri bildirimler bölümünü güncelle
   renderVotes(); // Oylar bölümünü güncelle
 
-  // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
-  try {
-    const response = await fetch('/.netlify/functions/updateApps', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(appsData)
-    });
-    
-    // Response'un JSON olup olmadığını kontrol et
-    const contentType = response.headers.get('content-type');
-    let result;
-    
-    if (contentType && contentType.includes('application/json')) {
-      result = await response.json();
-    } else {
-      // HTML response alındıysa (404, 405 gibi hatalar)
-      const text = await response.text();
-      console.error('Netlify Function HTML response:', text.substring(0, 200));
-      throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
-    }
-    
-    if (response.ok) {
-      // GitHub'a başarıyla kaydedildi
-      saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Silindi!', 'success');
-      // Önizlemeyi otomatik yenile
-      autoRefreshPreview();
-    } else {
-      // Netlify Function çalışmıyorsa fallback
-      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
-    }
-  } catch (error) {
-    console.error('Netlify Function hatası:', error);
-    // Netlify Function çalışmıyor - kullanıcıyı uyar
-    saveToLocal(); // LocalStorage'a backup olarak kaydet
-    
-    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
-    // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
-    if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
-      showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
-    } else {
-      showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
-    }
+  // GitHub Pages kontrolü - Netlify Functions çalışmaz, direkt LocalStorage'a kaydet
+  const isGitHubPages = window.location.hostname.includes('github.io') || 
+                        window.location.hostname.includes('github.com') ||
+                        currentMode === 'local';
+  
+  if (isGitHubPages) {
+    // GitHub Pages'deyse direkt LocalStorage'a kaydet
+    saveToLocal();
+    showAlert('✅ Silindi!', 'success');
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
     if (currentMode === 'github' && token) {
@@ -2032,6 +2012,58 @@ async function deleteApp(index) {
         showAlert('✅ Uygulama silindi ve GitHub\'a manuel olarak kaydedildi!', 'success');
       } catch (githubError) {
         console.error('GitHub kaydetme hatası:', githubError);
+      }
+    }
+    
+    // Önizlemeyi otomatik yenile
+    autoRefreshPreview();
+  } else {
+    // Netlify'da ise Netlify Function'ı kullan
+    try {
+      const response = await fetch('/.netlify/functions/updateApps', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appsData)
+      });
+      
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const text = await response.text();
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.warn('Netlify Function HTML response:', text.substring(0, 200));
+        }
+        throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}`);
+      }
+      
+      if (response.ok) {
+        saveToLocal();
+        showAlert('✅ Silindi!', 'success');
+        autoRefreshPreview();
+      } else {
+        throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.warn('Netlify Function hatası:', errorMessage);
+      }
+      
+      saveToLocal();
+      showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
+      
+      if (currentMode === 'github' && token) {
+        try {
+          await saveToGitHub();
+          showAlert('✅ Uygulama silindi ve GitHub\'a manuel olarak kaydedildi!', 'success');
+        } catch (githubError) {
+          console.error('GitHub kaydetme hatası:', githubError);
+        }
       }
     }
   }
@@ -2413,48 +2445,55 @@ async function saveSiteSection(section, event) {
     renderContactList();
   }
   
-  // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
-  try {
-    const response = await fetch('/.netlify/functions/updateApps', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(appsData)
-    });
-    
-    // Response'un JSON olup olmadığını kontrol et
-    const contentType = response.headers.get('content-type');
-    let result;
-    
-    if (contentType && contentType.includes('application/json')) {
-      result = await response.json();
-    } else {
-      // HTML response alındıysa (404, 405 gibi hatalar)
-      const text = await response.text();
-      console.error('Netlify Function HTML response:', text.substring(0, 200));
-      throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
-    }
-    
-    if (response.ok) {
-      // GitHub'a başarıyla kaydedildi
-      saveToLocal(); // LocalStorage'a da kaydet (backup)
-      showAlert('✅ Kaydedildi!', 'success');
-      // Önizlemeyi otomatik yenile
-      autoRefreshPreview();
-    } else {
-      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
-    }
-  } catch (error) {
-    console.error('Netlify Function hatası:', error);
-    // Netlify Function çalışmıyor - kullanıcıyı uyar
-    saveToLocal(); // LocalStorage'a backup olarak kaydet
-    
-    // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
-    if (error.message.includes('405') || error.message.includes('404')) {
+  // GitHub Pages kontrolü - Netlify Functions çalışmaz, direkt LocalStorage'a kaydet
+  const isGitHubPages = window.location.hostname.includes('github.io') || 
+                        window.location.hostname.includes('github.com') ||
+                        currentMode === 'local';
+  
+  if (isGitHubPages) {
+    // GitHub Pages'deyse direkt LocalStorage'a kaydet
+    saveToLocal();
+    showAlert('✅ Kaydedildi!', 'success');
+    autoRefreshPreview();
+  } else {
+    // Netlify'da ise Netlify Function'ı kullan
+    try {
+      const response = await fetch('/.netlify/functions/updateApps', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appsData)
+      });
+      
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const text = await response.text();
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.warn('Netlify Function HTML response:', text.substring(0, 200));
+        }
+        throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}`);
+      }
+      
+      if (response.ok) {
+        saveToLocal();
+        showAlert('✅ Kaydedildi!', 'success');
+        autoRefreshPreview();
+      } else {
+        throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.warn('Netlify Function hatası:', errorMessage);
+      }
+      
+      saveToLocal();
       showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
-    } else {
-      showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
     }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
@@ -3876,6 +3915,13 @@ function loadAppNotificationSettings(appIndex) {
     if (durationTypeEl) durationTypeEl.value = 'none';
     if (durationValueGroup) durationValueGroup.classList.add('hidden');
   }
+  
+  // Süre tipi değişikliği event'ini tetikle (UI güncellemesi için)
+  if (durationTypeEl) {
+    setTimeout(() => {
+      onNotificationDurationTypeChange();
+    }, 50);
+  }
 }
 
 // Uygulama formu için süre tipi değiştiğinde input'u göster/gizle
@@ -4028,55 +4074,15 @@ async function saveAppNotification(event) {
       }
     }
     
-    // Otomatik olarak GitHub'a deploy et (Netlify Function ile)
-    try {
-      const response = await fetch('/.netlify/functions/updateApps', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(appsData)
-      });
-      
-      const contentType = response.headers.get('content-type');
-      let result;
-      
-      if (contentType && contentType.includes('application/json')) {
-        result = await response.json();
-      } else {
-        const text = await response.text();
-        console.error('Netlify Function HTML response:', text.substring(0, 200));
-        throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}. GitHub Pages üzerinde Netlify Functions çalışmaz.`);
-      }
-      
-      if (response.ok) {
-        saveToLocal();
-        showAlert('✅ Bildirim ayarları kaydedildi!', 'success');
-        autoRefreshPreview();
-      } else {
-        throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
-      }
-    } catch (error) {
-      // Hata yönetimi - kullanıcı dostu mesajlar
-      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
-      
-      // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal, sadece localhost'ta logla
-      if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          console.warn('ℹ️ Netlify Function çalışmıyor (GitHub Pages modu):', errorMessage);
-        }
-      } else {
-        console.error('Netlify Function hatası:', error);
-      }
-      
-      saveToLocal(); // LocalStorage'a backup olarak kaydet
-      
-      // GitHub Pages üzerinde Netlify Functions çalışmaz - bu normal
-      if (errorMessage.includes('405') || errorMessage.includes('404') || errorMessage.includes('GitHub Pages')) {
-        showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
-      } else {
-        showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
-      }
+    // GitHub Pages kontrolü - Netlify Functions çalışmaz, direkt LocalStorage'a kaydet
+    const isGitHubPages = window.location.hostname.includes('github.io') || 
+                          window.location.hostname.includes('github.com') ||
+                          currentMode === 'local';
+    
+    if (isGitHubPages) {
+      // GitHub Pages'deyse direkt LocalStorage'a kaydet
+      saveToLocal();
+      showAlert('✅ Bildirim ayarları kaydedildi!', 'success');
       
       // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
       if (currentMode === 'github' && token) {
@@ -4087,6 +4093,61 @@ async function saveAppNotification(event) {
           const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
           console.error('GitHub kaydetme hatası:', githubError);
           showAlert(`❌ GitHub kaydetme hatası: ${githubErrorMessage}`, 'error');
+        }
+      }
+    } else {
+      // Netlify'da ise Netlify Function'ı kullan
+      try {
+        const response = await fetch('/.netlify/functions/updateApps', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(appsData)
+        });
+        
+        const contentType = response.headers.get('content-type');
+        let result;
+        
+        if (contentType && contentType.includes('application/json')) {
+          result = await response.json();
+        } else {
+          const text = await response.text();
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.warn('Netlify Function HTML response:', text.substring(0, 200));
+          }
+          throw new Error(`Netlify Function çalışmıyor (${response.status}): ${response.statusText}`);
+        }
+        
+        if (response.ok) {
+          saveToLocal();
+          showAlert('✅ Bildirim ayarları kaydedildi!', 'success');
+          autoRefreshPreview();
+        } else {
+          throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
+        }
+      } catch (error) {
+        // Hata yönetimi - kullanıcı dostu mesajlar
+        const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+        
+        // Sadece localhost'ta logla
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.warn('Netlify Function hatası:', errorMessage);
+        }
+        
+        saveToLocal(); // LocalStorage'a backup olarak kaydet
+        showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
+        
+        // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
+        if (currentMode === 'github' && token) {
+          try {
+            await saveToGitHub();
+            showAlert('✅ GitHub\'a manuel olarak kaydedildi!', 'success');
+          } catch (githubError) {
+            const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
+            console.error('GitHub kaydetme hatası:', githubError);
+            showAlert(`❌ GitHub kaydetme hatası: ${githubErrorMessage}`, 'error');
+          }
         }
       }
     }
@@ -4267,11 +4328,36 @@ function editAppNotification(appIndex) {
   // Bildirim ayarları formuna geç ve uygulamayı seç
   showSection('notifications');
   
+  // Sayfanın yüklenmesini bekle
   setTimeout(() => {
     const appSelect = document.getElementById('notification_app_select');
     if (appSelect) {
+      // Uygulamayı seç
       appSelect.value = appIndex;
+      
+      // onchange event'ini manuel tetikle (dropdown değişikliği için)
+      const changeEvent = new Event('change', { bubbles: true });
+      appSelect.dispatchEvent(changeEvent);
+      
+      // Ayarları yükle
       loadAppNotificationSettings(appIndex);
+      
+      // Süre tipi değişikliği event'ini de tetikle
+      setTimeout(() => {
+        const durationTypeEl = document.getElementById('notification_duration_type');
+        if (durationTypeEl) {
+          const durationChangeEvent = new Event('change', { bubbles: true });
+          durationTypeEl.dispatchEvent(durationChangeEvent);
+        }
+        
+        // Form alanlarına scroll yap
+        const settingsDiv = document.getElementById('appNotificationSettings');
+        if (settingsDiv) {
+          settingsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      console.warn('⚠️ notification_app_select elementi bulunamadı');
     }
   }, 300);
 }
@@ -4291,39 +4377,58 @@ async function deactivateNotification(appIndex) {
   // Bildirimi kapat
   app.notification.enabled = false;
   
-  try {
-    // GitHub'a kaydet
-    const response = await fetch('/.netlify/functions/updateApps', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(appsData)
-    });
-    
-    const contentType = response.headers.get('content-type');
-    let result;
-    
-    if (contentType && contentType.includes('application/json')) {
-      result = await response.json();
-    } else {
-      const text = await response.text();
-      console.error('Netlify Function HTML response:', text.substring(0, 200));
-      throw new Error(`Netlify Function çalışmıyor (${response.status})`);
-    }
-    
-    if (response.ok) {
-      saveToLocal();
-      showAlert('✅ Bildirim kapatıldı!', 'success');
-      renderActiveNotifications();
-      autoRefreshPreview();
-    } else {
-      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
-    }
-  } catch (error) {
-    console.error('Bildirim kapatma hatası:', error);
+  // GitHub Pages kontrolü - Netlify Functions çalışmaz, direkt LocalStorage'a kaydet
+  const isGitHubPages = window.location.hostname.includes('github.io') || 
+                        window.location.hostname.includes('github.com') ||
+                        currentMode === 'local';
+  
+  if (isGitHubPages) {
+    // GitHub Pages'deyse direkt LocalStorage'a kaydet
     saveToLocal();
-    showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
+    showAlert('✅ Bildirim kapatıldı!', 'success');
+    renderActiveNotifications();
+    autoRefreshPreview();
+  } else {
+    // Netlify'da ise Netlify Function'ı kullan
+    try {
+      const response = await fetch('/.netlify/functions/updateApps', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appsData)
+      });
+      
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const text = await response.text();
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          console.warn('Netlify Function HTML response:', text.substring(0, 200));
+        }
+        throw new Error(`Netlify Function çalışmıyor (${response.status})`);
+      }
+      
+      if (response.ok) {
+        saveToLocal();
+        showAlert('✅ Bildirim kapatıldı!', 'success');
+        renderActiveNotifications();
+        autoRefreshPreview();
+      } else {
+        throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.warn('Netlify Function hatası:', errorMessage);
+      }
+      
+      saveToLocal();
+      showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
+    }
   }
 }
 
