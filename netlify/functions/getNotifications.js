@@ -93,12 +93,44 @@ exports.handler = async (event, context) => {
       });
 
       if (app && app.notification) {
+        // Süreli bildirim kontrolü
+        let notificationEnabled = app.notification.enabled || false;
+        
+        // Eğer bildirim süreli ise ve süresi dolmuşsa, bildirimi devre dışı bırak
+        if (notificationEnabled && app.notification.duration) {
+          const duration = app.notification.duration;
+          const startTime = new Date(duration.start_time);
+          const now = new Date();
+          let durationInMs = 0;
+          
+          if (duration.type === 'hours') {
+            durationInMs = duration.value * 60 * 60 * 1000; // Saat -> milisaniye
+          } else if (duration.type === 'days') {
+            durationInMs = duration.value * 24 * 60 * 60 * 1000; // Gün -> milisaniye
+          }
+          
+          const elapsed = now.getTime() - startTime.getTime();
+          if (elapsed > durationInMs) {
+            // Süre dolmuş, bildirimi devre dışı bırak
+            notificationEnabled = false;
+          }
+        }
+        
         response.app = {
-          enabled: app.notification.enabled || false,
+          enabled: notificationEnabled,
           latest_version: app.notification.latest_version || "1.0.0",
           force_update: app.notification.force_update || false,
           update_message: app.notification.update_message || "",
         };
+        
+        // Süreli bildirim bilgilerini de ekle (debug için)
+        if (app.notification.duration) {
+          response.app.duration = {
+            type: app.notification.duration.type,
+            value: app.notification.duration.value,
+            start_time: app.notification.duration.start_time
+          };
+        }
       }
     }
 

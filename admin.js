@@ -306,6 +306,7 @@ function showSection(section) {
   if (section === 'notifications') {
     loadNotificationsConfig();
     populateAppNotificationSelect();
+    renderActiveNotifications();
     // Süre tipi değişikliği için event listener ekle
     const durationTypeEl = document.getElementById('notification_duration_type');
     if (durationTypeEl) {
@@ -3679,8 +3680,8 @@ function loadAppNotificationSettings(appIndex) {
   const actionsDiv = document.getElementById('appNotificationActions');
   
   if (!appIndex || appIndex === '') {
-    if (settingsDiv) settingsDiv.style.display = 'none';
-    if (actionsDiv) actionsDiv.style.display = 'none';
+    if (settingsDiv) settingsDiv.classList.add('hidden');
+    if (actionsDiv) actionsDiv.classList.add('hidden');
     return;
   }
   
@@ -3691,8 +3692,8 @@ function loadAppNotificationSettings(appIndex) {
   }
   
   // Form alanlarını göster
-  if (settingsDiv) settingsDiv.style.display = 'block';
-  if (actionsDiv) actionsDiv.style.display = 'flex';
+  if (settingsDiv) settingsDiv.classList.remove('hidden');
+  if (actionsDiv) actionsDiv.classList.remove('hidden');
   
   // Mevcut bildirim ayarlarını yükle
   const notification = app.notification || {};
@@ -3718,20 +3719,20 @@ function loadAppNotificationSettings(appIndex) {
     if (notification.duration.type === 'hours') {
       if (durationTypeEl) durationTypeEl.value = 'hours';
       if (durationValueEl) durationValueEl.value = notification.duration.value || '';
-      if (durationValueGroup) durationValueGroup.style.display = 'block';
+      if (durationValueGroup) durationValueGroup.classList.remove('hidden');
       if (durationHint) durationHint.textContent = 'Bildirimin kaç saat gösterileceğini girin';
     } else if (notification.duration.type === 'days') {
       if (durationTypeEl) durationTypeEl.value = 'days';
       if (durationValueEl) durationValueEl.value = notification.duration.value || '';
-      if (durationValueGroup) durationValueGroup.style.display = 'block';
+      if (durationValueGroup) durationValueGroup.classList.remove('hidden');
       if (durationHint) durationHint.textContent = 'Bildirimin kaç gün gösterileceğini girin';
     } else {
       if (durationTypeEl) durationTypeEl.value = 'none';
-      if (durationValueGroup) durationValueGroup.style.display = 'none';
+      if (durationValueGroup) durationValueGroup.classList.add('hidden');
     }
   } else {
     if (durationTypeEl) durationTypeEl.value = 'none';
-    if (durationValueGroup) durationValueGroup.style.display = 'none';
+    if (durationValueGroup) durationValueGroup.classList.add('hidden');
   }
 }
 
@@ -3747,10 +3748,10 @@ function onAppNotificationDurationTypeChange() {
   const type = durationTypeEl.value;
   
   if (type === 'none') {
-    durationValueGroup.style.display = 'none';
+    durationValueGroup.classList.add('hidden');
     if (durationValueEl) durationValueEl.required = false;
   } else {
-    durationValueGroup.style.display = 'block';
+    durationValueGroup.classList.remove('hidden');
     if (durationValueEl) durationValueEl.required = true;
     
     if (type === 'hours') {
@@ -3775,10 +3776,10 @@ function onNotificationDurationTypeChange() {
   const type = durationTypeEl.value;
   
   if (type === 'none') {
-    durationValueGroup.style.display = 'none';
+    durationValueGroup.classList.add('hidden');
     if (durationValueEl) durationValueEl.required = false;
   } else {
-    durationValueGroup.style.display = 'block';
+    durationValueGroup.classList.remove('hidden');
     if (durationValueEl) durationValueEl.required = true;
     
     if (type === 'hours') {
@@ -3957,8 +3958,8 @@ function resetAppNotificationForm() {
   const settingsDiv = document.getElementById('appNotificationSettings');
   const actionsDiv = document.getElementById('appNotificationActions');
   
-  if (settingsDiv) settingsDiv.style.display = 'none';
-  if (actionsDiv) actionsDiv.style.display = 'none';
+  if (settingsDiv) settingsDiv.classList.add('hidden');
+  if (actionsDiv) actionsDiv.classList.add('hidden');
   
   // Form'u temizle
   const form = document.getElementById('notificationsForm');
@@ -3966,6 +3967,204 @@ function resetAppNotificationForm() {
   
   // Süre input'unu gizle
   const durationValueGroup = document.getElementById('notification_duration_value_group');
-  if (durationValueGroup) durationValueGroup.style.display = 'none';
+  if (durationValueGroup) durationValueGroup.classList.add('hidden');
+}
+
+// Aktif bildirimleri listele
+function renderActiveNotifications() {
+  const container = document.getElementById('activeNotificationsList');
+  if (!container) return;
+  
+  if (!appsData || !appsData.apps || appsData.apps.length === 0) {
+    container.innerHTML = '<p class="empty-state">Henüz bildirim yok</p>';
+    return;
+  }
+  
+  const now = new Date();
+  const activeNotifications = [];
+  
+  // Tüm uygulamaları kontrol et
+  appsData.apps.forEach((app, index) => {
+    if (app.notification && app.notification.enabled) {
+      const notification = app.notification;
+      let isActive = true;
+      let remainingTime = null;
+      let statusText = 'Aktif';
+      
+      // Süreli bildirim kontrolü
+      if (notification.duration) {
+        const duration = notification.duration;
+        const startTime = new Date(duration.start_time);
+        let durationInMs = 0;
+        
+        if (duration.type === 'hours') {
+          durationInMs = duration.value * 60 * 60 * 1000;
+        } else if (duration.type === 'days') {
+          durationInMs = duration.value * 24 * 60 * 60 * 1000;
+        }
+        
+        const elapsed = now.getTime() - startTime.getTime();
+        const remaining = durationInMs - elapsed;
+        
+        if (remaining <= 0) {
+          isActive = false;
+          statusText = 'Süresi Doldu';
+        } else {
+          // Kalan süreyi hesapla
+          if (duration.type === 'hours') {
+            const hours = Math.floor(remaining / (60 * 60 * 1000));
+            const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+            remainingTime = `${hours} saat ${minutes} dakika`;
+          } else if (duration.type === 'days') {
+            const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+            const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+            remainingTime = `${days} gün ${hours} saat`;
+          }
+        }
+      } else {
+        statusText = 'Süresiz';
+      }
+      
+      if (isActive) {
+        activeNotifications.push({
+          app,
+          index,
+          notification,
+          remainingTime,
+          statusText
+        });
+      }
+    }
+  });
+  
+  if (activeNotifications.length === 0) {
+    container.innerHTML = '<p class="empty-state">Şu anda aktif bildirim yok</p>';
+    return;
+  }
+  
+  // Bildirimleri render et
+  const notificationsHTML = activeNotifications.map(({ app, index, notification, remainingTime, statusText }) => {
+    const startTime = notification.duration ? new Date(notification.duration.start_time) : null;
+    const startTimeStr = startTime ? startTime.toLocaleString('tr-TR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) : '-';
+    
+    return `
+      <div class="notification-item">
+        <div class="notification-item-header">
+          <div class="notification-item-title">
+            <span class="notification-app-icon">${app.icon || '📱'}</span>
+            <div>
+              <h3>${app.title || 'İsimsiz Uygulama'}</h3>
+              <p class="notification-item-subtitle">${notification.update_message || 'Bildirim mesajı yok'}</p>
+            </div>
+          </div>
+          <div class="notification-item-actions">
+            <button class="btn btn-small btn-secondary" onclick="editAppNotification(${index})" title="Düzenle">
+              <span>✏️ Düzenle</span>
+            </button>
+            <button class="btn btn-small btn-danger" onclick="deactivateNotification(${index})" title="Kapat">
+              <span>❌ Kapat</span>
+            </button>
+          </div>
+        </div>
+        <div class="notification-item-details">
+          <div class="notification-detail-item">
+            <span class="notification-detail-label">Versiyon:</span>
+            <span class="notification-detail-value">${notification.latest_version || '1.0.0'}</span>
+          </div>
+          <div class="notification-detail-item">
+            <span class="notification-detail-label">Zorunlu Güncelleme:</span>
+            <span class="notification-detail-value">${notification.force_update ? '✅ Evet' : '❌ Hayır'}</span>
+          </div>
+          <div class="notification-detail-item">
+            <span class="notification-detail-label">Durum:</span>
+            <span class="notification-detail-value ${statusText === 'Süresi Doldu' ? 'text-danger' : 'text-success'}">${statusText}</span>
+          </div>
+          ${remainingTime ? `
+          <div class="notification-detail-item">
+            <span class="notification-detail-label">Kalan Süre:</span>
+            <span class="notification-detail-value text-warning">⏰ ${remainingTime}</span>
+          </div>
+          ` : ''}
+          <div class="notification-detail-item">
+            <span class="notification-detail-label">Başlangıç:</span>
+            <span class="notification-detail-value">${startTimeStr}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  container.innerHTML = notificationsHTML;
+}
+
+// Bildirimi düzenle
+function editAppNotification(appIndex) {
+  // Bildirim ayarları formuna geç ve uygulamayı seç
+  showSection('notifications');
+  
+  setTimeout(() => {
+    const appSelect = document.getElementById('notification_app_select');
+    if (appSelect) {
+      appSelect.value = appIndex;
+      loadAppNotificationSettings(appIndex);
+    }
+  }, 300);
+}
+
+// Bildirimi devre dışı bırak
+async function deactivateNotification(appIndex) {
+  if (!confirm('Bu bildirimi kapatmak istediğinizden emin misiniz?')) {
+    return;
+  }
+  
+  const app = appsData.apps[appIndex];
+  if (!app || !app.notification) {
+    showAlert('❌ Bildirim bulunamadı!', 'error');
+    return;
+  }
+  
+  // Bildirimi kapat
+  app.notification.enabled = false;
+  
+  try {
+    // GitHub'a kaydet
+    const response = await fetch('/.netlify/functions/updateApps', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(appsData)
+    });
+    
+    const contentType = response.headers.get('content-type');
+    let result;
+    
+    if (contentType && contentType.includes('application/json')) {
+      result = await response.json();
+    } else {
+      const text = await response.text();
+      console.error('Netlify Function HTML response:', text.substring(0, 200));
+      throw new Error(`Netlify Function çalışmıyor (${response.status})`);
+    }
+    
+    if (response.ok) {
+      saveToLocal();
+      showAlert('✅ Bildirim kapatıldı!', 'success');
+      renderActiveNotifications();
+      autoRefreshPreview();
+    } else {
+      throw new Error(result.error || `GitHub kaydetme başarısız (${response.status})`);
+    }
+  } catch (error) {
+    console.error('Bildirim kapatma hatası:', error);
+    saveToLocal();
+    showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
+  }
 }
 

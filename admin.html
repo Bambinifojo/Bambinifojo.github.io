@@ -5302,6 +5302,154 @@
   }
     margin-bottom: 15px;
   }
+
+  /* Hidden utility class */
+  .hidden {
+    display: none !important;
+  }
+
+  /* Admin card spacing */
+  .admin-card-spacing {
+    margin-top: 30px;
+  }
+
+  /* Aktif Bildirimler Listesi */
+  .notification-item {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .notification-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+  }
+
+  .notification-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+
+  .notification-item-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .notification-app-icon {
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .notification-item-title h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .notification-item-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+
+  .notification-item-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .notification-item-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .notification-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .notification-detail-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .notification-detail-value {
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+
+  .text-success {
+    color: #10b981;
+  }
+
+  .text-danger {
+    color: #ef4444;
+  }
+
+  .text-warning {
+    color: #f59e0b;
+  }
+
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+  }
+
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .notification-list-subtitle {
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .notification-item-header {
+      flex-direction: column;
+    }
+
+    .notification-item-actions {
+      width: 100%;
+    }
+
+    .notification-item-actions .btn {
+      flex: 1;
+    }
+
+    .notification-item-details {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 <script src="js/admin-utils.js"></script>
 <script src="js/admin-state.js"></script>
@@ -6098,7 +6246,23 @@
               <p class="admin-page-subtitle">Uygulama bildirimleri, güncellemeler ve bakım modu ayarlarını yönetin</p>
             </div>
 
+            <!-- Aktif Bildirimler Listesi -->
             <div class="admin-card">
+              <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                ⏰ Aktif Bildirimler
+              </h2>
+              <p class="admin-page-subtitle notification-list-subtitle">Şu anda aktif olan bildirimler ve kalan süreleri</p>
+              
+              <div id="activeNotificationsList" class="apps-list">
+                <p class="loading-text">Yükleniyor...</p>
+              </div>
+            </div>
+
+            <div class="admin-card admin-card-spacing">
               <h2>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -6122,7 +6286,7 @@
                 </div>
 
                 <!-- Versiyon Yönetimi -->
-                <div class="site-form-section" id="appNotificationSettings" style="display: none;">
+                <div class="site-form-section hidden" id="appNotificationSettings">
                   <h3>📦 Versiyon Yönetimi</h3>
                   
                   <div class="form-group">
@@ -6172,14 +6336,14 @@
                     <small>Bildirimin ne kadar süre gösterileceğini seçin</small>
                   </div>
 
-                  <div class="form-group" id="notification_duration_value_group" style="display: none;">
+                  <div class="form-group hidden" id="notification_duration_value_group">
                     <label for="notification_duration_value">Bildirim Süresi *</label>
                     <input type="number" id="notification_duration_value" name="notification_duration_value" min="1" placeholder="Örn: 24"/>
                     <small id="notification_duration_hint">Bildirimin kaç saat gösterileceğini girin</small>
                   </div>
                 </div>
 
-                <div class="form-actions" id="appNotificationActions" style="display: none;">
+                <div class="form-actions hidden" id="appNotificationActions">
                   <button type="submit" class="btn btn-primary" id="saveAppNotificationBtn">
                     <span>💾 Kaydet</span>
                   </button>
@@ -6190,7 +6354,7 @@
               </form>
 
               <!-- Genel Bildirim Ayarları (Eski Form) -->
-              <div class="admin-card" style="margin-top: 30px;">
+              <div class="admin-card admin-card-spacing">
                 <h2>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -6579,7 +6743,7 @@
             <small>Bildirimin ne kadar süre gösterileceğini seçin</small>
           </div>
 
-          <div class="form-group" id="appNotificationDurationValueGroup" style="display: none;">
+          <div class="form-group hidden" id="appNotificationDurationValueGroup">
             <label for="appNotificationDurationValue">Bildirim Süresi *</label>
             <input type="number" id="appNotificationDurationValue" name="appNotificationDurationValue" min="1" placeholder="Örn: 24"/>
             <small id="appNotificationDurationHint">Bildirimin kaç saat gösterileceğini girin</small>

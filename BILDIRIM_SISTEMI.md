@@ -9,6 +9,8 @@ Bu dokümantasyon, Android uygulamalarının bildirim sistemini nasıl kullanaca
 3. [Bildirim Türleri](#bildirim-türleri)
 4. [Android Uygulaması Entegrasyonu](#android-uygulaması-entegrasyonu)
 5. [Örnek Kullanım](#örnek-kullanım)
+6. [Test ve Debug](#test-ve-debug)
+7. [Hata Ayıklama](#hata-ayıklama)
 
 ## 🎯 Genel Bakış
 
@@ -417,17 +419,112 @@ settingsButton.setOnClickListener {
    4. Broadcast (en düşük öncelik)
 5. **Caching**: Bildirimleri cache'leyebilirsiniz, ancak her uygulama açılışında kontrol etmeniz önerilir
 
+## 🧪 Test ve Debug
+
+### Sunucu Endpoint'i (Test İçin)
+
+Bildirim endpoint'ini test etmek için aşağıdaki URL'yi kullanabilirsiniz:
+
+```
+https://bambinifojo.netlify.app/.netlify/functions/getNotifications?appId=task-cosmos
+```
+
+**Test Yöntemleri:**
+- **Tarayıcı**: URL'yi doğrudan tarayıcı adres çubuğuna yapıştırın
+- **Postman**: GET isteği göndererek test edebilirsiniz
+- **cURL**: Terminal'den test etmek için:
+  ```bash
+  curl "https://bambinifojo.netlify.app/.netlify/functions/getNotifications?appId=task-cosmos"
+  ```
+
+**Örnek Yanıt:**
+```json
+{
+  "general": {
+    "maintenance": {
+      "enabled": false,
+      "message": ""
+    },
+    "broadcast": {
+      "enabled": false,
+      "title": "",
+      "message": ""
+    },
+    "version": {
+      "latest_version": "1.0.0",
+      "force_update": false,
+      "update_message": ""
+    }
+  },
+  "app": {
+    "enabled": true,
+    "latest_version": "1.2.0",
+    "force_update": false,
+    "update_message": "Yeni özellikler eklendi!"
+  }
+}
+```
+
+### Loglardan Kontrol (Geliştirici)
+
+#### Android
+Android uygulamasında bildirim loglarını görmek için:
+
+```bash
+adb logcat | grep "Bildirim\|Notification\|🔔"
+```
+
+Bu komut, bildirim ile ilgili tüm logları filtreler ve gösterir.
+
+**Örnek Log Çıktısı:**
+```
+🔔 Bildirim kontrolü başlatıldı: appId=task-cosmos
+🔔 Bildirim yanıtı alındı: maintenance=false, broadcast=false
+🔔 Versiyon kontrolü: mevcut=1.0.0, güncel=1.2.0
+🔔 Güncelleme mevcut, kullanıcıya gösteriliyor
+```
+
+#### Web
+Web uygulamasında bildirim loglarını görmek için:
+
+1. Tarayıcı Developer Tools'u açın (F12)
+2. Console sekmesine gidin
+3. 🔔 ile başlayan logları arayın
+
+**Örnek Console Log:**
+```javascript
+🔔 Bildirim API çağrısı: https://bambinifojo.netlify.app/.netlify/functions/getNotifications?appId=task-cosmos
+🔔 Bildirim yanıtı: {general: {...}, app: {...}}
+🔔 Bakım modu: false
+🔔 Broadcast: false
+🔔 Versiyon kontrolü: güncelleme mevcut
+```
+
+**Log Formatı:**
+- Tüm bildirim logları 🔔 emoji ile başlar
+- Log mesajları Türkçe veya İngilizce olabilir
+- Hata durumlarında ❌ emoji kullanılır
+- Başarılı işlemlerde ✅ emoji kullanılır
+
 ## 🐛 Hata Ayıklama
 
 ### API Yanıt Vermiyor
 - İnternet bağlantısını kontrol edin
 - API endpoint'in doğru olduğundan emin olun
 - CORS hatalarını kontrol edin
+- Tarayıcı console'unda veya logcat'te hata mesajlarını kontrol edin
 
 ### Bildirimler Gösterilmiyor
 - `appId` veya `appPackage` parametresinin doğru olduğundan emin olun
 - Admin Panel'de bildirimin aktif olduğunu kontrol edin
 - Versiyon numaralarının doğru format olduğunu kontrol edin
+- Loglardan bildirim yanıtını kontrol edin (🔔 ile başlayan loglar)
+- Süreli bildirimlerin süresinin dolmadığını kontrol edin
+
+### Süreli Bildirimler
+- Bildirim süresi dolduğunda otomatik olarak devre dışı kalır
+- Süre kontrolü için `duration.start_time` ve `duration.value` alanlarını kontrol edin
+- Süre tipi `hours` veya `days` olabilir
 
 ## 📞 Destek
 
