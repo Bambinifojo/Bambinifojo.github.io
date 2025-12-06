@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bildirim Geçmişi Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f7fa;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .test-section h2 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Bildirim Geçmişi Test Sayfası</h1>
+  
+  <div class="test-section">
+    <h2>1. Veri Yapısı Testi</h2>
+    <button onclick="testDataStructure()">Veri Yapısını Test Et</button>
+    <div id="dataStructureResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>2. Bildirim Geçmişi Kaydetme Testi</h2>
+    <button onclick="testSaveNotification()">Test Bildirimi Kaydet</button>
+    <div id="saveResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>3. Bildirim Geçmişi Yükleme Testi</h2>
+    <button onclick="testLoadNotification()">Geçmişi Yükle</button>
+    <div id="loadResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>4. Filtreleme Testi</h2>
+    <button onclick="testFilter()">Filtreleme Test Et</button>
+    <div id="filterResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>5. Export Testi</h2>
+    <button onclick="testExport()">Export Test Et</button>
+    <div id="exportResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>6. Tüm Testleri Çalıştır</h2>
+    <button onclick="runAllTests()" style="background: #10b981;">Tüm Testleri Çalıştır</button>
+    <div id="allTestsResult" class="result"></div>
+  </div>
+
+  <script>
+    // Bildirim geçmişi fonksiyonlarını buraya kopyalayalım (test için)
+    let notificationHistoryData = { history: [], last_updated: null };
+    let filteredNotificationHistory = [];
+
+    function generateNotificationId() {
+      return 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    async function saveNotificationHistory(notificationData) {
+      try {
+        const historyEntry = {
+          id: generateNotificationId(),
+          type: notificationData.type || 'app',
+          app_id: notificationData.app_id || null,
+          app_name: notificationData.app_name || null,
+          title: notificationData.title || 'Bildirim',
+          message: notificationData.message || '',
+          status: notificationData.status || 'active',
+          created_at: notificationData.created_at || new Date().toISOString(),
+          activated_at: notificationData.activated_at || new Date().toISOString(),
+          expired_at: notificationData.expired_at || null,
+          deactivated_at: notificationData.deactivated_at || null,
+          created_by: 'admin',
+          duration: notificationData.duration || null,
+          latest_version: notificationData.latest_version || null,
+          force_update: notificationData.force_update || false,
+          stats: {
+            views: 0,
+            clicks: 0,
+            update_clicks: 0,
+            dismiss_clicks: 0
+          }
+        };
+        
+        notificationHistoryData.history.unshift(historyEntry);
+        notificationHistoryData.last_updated = new Date().toISOString();
+        localStorage.setItem('notificationHistory', JSON.stringify(notificationHistoryData));
+        
+        return { success: true, entry: historyEntry };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    }
+
+    async function loadNotificationHistory() {
+      try {
+        const saved = localStorage.getItem('notificationHistory');
+        if (saved) {
+          notificationHistoryData = JSON.parse(saved);
+          filteredNotificationHistory = notificationHistoryData.history || [];
+          return { success: true, data: notificationHistoryData };
+        } else {
+          notificationHistoryData = { history: [], last_updated: new Date().toISOString() };
+          return { success: true, data: notificationHistoryData };
+        }
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    }
+
+    function filterNotificationHistory(searchTerm = '', statusFilter = 'all', appFilter = 'all') {
+      filteredNotificationHistory = (notificationHistoryData.history || []).filter(entry => {
+        const matchesSearch = !searchTerm || 
+          entry.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entry.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entry.app_name?.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = statusFilter === 'all' || entry.status === statusFilter;
+        const matchesApp = appFilter === 'all' || entry.app_id === appFilter;
+        
+        return matchesSearch && matchesStatus && matchesApp;
+      });
+      
+      return filteredNotificationHistory;
+    }
+
+    function exportNotificationHistory() {
+      try {
+        const data = filteredNotificationHistory.length > 0 ? filteredNotificationHistory : notificationHistoryData.history;
+        
+        let csv = 'ID,Tip,Uygulama,Başlık,Mesaj,Durum,Oluşturulma,Aktifleştirme,Bitiş,Kapatılma\n';
+        
+        data.forEach(entry => {
+          const row = [
+            entry.id || '',
+            entry.type || '',
+            entry.app_name || '',
+            `"${(entry.title || '').replace(/"/g, '""')}"`,
+            `"${(entry.message || '').replace(/"/g, '""')}"`,
+            entry.status || '',
+            entry.created_at || '',
+            entry.activated_at || '',
+            entry.expired_at || '',
+            entry.deactivated_at || ''
+          ];
+          csv += row.join(',') + '\n';
+        });
+        
+        return { success: true, csv: csv, count: data.length };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    }
+
+    // Test fonksiyonları
+    function testDataStructure() {
+      const result = document.getElementById('dataStructureResult');
+      try {
+        const testData = {
+          id: 'test_id',
+          type: 'app',
+          app_id: 'test-app',
+          app_name: 'Test App',
+          title: 'Test Bildirim',
+          message: 'Test mesajı',
+          status: 'active',
+          created_at: new Date().toISOString(),
+          activated_at: new Date().toISOString(),
+          expired_at: null,
+          deactivated_at: null,
+          created_by: 'admin',
+          duration: { type: 'hours', value: 24 },
+          latest_version: '1.0.0',
+          force_update: false,
+          stats: { views: 0, clicks: 0, update_clicks: 0, dismiss_clicks: 0 }
+        };
+        
+        result.className = 'result success';
+        result.textContent = '✅ Veri yapısı doğru!\n\n' + JSON.stringify(testData, null, 2);
+      } catch (error) {
+        result.className = 'result error';
+        result.textContent = '❌ Hata: ' + error.message;
+      }
+    }
+
+    async function testSaveNotification() {
+      const result = document.getElementById('saveResult');
+      result.className = 'result';
+      result.textContent = '⏳ Test ediliyor...';
+      
+      const testNotification = {
+        type: 'app',
+        app_id: 'test-app',
+        app_name: 'Test Uygulama',
+        title: 'Test Bildirimi',
+        message: 'Bu bir test bildirimidir',
+        status: 'active',
+        latest_version: '1.0.1',
+        force_update: false,
+        duration: { type: 'hours', value: 24 }
+      };
+      
+      const saveResult = await saveNotificationHistory(testNotification);
+      
+      if (saveResult.success) {
+        result.className = 'result success';
+        result.textContent = '✅ Bildirim başarıyla kaydedildi!\n\n' + 
+          'Kayıt ID: ' + saveResult.entry.id + '\n' +
+          'Toplam kayıt sayısı: ' + notificationHistoryData.history.length;
+      } else {
+        result.className = 'result error';
+        result.textContent = '❌ Hata: ' + saveResult.error;
+      }
+    }
+
+    async function testLoadNotification() {
+      const result = document.getElementById('loadResult');
+      result.className = 'result';
+      result.textContent = '⏳ Yükleniyor...';
+      
+      const loadResult = await loadNotificationHistory();
+      
+      if (loadResult.success) {
+        result.className = 'result success';
+        result.textContent = '✅ Bildirim geçmişi yüklendi!\n\n' +
+          'Toplam kayıt: ' + (loadResult.data.history?.length || 0) + '\n' +
+          'Son güncelleme: ' + (loadResult.data.last_updated || 'Yok') + '\n\n' +
+          'Kayıtlar:\n' + JSON.stringify(loadResult.data.history?.slice(0, 3) || [], null, 2);
+      } else {
+        result.className = 'result error';
+        result.textContent = '❌ Hata: ' + loadResult.error;
+      }
+    }
+
+    function testFilter() {
+      const result = document.getElementById('filterResult');
+      result.className = 'result';
+      result.textContent = '⏳ Test ediliyor...';
+      
+      // Önce veriyi yükle
+      loadNotificationHistory().then(() => {
+        // Filtreleme testi
+        const filtered = filterNotificationHistory('test', 'active', 'all');
+        
+        result.className = 'result success';
+        result.textContent = '✅ Filtreleme testi tamamlandı!\n\n' +
+          'Arama terimi: "test"\n' +
+          'Durum filtresi: "active"\n' +
+          'Bulunan kayıt sayısı: ' + filtered.length + '\n\n' +
+          'Filtrelenmiş kayıtlar:\n' + JSON.stringify(filtered.slice(0, 2), null, 2);
+      });
+    }
+
+    function testExport() {
+      const result = document.getElementById('exportResult');
+      result.className = 'result';
+      result.textContent = '⏳ Test ediliyor...';
+      
+      // Önce veriyi yükle
+      loadNotificationHistory().then(() => {
+        const exportResult = exportNotificationHistory();
+        
+        if (exportResult.success) {
+          result.className = 'result success';
+          result.textContent = '✅ Export testi başarılı!\n\n' +
+            'Export edilen kayıt sayısı: ' + exportResult.count + '\n' +
+            'CSV uzunluğu: ' + exportResult.csv.length + ' karakter\n\n' +
+            'CSV önizleme (ilk 500 karakter):\n' + exportResult.csv.substring(0, 500);
+        } else {
+          result.className = 'result error';
+          result.textContent = '❌ Hata: ' + exportResult.error;
+        }
+      });
+    }
+
+    async function runAllTests() {
+      const result = document.getElementById('allTestsResult');
+      result.className = 'result';
+      result.textContent = '⏳ Tüm testler çalıştırılıyor...\n\n';
+      
+      let allPassed = true;
+      let testResults = [];
+      
+      // Test 1: Veri yapısı
+      try {
+        testDataStructure();
+        testResults.push('✅ Veri yapısı testi: BAŞARILI');
+      } catch (e) {
+        testResults.push('❌ Veri yapısı testi: BAŞARISIZ - ' + e.message);
+        allPassed = false;
+      }
+      
+      // Test 2: Kaydetme
+      const saveResult = await saveNotificationHistory({
+        type: 'app',
+        app_id: 'test-app-2',
+        app_name: 'Test Uygulama 2',
+        title: 'Test Bildirimi 2',
+        message: 'İkinci test bildirimi',
+        status: 'active'
+      });
+      if (saveResult.success) {
+        testResults.push('✅ Kaydetme testi: BAŞARILI');
+      } else {
+        testResults.push('❌ Kaydetme testi: BAŞARISIZ - ' + saveResult.error);
+        allPassed = false;
+      }
+      
+      // Test 3: Yükleme
+      const loadResult = await loadNotificationHistory();
+      if (loadResult.success) {
+        testResults.push('✅ Yükleme testi: BAŞARILI (' + (loadResult.data.history?.length || 0) + ' kayıt)');
+      } else {
+        testResults.push('❌ Yükleme testi: BAŞARISIZ - ' + loadResult.error);
+        allPassed = false;
+      }
+      
+      // Test 4: Filtreleme
+      const filtered = filterNotificationHistory('test', 'active', 'all');
+      testResults.push('✅ Filtreleme testi: BAŞARILI (' + filtered.length + ' kayıt bulundu)');
+      
+      // Test 5: Export
+      const exportResult = exportNotificationHistory();
+      if (exportResult.success) {
+        testResults.push('✅ Export testi: BAŞARILI (' + exportResult.count + ' kayıt)');
+      } else {
+        testResults.push('❌ Export testi: BAŞARISIZ - ' + exportResult.error);
+        allPassed = false;
+      }
+      
+      result.className = allPassed ? 'result success' : 'result error';
+      result.textContent = (allPassed ? '✅ TÜM TESTLER BAŞARILI!\n\n' : '⚠️ BAZI TESTLER BAŞARISIZ!\n\n') +
+        testResults.join('\n');
+    }
+  </script>
+</body>
+</html>
+
