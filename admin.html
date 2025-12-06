@@ -5433,6 +5433,451 @@
     margin-bottom: 20px;
   }
 
+  /* Bildirim Geçmişi Stilleri */
+  .notification-history-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .notification-history-controls .search-input,
+  .notification-history-controls .filter-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    max-width: 250px;
+    padding: 8px 12px;
+    margin-right: 10px;
+  }
+
+  .notification-history-controls .search-input:focus,
+  .notification-history-controls .filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .notification-history-item {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .notification-history-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+    transform: translateY(-2px);
+  }
+
+  .notification-history-header {
+    margin-bottom: 16px;
+  }
+
+  .notification-history-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .notification-history-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .notification-history-title h4 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .notification-history-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .notification-history-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .notification-history-body {
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .notification-history-message {
+    margin: 0 0 16px 0;
+    color: #1a1a1a;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .notification-history-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .notification-history-details div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .notification-history-details strong {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .notification-history-details div:not(:has(strong)) {
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+
+  .pagination {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .pagination button {
+    min-width: 40px;
+    height: 40px;
+    padding: 8px 12px;
+  }
+
+  .pagination button.btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pagination span {
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+
+  /* Bildirim Önizleme Modal Stilleri */
+  .notification-preview-modal {
+    max-width: 900px;
+  }
+
+  .preview-view-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f3f4f6;
+    border-radius: 12px;
+  }
+
+  .view-toggle-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #6b7280;
+    transition: all 0.3s ease;
+  }
+
+  .view-toggle-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .view-toggle-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+  }
+
+  .preview-container {
+    display: none;
+  }
+
+  .preview-container.active {
+    display: block;
+  }
+
+  /* Mobil Görünüm */
+  .preview-mobile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .preview-device-frame {
+    width: 375px;
+    max-width: 100%;
+    background: #000;
+    border-radius: 30px;
+    padding: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .preview-device-header {
+    background: #000;
+    border-radius: 22px 22px 0 0;
+    padding: 8px 16px 4px;
+  }
+
+  .preview-device-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 0;
+  }
+
+  .preview-device-icons {
+    display: flex;
+    gap: 4px;
+    font-size: 0.7rem;
+  }
+
+  .preview-device-content {
+    background: #f5f7fa;
+    border-radius: 0 0 22px 22px;
+    min-height: 600px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  /* Desktop Görünüm */
+  .preview-desktop {
+    padding: 20px;
+  }
+
+  .preview-desktop-frame {
+    background: #f5f7fa;
+    border-radius: 12px;
+    padding: 40px;
+    min-height: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .preview-desktop-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Bildirim Dialog Önizleme Stilleri */
+  .preview-dialog {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    margin: 20px 0;
+  }
+
+  .preview-dialog-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .preview-dialog-message {
+    font-size: 1rem;
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .preview-dialog-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .preview-dialog-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+  }
+
+  .preview-dialog-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .preview-dialog-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .preview-dialog-btn-secondary {
+    background: #f3f4f6;
+    color: #4b5563;
+  }
+
+  .preview-dialog-btn-secondary:hover {
+    background: #e5e7eb;
+  }
+
+  /* Bakım Modu Önizleme */
+  .preview-maintenance {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+  }
+
+  .preview-maintenance .preview-dialog-title {
+    color: #92400e;
+  }
+
+  .preview-maintenance .preview-dialog-message {
+    color: #78350f;
+  }
+
+  /* Broadcast Önizleme */
+  .preview-broadcast {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 2px solid #3b82f6;
+  }
+
+  .preview-broadcast .preview-dialog-title {
+    color: #1e40af;
+  }
+
+  .preview-broadcast .preview-dialog-message {
+    color: #1e3a8a;
+  }
+
+  /* Versiyon Güncelleme Önizleme */
+  .preview-update {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border: 2px solid #10b981;
+  }
+
+  .preview-update .preview-dialog-title {
+    color: #065f46;
+  }
+
+  .preview-update .preview-dialog-message {
+    color: #047857;
+  }
+
+  /* Bildirim İstatistikleri Stilleri */
+  .stats-filters {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .stats-filters .filter-select {
+    padding: 8px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .stat-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .stat-card-content {
+    flex: 1;
+  }
+
+  .stat-card-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+  .stat-card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .stats-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+  }
+
+  .chart-container {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .chart-container h3 {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .chart-container canvas {
+    max-height: 300px;
+  }
+
   @media (max-width: 768px) {
     .notification-item-header {
       flex-direction: column;
@@ -5449,8 +5894,56 @@
     .notification-item-details {
       grid-template-columns: 1fr;
     }
+
+    .notification-history-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .notification-history-controls .search-input,
+    .notification-history-controls .filter-select {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .notification-history-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .notification-history-details {
+      grid-template-columns: 1fr;
+    }
+
+    .notification-preview-modal {
+      max-width: 100%;
+      margin: 10px;
+    }
+
+    .preview-device-frame {
+      width: 100%;
+      max-width: 375px;
+    }
+
+    .preview-desktop-frame {
+      padding: 20px;
+    }
+
+    .stats-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-charts {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+      padding: 15px;
+    }
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/admin-utils.js"></script>
 <script src="js/admin-state.js"></script>
 <script src="js/admin-auth.js"></script>
@@ -6262,6 +6755,133 @@
               </div>
             </div>
 
+            <!-- Bildirim İstatistikleri -->
+            <div class="admin-card admin-card-spacing">
+              <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                📊 Bildirim İstatistikleri
+              </h2>
+              <p class="admin-page-subtitle">Bildirimlerin performansını takip edin</p>
+              
+              <!-- İstatistik Filtreleri -->
+              <div class="stats-filters" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <select id="statsNotificationFilter" class="filter-select" onchange="loadNotificationStats()" title="Bildirim filtresi">
+                  <option value="all">Tüm Bildirimler</option>
+                </select>
+                <select id="statsDateRange" class="filter-select" onchange="loadNotificationStats()" title="Tarih aralığı">
+                  <option value="7">Son 7 Gün</option>
+                  <option value="30" selected>Son 30 Gün</option>
+                  <option value="90">Son 90 Gün</option>
+                  <option value="all">Tümü</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="exportNotificationStats()" title="Export">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Export</span>
+                </button>
+              </div>
+
+              <!-- İstatistik Kartları -->
+              <div class="stats-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                <div class="stat-card">
+                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👁️</div>
+                  <div class="stat-card-content">
+                    <div class="stat-card-label">Toplam Görüntülenme</div>
+                    <div class="stat-card-value" id="statTotalViews">0</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">👆</div>
+                  <div class="stat-card-content">
+                    <div class="stat-card-label">Toplam Tıklama</div>
+                    <div class="stat-card-value" id="statTotalClicks">0</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">🔄</div>
+                  <div class="stat-card-content">
+                    <div class="stat-card-label">Güncelleme Tıklama</div>
+                    <div class="stat-card-value" id="statUpdateClicks">0</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">📈</div>
+                  <div class="stat-card-content">
+                    <div class="stat-card-label">Dönüşüm Oranı</div>
+                    <div class="stat-card-value" id="statConversionRate">0%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Grafikler -->
+              <div class="stats-charts" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                <div class="chart-container">
+                  <h3 style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 600;">Günlük Görüntülenme</h3>
+                  <canvas id="viewsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                  <h3 style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 600;">Günlük Tıklama</h3>
+                  <canvas id="clicksChart"></canvas>
+                </div>
+                <div class="chart-container" style="grid-column: 1 / -1;">
+                  <h3 style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 600;">Bildirim Performansı</h3>
+                  <canvas id="performanceChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bildirim Geçmişi -->
+            <div class="admin-card admin-card-spacing">
+              <div class="flex-between apps-header">
+                <h2>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  📜 Bildirim Geçmişi
+                </h2>
+                <div class="notification-history-controls">
+                  <input type="text" id="notificationHistorySearch" class="search-input" placeholder="🔍 Ara..." onkeyup="filterNotificationHistory()" title="Bildirim geçmişinde ara">
+                  <select id="notificationHistoryFilter" class="filter-select" onchange="filterNotificationHistory()" title="Durum filtresi">
+                    <option value="all">Tümü</option>
+                    <option value="active">Aktif</option>
+                    <option value="expired">Süresi Doldu</option>
+                    <option value="deactivated">Kapatıldı</option>
+                  </select>
+                  <select id="notificationHistoryAppFilter" class="filter-select" onchange="filterNotificationHistory()" title="Uygulama filtresi">
+                    <option value="all">Tüm Uygulamalar</option>
+                  </select>
+                  <button class="btn btn-secondary btn-sm" onclick="exportNotificationHistory()" title="Export">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Export</span>
+                  </button>
+                </div>
+              </div>
+              <p class="admin-page-subtitle">Gönderilen tüm bildirimlerin kaydı</p>
+              
+              <div id="notificationHistoryList" class="apps-list">
+                <p class="loading-text">Yükleniyor...</p>
+              </div>
+              
+              <div id="notificationHistoryPagination" class="pagination">
+                <!-- Pagination butonları buraya eklenecek -->
+              </div>
+            </div>
+
             <div class="admin-card admin-card-spacing">
               <h2>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
@@ -6344,6 +6964,9 @@
                 </div>
 
                 <div class="form-actions hidden" id="appNotificationActions">
+                  <button type="button" class="btn btn-secondary" onclick="previewAppNotification()" title="Bildirimi önizle" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <span>👁️ Önizle</span>
+                  </button>
                   <button type="submit" class="btn btn-primary" id="saveAppNotificationBtn">
                     <span>💾 Kaydet</span>
                   </button>
@@ -6409,6 +7032,12 @@
                   </div>
 
                   <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="previewGeneralNotification('broadcast')" title="Yayın önizlemesi">
+                      <span>👁️ Yayın Önizle</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="previewGeneralNotification('maintenance')" title="Bakım modu önizlemesi">
+                      <span>👁️ Bakım Önizle</span>
+                    </button>
                     <button type="submit" class="btn btn-primary" id="saveNotificationsBtn">
                       <span>💾 Kaydet</span>
                     </button>
@@ -6897,6 +7526,61 @@
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bildirim Önizleme Modal -->
+      <div id="notificationPreviewModal" class="modal-overlay" onclick="closeNotificationPreview(event)">
+        <div class="modal-content notification-preview-modal" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <h2>👁️ Bildirim Önizlemesi</h2>
+            <button class="modal-close-btn" onclick="closeNotificationPreview()" title="Kapat">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="modal-body">
+            <!-- Görünüm Seçimi -->
+            <div class="preview-view-toggle">
+              <button class="view-toggle-btn active" data-view="mobile" onclick="switchPreviewView('mobile')">
+                📱 Mobil
+              </button>
+              <button class="view-toggle-btn" data-view="desktop" onclick="switchPreviewView('desktop')">
+                💻 Desktop
+              </button>
+            </div>
+
+            <!-- Mobil Görünüm -->
+            <div id="previewMobile" class="preview-container preview-mobile active">
+              <div class="preview-device-frame">
+                <div class="preview-device-header">
+                  <div class="preview-device-status-bar">
+                    <span>9:41</span>
+                    <div class="preview-device-icons">
+                      <span>📶</span>
+                      <span>📶</span>
+                      <span>🔋</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="preview-device-content" id="previewMobileContent">
+                  <!-- Önizleme içeriği buraya eklenecek -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop Görünüm -->
+            <div id="previewDesktop" class="preview-container preview-desktop">
+              <div class="preview-desktop-frame">
+                <div class="preview-desktop-content" id="previewDesktopContent">
+                  <!-- Önizleme içeriği buraya eklenecek -->
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

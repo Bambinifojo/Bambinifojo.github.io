@@ -309,6 +309,10 @@ function showSection(section) {
     setTimeout(() => {
       populateAppNotificationSelect();
       renderActiveNotifications();
+      // Bildirim geçmişini yükle
+      if (typeof loadNotificationHistory === 'function') {
+        loadNotificationHistory();
+      }
     }, 100);
     // Süre tipi değişikliği için event listener ekle
     const durationTypeEl = document.getElementById('notification_duration_type');
@@ -631,6 +635,14 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
             populateAppNotificationSelect();
             renderActiveNotifications();
+            // Bildirim geçmişini yükle
+            if (typeof loadNotificationHistory === 'function') {
+              loadNotificationHistory();
+            }
+            // Bildirim istatistiklerini yükle
+            if (typeof loadNotificationStats === 'function') {
+              loadNotificationStats();
+            }
           }, 200);
           // Süre tipi değişikliği için event listener ekle
           const durationTypeEl = document.getElementById('notification_duration_type');
@@ -3857,27 +3869,71 @@ function populateAppNotificationSelect() {
 
 // Seçilen uygulama için bildirim ayarlarını yükle
 function loadAppNotificationSettings(appIndex) {
+  console.log('📥 loadAppNotificationSettings çağrıldı, appIndex:', appIndex, typeof appIndex);
+  
   const settingsDiv = document.getElementById('appNotificationSettings');
   const actionsDiv = document.getElementById('appNotificationActions');
   
   if (!appIndex || appIndex === '') {
+    console.log('⚠️ appIndex boş, form gizleniyor');
     if (settingsDiv) settingsDiv.classList.add('hidden');
     if (actionsDiv) actionsDiv.classList.add('hidden');
     return;
   }
   
-  const app = appsData.apps[parseInt(appIndex)];
+  // appIndex'i integer'a çevir
+  const index = parseInt(appIndex);
+  if (isNaN(index)) {
+    console.error('❌ Geçersiz appIndex:', appIndex);
+    showAlert('❌ Geçersiz uygulama indeksi!', 'error');
+    return;
+  }
+  
+  // appsData kontrolü
+  if (!appsData || !appsData.apps) {
+    console.warn('⚠️ appsData yüklenmemiş, yükleniyor...');
+    const saved = localStorage.getItem('appsData');
+    if (saved) {
+      try {
+        appsData = JSON.parse(saved);
+      } catch (e) {
+        console.error('❌ LocalStorage\'dan appsData parse edilemedi:', e);
+        showAlert('❌ Veri yüklenemedi!', 'error');
+        return;
+      }
+    } else {
+      showAlert('❌ Uygulama verileri bulunamadı!', 'error');
+      return;
+    }
+  }
+  
+  const app = appsData.apps[index];
   if (!app) {
+    console.error('❌ Uygulama bulunamadı, index:', index, 'toplam:', appsData.apps.length);
     showAlert('❌ Uygulama bulunamadı!', 'error');
     return;
   }
   
+  console.log('✅ Uygulama bulundu:', app.title, 'Bildirim:', app.notification);
+  
   // Form alanlarını göster
-  if (settingsDiv) settingsDiv.classList.remove('hidden');
-  if (actionsDiv) actionsDiv.classList.remove('hidden');
+  if (settingsDiv) {
+    settingsDiv.classList.remove('hidden');
+    console.log('✅ Form alanları gösterildi');
+  } else {
+    console.error('❌ appNotificationSettings elementi bulunamadı!');
+  }
+  
+  if (actionsDiv) {
+    actionsDiv.classList.remove('hidden');
+    console.log('✅ Form butonları gösterildi');
+  } else {
+    console.error('❌ appNotificationActions elementi bulunamadı!');
+  }
   
   // Mevcut bildirim ayarlarını yükle
   const notification = app.notification || {};
+  console.log('📋 Bildirim ayarları yükleniyor:', notification);
   
   const latestVersionEl = document.getElementById('latest_version');
   const forceUpdateEl = document.getElementById('force_update');
@@ -3889,11 +3945,37 @@ function loadAppNotificationSettings(appIndex) {
   const durationValueGroup = document.getElementById('notification_duration_value_group');
   const durationHint = document.getElementById('notification_duration_hint');
   
-  if (latestVersionEl) latestVersionEl.value = notification.latest_version || '';
-  if (forceUpdateEl) forceUpdateEl.value = String(notification.force_update || false);
-  if (updateMessageEl) updateMessageEl.value = notification.update_message || '';
-  if (playStoreUrlEl) playStoreUrlEl.value = app.details && app.details !== '#' ? app.details : '';
-  if (notificationEnabledEl) notificationEnabledEl.value = String(notification.enabled || false);
+  // Form elemanlarını kontrol et
+  if (!latestVersionEl) console.error('❌ latest_version elementi bulunamadı!');
+  if (!forceUpdateEl) console.error('❌ force_update elementi bulunamadı!');
+  if (!updateMessageEl) console.error('❌ update_message elementi bulunamadı!');
+  if (!notificationEnabledEl) console.error('❌ notification_enabled elementi bulunamadı!');
+  
+  // Form alanlarını doldur
+  if (latestVersionEl) {
+    latestVersionEl.value = notification.latest_version || '';
+    console.log('✅ latest_version dolduruldu:', latestVersionEl.value);
+  }
+  
+  if (forceUpdateEl) {
+    forceUpdateEl.value = String(notification.force_update || false);
+    console.log('✅ force_update dolduruldu:', forceUpdateEl.value);
+  }
+  
+  if (updateMessageEl) {
+    updateMessageEl.value = notification.update_message || '';
+    console.log('✅ update_message dolduruldu:', updateMessageEl.value);
+  }
+  
+  if (playStoreUrlEl) {
+    playStoreUrlEl.value = app.details && app.details !== '#' ? app.details : '';
+    console.log('✅ play_store_url dolduruldu:', playStoreUrlEl.value);
+  }
+  
+  if (notificationEnabledEl) {
+    notificationEnabledEl.value = String(notification.enabled || false);
+    console.log('✅ notification_enabled dolduruldu:', notificationEnabledEl.value);
+  }
   
   // Süreli bildirim ayarları
   if (notification.duration) {
@@ -4063,12 +4145,53 @@ async function saveAppNotification(event) {
     }
     
     // Uygulama bildirim ayarlarını güncelle
+    const wasEnabled = app.notification?.enabled || false;
     if (notificationEnabled) {
       app.notification = notification;
+      
+      // Bildirim geçmişine kaydet (yeni bildirim veya güncelleme)
+      if (!wasEnabled || !app.notification.duration?.start_time) {
+        // Yeni bildirim veya süre başlangıcı yoksa, geçmişe ekle
+        const expiredAt = notification.duration ? 
+          new Date(new Date(notification.duration.start_time).getTime() + 
+            (notification.duration.type === 'hours' ? notification.duration.value * 60 * 60 * 1000 :
+             notification.duration.type === 'days' ? notification.duration.value * 24 * 60 * 60 * 1000 : 0)
+          ).toISOString() : null;
+        
+        saveNotificationHistory({
+          type: 'app',
+          app_id: app.appId || app.title?.toLowerCase().replace(/\s+/g, '-'),
+          app_name: app.title,
+          title: 'Versiyon Güncelleme',
+          message: updateMessage,
+          status: 'active',
+          latest_version: latestVersion,
+          force_update: forceUpdateEl.value === 'true',
+          duration: notification.duration || null,
+          expired_at: expiredAt
+        });
+      }
     } else {
       // Bildirim kapalıysa, sadece enabled false yap, diğer ayarları koru
       if (app.notification) {
         app.notification.enabled = false;
+        
+        // Bildirim geçmişini güncelle (kapatıldı olarak işaretle)
+        if (wasEnabled) {
+          // En son aktif bildirimi bul ve kapat
+          const history = JSON.parse(localStorage.getItem('notificationHistory') || '{"history":[]}');
+          const lastActive = history.history?.find(h => 
+            h.app_id === (app.appId || app.title?.toLowerCase().replace(/\s+/g, '-')) && 
+            h.status === 'active'
+          );
+          
+          if (lastActive) {
+            updateNotificationHistory(lastActive.id, {
+              status: 'deactivated',
+              deactivated_at: new Date().toISOString()
+            });
+          }
+        }
       } else {
         app.notification = { enabled: false };
       }
@@ -4154,6 +4277,11 @@ async function saveAppNotification(event) {
     
     // Aktif bildirimler listesini güncelle
     renderActiveNotifications();
+    
+    // Bildirim geçmişini yenile
+    if (typeof loadNotificationHistory === 'function') {
+      loadNotificationHistory();
+    }
     
     saveBtn.querySelector('span').textContent = '✅ Kaydedildi!';
     setTimeout(() => {
@@ -4345,40 +4473,36 @@ function editAppNotification(appIndex) {
   // Bildirim ayarları formuna geç ve uygulamayı seç
   showSection('notifications');
   
-  // Sayfanın yüklenmesini bekle
+  // Sayfanın yüklenmesini bekle - daha uzun süre bekle
   setTimeout(() => {
     const appSelect = document.getElementById('notification_app_select');
     if (appSelect) {
       console.log('✅ notification_app_select bulundu, değer ayarlanıyor:', index);
       
-      // Uygulamayı seç
+      // Uygulamayı seç (onchange event'ini tetiklemeden)
       appSelect.value = String(index);
+      console.log('✅ Dropdown değeri ayarlandı:', appSelect.value);
       
-      // onchange event'ini manuel tetikle (dropdown değişikliği için)
-      const changeEvent = new Event('change', { bubbles: true });
-      appSelect.dispatchEvent(changeEvent);
-      
-      // Ayarları yükle
+      // Ayarları yükle (onchange event'ini tetikleme, direkt yükle)
+      // loadAppNotificationSettings fonksiyonu zaten onNotificationDurationTypeChange() çağırıyor
       loadAppNotificationSettings(String(index));
       
-      // Süre tipi değişikliği event'ini de tetikle
+      // Form alanlarına scroll yap
       setTimeout(() => {
-        const durationTypeEl = document.getElementById('notification_duration_type');
-        if (durationTypeEl) {
-          const durationChangeEvent = new Event('change', { bubbles: true });
-          durationTypeEl.dispatchEvent(durationChangeEvent);
-        }
-        
-        // Form alanlarına scroll yap
         const settingsDiv = document.getElementById('appNotificationSettings');
         if (settingsDiv) {
           settingsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          console.log('✅ Form alanlarına scroll yapıldı');
         }
-      }, 100);
+      }, 200);
     } else {
-      console.warn('⚠️ notification_app_select elementi bulunamadı');
+      console.warn('⚠️ notification_app_select elementi bulunamadı, tekrar deneniyor...');
+      // Tekrar dene
+      setTimeout(() => {
+        editAppNotification(index);
+      }, 200);
     }
-  }, 300);
+  }, 500); // Daha uzun bekleme süresi
 }
 
 // Global scope'a ekle (HTML onclick için)
@@ -4402,6 +4526,20 @@ async function deactivateNotification(appIndex) {
   
   // Bildirimi kapat
   app.notification.enabled = false;
+  
+  // Bildirim geçmişini güncelle (kapatıldı olarak işaretle)
+  const history = JSON.parse(localStorage.getItem('notificationHistory') || '{"history":[]}');
+  const lastActive = history.history?.find(h => 
+    h.app_id === (app.appId || app.title?.toLowerCase().replace(/\s+/g, '-')) && 
+    h.status === 'active'
+  );
+  
+  if (lastActive && typeof updateNotificationHistory === 'function') {
+    updateNotificationHistory(lastActive.id, {
+      status: 'deactivated',
+      deactivated_at: new Date().toISOString()
+    });
+  }
   
   // GitHub Pages kontrolü - Netlify Functions çalışmaz, direkt LocalStorage'a kaydet
   const isGitHubPages = window.location.hostname.includes('github.io') || 
@@ -4456,5 +4594,1073 @@ async function deactivateNotification(appIndex) {
       showAlert('⚠️ LocalStorage\'a kaydedildi', 'info');
     }
   }
+}
+
+// ==================== BİLDİRİM GEÇMİŞİ FONKSİYONLARI ====================
+
+let notificationHistoryData = { history: [], last_updated: null };
+let filteredNotificationHistory = [];
+let currentHistoryPage = 1;
+const HISTORY_ITEMS_PER_PAGE = 10;
+
+// Bildirim geçmişi verilerini yükle
+async function loadNotificationHistory() {
+  try {
+    // LocalStorage'dan yükle
+    const saved = localStorage.getItem('notificationHistory');
+    if (saved) {
+      notificationHistoryData = JSON.parse(saved);
+    } else {
+      // JSON dosyasından yükle
+      try {
+        const response = await fetch('/data/notification_history.json?t=' + Date.now());
+        if (response.ok) {
+          notificationHistoryData = await response.json();
+          // LocalStorage'a kaydet
+          localStorage.setItem('notificationHistory', JSON.stringify(notificationHistoryData));
+        }
+      } catch (error) {
+        console.warn('Bildirim geçmişi dosyası yüklenemedi, yeni oluşturuluyor:', error);
+        notificationHistoryData = { history: [], last_updated: new Date().toISOString() };
+      }
+    }
+    
+    // Uygulama filtre dropdown'unu doldur
+    populateHistoryAppFilter();
+    
+    // Geçmişi render et
+    filterNotificationHistory();
+  } catch (error) {
+    console.error('Bildirim geçmişi yükleme hatası:', error);
+    notificationHistoryData = { history: [], last_updated: new Date().toISOString() };
+  }
+}
+
+// Bildirim geçmişine kayıt ekle
+async function saveNotificationHistory(notificationData) {
+  try {
+    // Geçmiş verilerini yükle
+    if (!notificationHistoryData || !notificationHistoryData.history) {
+      await loadNotificationHistory();
+    }
+    
+    const historyEntry = {
+      id: generateNotificationId(),
+      type: notificationData.type || 'app', // 'app', 'general', 'broadcast', 'maintenance'
+      app_id: notificationData.app_id || null,
+      app_name: notificationData.app_name || null,
+      title: notificationData.title || 'Bildirim',
+      message: notificationData.message || '',
+      status: notificationData.status || 'active', // 'active', 'expired', 'deactivated'
+      created_at: notificationData.created_at || new Date().toISOString(),
+      activated_at: notificationData.activated_at || new Date().toISOString(),
+      expired_at: notificationData.expired_at || null,
+      deactivated_at: notificationData.deactivated_at || null,
+      created_by: 'admin', // Gelecekte kullanıcı bilgisi eklenebilir
+      duration: notificationData.duration || null,
+      latest_version: notificationData.latest_version || null,
+      force_update: notificationData.force_update || false,
+      stats: {
+        views: 0,
+        clicks: 0,
+        update_clicks: 0,
+        dismiss_clicks: 0
+      }
+    };
+    
+    // Geçmişe ekle (en yeni başta)
+    notificationHistoryData.history.unshift(historyEntry);
+    
+    // Son güncelleme zamanını güncelle
+    notificationHistoryData.last_updated = new Date().toISOString();
+    
+    // LocalStorage'a kaydet
+    localStorage.setItem('notificationHistory', JSON.stringify(notificationHistoryData));
+    
+    // Geçmişi render et
+    filterNotificationHistory();
+    
+    console.log('✅ Bildirim geçmişi kaydedildi:', historyEntry.id);
+  } catch (error) {
+    console.error('Bildirim geçmişi kaydetme hatası:', error);
+  }
+}
+
+// Bildirim geçmişini güncelle (durum değişikliği için)
+async function updateNotificationHistory(notificationId, updates) {
+  try {
+    if (!notificationHistoryData || !notificationHistoryData.history) {
+      await loadNotificationHistory();
+    }
+    
+    const index = notificationHistoryData.history.findIndex(h => h.id === notificationId);
+    if (index !== -1) {
+      notificationHistoryData.history[index] = {
+        ...notificationHistoryData.history[index],
+        ...updates
+      };
+      
+      notificationHistoryData.last_updated = new Date().toISOString();
+      localStorage.setItem('notificationHistory', JSON.stringify(notificationHistoryData));
+      filterNotificationHistory();
+    }
+  } catch (error) {
+    console.error('Bildirim geçmişi güncelleme hatası:', error);
+  }
+}
+
+// Bildirim geçmişini render et
+function renderNotificationHistory() {
+  const container = document.getElementById('notificationHistoryList');
+  if (!container) return;
+  
+  if (!filteredNotificationHistory || filteredNotificationHistory.length === 0) {
+    container.innerHTML = '<p class="empty-state">Henüz bildirim geçmişi yok</p>';
+    document.getElementById('notificationHistoryPagination').style.display = 'none';
+    return;
+  }
+  
+  // Sayfalama
+  const totalPages = Math.ceil(filteredNotificationHistory.length / HISTORY_ITEMS_PER_PAGE);
+  const startIndex = (currentHistoryPage - 1) * HISTORY_ITEMS_PER_PAGE;
+  const endIndex = startIndex + HISTORY_ITEMS_PER_PAGE;
+  const pageItems = filteredNotificationHistory.slice(startIndex, endIndex);
+  
+  let html = '';
+  
+  pageItems.forEach(entry => {
+    const statusClass = entry.status === 'active' ? 'text-success' : 
+                       entry.status === 'expired' ? 'text-warning' : 'text-danger';
+    const statusIcon = entry.status === 'active' ? '✅' : 
+                      entry.status === 'expired' ? '⏰' : '❌';
+    const statusText = entry.status === 'active' ? 'Aktif' : 
+                      entry.status === 'expired' ? 'Süresi Doldu' : 'Kapatıldı';
+    
+    const createdDate = new Date(entry.created_at).toLocaleString('tr-TR');
+    const activatedDate = entry.activated_at ? new Date(entry.activated_at).toLocaleString('tr-TR') : '-';
+    const expiredDate = entry.expired_at ? new Date(entry.expired_at).toLocaleString('tr-TR') : '-';
+    const deactivatedDate = entry.deactivated_at ? new Date(entry.deactivated_at).toLocaleString('tr-TR') : '-';
+    
+    let durationText = 'Süresiz';
+    if (entry.duration) {
+      if (entry.duration.type === 'hours') {
+        durationText = `${entry.duration.value} saat`;
+      } else if (entry.duration.type === 'days') {
+        durationText = `${entry.duration.value} gün`;
+      }
+    }
+    
+    html += `
+      <div class="notification-history-item" data-id="${entry.id}">
+        <div class="notification-history-header">
+          <div class="notification-history-title">
+            <span class="notification-history-icon">${entry.type === 'app' ? '📱' : entry.type === 'broadcast' ? '📢' : entry.type === 'maintenance' ? '🔧' : '📦'}</span>
+            <div>
+              <h4>${entry.title || 'Bildirim'}</h4>
+              <p class="notification-history-meta">
+                ${entry.app_name ? `<span>📱 ${entry.app_name}</span>` : ''}
+                <span>📅 ${createdDate}</span>
+                <span class="${statusClass}">${statusIcon} ${statusText}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="notification-history-body">
+          <p class="notification-history-message">${entry.message || ''}</p>
+          <div class="notification-history-details">
+            ${entry.latest_version ? `<div><strong>Versiyon:</strong> ${entry.latest_version}</div>` : ''}
+            ${entry.force_update !== undefined ? `<div><strong>Zorunlu Güncelleme:</strong> ${entry.force_update ? 'Evet' : 'Hayır'}</div>` : ''}
+            <div><strong>Süre:</strong> ${durationText}</div>
+            <div><strong>Oluşturulma:</strong> ${createdDate}</div>
+            <div><strong>Aktifleştirme:</strong> ${activatedDate}</div>
+            ${expiredDate !== '-' ? `<div><strong>Bitiş:</strong> ${expiredDate}</div>` : ''}
+            ${deactivatedDate !== '-' ? `<div><strong>Kapatılma:</strong> ${deactivatedDate}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+  
+  // Sayfalama butonlarını render et
+  if (totalPages > 1) {
+    renderHistoryPagination(totalPages);
+  } else {
+    document.getElementById('notificationHistoryPagination').style.display = 'none';
+  }
+}
+
+// Sayfalama butonlarını render et
+function renderHistoryPagination(totalPages) {
+  const container = document.getElementById('notificationHistoryPagination');
+  if (!container) return;
+  
+  container.style.display = 'flex';
+  container.style.justifyContent = 'center';
+  container.style.gap = '10px';
+  container.style.alignItems = 'center';
+  
+  let html = '';
+  
+  // Önceki sayfa butonu
+  html += `<button class="btn btn-sm ${currentHistoryPage === 1 ? 'btn-disabled' : 'btn-secondary'}" 
+                   onclick="changeHistoryPage(${currentHistoryPage - 1})" 
+                   ${currentHistoryPage === 1 ? 'disabled' : ''}>
+            ← Önceki
+          </button>`;
+  
+  // Sayfa numaraları
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentHistoryPage - 2 && i <= currentHistoryPage + 2)) {
+      html += `<button class="btn btn-sm ${i === currentHistoryPage ? 'btn-primary' : 'btn-secondary'}" 
+                       onclick="changeHistoryPage(${i})">
+                ${i}
+              </button>`;
+    } else if (i === currentHistoryPage - 3 || i === currentHistoryPage + 3) {
+      html += `<span>...</span>`;
+    }
+  }
+  
+  // Sonraki sayfa butonu
+  html += `<button class="btn btn-sm ${currentHistoryPage === totalPages ? 'btn-disabled' : 'btn-secondary'}" 
+                   onclick="changeHistoryPage(${currentHistoryPage + 1})" 
+                   ${currentHistoryPage === totalPages ? 'disabled' : ''}>
+            Sonraki →
+          </button>`;
+  
+  html += `<span style="margin-left: 10px; color: #666;">
+            Toplam: ${filteredNotificationHistory.length} kayıt
+          </span>`;
+  
+  container.innerHTML = html;
+}
+
+// Sayfa değiştir
+function changeHistoryPage(page) {
+  const totalPages = Math.ceil(filteredNotificationHistory.length / HISTORY_ITEMS_PER_PAGE);
+  if (page < 1 || page > totalPages) return;
+  
+  currentHistoryPage = page;
+  renderNotificationHistory();
+  
+  // Sayfayı yukarı kaydır
+  const container = document.getElementById('notificationHistoryList');
+  if (container) {
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// Bildirim geçmişini filtrele
+function filterNotificationHistory() {
+  const searchTerm = document.getElementById('notificationHistorySearch')?.value.toLowerCase() || '';
+  const statusFilter = document.getElementById('notificationHistoryFilter')?.value || 'all';
+  const appFilter = document.getElementById('notificationHistoryAppFilter')?.value || 'all';
+  
+  filteredNotificationHistory = (notificationHistoryData.history || []).filter(entry => {
+    // Arama filtresi
+    const matchesSearch = !searchTerm || 
+      entry.title?.toLowerCase().includes(searchTerm) ||
+      entry.message?.toLowerCase().includes(searchTerm) ||
+      entry.app_name?.toLowerCase().includes(searchTerm);
+    
+    // Durum filtresi
+    const matchesStatus = statusFilter === 'all' || entry.status === statusFilter;
+    
+    // Uygulama filtresi
+    const matchesApp = appFilter === 'all' || entry.app_id === appFilter;
+    
+    return matchesSearch && matchesStatus && matchesApp;
+  });
+  
+  // Sayfayı sıfırla
+  currentHistoryPage = 1;
+  
+  // Render et
+  renderNotificationHistory();
+}
+
+// Uygulama filtre dropdown'unu doldur
+function populateHistoryAppFilter() {
+  const select = document.getElementById('notificationHistoryAppFilter');
+  if (!select) return;
+  
+  // Mevcut seçimi sakla
+  const currentValue = select.value;
+  
+  // Tüm uygulamaları topla
+  const apps = new Set();
+  (notificationHistoryData.history || []).forEach(entry => {
+    if (entry.app_id && entry.app_name) {
+      apps.add(JSON.stringify({ id: entry.app_id, name: entry.app_name }));
+    }
+  });
+  
+  // Dropdown'u temizle (ilk seçeneği koru)
+  const firstOption = select.querySelector('option[value="all"]');
+  select.innerHTML = '';
+  if (firstOption) {
+    select.appendChild(firstOption);
+  } else {
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.textContent = 'Tüm Uygulamalar';
+    select.appendChild(allOption);
+  }
+  
+  // Uygulamaları ekle
+  apps.forEach(appStr => {
+    const app = JSON.parse(appStr);
+    const option = document.createElement('option');
+    option.value = app.id;
+    option.textContent = app.name;
+    select.appendChild(option);
+  });
+  
+  // Önceki seçimi geri yükle
+  if (currentValue && currentValue !== 'all') {
+    select.value = currentValue;
+  }
+}
+
+// Bildirim geçmişini export et
+function exportNotificationHistory() {
+  try {
+    const data = filteredNotificationHistory.length > 0 ? filteredNotificationHistory : notificationHistoryData.history;
+    
+    // CSV formatına çevir
+    let csv = 'ID,Tip,Uygulama,Başlık,Mesaj,Durum,Oluşturulma,Aktifleştirme,Bitiş,Kapatılma\n';
+    
+    data.forEach(entry => {
+      const row = [
+        entry.id || '',
+        entry.type || '',
+        entry.app_name || '',
+        `"${(entry.title || '').replace(/"/g, '""')}"`,
+        `"${(entry.message || '').replace(/"/g, '""')}"`,
+        entry.status || '',
+        entry.created_at || '',
+        entry.activated_at || '',
+        entry.expired_at || '',
+        entry.deactivated_at || ''
+      ];
+      csv += row.join(',') + '\n';
+    });
+    
+    // Dosyayı indir
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bildirim_gecmisi_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showAlert('✅ Bildirim geçmişi export edildi!', 'success');
+  } catch (error) {
+    console.error('Export hatası:', error);
+    showAlert('❌ Export sırasında hata oluştu!', 'error');
+  }
+}
+
+// Bildirim ID oluştur
+function generateNotificationId() {
+  return 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Global scope'a ekle
+if (typeof window !== 'undefined') {
+  window.filterNotificationHistory = filterNotificationHistory;
+  window.changeHistoryPage = changeHistoryPage;
+  window.exportNotificationHistory = exportNotificationHistory;
+}
+
+// ==================== BİLDİRİM ÖNİZLEME FONKSİYONLARI ====================
+
+let currentPreviewView = 'mobile';
+
+// Bildirim önizlemesini göster
+function previewAppNotification() {
+  const appSelect = document.getElementById('notification_app_select');
+  if (!appSelect || !appSelect.value) {
+    showAlert('⚠️ Lütfen önce bir uygulama seçin!', 'error');
+    return;
+  }
+
+  const appIndex = parseInt(appSelect.value);
+  const app = appsData.apps[appIndex];
+  if (!app) {
+    showAlert('❌ Uygulama bulunamadı!', 'error');
+    return;
+  }
+
+  // Form verilerini topla
+  const latestVersion = document.getElementById('latest_version')?.value.trim() || '';
+  const updateMessage = document.getElementById('update_message')?.value.trim() || '';
+  const forceUpdate = document.getElementById('force_update')?.value === 'true';
+  const notificationEnabled = document.getElementById('notification_enabled')?.value === 'true';
+
+  if (!notificationEnabled) {
+    showAlert('⚠️ Bildirim kapalı! Önizleme için bildirimi açın.', 'error');
+    return;
+  }
+
+  if (!latestVersion || !updateMessage) {
+    showAlert('⚠️ Lütfen tüm zorunlu alanları doldurun!', 'error');
+    return;
+  }
+
+  // Önizlemeyi render et
+  renderNotificationPreview({
+    type: 'app',
+    app_name: app.title,
+    latest_version: latestVersion,
+    update_message: updateMessage,
+    force_update: forceUpdate
+  });
+
+  // Modal'ı göster
+  const modal = document.getElementById('notificationPreviewModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+  }
+}
+
+// Genel bildirim önizlemesi (broadcast, maintenance)
+function previewGeneralNotification(type) {
+  let title, message, enabled;
+
+  if (type === 'broadcast') {
+    title = document.getElementById('broadcast_title')?.value.trim() || '';
+    message = document.getElementById('broadcast_message')?.value.trim() || '';
+    enabled = document.getElementById('broadcast_enabled')?.value === 'true';
+  } else if (type === 'maintenance') {
+    title = '🔧 Bakım Modu';
+    message = document.getElementById('maintenance_message')?.value.trim() || '';
+    enabled = document.getElementById('maintenance')?.value === 'true';
+  }
+
+  if (!enabled) {
+    showAlert(`⚠️ ${type === 'broadcast' ? 'Yayın' : 'Bakım modu'} kapalı! Önizleme için açın.`, 'error');
+    return;
+  }
+
+  if (!message) {
+    showAlert('⚠️ Lütfen mesaj alanını doldurun!', 'error');
+    return;
+  }
+
+  renderNotificationPreview({
+    type: type,
+    title: title,
+    message: message
+  });
+
+  // Modal'ı göster
+  const modal = document.getElementById('notificationPreviewModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+  }
+}
+
+// Önizlemeyi render et
+function renderNotificationPreview(data) {
+  const mobileContent = document.getElementById('previewMobileContent');
+  const desktopContent = document.getElementById('previewDesktopContent');
+
+  if (!mobileContent || !desktopContent) return;
+
+  let html = '';
+
+  if (data.type === 'app') {
+    // Versiyon güncelleme modal önizlemesi
+    html = `
+      <div class="preview-dialog preview-update">
+        <div class="preview-dialog-title">🔄 Güncelleme Mevcut</div>
+        <div class="preview-dialog-message">${escapeHtml(data.update_message)}</div>
+        <div class="preview-dialog-actions">
+          ${data.force_update ? '' : '<button class="preview-dialog-btn preview-dialog-btn-secondary">Daha Sonra</button>'}
+          <button class="preview-dialog-btn preview-dialog-btn-primary">Güncelle</button>
+        </div>
+        ${data.latest_version ? `<div style="margin-top: 12px; font-size: 0.85rem; color: #6b7280;">Versiyon: ${escapeHtml(data.latest_version)}</div>` : ''}
+      </div>
+    `;
+  } else if (data.type === 'broadcast') {
+    // Broadcast dialog önizlemesi
+    html = `
+      <div class="preview-dialog preview-broadcast">
+        <div class="preview-dialog-title">${escapeHtml(data.title)}</div>
+        <div class="preview-dialog-message">${escapeHtml(data.message)}</div>
+        <div class="preview-dialog-actions">
+          <button class="preview-dialog-btn preview-dialog-btn-primary">Tamam</button>
+        </div>
+      </div>
+    `;
+  } else if (data.type === 'maintenance') {
+    // Bakım modu dialog önizlemesi
+    html = `
+      <div class="preview-dialog preview-maintenance">
+        <div class="preview-dialog-title">🔧 Bakım Modu</div>
+        <div class="preview-dialog-message">${escapeHtml(data.message)}</div>
+        <div class="preview-dialog-actions">
+          <button class="preview-dialog-btn preview-dialog-btn-primary">Tamam</button>
+        </div>
+      </div>
+    `;
+  }
+
+  mobileContent.innerHTML = html;
+  desktopContent.innerHTML = html;
+}
+
+// Görünüm değiştir (mobil/desktop)
+function switchPreviewView(view) {
+  currentPreviewView = view;
+
+  // Butonları güncelle
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.view === view) {
+      btn.classList.add('active');
+    }
+  });
+
+  // Görünümleri güncelle
+  document.querySelectorAll('.preview-container').forEach(container => {
+    container.classList.remove('active');
+  });
+
+  if (view === 'mobile') {
+    document.getElementById('previewMobile')?.classList.add('active');
+  } else {
+    document.getElementById('previewDesktop')?.classList.add('active');
+  }
+}
+
+// Önizleme modal'ını kapat
+function closeNotificationPreview(event) {
+  if (event && event.target !== event.currentTarget) {
+    return; // Modal içeriğine tıklanırsa kapatma
+  }
+
+  const modal = document.getElementById('notificationPreviewModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+  }
+}
+
+// HTML escape fonksiyonu
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Global scope'a ekle
+if (typeof window !== 'undefined') {
+  window.previewAppNotification = previewAppNotification;
+  window.previewGeneralNotification = previewGeneralNotification;
+  window.switchPreviewView = switchPreviewView;
+  window.closeNotificationPreview = closeNotificationPreview;
+}
+
+// ==================== BİLDİRİM İSTATİSTİKLERİ FONKSİYONLARI ====================
+
+// notificationStatsData değişkeni zaten tanımlı mı kontrol et
+if (typeof notificationStatsData === 'undefined') {
+  var notificationStatsData = { stats: {}, last_updated: null };
+}
+
+let statsCharts = {
+  viewsChart: null,
+  clicksChart: null,
+  performanceChart: null
+};
+
+// Bildirim istatistiklerini yükle
+async function loadNotificationStats() {
+  try {
+    // LocalStorage'dan yükle
+    const saved = localStorage.getItem('notificationStats');
+    if (saved) {
+      notificationStatsData = JSON.parse(saved);
+    } else {
+      // JSON dosyasından yükle
+      try {
+        const response = await fetch('/data/notification_stats.json?t=' + Date.now());
+        if (response.ok) {
+          notificationStatsData = await response.json();
+          localStorage.setItem('notificationStats', JSON.stringify(notificationStatsData));
+        }
+      } catch (error) {
+        console.warn('Bildirim istatistikleri dosyası yüklenemedi:', error);
+        notificationStatsData = { stats: {}, last_updated: new Date().toISOString() };
+      }
+    }
+    
+    // Filtreleri doldur
+    populateStatsFilters();
+    
+    // İstatistikleri render et
+    renderNotificationStats();
+  } catch (error) {
+    console.error('Bildirim istatistikleri yükleme hatası:', error);
+    notificationStatsData = { stats: {}, last_updated: new Date().toISOString() };
+  }
+}
+
+// İstatistik filtrelerini doldur
+function populateStatsFilters() {
+  const select = document.getElementById('statsNotificationFilter');
+  if (!select) return;
+  
+  // Tüm bildirimleri topla
+  const notifications = new Set();
+  if (notificationHistoryData && notificationHistoryData.history) {
+    notificationHistoryData.history.forEach(entry => {
+      if (entry.app_name) {
+        notifications.add(entry.app_name);
+      }
+    });
+  }
+  
+  // Dropdown'u temizle
+  select.innerHTML = '<option value="all">Tüm Bildirimler</option>';
+  
+  // Bildirimleri ekle
+  notifications.forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    option.textContent = name;
+    select.appendChild(option);
+  });
+}
+
+// İstatistikleri render et
+function renderNotificationStats() {
+  const notificationFilter = document.getElementById('statsNotificationFilter')?.value || 'all';
+  const dateRange = parseInt(document.getElementById('statsDateRange')?.value || '30');
+  
+  // Filtrelenmiş istatistikleri hesapla
+  const filteredStats = calculateFilteredStats(notificationFilter, dateRange);
+  
+  // İstatistik kartlarını güncelle
+  updateStatsCards(filteredStats);
+  
+  // Grafikleri render et
+  renderStatsCharts(filteredStats);
+}
+
+// Filtrelenmiş istatistikleri hesapla
+function calculateFilteredStats(notificationFilter, dateRange) {
+  const now = new Date();
+  const startDate = dateRange === 0 || dateRange === 'all' ? null : new Date(now.getTime() - dateRange * 24 * 60 * 60 * 1000);
+  
+  let totalViews = 0;
+  let totalClicks = 0;
+  let totalUpdateClicks = 0;
+  const dailyStats = {};
+  
+  // Eğer istatistik yoksa boş veri döndür
+  if (!notificationStatsData || !notificationStatsData.stats) {
+    return {
+      totalViews: 0,
+      totalClicks: 0,
+      totalUpdateClicks: 0,
+      conversionRate: 0,
+      dailyStats: []
+    };
+  }
+  
+  // Tüm bildirimlerin istatistiklerini topla
+  Object.keys(notificationStatsData.stats || {}).forEach(notificationId => {
+    const stat = notificationStatsData.stats[notificationId];
+    
+    // Bildirim filtresi kontrolü
+    if (notificationFilter !== 'all') {
+      const historyEntry = (notificationHistoryData && notificationHistoryData.history) ? 
+        notificationHistoryData.history.find(h => h.id === notificationId) : null;
+      if (!historyEntry || historyEntry.app_name !== notificationFilter) {
+        return;
+      }
+    }
+    
+    // Tarih filtresi kontrolü
+    if (startDate && stat.daily_stats && stat.daily_stats.length > 0) {
+      stat.daily_stats.forEach(daily => {
+        const dailyDate = new Date(daily.date);
+        if (dailyDate >= startDate) {
+          totalViews += daily.views || 0;
+          totalClicks += daily.clicks || 0;
+          
+          const dateKey = daily.date;
+          if (!dailyStats[dateKey]) {
+            dailyStats[dateKey] = { views: 0, clicks: 0, date: dateKey };
+          }
+          dailyStats[dateKey].views += daily.views || 0;
+          dailyStats[dateKey].clicks += daily.clicks || 0;
+        }
+      });
+    } else if (!startDate) {
+      // Tarih filtresi yoksa tüm istatistikleri topla
+      totalViews += stat.views || 0;
+      totalClicks += stat.clicks || 0;
+      totalUpdateClicks += stat.update_clicks || 0;
+      
+      // Günlük istatistikleri de ekle
+      if (stat.daily_stats && stat.daily_stats.length > 0) {
+        stat.daily_stats.forEach(daily => {
+          const dateKey = daily.date;
+          if (!dailyStats[dateKey]) {
+            dailyStats[dateKey] = { views: 0, clicks: 0, date: dateKey };
+          }
+          dailyStats[dateKey].views += daily.views || 0;
+          dailyStats[dateKey].clicks += daily.clicks || 0;
+        });
+      }
+    }
+  });
+  
+  // Günlük istatistikleri tarihe göre sırala
+  const sortedDailyStats = Object.values(dailyStats).sort((a, b) => 
+    new Date(a.date) - new Date(b.date)
+  );
+  
+  const conversionRate = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : 0;
+  
+  return {
+    totalViews,
+    totalClicks,
+    totalUpdateClicks,
+    conversionRate,
+    dailyStats: sortedDailyStats
+  };
+}
+
+// İstatistik kartlarını güncelle
+function updateStatsCards(stats) {
+  const totalViewsEl = document.getElementById('statTotalViews');
+  const totalClicksEl = document.getElementById('statTotalClicks');
+  const updateClicksEl = document.getElementById('statUpdateClicks');
+  const conversionRateEl = document.getElementById('statConversionRate');
+  
+  if (totalViewsEl) totalViewsEl.textContent = stats.totalViews.toLocaleString('tr-TR');
+  if (totalClicksEl) totalClicksEl.textContent = stats.totalClicks.toLocaleString('tr-TR');
+  if (updateClicksEl) updateClicksEl.textContent = stats.totalUpdateClicks.toLocaleString('tr-TR');
+  if (conversionRateEl) conversionRateEl.textContent = stats.conversionRate + '%';
+}
+
+// Grafikleri render et
+function renderStatsCharts(stats) {
+  // Chart.js yüklü mü kontrol et
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js yüklenmedi, grafikler gösterilemiyor');
+    return;
+  }
+  
+  // Görüntülenme grafiği
+  renderViewsChart(stats.dailyStats);
+  
+  // Tıklama grafiği
+  renderClicksChart(stats.dailyStats);
+  
+  // Performans grafiği
+  renderPerformanceChart(stats);
+}
+
+// Görüntülenme grafiği
+function renderViewsChart(dailyStats) {
+  const ctx = document.getElementById('viewsChart');
+  if (!ctx) return;
+  
+  // Mevcut grafiği yok et
+  if (statsCharts.viewsChart) {
+    statsCharts.viewsChart.destroy();
+  }
+  
+  const labels = dailyStats.map(d => {
+    const date = new Date(d.date);
+    return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+  });
+  const data = dailyStats.map(d => d.views || 0);
+  
+  statsCharts.viewsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Görüntülenme',
+        data: data,
+        borderColor: 'rgb(102, 126, 234)',
+        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+// Tıklama grafiği
+function renderClicksChart(dailyStats) {
+  const ctx = document.getElementById('clicksChart');
+  if (!ctx) return;
+  
+  // Mevcut grafiği yok et
+  if (statsCharts.clicksChart) {
+    statsCharts.clicksChart.destroy();
+  }
+  
+  // Eğer veri yoksa boş grafik göster
+  if (!dailyStats || dailyStats.length === 0) {
+    statsCharts.clicksChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Henüz veri yok'],
+        datasets: [{
+          label: 'Tıklama',
+          data: [0],
+          backgroundColor: 'rgba(16, 185, 129, 0.8)',
+          borderColor: 'rgb(16, 185, 129)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+    return;
+  }
+  
+  const labels = dailyStats.map(d => {
+    const date = new Date(d.date);
+    return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+  });
+  const data = dailyStats.map(d => d.clicks || 0);
+  
+  statsCharts.clicksChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Tıklama',
+        data: data,
+        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+        borderColor: 'rgb(16, 185, 129)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+// Performans grafiği
+function renderPerformanceChart(stats) {
+  const ctx = document.getElementById('performanceChart');
+  if (!ctx) return;
+  
+  // Mevcut grafiği yok et
+  if (statsCharts.performanceChart) {
+    statsCharts.performanceChart.destroy();
+  }
+  
+  // Eğer veri yoksa boş grafik göster
+  if (stats.totalViews === 0 && stats.totalClicks === 0 && stats.totalUpdateClicks === 0) {
+    statsCharts.performanceChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Henüz veri yok'],
+        datasets: [{
+          data: [1],
+          backgroundColor: ['rgba(200, 200, 200, 0.5)'],
+          borderColor: ['rgb(200, 200, 200)'],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+    return;
+  }
+  
+  statsCharts.performanceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Görüntülenme', 'Tıklama', 'Güncelleme Tıklama'],
+      datasets: [{
+        data: [
+          stats.totalViews,
+          stats.totalClicks,
+          stats.totalUpdateClicks
+        ],
+        backgroundColor: [
+          'rgba(102, 126, 234, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(59, 130, 246, 0.8)'
+        ],
+        borderColor: [
+          'rgb(102, 126, 234)',
+          'rgb(16, 185, 129)',
+          'rgb(59, 130, 246)'
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+}
+
+// İstatistik kaydet (tracking için)
+function trackNotificationStat(notificationId, statType) {
+  try {
+    if (!notificationStatsData.stats) {
+      notificationStatsData.stats = {};
+    }
+    
+    if (!notificationStatsData.stats[notificationId]) {
+      notificationStatsData.stats[notificationId] = {
+        views: 0,
+        clicks: 0,
+        update_clicks: 0,
+        dismiss_clicks: 0,
+        daily_stats: []
+      };
+    }
+    
+    const stat = notificationStatsData.stats[notificationId];
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Günlük istatistik bul veya oluştur
+    let dailyStat = stat.daily_stats.find(d => d.date === today);
+    if (!dailyStat) {
+      dailyStat = { date: today, views: 0, clicks: 0 };
+      stat.daily_stats.push(dailyStat);
+    }
+    
+    // İstatistiği güncelle
+    if (statType === 'view') {
+      stat.views++;
+      dailyStat.views++;
+    } else if (statType === 'click') {
+      stat.clicks++;
+      dailyStat.clicks++;
+    } else if (statType === 'update_click') {
+      stat.update_clicks++;
+      stat.clicks++;
+      dailyStat.clicks++;
+    } else if (statType === 'dismiss_click') {
+      stat.dismiss_clicks++;
+      stat.clicks++;
+      dailyStat.clicks++;
+    }
+    
+    notificationStatsData.last_updated = new Date().toISOString();
+    localStorage.setItem('notificationStats', JSON.stringify(notificationStatsData));
+  } catch (error) {
+    console.error('İstatistik kaydetme hatası:', error);
+  }
+}
+
+// İstatistikleri export et
+function exportNotificationStats() {
+  try {
+    const notificationFilter = document.getElementById('statsNotificationFilter')?.value || 'all';
+    const dateRange = parseInt(document.getElementById('statsDateRange')?.value || '30');
+    const filteredStats = calculateFilteredStats(notificationFilter, dateRange);
+    
+    // CSV formatına çevir
+    let csv = 'Tarih,Görüntülenme,Tıklama\n';
+    
+    filteredStats.dailyStats.forEach(daily => {
+      csv += `${daily.date},${daily.views},${daily.clicks}\n`;
+    });
+    
+    // Özet istatistikler
+    csv += `\nÖzet\n`;
+    csv += `Toplam Görüntülenme,${filteredStats.totalViews}\n`;
+    csv += `Toplam Tıklama,${filteredStats.totalClicks}\n`;
+    csv += `Güncelleme Tıklama,${filteredStats.totalUpdateClicks}\n`;
+    csv += `Dönüşüm Oranı,${filteredStats.conversionRate}%\n`;
+    
+    // Dosyayı indir
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `bildirim_istatistikleri_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showAlert('✅ İstatistikler export edildi!', 'success');
+  } catch (error) {
+    console.error('Export hatası:', error);
+    showAlert('❌ Export sırasında hata oluştu!', 'error');
+  }
+}
+
+// Global scope'a ekle
+if (typeof window !== 'undefined') {
+  window.loadNotificationStats = loadNotificationStats;
+  window.exportNotificationStats = exportNotificationStats;
+  window.trackNotificationStat = trackNotificationStat;
 }
 
