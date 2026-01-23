@@ -1358,6 +1358,14 @@
     overflow: hidden;
   }
 
+  .app-item-icon .app-icon-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 16px;
+    padding: 6px;
+  }
+
   .app-item:hover .app-item-icon {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
     border-color: rgba(102, 126, 234, 0.3);
@@ -7266,9 +7274,9 @@
           </div>
 
           <div class="form-group">
-            <label for="appIcon">İkon (Emoji) *</label>
-            <input type="text" id="appIcon" name="appIcon" required placeholder="📱" maxlength="2" autocomplete="off"/>
-            <small>Bir emoji girin (örn: 📱, 🌤️, 📝)</small>
+            <label for="appIcon">İkon (Emoji veya Resim URL) *</label>
+            <input type="text" id="appIcon" name="appIcon" required placeholder="📱 veya https://..." autocomplete="off"/>
+            <small>Bir emoji girin (örn: 📱, 🌤️, 📝) veya Play Store'dan resim URL'si yapıştırın</small>
           </div>
 
           <div class="form-group">

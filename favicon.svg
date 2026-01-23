@@ -1,14 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-    </linearGradient>
+    <style>
+      .icon-outline {
+        fill: none;
+        stroke: #14b8a6;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .icon-fill {
+        fill: #0d9488;
+      }
+    </style>
   </defs>
-  <rect width="100" height="100" rx="20" fill="url(#grad)"/>
-  <text x="50" y="70" font-family="Arial, sans-serif" font-size="60" font-weight="bold" fill="white" text-anchor="middle">B</text>
+  
+  <!-- Arka plan -->
+  <rect width="100" height="100" rx="20" fill="#0f172a"/>
+  
+  <!-- Merkezi sekizgen şekil -->
+  <polygon points="50,40 56,44 60,50 56,56 50,60 44,56 40,50 44,44" class="icon-outline"/>
+  <circle cx="50" cy="50" r="5" class="icon-fill"/>
+  
+  <!-- 6 dış şekil (simetrik yerleşim) -->
+  <!-- Üst -->
+  <polygon points="50,12 56,16 58,22 56,28 50,30 44,28 42,22 44,16" class="icon-outline"/>
+  <circle cx="50" cy="21" r="3" class="icon-fill"/>
+  
+  <!-- Sağ üst -->
+  <polygon points="76,36 82,40 84,46 82,52 76,54 70,52 68,46 70,40" class="icon-outline"/>
+  <circle cx="76" cy="45" r="3" class="icon-fill"/>
+  
+  <!-- Sağ alt -->
+  <polygon points="76,48 82,52 84,58 82,64 76,66 70,64 68,58 70,52" class="icon-outline"/>
+  <circle cx="76" cy="57" r="3" class="icon-fill"/>
+  
+  <!-- Alt -->
+  <polygon points="50,70 56,74 58,80 56,86 50,88 44,86 42,80 44,74" class="icon-outline"/>
+  <circle cx="50" cy="79" r="3" class="icon-fill"/>
+  
+  <!-- Sol alt -->
+  <polygon points="24,48 30,52 32,58 30,64 24,66 18,64 16,58 18,52" class="icon-outline"/>
+  <circle cx="24" cy="57" r="3" class="icon-fill"/>
+  
+  <!-- Sol üst -->
+  <polygon points="24,36 30,40 32,46 30,52 24,54 18,52 16,46 18,40" class="icon-outline"/>
+  <circle cx="24" cy="45" r="3" class="icon-fill"/>
+  
+  <!-- Bağlantı çizgileri (merkezden dış şekillere) -->
+  <line x1="50" y1="50" x2="50" y2="21" class="icon-outline"/>
+  <line x1="50" y1="50" x2="76" y2="45" class="icon-outline"/>
+  <line x1="50" y1="50" x2="76" y2="57" class="icon-outline"/>
+  <line x1="50" y1="50" x2="50" y2="79" class="icon-outline"/>
+  <line x1="50" y1="50" x2="24" y2="57" class="icon-outline"/>
+  <line x1="50" y1="50" x2="24" y2="45" class="icon-outline"/>
 </svg>
-
-
-
-

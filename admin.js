@@ -1422,6 +1422,16 @@ function renderApps() {
     return;
   }
 
+  // Helper function: Icon'un URL mi emoji mi olduğunu kontrol et
+  const renderIcon = (icon) => {
+    const iconValue = icon || '📱';
+    // URL kontrolü: http veya https ile başlıyorsa URL'dir
+    if (iconValue.startsWith('http://') || iconValue.startsWith('https://')) {
+      return `<img src="${escapeHtml(iconValue)}" alt="App icon" class="app-icon-image" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" onerror="this.style.display='none'; this.parentElement.innerHTML='📱';" />`;
+    }
+    return iconValue;
+  };
+  
   // Uygulamaları render et
   const appsHTML = appsData.apps.map((app, index) => {
     const icon = app.icon || '📱';
@@ -1434,7 +1444,7 @@ function renderApps() {
     
     return `
     <div class="app-item">
-      <div class="app-item-icon">${icon}</div>
+      <div class="app-item-icon">${renderIcon(icon)}</div>
       <div class="app-item-info">
         <div class="app-item-title">
           <span class="app-item-title-text">${title}</span>
@@ -1776,8 +1786,12 @@ async function fetchPlayStoreData() {
       
       if (data.icon) {
         const iconEl = document.getElementById('appIcon');
-        if (iconEl && !iconEl.value.trim()) {
-          iconEl.value = data.icon;
+        if (iconEl) {
+          // Icon alanı boşsa veya sadece varsayılan emoji varsa, Play Store'dan gelen icon'u kullan
+          if (!iconEl.value.trim() || iconEl.value.trim() === '📱') {
+            iconEl.value = data.icon;
+            console.log('✅ Icon güncellendi:', data.icon);
+          }
         }
       }
       

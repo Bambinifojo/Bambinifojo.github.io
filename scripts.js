@@ -326,6 +326,16 @@ async function loadApps(){
       return;
     }
     
+    // Helper function: Icon'un URL mi emoji mi olduğunu kontrol et
+    const renderIcon = (icon) => {
+      const iconValue = icon || '📱';
+      // URL kontrolü: http veya https ile başlıyorsa URL'dir
+      if (iconValue.startsWith('http://') || iconValue.startsWith('https://')) {
+        return `<img src="${escapeHtml(iconValue)}" alt="App icon" class="app-icon-image" onerror="this.style.display='none'; this.parentElement.innerHTML='📱';" />`;
+      }
+      return iconValue;
+    };
+    
     data.apps.forEach((app, index) => {
       const icon = app.icon || '📱';
       const rating = app.rating || 4.5;
@@ -369,7 +379,7 @@ async function loadApps(){
       
       card.innerHTML = `
         <div class="app-card-header" ${detailPage ? 'style="cursor: pointer;"' : ''}>
-          <div class="app-icon-large">${icon}</div>
+          <div class="app-icon-large">${renderIcon(icon)}</div>
           <div class="app-header-info">
             <div class="app-category">${category}</div>
             <h3 class="app-title">${app.title}</h3>
