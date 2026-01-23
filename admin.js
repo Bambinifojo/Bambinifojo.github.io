@@ -544,6 +544,11 @@ function setupHamburgerMenu() {
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📄 DOMContentLoaded event tetiklendi');
+  
+  // Kategorileri yükle (appsData yüklendikten sonra)
+  setTimeout(() => {
+    loadCategories();
+  }, 500);
   // Hamburger menü event listener'larını hemen ekle (session kontrolünden önce)
   // Biraz gecikme ile ekle ki DOM tamamen yüklensin
   setTimeout(() => {
@@ -1504,6 +1509,210 @@ function renderApps() {
   container.innerHTML = appsHTML;
 }
 
+// Kategorileri yükle ve dropdown'ı doldur
+function loadCategories() {
+  const categorySelect = document.getElementById('appCategory');
+  if (!categorySelect) return;
+  
+  // Mevcut kategorileri apps.json'dan çıkar
+  const categories = new Set();
+  if (appsData && appsData.apps) {
+    appsData.apps.forEach(app => {
+      if (app.category && app.category.trim()) {
+        categories.add(app.category.trim());
+      }
+    });
+  }
+  
+  // Dropdown'ı temizle ve seçenekleri ekle
+  categorySelect.innerHTML = '<option value="">Kategori Seçin</option>';
+  
+  // Alfabetik sırayla ekle
+  Array.from(categories).sort().forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    categorySelect.appendChild(option);
+  });
+}
+
+// Yeni kategori ekleme modal'ını göster
+function showAddCategoryModal() {
+  const modal = document.getElementById('addCategoryModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+    const input = document.getElementById('newCategoryName');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 100);
+    }
+  }
+}
+
+// Yeni kategori ekleme modal'ını kapat
+function closeAddCategoryModal() {
+  const modal = document.getElementById('addCategoryModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    const input = document.getElementById('newCategoryName');
+    if (input) input.value = '';
+  }
+}
+
+// Yeni kategori ekle
+function addNewCategory() {
+  const input = document.getElementById('newCategoryName');
+  if (!input) return;
+  
+  const newCategory = input.value.trim();
+  if (!newCategory) {
+    showAlert('⚠️ Kategori adı girin!', 'error');
+    input.focus();
+    return;
+  }
+  
+  const categorySelect = document.getElementById('appCategory');
+  if (!categorySelect) return;
+  
+  // Kategori zaten var mı kontrol et
+  const existingOptions = Array.from(categorySelect.options).map(opt => opt.value);
+  if (existingOptions.includes(newCategory)) {
+    showAlert('⚠️ Bu kategori zaten mevcut!', 'error');
+    categorySelect.value = newCategory;
+    closeAddCategoryModal();
+    return;
+  }
+  
+  // Yeni kategoriyi dropdown'a ekle
+  const option = document.createElement('option');
+  option.value = newCategory;
+  option.textContent = newCategory;
+  option.selected = true;
+  
+  // Alfabetik sıraya göre ekle
+  const options = Array.from(categorySelect.options);
+  let insertIndex = 1; // İlk option "Kategori Seçin" olduğu için 1'den başla
+  for (let i = 1; i < options.length; i++) {
+    if (options[i].value > newCategory) {
+      insertIndex = i;
+      break;
+    }
+    insertIndex = i + 1;
+  }
+  
+  categorySelect.insertBefore(option, options[insertIndex] || null);
+  categorySelect.value = newCategory;
+  
+  showAlert('✅ Kategori eklendi!', 'success');
+  closeAddCategoryModal();
+  
+  // Otomatik kaydet (eğer form doluysa)
+  autoSaveApp();
+}
+
+// Kategori değiştiğinde otomatik kaydet
+function handleCategoryChange() {
+  autoSaveApp();
+}
+
+// Otomatik kaydetme (debounce ile)
+let autoSaveTimeout = null;
+function autoSaveApp() {
+  // Sadece düzenleme modunda ve form doluysa otomatik kaydet
+  const appIndexEl = document.getElementById('appIndex');
+  const appTitleEl = document.getElementById('appTitle');
+  
+  if (!appIndexEl || !appTitleEl) return;
+  
+  const index = parseInt(appIndexEl.value || '-1');
+  const title = appTitleEl.value.trim();
+  
+  // Yeni ekleme modunda veya başlık boşsa otomatik kaydetme
+  if (index === -1 || !title) return;
+  
+  // Debounce: 2 saniye bekle, sonra kaydet
+  clearTimeout(autoSaveTimeout);
+  autoSaveTimeout = setTimeout(async () => {
+    try {
+      // Form verilerini topla ve kaydet
+      const app = appsData.apps[index];
+      if (!app) return;
+      
+      // Tüm form alanlarını güncelle
+      const appDescriptionEl = document.getElementById('appDescription');
+      const appIconEl = document.getElementById('appIcon');
+      const appCategoryEl = document.getElementById('appCategory');
+      const appRatingEl = document.getElementById('appRating');
+      const appDownloadsEl = document.getElementById('appDownloads');
+      const appDetailsEl = document.getElementById('appDetails');
+      const appPrivacyEl = document.getElementById('appPrivacy');
+      
+      // Hakkında sayfası içeriği
+      const appAboutTitleEl = document.getElementById('appAboutTitle');
+      const appAboutSubtitleEl = document.getElementById('appAboutSubtitle');
+      const appAboutDescriptionEl = document.getElementById('appAboutDescription');
+      const appFeaturesSubtitleEl = document.getElementById('appFeaturesSubtitle');
+      
+      // Uygulama bilgilerini güncelle
+      app.title = title;
+      if (appDescriptionEl) app.description = appDescriptionEl.value.trim();
+      if (appIconEl) app.icon = appIconEl.value.trim();
+      if (appCategoryEl) app.category = appCategoryEl.value.trim();
+      if (appRatingEl) app.rating = parseFloat(appRatingEl.value || 0);
+      if (appDownloadsEl) app.downloads = appDownloadsEl.value.trim();
+      if (appDetailsEl) app.details = appDetailsEl.value.trim() || '#';
+      if (appPrivacyEl) app.privacy = appPrivacyEl.value.trim() || '#';
+      
+      // Hakkında sayfası içeriği
+      const aboutTitle = appAboutTitleEl?.value.trim() || '';
+      const aboutSubtitle = appAboutSubtitleEl?.value.trim() || '';
+      const aboutDescription = appAboutDescriptionEl?.value.trim() || '';
+      const featuresSubtitle = appFeaturesSubtitleEl?.value.trim() || '';
+      
+      if (aboutTitle || aboutSubtitle || aboutDescription) {
+        app.about = {
+          title: aboutTitle || 'Hakkında',
+          subtitle: aboutSubtitle || '',
+          description: aboutDescription || ''
+        };
+      }
+      
+      if (featuresSubtitle) {
+        app.featuresSubtitle = featuresSubtitle;
+      }
+      
+      // Otomatik kaydet
+      const isGitHubPages = window.location.hostname.includes('github.io') || 
+                            window.location.hostname.includes('github.com') ||
+                            currentMode === 'local';
+      
+      if (isGitHubPages) {
+        saveToLocal();
+        if (currentMode === 'github' && token) {
+          await saveToGitHub();
+        }
+      } else {
+        // Netlify'da ise Netlify Function'ı kullan
+        await fetch('/.netlify/functions/updateApps', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(appsData)
+        });
+        saveToLocal();
+      }
+      
+      console.log('✅ Otomatik kaydedildi');
+      updateStats();
+      renderApps();
+      loadCategories(); // Kategorileri yeniden yükle
+    } catch (error) {
+      console.error('⚠️ Otomatik kaydetme hatası:', error);
+    }
+  }, 2000); // 2 saniye bekle
+}
+
 // Form göster
 function showAddForm() {
   // Apps section'ına geç
@@ -1518,6 +1727,9 @@ function showAddForm() {
     if (formTitleEl) formTitleEl.textContent = 'Yeni Uygulama Ekle';
     if (appFormEl) appFormEl.reset();
     if (appIndexEl) appIndexEl.value = '-1';
+    
+    // Kategorileri yükle
+    loadCategories();
     currentFeatures = [];
     renderFeatures();
     
@@ -1568,7 +1780,21 @@ function editApp(index) {
   if (appTitleEl) appTitleEl.value = app.title || '';
   if (appDescriptionEl) appDescriptionEl.value = app.description || '';
   if (appIconEl) appIconEl.value = app.icon || '';
-  if (appCategoryEl) appCategoryEl.value = app.category || '';
+  
+  // Kategorileri yükle ve seçili kategoriyi ayarla
+  loadCategories();
+  if (appCategoryEl && app.category) {
+    // Kategori dropdown'ında yoksa ekle
+    const categoryExists = Array.from(appCategoryEl.options).some(opt => opt.value === app.category);
+    if (!categoryExists && app.category.trim()) {
+      const option = document.createElement('option');
+      option.value = app.category;
+      option.textContent = app.category;
+      appCategoryEl.appendChild(option);
+    }
+    appCategoryEl.value = app.category;
+  }
+  
   if (appRatingEl) appRatingEl.value = app.rating || 4.5;
   if (appDownloadsEl) appDownloadsEl.value = app.downloads || '';
   if (appDetailsEl) appDetailsEl.value = app.details && app.details !== '#' ? app.details : '';
@@ -1634,7 +1860,43 @@ function editApp(index) {
   // Kısa bir gecikme ile modal'ı aç
   setTimeout(() => {
     showAppModal();
+    
+    // Form alanlarına otomatik kaydetme event listener'ları ekle
+    setupAutoSaveListeners();
   }, 100);
+}
+
+// Otomatik kaydetme için event listener'ları kur
+function setupAutoSaveListeners() {
+  // Sadece düzenleme modunda otomatik kaydetme aktif
+  const appIndexEl = document.getElementById('appIndex');
+  if (!appIndexEl) return;
+  
+  const index = parseInt(appIndexEl.value || '-1');
+  if (index === -1) return; // Yeni ekleme modunda otomatik kaydetme yok
+  
+  // Form alanlarına change event listener ekle
+  const fieldsToWatch = [
+    'appTitle', 'appDescription', 'appIcon', 'appCategory', 
+    'appRating', 'appDownloads', 'appDetails', 'appPrivacy',
+    'appAboutTitle', 'appAboutSubtitle', 'appAboutDescription', 'appFeaturesSubtitle'
+  ];
+  
+  fieldsToWatch.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      // Mevcut listener'ları kaldır (tekrar eklememek için)
+      field.removeEventListener('input', autoSaveApp);
+      field.removeEventListener('change', autoSaveApp);
+      
+      // Yeni listener ekle
+      if (field.tagName === 'SELECT' || field.type === 'checkbox' || field.type === 'radio') {
+        field.addEventListener('change', autoSaveApp);
+      } else {
+        field.addEventListener('input', autoSaveApp);
+      }
+    }
+  });
 }
 
 // Uygulama kaydet
@@ -1768,6 +2030,9 @@ async function saveApp(event) {
     logActivity('update', `"${app.title}" uygulaması güncellendi`);
   }
 
+  // Kategorileri yeniden yükle (yeni kategori eklenmiş olabilir)
+  loadCategories();
+
   // GitHub Pages kontrolü - Netlify Functions çalışmaz, direkt LocalStorage'a kaydet
   const isGitHubPages = window.location.hostname.includes('github.io') || 
                         window.location.hostname.includes('github.com') ||
@@ -1877,6 +2142,9 @@ async function saveApp(event) {
 // Modal Functions
 function showAppModal() {
   const modal = document.getElementById('appFormModal');
+  
+  // Kategorileri yükle
+  loadCategories();
   if (modal) {
     // Modal açılmadan önce sidebar overlay'i gizle
     const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
@@ -2834,11 +3102,46 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==================== KULLANICI YÖNETİMİ ====================
 
 // Kullanıcıları LocalStorage'dan yükle
-function loadUsers() {
+async function loadUsers() {
+  // Önce GitHub'dan yüklemeyi dene (eğer GitHub modu aktifse ve token varsa)
+  if (currentMode === 'github' && token) {
+    try {
+      const githubUsers = await loadUsersFromGitHub();
+      if (githubUsers && githubUsers.length > 0) {
+        usersData = githubUsers;
+        // LocalStorage'a da kaydet (senkronizasyon için)
+        localStorage.setItem('adminUsers', JSON.stringify(usersData));
+        console.log('✅ Kullanıcılar GitHub\'dan yüklendi:', usersData.length, 'kullanıcı');
+        renderUsers();
+        return;
+      }
+    } catch (error) {
+      console.warn('⚠️ GitHub\'dan yükleme başarısız, localStorage\'dan yükleniyor:', error);
+    }
+  }
+
+  // Netlify'da ise Netlify Function'dan yüklemeyi dene
+  if (window.location.hostname.includes('netlify.app')) {
+    try {
+      const netlifyUsers = await loadUsersFromNetlify();
+      if (netlifyUsers && netlifyUsers.length > 0) {
+        usersData = netlifyUsers;
+        localStorage.setItem('adminUsers', JSON.stringify(usersData));
+        console.log('✅ Kullanıcılar Netlify üzerinden yüklendi:', usersData.length, 'kullanıcı');
+        renderUsers();
+        return;
+      }
+    } catch (error) {
+      console.warn('⚠️ Netlify\'dan yükleme başarısız, localStorage\'dan yükleniyor:', error);
+    }
+  }
+
+  // LocalStorage'dan yükle
   const saved = localStorage.getItem('adminUsers');
   if (saved) {
     try {
       usersData = JSON.parse(saved);
+      console.log('✅ Kullanıcılar localStorage\'dan yüklendi:', usersData.length, 'kullanıcı');
     } catch (e) {
       console.error('Kullanıcı verileri yüklenirken hata:', e);
       usersData = [];
@@ -2859,17 +3162,180 @@ function loadUsers() {
   renderUsers();
 }
 
+// Kullanıcıları GitHub'dan yükle
+async function loadUsersFromGitHub() {
+  if (!token) return null;
+
+  const REPO_OWNER = 'Bambinifojo';
+  const REPO_NAME = 'Bambinifojo.github.io';
+  const FILE_PATH = 'data/adminUsers.json';
+  const FILE_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+
+  try {
+    const response = await fetch(FILE_URL, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        // Dosya yoksa null döndür (ilk kurulum)
+        return null;
+      }
+      throw new Error(`GitHub API hatası: ${response.status}`);
+    }
+
+    const fileData = await response.json();
+    const content = atob(fileData.content.replace(/\s/g, ''));
+    const users = JSON.parse(content);
+    
+    return Array.isArray(users) ? users : null;
+  } catch (error) {
+    console.error('GitHub\'dan yükleme hatası:', error);
+    throw error;
+  }
+}
+
+// Kullanıcıları Netlify Function'dan yükle
+async function loadUsersFromNetlify() {
+  try {
+    const response = await fetch('/.netlify/functions/getAdminUsers', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error(`Netlify Function hatası: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return Array.isArray(data.users) ? data.users : null;
+  } catch (error) {
+    console.error('Netlify\'dan yükleme hatası:', error);
+    throw error;
+  }
+}
+
 // Kullanıcıları LocalStorage'a kaydet
 function saveUsers() {
   try {
     const jsonData = JSON.stringify(usersData);
     localStorage.setItem('adminUsers', jsonData);
-    console.log('✅ Kullanıcılar kaydedildi:', usersData.length, 'kullanıcı');
+    console.log('✅ Kullanıcılar localStorage\'a kaydedildi:', usersData.length, 'kullanıcı');
+    
+    // GitHub'a da kaydet (eğer GitHub modu aktifse ve token varsa)
+    if (currentMode === 'github' && token) {
+      saveUsersToGitHub().catch(error => {
+        console.error('⚠️ GitHub kaydetme hatası (localStorage başarılı):', error);
+        // Hata olsa bile localStorage'a kaydedildiği için devam et
+      });
+    }
+    
+    // Netlify'da ise Netlify Function kullan
+    if (window.location.hostname.includes('netlify.app')) {
+      saveUsersToNetlify().catch(error => {
+        console.error('⚠️ Netlify kaydetme hatası (localStorage başarılı):', error);
+      });
+    }
+    
     return true;
   } catch (error) {
     console.error('❌ Kullanıcılar kaydedilemedi:', error);
     showAlert('❌ Veriler kaydedilemedi. Lütfen tekrar deneyin.', 'error');
     return false;
+  }
+}
+
+// Kullanıcıları GitHub'a kaydet
+async function saveUsersToGitHub() {
+  if (!token) {
+    console.log('⚠️ GitHub token yok, kullanıcılar sadece localStorage\'a kaydedildi');
+    return;
+  }
+
+  const REPO_OWNER = 'Bambinifojo';
+  const REPO_NAME = 'Bambinifojo.github.io';
+  const FILE_PATH = 'data/adminUsers.json';
+  const FILE_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+
+  try {
+    // Önce mevcut dosyayı al (SHA için)
+    let sha = null;
+    try {
+      const getResponse = await fetch(FILE_URL, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (getResponse.ok) {
+        const fileData = await getResponse.json();
+        sha = fileData.sha;
+      }
+    } catch (e) {
+      // Dosya yoksa SHA null kalır (yeni dosya oluşturulacak)
+    }
+
+    // JSON'u string'e çevir
+    const content = JSON.stringify(usersData, null, 2);
+    const encodedContent = btoa(unescape(encodeURIComponent(content)));
+
+    // GitHub API'ye gönder
+    const response = await fetch(FILE_URL, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `Admin kullanıcıları güncellendi - ${new Date().toLocaleString('tr-TR')}`,
+        content: encodedContent,
+        sha: sha // Mevcut dosya varsa SHA gerekli
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'GitHub\'a kaydetme başarısız oldu.');
+    }
+
+    console.log('✅ Kullanıcılar GitHub\'a kaydedildi');
+    return true;
+  } catch (error) {
+    console.error('GitHub kaydetme hatası:', error);
+    throw error;
+  }
+}
+
+// Kullanıcıları Netlify Function ile kaydet
+async function saveUsersToNetlify() {
+  try {
+    const response = await fetch('/.netlify/functions/updateAdminUsers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(usersData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Netlify Function hatası: ${response.status}`);
+    }
+
+    console.log('✅ Kullanıcılar Netlify üzerinden GitHub\'a kaydedildi');
+    return true;
+  } catch (error) {
+    console.error('Netlify kaydetme hatası:', error);
+    throw error;
   }
 }
 

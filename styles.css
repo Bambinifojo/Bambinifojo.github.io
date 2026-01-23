@@ -6496,3 +6496,30 @@ body.ai-modal-open .hamburger {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
+
+/* Admin Panel - Kategori Yönetimi Stilleri */
+.category-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.category-select {
+    flex: 1;
+}
+
+.btn-add-category {
+    white-space: nowrap;
+}
+
+.category-modal {
+    display: none;
+}
+
+.category-modal.active {
+    display: flex;
+}
+
+.category-modal-content {
+    max-width: 400px;
+}

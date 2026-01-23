@@ -7273,7 +7273,39 @@
 
           <div class="form-group">
             <label for="appCategory">Kategori *</label>
-            <input type="text" id="appCategory" name="appCategory" required placeholder="Örn: Üretkenlik, Hava Durumu" autocomplete="off"/>
+            <div class="category-input-group">
+              <select id="appCategory" name="appCategory" required class="category-select" onchange="handleCategoryChange()">
+                <option value="">Kategori Seçin</option>
+              </select>
+              <button type="button" class="btn btn-secondary btn-sm btn-add-category" onclick="showAddCategoryModal()" title="Yeni Kategori Ekle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Yeni</span>
+              </button>
+            </div>
+            <small>Mevcut kategorilerden seçin veya yeni kategori ekleyin</small>
+          </div>
+          
+          <!-- Yeni Kategori Ekleme Modal -->
+          <div id="addCategoryModal" class="modal-overlay category-modal">
+            <div class="modal-content category-modal-content">
+              <div class="modal-header">
+                <h2>Yeni Kategori Ekle</h2>
+                <button type="button" class="modal-close" onclick="closeAddCategoryModal()">✖</button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="newCategoryName">Kategori Adı *</label>
+                  <input type="text" id="newCategoryName" name="newCategoryName" placeholder="Örn: Oyun, Eğitim" autocomplete="off" onkeypress="if(event.key === 'Enter') addNewCategory()"/>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn btn-primary" onclick="addNewCategory()">Ekle</button>
+                  <button type="button" class="btn btn-secondary" onclick="closeAddCategoryModal()">İptal</button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
