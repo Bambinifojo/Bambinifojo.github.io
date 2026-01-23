@@ -855,6 +855,24 @@ function setMode(mode) {
       saveGitHubBtn.classList.add('hidden');
     }
   }
+  
+  // Topbar ve mobile butonlarını güncelle
+  const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+  const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+  if (saveGitHubBtnTopbar) {
+    if (mode === 'github' && token) {
+      saveGitHubBtnTopbar.classList.remove('hidden');
+    } else {
+      saveGitHubBtnTopbar.classList.add('hidden');
+    }
+  }
+  if (saveGitHubBtnMobile) {
+    if (mode === 'github' && token) {
+      saveGitHubBtnMobile.classList.remove('hidden');
+    } else {
+      saveGitHubBtnMobile.classList.add('hidden');
+    }
+  }
 }
 
 // Giriş
@@ -921,6 +939,24 @@ async function login() {
   const tokenInput = document.getElementById('token');
   if (tokenInput) {
     tokenInput.disabled = currentMode === 'local';
+  }
+  
+  // GitHub'a Kaydet butonlarını göster/gizle
+  const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+  const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+  if (saveGitHubBtnTopbar) {
+    if (currentMode === 'github' && token) {
+      saveGitHubBtnTopbar.classList.remove('hidden');
+    } else {
+      saveGitHubBtnTopbar.classList.add('hidden');
+    }
+  }
+  if (saveGitHubBtnMobile) {
+    if (currentMode === 'github' && token) {
+      saveGitHubBtnMobile.classList.remove('hidden');
+    } else {
+      saveGitHubBtnMobile.classList.add('hidden');
+    }
   }
   
   // Dashboard'u göster

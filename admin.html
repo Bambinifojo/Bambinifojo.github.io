@@ -5986,6 +5986,14 @@
         </div>
         <!-- Desktop Butonlar -->
         <div class="admin-topbar-buttons-desktop">
+          <button class="btn btn-success btn-sm hidden" onclick="saveToGitHub()" id="saveGitHubBtnTopbar" title="GitHub'a Kaydet">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="btn-icon">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span class="btn-text">GitHub'a Kaydet</span>
+          </button>
           <button class="btn btn-secondary btn-sm" onclick="showChangePasswordModal()" id="changePasswordBtn" title="Şifre Değiştir">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="btn-icon">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -6097,6 +6105,16 @@
             <path d="M12 12v3"></path>
           </svg>
           <span>🤖 AI Asistan Ayarları</span>
+        </button>
+        
+        <!-- GitHub'a Kaydet (Mobile) -->
+        <button class="admin-topbar-menu-item hidden" onclick="toggleTopbarMenu(); saveToGitHub();" id="saveGitHubBtnMobile">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>💾 GitHub'a Kaydet</span>
         </button>
         
         <!-- Hızlı İşlemler Bölümü -->
