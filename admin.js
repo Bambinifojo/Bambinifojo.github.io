@@ -979,25 +979,40 @@ function updateGitHubSettingsUI() {
   if (githubBtn) githubBtn.classList.toggle('active', currentMode === 'github');
   
   const testBtn = document.getElementById('testTokenBtn');
+  const githubModeInfo = document.getElementById('githubModeInfo');
+  const localModeInfoInSettings = document.getElementById('localModeInfoInSettings');
   
-  if (currentMode === 'github' && token) {
+  if (currentMode === 'github') {
     if (tokenGroup) tokenGroup.style.display = 'block';
-    if (saveBtn) saveBtn.style.display = 'inline-flex';
     if (testBtn) testBtn.style.display = 'inline-flex';
-    if (tokenInput) tokenInput.value = token;
-    if (statusText) {
-      statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
-      statusText.style.color = '#10b981';
+    if (githubModeInfo) githubModeInfo.style.display = 'block';
+    if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'none';
+    if (tokenInput) {
+      tokenInput.value = token || '';
+      tokenInput.classList.remove('error', 'success');
+    }
+    if (token) {
+      if (saveBtn) saveBtn.style.display = 'inline-flex';
+      if (statusText) {
+        statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
+        statusText.style.color = '#10b981';
+      }
+    } else {
+      if (saveBtn) saveBtn.style.display = 'none';
+      if (statusText) {
+        statusText.innerHTML = 'GitHub modu aktif ama token gerekli. Token\'ı girin ve "Token\'ı Test Et" butonuna tıklayın.';
+        statusText.style.color = '#f59e0b';
+      }
     }
   } else {
-    if (tokenGroup) tokenGroup.style.display = currentMode === 'github' ? 'block' : 'none';
-    if (saveBtn) saveBtn.style.display = (currentMode === 'github' && token) ? 'inline-flex' : 'none';
-    if (testBtn) testBtn.style.display = currentMode === 'github' ? 'inline-flex' : 'none';
+    if (tokenGroup) tokenGroup.style.display = 'none';
+    if (saveBtn) saveBtn.style.display = 'none';
+    if (testBtn) testBtn.style.display = 'none';
+    if (githubModeInfo) githubModeInfo.style.display = 'none';
+    if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'block';
     if (statusText) {
-      statusText.innerHTML = currentMode === 'github' 
-        ? 'GitHub modu aktif ama token gerekli.'
-        : 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.';
-      statusText.style.color = currentMode === 'github' ? '#f59e0b' : '#6b7280';
+      statusText.innerHTML = 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.';
+      statusText.style.color = '#6b7280';
     }
   }
 }
