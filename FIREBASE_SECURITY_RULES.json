@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "apps": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "site": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
+}
