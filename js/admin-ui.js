@@ -28,6 +28,10 @@ function showSection(section) {
     sectionId = 'siteSection';
     console.log('🟢 Settings için siteSection kullanılıyor');
   }
+  if (section === 'github-settings') {
+    sectionId = 'githubSettingsSection';
+    console.log('🟢 GitHub Settings için sectionId:', sectionId);
+  }
   
   // Seçilen section'ı göster
   const targetSection = document.getElementById(sectionId);
@@ -92,6 +96,15 @@ function showSection(section) {
         showSiteSection('header');
       } else if (typeof loadSiteData === 'function') {
         loadSiteData();
+      }
+    }, 100);
+  }
+  
+  if (section === 'github-settings') {
+    // GitHub Settings section'ı açıldığında ayarları yükle
+    setTimeout(() => {
+      if (typeof loadGitHubSettings === 'function') {
+        loadGitHubSettings();
       }
     }, 100);
   }

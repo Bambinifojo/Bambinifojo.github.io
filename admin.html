@@ -6107,6 +6107,13 @@
           <span>🤖 AI Asistan Ayarları</span>
         </button>
         
+        <button class="admin-topbar-menu-item" onclick="toggleTopbarMenu(); if(typeof showSection === 'function') showSection('github-settings');">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg>
+          <span>🔗 GitHub Ayarları</span>
+        </button>
+        
         <!-- GitHub'a Kaydet (Mobile) -->
         <button class="admin-topbar-menu-item hidden" onclick="toggleTopbarMenu(); saveToGitHub();" id="saveGitHubBtnMobile">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
@@ -6215,6 +6222,12 @@
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
             Kullanıcılar
+          </a>
+          <a href="#github-settings" class="admin-nav-item" data-section="github-settings">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            GitHub Ayarları
           </a>
           <a href="#feedback" class="admin-nav-item" data-section="feedback">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -7073,6 +7086,78 @@
                   </div>
                 </form>
               </div>
+            </div>
+          </div>
+
+          <!-- GitHub Settings Section -->
+          <div id="githubSettingsSection" class="admin-section hidden">
+            <div class="admin-page-header">
+              <div class="admin-page-header-actions">
+                <button class="admin-page-back-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Geri">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                  <span>Geri</span>
+                </button>
+                <button class="admin-page-dashboard-btn" onclick="if(typeof showSection === 'function') showSection('dashboard');" title="Dashboard">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+              </div>
+              <h1 class="admin-page-title">🔗 GitHub Ayarları</h1>
+              <p class="admin-page-subtitle">GitHub entegrasyonu ve veri kaynağı ayarlarını yönetin</p>
+            </div>
+
+            <div class="admin-card">
+              <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+                Veri Kaynağı Ayarları
+              </h2>
+
+              <form id="githubSettingsForm" onsubmit="event.preventDefault(); saveGitHubSettings();">
+                <div class="site-form-section">
+                  <h3>📡 Veri Kaynağı Modu</h3>
+                  <div class="form-group">
+                    <label>Mevcut Mod</label>
+                    <div class="mode-toggle margin-top-10">
+                      <button type="button" id="githubSettingsLocalModeBtn" class="active" onclick="setGitHubSettingsMode('local')">LocalStorage</button>
+                      <button type="button" id="githubSettingsGithubModeBtn" onclick="setGitHubSettingsMode('github')">GitHub API</button>
+                    </div>
+                    <small id="githubModeStatus" class="margin-top-10" style="display: block; color: #6b7280;">
+                      Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.
+                    </small>
+                  </div>
+
+                  <div class="form-group margin-top-20" id="githubTokenGroup" style="display: none;">
+                    <label for="githubSettingsToken">GitHub Personal Access Token</label>
+                    <input type="password" id="githubSettingsToken" name="githubSettingsToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+                    <small>
+                      Token oluşturmak için: GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic)
+                      <br>
+                      <strong>Gerekli izin:</strong> <code>repo</code> (Full control of private repositories)
+                    </small>
+                  </div>
+
+                  <div class="form-actions margin-top-20">
+                    <button type="submit" class="btn btn-primary">
+                      <span>💾 Ayarları Kaydet</span>
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="saveToGitHub()" id="githubSettingsSaveBtn" style="display: none;">
+                      <span>📤 GitHub'a Kaydet</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="loadGitHubSettings()">
+                      <span>🔄 Yenile</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
 

@@ -271,6 +271,9 @@ function showSection(section) {
   if (section === 'settings') {
     sectionId = 'siteSection';
   }
+  if (section === 'github-settings') {
+    sectionId = 'githubSettingsSection';
+  }
   
   const targetSection = document.getElementById(sectionId);
   if (targetSection) {
@@ -326,6 +329,15 @@ function showSection(section) {
         showSiteSection('header');
       } else if (typeof loadSiteData === 'function') {
         loadSiteData();
+      }
+    }, 100);
+  }
+  
+  // GitHub Settings section'ı açıldığında ayarları yükle
+  if (section === 'github-settings') {
+    setTimeout(() => {
+      if (typeof loadGitHubSettings === 'function') {
+        loadGitHubSettings();
       }
     }, 100);
   }
@@ -883,6 +895,127 @@ function setMode(mode) {
   }
   if (saveGitHubBtnMobile) {
     if (mode === 'github' && token) {
+      saveGitHubBtnMobile.classList.remove('hidden');
+    } else {
+      saveGitHubBtnMobile.classList.add('hidden');
+    }
+  }
+  
+  // GitHub Settings sayfasındaki butonları da güncelle
+  updateGitHubSettingsUI();
+}
+
+// GitHub Settings sayfası için mod değiştirme
+function setGitHubSettingsMode(mode) {
+  currentMode = mode;
+  const localBtn = document.getElementById('githubSettingsLocalModeBtn');
+  const githubBtn = document.getElementById('githubSettingsGithubModeBtn');
+  const tokenGroup = document.getElementById('githubTokenGroup');
+  const saveBtn = document.getElementById('githubSettingsSaveBtn');
+  const statusText = document.getElementById('githubModeStatus');
+  
+  if (localBtn) localBtn.classList.toggle('active', mode === 'local');
+  if (githubBtn) githubBtn.classList.toggle('active', mode === 'github');
+  
+  if (mode === 'github') {
+    if (tokenGroup) tokenGroup.style.display = 'block';
+    if (saveBtn) saveBtn.style.display = 'inline-flex';
+    if (statusText) {
+      statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
+      statusText.style.color = '#10b981';
+    }
+  } else {
+    if (tokenGroup) tokenGroup.style.display = 'none';
+    if (saveBtn) saveBtn.style.display = 'none';
+    if (statusText) {
+      statusText.innerHTML = 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.';
+      statusText.style.color = '#6b7280';
+    }
+  }
+}
+
+// GitHub Settings UI'ı güncelle
+function updateGitHubSettingsUI() {
+  const localBtn = document.getElementById('githubSettingsLocalModeBtn');
+  const githubBtn = document.getElementById('githubSettingsGithubModeBtn');
+  const tokenGroup = document.getElementById('githubTokenGroup');
+  const saveBtn = document.getElementById('githubSettingsSaveBtn');
+  const statusText = document.getElementById('githubModeStatus');
+  const tokenInput = document.getElementById('githubSettingsToken');
+  
+  if (localBtn) localBtn.classList.toggle('active', currentMode === 'local');
+  if (githubBtn) githubBtn.classList.toggle('active', currentMode === 'github');
+  
+  if (currentMode === 'github' && token) {
+    if (tokenGroup) tokenGroup.style.display = 'block';
+    if (saveBtn) saveBtn.style.display = 'inline-flex';
+    if (tokenInput) tokenInput.value = token;
+    if (statusText) {
+      statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
+      statusText.style.color = '#10b981';
+    }
+  } else {
+    if (tokenGroup) tokenGroup.style.display = currentMode === 'github' ? 'block' : 'none';
+    if (saveBtn) saveBtn.style.display = (currentMode === 'github' && token) ? 'inline-flex' : 'none';
+    if (statusText) {
+      statusText.innerHTML = currentMode === 'github' 
+        ? 'GitHub modu aktif ama token gerekli.'
+        : 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.';
+      statusText.style.color = currentMode === 'github' ? '#f59e0b' : '#6b7280';
+    }
+  }
+}
+
+// GitHub ayarlarını yükle
+function loadGitHubSettings() {
+  const tokenInput = document.getElementById('githubSettingsToken');
+  if (tokenInput) {
+    tokenInput.value = token || '';
+  }
+  updateGitHubSettingsUI();
+}
+
+// GitHub ayarlarını kaydet
+async function saveGitHubSettings() {
+  const tokenInput = document.getElementById('githubSettingsToken');
+  const newToken = tokenInput ? tokenInput.value.trim() : '';
+  const newMode = currentMode;
+  
+  if (newMode === 'github' && !newToken) {
+    alert('GitHub modu için token gerekli!');
+    return;
+  }
+  
+  // Token'ı güncelle
+  if (newMode === 'github') {
+    token = newToken;
+    
+    // GitHub'dan veri yüklemeyi dene
+    try {
+      await loadFromGitHub();
+      showAlert('✅ GitHub ayarları kaydedildi ve veriler yüklendi!', 'success');
+    } catch (error) {
+      showAlert('⚠️ Token kaydedildi ama veri yüklenemedi: ' + error.message, 'warning');
+    }
+  } else {
+    showAlert('✅ LocalStorage modu aktif edildi!', 'success');
+  }
+  
+  // UI'ı güncelle
+  updateGitHubSettingsUI();
+  
+  // Topbar butonlarını güncelle
+  const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+  const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+  if (saveGitHubBtnTopbar) {
+    if (currentMode === 'github' && token) {
+      saveGitHubBtnTopbar.classList.remove('hidden');
+    } else {
+      saveGitHubBtnTopbar.classList.add('hidden');
+    }
+  }
+  if (saveGitHubBtnMobile) {
+    if (currentMode === 'github' && token) {
       saveGitHubBtnMobile.classList.remove('hidden');
     } else {
       saveGitHubBtnMobile.classList.add('hidden');
