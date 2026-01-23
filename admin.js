@@ -3735,6 +3735,19 @@ async function saveSiteSection(section, event) {
     // GitHub Pages'deyse direkt LocalStorage'a kaydet
     saveToLocal();
     showAlert('✅ Kaydedildi!', 'success');
+    
+    // Eğer GitHub modu aktifse ve token varsa, otomatik olarak GitHub'a kaydet
+    if (currentMode === 'github' && token) {
+      try {
+        await saveToGitHub();
+        showAlert('✅ GitHub\'a otomatik kaydedildi! Yayında görünecek.', 'success');
+      } catch (githubError) {
+        const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
+        console.error('GitHub kaydetme hatası:', githubError);
+        showAlert(`⚠️ LocalStorage'a kaydedildi ama GitHub'a kaydedilemedi: ${githubErrorMessage}`, 'warning');
+      }
+    }
+    
     autoRefreshPreview();
   } else {
     // Netlify'da ise Netlify Function'ı kullan
@@ -3775,6 +3788,18 @@ async function saveSiteSection(section, event) {
       
       saveToLocal();
       showAlert('ℹ️ LocalStorage\'a kaydedildi', 'info');
+      
+      // Eğer GitHub modu aktifse ve token varsa, GitHub'a kaydetmeyi dene
+      if (currentMode === 'github' && token) {
+        try {
+          await saveToGitHub();
+          showAlert('✅ GitHub\'a otomatik kaydedildi! Yayında görünecek.', 'success');
+        } catch (githubError) {
+          const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
+          console.error('GitHub kaydetme hatası:', githubError);
+          showAlert(`⚠️ GitHub kaydetme hatası: ${githubErrorMessage}`, 'warning');
+        }
+      }
     }
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
