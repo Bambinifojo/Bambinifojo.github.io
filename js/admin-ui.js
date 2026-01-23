@@ -24,6 +24,10 @@ function showSection(section) {
     sectionId = 'aiSettingsSection';
     console.log('🟢 AI Settings için sectionId:', sectionId);
   }
+  if (section === 'settings') {
+    sectionId = 'siteSection';
+    console.log('🟢 Settings için siteSection kullanılıyor');
+  }
   
   // Seçilen section'ı göster
   const targetSection = document.getElementById(sectionId);
@@ -80,7 +84,7 @@ function showSection(section) {
     }, 100);
   }
   
-  if (section === 'site') {
+  if (section === 'site' || section === 'settings') {
     // Site section'ı açıldığında direkt içeriği göster (modal açma)
     setTimeout(() => {
       // İlk section'ı göster (header)

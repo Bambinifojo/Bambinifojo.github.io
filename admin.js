@@ -268,6 +268,9 @@ function showSection(section) {
   if (section === 'ai-settings') {
     sectionId = 'aiSettingsSection';
   }
+  if (section === 'settings') {
+    sectionId = 'siteSection';
+  }
   
   const targetSection = document.getElementById(sectionId);
   if (targetSection) {
@@ -313,6 +316,18 @@ function showSection(section) {
     if (durationTypeEl) {
       durationTypeEl.addEventListener('change', onNotificationDurationTypeChange);
     }
+  }
+  
+  // Site section'ı açıldığında direkt içeriği göster
+  if (section === 'site' || section === 'settings') {
+    setTimeout(() => {
+      // İlk section'ı göster (header)
+      if (typeof showSiteSection === 'function') {
+        showSiteSection('header');
+      } else if (typeof loadSiteData === 'function') {
+        loadSiteData();
+      }
+    }, 100);
   }
   
   // Dashboard'a geçildiğinde istatistikleri güncelle ve önizlemeyi yenile
