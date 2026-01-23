@@ -2846,11 +2846,15 @@ function renderScreenshots() {
   
   container.innerHTML = currentScreenshots.map((screenshot, index) => `
     <div class="screenshot-item" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="font-size: 2rem;">${screenshot.icon || '📱'}</div>
+      <div style="display: flex; align-items: flex-start; gap: 15px;">
+        ${screenshot.image ? `
+          <div class="screenshot-container" style="width: 120px; min-width: 120px; flex-shrink: 0;">
+            <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'font-size: 2rem; display: flex; align-items: center; justify-content: center; height: 100%;\\'>${screenshot.icon || '📱'}</div>';"/>
+          </div>
+        ` : `<div style="font-size: 2rem; flex-shrink: 0;">${screenshot.icon || '📱'}</div>`}
         <div style="flex: 1;">
           <div style="font-weight: 600; color: #1a1a1a;">${escapeHtml(screenshot.title || '')}</div>
-          ${screenshot.image ? `<div style="font-size: 0.85rem; color: #6b7280; margin-top: 4px;">${escapeHtml(screenshot.image)}</div>` : ''}
+          ${screenshot.image ? `<div style="font-size: 0.85rem; color: #6b7280; margin-top: 4px; word-break: break-all;">${escapeHtml(screenshot.image)}</div>` : ''}
         </div>
         <button type="button" class="btn btn-danger btn-sm" onclick="removeScreenshot(${index})" title="Sil">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
