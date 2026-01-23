@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://bambinifojo.netlify.app https://bambinifojo.github.io https://cdn.jsdelivr.net; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://bambinifojo.netlify.app https://bambinifojo.github.io https://cdn.jsdelivr.net https://*.firebaseio.com https://*.googleapis.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <title>Admin Paneli - Bambinifojo</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <link rel="stylesheet" href="/styles.css?v=1.0.1"/>
@@ -7129,6 +7129,7 @@
                     <div class="mode-toggle margin-top-10">
                       <button type="button" id="githubSettingsLocalModeBtn" class="active" onclick="setGitHubSettingsMode('local')">LocalStorage</button>
                       <button type="button" id="githubSettingsGithubModeBtn" onclick="setGitHubSettingsMode('github')">GitHub API</button>
+                      <button type="button" id="githubSettingsFirebaseModeBtn" onclick="setGitHubSettingsMode('firebase')">🔥 Firebase</button>
                     </div>
                     <small id="githubModeStatus" class="margin-top-10" style="display: block; color: #6b7280;">
                       Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.
@@ -7167,10 +7168,68 @@
                     </p>
                   </div>
                   
+                  <div id="firebaseModeInfo" class="margin-top-20" style="padding: 12px; background: #fff5e6; border-radius: 8px; border-left: 4px solid #ff9800; display: none;">
+                    <p style="margin: 0; color: #e65100; font-size: 0.875rem;">
+                      <strong>🔥 Firebase Modu:</strong> Token yok! Gerçek zamanlı senkronizasyon. Değişiklikler anında yayında görünür. En kolay ve hızlı çözüm!
+                    </p>
+                  </div>
+                  
                   <div id="localModeInfoInSettings" class="margin-top-20" style="padding: 12px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
                     <p style="margin: 0; color: #1e40af; font-size: 0.875rem;">
-                      <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. İstediğiniz gibi ayarları değiştirebilirsiniz. Başka tarayıcıdan erişmek için GitHub API modunu kullanın.
+                      <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. İstediğiniz gibi ayarları değiştirebilirsiniz. Başka tarayıcıdan erişmek için Firebase veya GitHub API modunu kullanın.
                     </p>
+                  </div>
+                  
+                  <!-- Firebase Config Form -->
+                  <div class="form-group margin-top-20" id="firebaseConfigGroup" style="display: none;">
+                    <label>Firebase Configuration</label>
+                    <div class="form-group">
+                      <label for="firebaseApiKey">API Key</label>
+                      <input type="text" id="firebaseApiKey" name="firebaseApiKey" placeholder="AIzaSy..." autocomplete="off"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="firebaseAuthDomain">Auth Domain</label>
+                      <input type="text" id="firebaseAuthDomain" name="firebaseAuthDomain" placeholder="your-project.firebaseapp.com" autocomplete="off"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="firebaseDatabaseURL">Database URL</label>
+                      <input type="text" id="firebaseDatabaseURL" name="firebaseDatabaseURL" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="firebaseProjectId">Project ID</label>
+                      <input type="text" id="firebaseProjectId" name="firebaseProjectId" placeholder="your-project-id" autocomplete="off"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="firebaseStorageBucket">Storage Bucket</label>
+                      <input type="text" id="firebaseStorageBucket" name="firebaseStorageBucket" placeholder="your-project.appspot.com" autocomplete="off"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="firebaseMessagingSenderId">Messaging Sender ID</label>
+                      <input type="text" id="firebaseMessagingSenderId" name="firebaseMessagingSenderId" placeholder="123456789" autocomplete="off"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="firebaseAppId">App ID</label>
+                      <input type="text" id="firebaseAppId" name="firebaseAppId" placeholder="1:123456789:web:abc123" autocomplete="off"/>
+                    </div>
+                    <small style="display: block; margin-top: 8px; color: #6b7280; font-size: 0.875rem;">
+                      Firebase Console → Project Settings → Your apps → Web app → Config bilgilerini kopyalayın
+                    </small>
+                  </div>
+                  
+                  <!-- Firebase Auth Form -->
+                  <div class="form-group margin-top-20" id="firebaseAuthGroup" style="display: none;">
+                    <label>Firebase Authentication</label>
+                    <div class="form-group">
+                      <label for="firebaseEmail">Email</label>
+                      <input type="email" id="firebaseEmail" name="firebaseEmail" placeholder="admin@example.com" autocomplete="email"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="firebasePassword">Password</label>
+                      <input type="password" id="firebasePassword" name="firebasePassword" placeholder="Güçlü bir şifre" autocomplete="new-password"/>
+                    </div>
+                    <small style="display: block; margin-top: 8px; color: #6b7280; font-size: 0.875rem;">
+                      Firebase Authentication'da kullanıcı oluşturmanız gerekecek. İlk kez giriş yaparken otomatik oluşturulacak.
+                    </small>
                   </div>
 
                   <div class="form-actions margin-top-20">
