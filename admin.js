@@ -826,6 +826,11 @@ function autoLogin() {
     populateAppNotificationSelect();
     renderActiveNotifications();
   }
+  
+  // Token kontrolünü başlat (GitHub modunda ise)
+  if (currentMode === 'github' && token) {
+    startTokenValidityCheck();
+  }
 }
 
 // Varsayılan site verisi
@@ -1130,7 +1135,7 @@ async function testGitHubToken(testToken) {
     });
     
     if (response.status === 401) {
-      return { valid: false, error: 'Token geçersiz veya süresi dolmuş' };
+      return { valid: false, error: 'Token geçersiz veya süresi dolmuş', expired: true };
     }
     
     if (response.status === 403) {
@@ -1146,6 +1151,79 @@ async function testGitHubToken(testToken) {
   } catch (error) {
     return { valid: false, error: error.message || 'Bağlantı hatası' };
   }
+}
+
+// Token kontrolü yap ve süresi dolmuşsa uyar
+async function checkTokenValidity() {
+  if (currentMode !== 'github' || !token) {
+    return; // GitHub modunda değilse veya token yoksa kontrol etme
+  }
+  
+  try {
+    const result = await testGitHubToken(token);
+    
+    if (!result.valid) {
+      if (result.expired) {
+        // Token süresi dolmuş - kullanıcıyı uyar ve LocalStorage moduna geç
+        showAlert('⚠️ Token süresi dolmuş! Yayın için yeni token gerekli. LocalStorage moduna geçiliyor...', 'warning');
+        
+        // LocalStorage moduna geç
+        currentMode = 'local';
+        token = '';
+        localStorage.setItem('currentMode', 'local');
+        localStorage.removeItem('githubToken');
+        
+        // UI'ı güncelle
+        updateGitHubSettingsUI();
+        
+        // GitHub'a Kaydet butonlarını gizle
+        const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+        const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+        if (saveGitHubBtnTopbar) saveGitHubBtnTopbar.classList.add('hidden');
+        if (saveGitHubBtnMobile) saveGitHubBtnMobile.classList.add('hidden');
+        
+        // Kullanıcıyı GitHub Ayarları sayfasına yönlendir
+        setTimeout(() => {
+          showAlert('💡 Yeni token oluşturmak için: GitHub Ayarları → Token oluştur → Token\'ı girin', 'info');
+        }, 3000);
+      }
+    }
+  } catch (error) {
+    console.error('Token kontrolü hatası:', error);
+  }
+}
+
+// Sayfa yüklendiğinde ve periyodik olarak token kontrolü yap
+let tokenCheckInterval = null;
+function startTokenValidityCheck() {
+  // İlk kontrolü hemen yap
+  checkTokenValidity();
+  
+  // Her 30 dakikada bir kontrol et
+  if (tokenCheckInterval) {
+    clearInterval(tokenCheckInterval);
+  }
+  
+  tokenCheckInterval = setInterval(() => {
+    checkTokenValidity();
+  }, 30 * 60 * 1000); // 30 dakika
+}
+
+// Token kaydetme işlemlerinden önce kontrol yap
+async function checkTokenBeforeSave() {
+  if (currentMode === 'github' && token) {
+    const result = await testGitHubToken(token);
+    if (!result.valid) {
+      if (result.expired) {
+        showAlert('❌ Token süresi dolmuş! Yeni token gerekli. GitHub Ayarları bölümünden yeni token girin.', 'error');
+        return false;
+      } else {
+        showAlert(`❌ Token hatası: ${result.error}`, 'error');
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 // GitHub ayarlarını kaydet
@@ -1335,6 +1413,11 @@ async function login() {
     renderActiveNotifications();
   }, 100);
   
+  // Token kontrolünü başlat (GitHub modunda ise)
+  if (currentMode === 'github' && token) {
+    startTokenValidityCheck();
+  }
+  
   // Başarı mesajı
   const btn = document.querySelector('button[onclick="login()"]');
   if (btn) {
@@ -1408,6 +1491,12 @@ async function saveToGitHub() {
     alert('Token gerekli!');
     return;
   }
+  
+  // Token geçerliliğini kontrol et
+  const tokenValid = await checkTokenBeforeSave();
+  if (!tokenValid) {
+    return; // Token geçersizse işlemi durdur
+  }
 
   const repo = 'bambinifojo.github.io';
   const user = 'bambinifojo';
@@ -1434,6 +1523,10 @@ async function saveToGitHub() {
 
     if (!res.ok) {
       const error = await res.json();
+      // Token süresi dolmuşsa özel mesaj göster
+      if (res.status === 401) {
+        throw new Error('Token süresi dolmuş! Lütfen GitHub Ayarları bölümünden yeni token girin.');
+      }
       throw new Error(error.message || 'Kayıt başarısız');
     }
 

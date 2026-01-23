@@ -91,14 +91,45 @@ Eğer bir değişiklik GitHub'a kaydedilmediyse:
 
 ---
 
+## ⚠️ Token Süresi Dolduğunda Ne Olur?
+
+### 🔄 Otomatik Yönetim:
+
+Token süresi dolduğunda sistem **otomatik olarak** şunları yapar:
+
+1. **Token kontrolü yapılır** (her 30 dakikada bir)
+2. **Token süresi dolmuşsa:**
+   - ⚠️ Kullanıcıya uyarı gösterilir
+   - 🔄 Otomatik olarak **LocalStorage moduna** geçilir
+   - 💾 Değişiklikler sadece tarayıcınızda saklanır (yayında görünmez)
+   - 📢 "Yeni token gerekli" mesajı gösterilir
+
+### 🔑 Token Yenileme:
+
+Token süresi dolduğunda:
+
+1. **GitHub'a gidin** → Settings → Developer settings → Personal access tokens
+2. **Yeni token oluşturun** (eski token'ı silmek zorunda değilsiniz)
+3. **Admin panelinde** → GitHub Ayarları → Yeni token'ı girin
+4. **"Token'ı Test Et"** → Başarılı mesajını bekleyin
+5. **"Ayarları Kaydet"** → Artık yayın için hazırsınız!
+
+### 💡 İpuçları:
+
+- **Token süresini uzun tutun**: 90 gün veya 1 yıl seçin
+- **Token'ı güvenli tutun**: Kimseyle paylaşmayın
+- **Düzenli kontrol**: Admin paneli otomatik kontrol eder ama siz de "Token'ı Test Et" butonunu kullanabilirsiniz
+
+---
+
 ## ⚠️ Sorun Giderme
 
 ### Token Hataları:
 
-**"Token geçersiz" hatası:**
+**"Token geçersiz" veya "Token süresi dolmuş" hatası:**
+- Token'ın süresinin dolduğunu kontrol edin
+- Yeni token oluşturun ve girin
 - Token'ın doğru kopyalandığından emin olun
-- Token'ın süresinin dolmadığını kontrol edin
-- Token'ın "repo" iznine sahip olduğunu kontrol edin
 
 **"Token formatı hatalı" hatası:**
 - Token `ghp_` veya `github_pat_` ile başlamalıdır
