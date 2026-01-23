@@ -165,7 +165,7 @@ async function handleAdminLogin() {
             lastLogin: null
           };
           usersData.push(authenticatedUser);
-          saveUsers();
+          await saveUsers();
           console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
         } else {
           // Admin kullanıcısı var - varsayılan şifre ile giriş yapılmasına izin verilmez
@@ -187,7 +187,7 @@ async function handleAdminLogin() {
       
       // Son giriş zamanını güncelle
       authenticatedUser.lastLogin = new Date().toISOString();
-      saveUsers();
+      await saveUsers();
       
       // Başarı mesajı
       loginBtn.querySelector('span').textContent = '✅ Başarılı!';
@@ -3905,7 +3905,7 @@ async function loadUsers() {
       createdAt: new Date().toISOString(),
       lastLogin: null
     }];
-    saveUsers();
+    await saveUsers();
   }
   renderUsers();
 }
@@ -3972,7 +3972,7 @@ async function loadUsersFromNetlify() {
 }
 
 // Kullanıcıları LocalStorage'a kaydet
-function saveUsers() {
+async function saveUsers() {
   try {
     const jsonData = JSON.stringify(usersData);
     localStorage.setItem('adminUsers', jsonData);
@@ -3980,24 +3980,36 @@ function saveUsers() {
     
     // GitHub'a da kaydet (eğer GitHub modu aktifse ve token varsa)
     if (currentMode === 'github' && token) {
-      saveUsersToGitHub().catch(error => {
+      try {
+        await saveUsersToGitHub();
+        console.log('✅ Kullanıcılar GitHub\'a kaydedildi');
+      } catch (error) {
         console.error('⚠️ GitHub kaydetme hatası (localStorage başarılı):', error);
         // Hata olsa bile localStorage'a kaydedildiği için devam et
-      });
+        throw error; // Hata fırlat ki çağıran fonksiyon bilgilendirilebilsin
+      }
     }
     
     // Netlify'da ise Netlify Function kullan
     if (window.location.hostname.includes('netlify.app')) {
-      saveUsersToNetlify().catch(error => {
+      try {
+        await saveUsersToNetlify();
+        console.log('✅ Kullanıcılar Netlify üzerinden kaydedildi');
+      } catch (error) {
         console.error('⚠️ Netlify kaydetme hatası (localStorage başarılı):', error);
-      });
+      }
     }
     
     return true;
   } catch (error) {
     console.error('❌ Kullanıcılar kaydedilemedi:', error);
-    showAlert('❌ Veriler kaydedilemedi. Lütfen tekrar deneyin.', 'error');
-    return false;
+    // Sadece localStorage başarısızsa hata göster
+    if (!localStorage.getItem('adminUsers')) {
+      showAlert('❌ Veriler kaydedilemedi. Lütfen tekrar deneyin.', 'error');
+      return false;
+    }
+    // localStorage başarılı ama GitHub başarısızsa uyarı göster
+    return true; // localStorage başarılı olduğu için true döndür
   }
 }
 
@@ -4352,7 +4364,7 @@ async function saveUser(event) {
       showAlert('✅ Güncellendi!', 'success');
     }
     
-    saveUsers();
+    await saveUsers();
     renderUsers();
     closeUserModal();
   } catch (error) {
@@ -4362,7 +4374,7 @@ async function saveUser(event) {
 }
 
 // Kullanıcı sil
-function deleteUser(index) {
+async function deleteUser(index) {
   const user = usersData[index];
   if (!user) return;
   
@@ -4374,7 +4386,7 @@ function deleteUser(index) {
   
   if (confirm(`"${user.username}" kullanıcısını silmek istediğinize emin misiniz?`)) {
     usersData.splice(index, 1);
-    saveUsers();
+    await saveUsers();
     renderUsers();
     showAlert('✅ Silindi!', 'success');
   }
@@ -4645,9 +4657,30 @@ async function changePassword(event) {
     });
     
     // Değişiklikleri kaydet
-    const saveSuccess = saveUsers();
+    const saveSuccess = await saveUsers();
     if (!saveSuccess) {
       throw new Error('Şifre kaydedilemedi!');
+    }
+    
+    // GitHub modu aktifse GitHub'a kaydetmeyi bekle
+    if (currentMode === 'github' && token) {
+      try {
+        await saveUsersToGitHub();
+        console.log('✅ Şifre GitHub\'a başarıyla kaydedildi');
+      } catch (error) {
+        console.warn('⚠️ GitHub\'a kaydetme hatası (localStorage başarılı):', error);
+        showAlert('⚠️ Şifre localStorage\'a kaydedildi ama GitHub\'a kaydedilemedi. Lütfen GitHub Ayarları bölümünden tekrar deneyin.', 'warning');
+      }
+    }
+    
+    // Netlify'da ise Netlify Function'a kaydet
+    if (window.location.hostname.includes('netlify.app')) {
+      try {
+        await saveUsersToNetlify();
+        console.log('✅ Şifre Netlify üzerinden başarıyla kaydedildi');
+      } catch (error) {
+        console.warn('⚠️ Netlify\'a kaydetme hatası (localStorage başarılı):', error);
+      }
     }
     
     // Kayıt başarılı mı kontrol et
@@ -4669,7 +4702,18 @@ async function changePassword(event) {
     }
     
     // Kullanıcı listesini yeniden yükle (güncel veriler için)
-    loadUsers();
+    // GitHub modu aktifse GitHub'dan yükle, değilse localStorage'dan
+    if (currentMode === 'github' && token) {
+      try {
+        await loadUsers();
+        console.log('✅ Kullanıcılar GitHub\'dan yeniden yüklendi');
+      } catch (error) {
+        console.warn('⚠️ GitHub\'dan yükleme başarısız, localStorage\'dan yükleniyor:', error);
+        await loadUsers();
+      }
+    } else {
+      await loadUsers();
+    }
     
     // Form'u temizle
     document.getElementById('changePasswordForm').reset();
