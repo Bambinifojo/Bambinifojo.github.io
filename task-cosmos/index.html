@@ -932,6 +932,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       // Her zaman JSON dosyasından yükle (tarayıcılar arası tutarlılık için)
       // Admin panelinden yapılan değişiklikler GitHub/Netlify üzerinden JSON dosyasına kaydediliyor
+      // Cache-busting için timestamp kullanılıyor
       const timestamp = new Date().getTime();
       const response = await fetch(`../data/apps.json?t=${timestamp}`, {
         cache: 'no-cache',
