@@ -1619,6 +1619,123 @@ function handleCategoryChange() {
   autoSaveApp();
 }
 
+// Google Play Store URL'si değiştiğinde
+function handlePlayStoreUrlChange() {
+  const urlInput = document.getElementById('appDetails');
+  if (urlInput && urlInput.value.trim()) {
+    // URL geçerli mi kontrol et
+    const url = urlInput.value.trim();
+    if (url.includes('play.google.com/store/apps/details')) {
+      // URL geçerli, app ID'yi parse et
+      const match = url.match(/[?&]id=([^&]+)/);
+      if (match && match[1]) {
+        console.log('📱 Play Store App ID:', match[1]);
+      }
+    }
+  }
+}
+
+// Google Play Store'dan veri çek
+async function fetchPlayStoreData() {
+  const urlInput = document.getElementById('appDetails');
+  const fetchBtn = document.getElementById('fetchPlayStoreBtn');
+  
+  if (!urlInput || !urlInput.value.trim()) {
+    showAlert('⚠️ Lütfen önce Play Store URL\'sini girin!', 'error');
+    return;
+  }
+  
+  const url = urlInput.value.trim();
+  if (!url.includes('play.google.com/store/apps/details')) {
+    showAlert('⚠️ Geçerli bir Play Store URL\'si girin!', 'error');
+    return;
+  }
+  
+  // App ID'yi parse et
+  const match = url.match(/[?&]id=([^&]+)/);
+  if (!match || !match[1]) {
+    showAlert('⚠️ URL\'den uygulama ID\'si çıkarılamadı!', 'error');
+    return;
+  }
+  
+  const appId = match[1];
+  
+  // Loading state
+  if (fetchBtn) {
+    fetchBtn.disabled = true;
+    const originalHTML = fetchBtn.innerHTML;
+    fetchBtn.innerHTML = '<span class="spinner"></span> Çekiliyor...';
+    
+    try {
+      // Netlify Function kullanarak veri çek
+      const response = await fetch(`/.netlify/functions/fetchPlayStore?appId=${encodeURIComponent(appId)}`);
+      
+      if (!response.ok) {
+        throw new Error('Veri çekilemedi');
+      }
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Form alanlarını doldur
+      if (data.title) {
+        const titleEl = document.getElementById('appTitle');
+        if (titleEl && !titleEl.value.trim()) {
+          titleEl.value = data.title;
+        }
+      }
+      
+      if (data.description) {
+        const descEl = document.getElementById('appDescription');
+        if (descEl && !descEl.value.trim()) {
+          descEl.value = data.description;
+        }
+      }
+      
+      if (data.rating !== undefined) {
+        const ratingEl = document.getElementById('appRating');
+        if (ratingEl && !ratingEl.value) {
+          ratingEl.value = data.rating;
+        }
+      }
+      
+      if (data.downloads) {
+        const downloadsEl = document.getElementById('appDownloads');
+        if (downloadsEl && !downloadsEl.value.trim()) {
+          downloadsEl.value = data.downloads;
+        }
+      }
+      
+      if (data.icon) {
+        const iconEl = document.getElementById('appIcon');
+        if (iconEl && !iconEl.value.trim()) {
+          iconEl.value = data.icon;
+        }
+      }
+      
+      showAlert('✅ Play Store\'dan bilgiler çekildi!', 'success');
+      
+      // Otomatik kaydet
+      autoSaveApp();
+      
+    } catch (error) {
+      console.error('Play Store veri çekme hatası:', error);
+      showAlert(`⚠️ Veri çekilemedi: ${error.message}. Lütfen bilgileri manuel olarak girin.`, 'error');
+    } finally {
+      if (fetchBtn) {
+        fetchBtn.disabled = false;
+        fetchBtn.innerHTML = originalHTML;
+      }
+    }
+  } else {
+    // Netlify Function yoksa, basit bir uyarı göster
+    showAlert('ℹ️ Otomatik veri çekme özelliği şu anda aktif değil. Lütfen bilgileri manuel olarak girin.', 'info');
+  }
+}
+
 // Otomatik kaydetme (debounce ile)
 let autoSaveTimeout = null;
 function autoSaveApp() {
@@ -1695,17 +1812,17 @@ function autoSaveApp() {
         app.featuresSubtitle = featuresSubtitle;
       }
       
-      // Detaylı özellik kartları
-      if (currentFeatureCards && currentFeatureCards.length > 0) {
-        app.featureCards = currentFeatureCards;
+      // Detaylı özellik kartları (boş olsa bile kaydet - silme işlemi için)
+      if (currentFeatureCards !== undefined) {
+        app.featureCards = currentFeatureCards.length > 0 ? currentFeatureCards : [];
       }
       
-      // Ekran görüntüleri
-      if (screenshotsTitle || screenshotsSubtitle || (currentScreenshots && currentScreenshots.length > 0)) {
+      // Ekran görüntüleri (boş olsa bile kaydet - silme işlemi için)
+      if (screenshotsTitle || screenshotsSubtitle || currentScreenshots !== undefined) {
         app.screenshots = {
           title: screenshotsTitle || 'Ekran Görüntüleri',
           subtitle: screenshotsSubtitle || '',
-          items: currentScreenshots || []
+          items: currentScreenshots && currentScreenshots.length > 0 ? currentScreenshots : []
         };
       }
       
@@ -1730,6 +1847,14 @@ function autoSaveApp() {
       }
       
       console.log('✅ Otomatik kaydedildi');
+      console.log('📱 Kaydedilen uygulama:', {
+        title: app.title,
+        about: app.about,
+        featuresTitle: app.featuresTitle,
+        featuresSubtitle: app.featuresSubtitle,
+        featureCards: app.featureCards,
+        screenshots: app.screenshots
+      });
       updateStats();
       renderApps();
       loadCategories(); // Kategorileri yeniden yükle
@@ -1863,6 +1988,14 @@ function editApp(index) {
   if (appScreenshotsSubtitleEl) appScreenshotsSubtitleEl.value = app.screenshots?.subtitle || '';
   currentScreenshots = [...(app.screenshots?.items || [])];
   renderScreenshots();
+  
+  // Modal açıldığında "Hakkında Sayfası İçeriği" bölümüne scroll yap
+  setTimeout(() => {
+    const aboutSection = document.querySelector('.notification-section-title');
+    if (aboutSection) {
+      aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 300);
   
   // Bildirim ayarları
   const notification = app.notification || {};
@@ -2043,17 +2176,17 @@ async function saveApp(event) {
     app.featuresSubtitle = featuresSubtitle;
   }
   
-  // Detaylı özellik kartları
-  if (currentFeatureCards && currentFeatureCards.length > 0) {
-    app.featureCards = currentFeatureCards;
+  // Detaylı özellik kartları (boş olsa bile kaydet - silme işlemi için)
+  if (currentFeatureCards !== undefined) {
+    app.featureCards = currentFeatureCards.length > 0 ? currentFeatureCards : [];
   }
   
-  // Ekran görüntüleri
-  if (screenshotsTitle || screenshotsSubtitle || (currentScreenshots && currentScreenshots.length > 0)) {
+  // Ekran görüntüleri (boş olsa bile kaydet - silme işlemi için)
+  if (screenshotsTitle || screenshotsSubtitle || currentScreenshots !== undefined) {
     app.screenshots = {
       title: screenshotsTitle || 'Ekran Görüntüleri',
       subtitle: screenshotsSubtitle || '',
-      items: currentScreenshots || []
+      items: currentScreenshots && currentScreenshots.length > 0 ? currentScreenshots : []
     };
   }
   
@@ -2116,6 +2249,14 @@ async function saveApp(event) {
   if (isGitHubPages) {
     // GitHub Pages'deyse direkt LocalStorage'a kaydet
     saveToLocal();
+    console.log('💾 LocalStorage\'a kaydedildi:', {
+      title: app.title,
+      about: app.about,
+      featuresTitle: app.featuresTitle,
+      featuresSubtitle: app.featuresSubtitle,
+      featureCards: app.featureCards,
+      screenshots: app.screenshots
+    });
     showAlert('✅ Kaydedildi!', 'success');
     
     // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene

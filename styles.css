@@ -6556,3 +6556,63 @@ body.ai-modal-open .hamburger {
 .btn-icon-left {
     margin-right: 6px;
 }
+
+/* Admin Panel - Bölüm Başlıkları ve Görünürlük */
+.section-divider-highlight {
+    margin: 30px 0 !important;
+    border-color: #667eea !important;
+}
+
+.section-highlight-box {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    margin-top: 20px;
+}
+
+.section-title-highlight {
+    color: #667eea;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.section-subtitle-highlight {
+    color: #6b7280;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.section-icon-highlight {
+    margin-right: 8px;
+}
+
+.features-section-header {
+    margin-top: 20px;
+}
+
+.features-section-header h4 {
+    color: #667eea;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feature-cards-label {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* Play Store URL Input Group */
+.playstore-url-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.playstore-url-input {
+    flex: 1;
+}

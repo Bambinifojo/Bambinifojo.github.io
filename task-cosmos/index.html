@@ -855,16 +855,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hakkında sayfası içeriğini apps.json'dan yükle
   async function loadAboutContent() {
     try {
-      // Cache bypass için timestamp ekle
-      const timestamp = new Date().getTime();
-      const response = await fetch(`../data/apps.json?t=${timestamp}`, {
-        cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+      let data = null;
+      
+      // Önce LocalStorage'dan yüklemeyi dene (admin panelinden yapılan değişiklikler için)
+      const savedData = localStorage.getItem('appsData');
+      if (savedData) {
+        try {
+          data = JSON.parse(savedData);
+          console.log('💾 LocalStorage\'dan yüklendi');
+        } catch (e) {
+          console.warn('LocalStorage verisi parse edilemedi, JSON dosyasından yüklenecek');
         }
-      });
-      const data = await response.json();
+      }
+      
+      // LocalStorage'da yoksa veya parse edilemediyse JSON dosyasından yükle
+      if (!data || !data.apps) {
+        const timestamp = new Date().getTime();
+        const response = await fetch(`../data/apps.json?t=${timestamp}`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        data = await response.json();
+        console.log('📄 JSON dosyasından yüklendi');
+      }
       
       // Task Cosmos uygulamasını bul
       const taskCosmos = data.apps?.find(app => app.title === 'Task Cosmos');
