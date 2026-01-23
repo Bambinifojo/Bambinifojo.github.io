@@ -7274,7 +7274,7 @@
           <div class="form-group">
             <label for="appCategory">Kategori *</label>
             <div class="category-input-group">
-              <select id="appCategory" name="appCategory" required class="category-select" onchange="handleCategoryChange()">
+              <select id="appCategory" name="appCategory" required class="category-select" onchange="handleCategoryChange()" onclick="event.stopPropagation()" onblur="handleCategoryBlur(event)">
                 <option value="">Kategori Seçin</option>
               </select>
               <button type="button" class="btn btn-secondary btn-sm btn-add-category" onclick="showAddCategoryModal()" title="Yeni Kategori Ekle">

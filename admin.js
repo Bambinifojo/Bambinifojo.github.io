@@ -1619,6 +1619,42 @@ function handleCategoryChange() {
   autoSaveApp();
 }
 
+// Kategori dropdown blur event - değeri koru
+let lastCategoryValue = '';
+function handleCategoryBlur(event) {
+  const categorySelect = document.getElementById('appCategory');
+  if (!categorySelect) return;
+  
+  // Eğer bir değer seçildiyse, son değeri kaydet
+  if (categorySelect.value && categorySelect.value !== '') {
+    lastCategoryValue = categorySelect.value;
+  } else if (lastCategoryValue && categorySelect.value === '') {
+    // Eğer boş değer seçildiyse ama önceki değer varsa, eski değeri geri yükle
+    setTimeout(() => {
+      if (categorySelect.value === '' && lastCategoryValue) {
+        categorySelect.value = lastCategoryValue;
+        handleCategoryChange(); // Değişikliği kaydet
+      }
+    }, 50);
+  }
+  
+  // Düzenleme modunda, uygulamanın mevcut kategorisini koru
+  const appIndexEl = document.getElementById('appIndex');
+  if (appIndexEl && appIndexEl.value !== '-1') {
+    const index = parseInt(appIndexEl.value);
+    const app = appsData.apps?.[index];
+    if (app && app.category && !categorySelect.value) {
+      // Eğer boş değer seçildiyse ve uygulamada kategori varsa, eski değeri geri yükle
+      setTimeout(() => {
+        if (categorySelect.value === '') {
+          categorySelect.value = app.category;
+          lastCategoryValue = app.category;
+        }
+      }, 50);
+    }
+  }
+}
+
 // Google Play Store URL'si değiştiğinde
 function handlePlayStoreUrlChange() {
   const urlInput = document.getElementById('appDetails');
@@ -1716,7 +1752,25 @@ async function fetchPlayStoreData() {
         }
       }
       
-      showAlert('✅ Play Store\'dan bilgiler çekildi!', 'success');
+      // Ekran görüntülerini ekle
+      if (data.screenshots && data.screenshots.length > 0) {
+        // Mevcut ekran görüntülerini temizle (opsiyonel - kullanıcı isterse koruyabilir)
+        // currentScreenshots = [];
+        
+        // Yeni ekran görüntülerini ekle
+        data.screenshots.forEach((screenshot, index) => {
+          currentScreenshots.push({
+            icon: screenshot.icon || '📱',
+            title: screenshot.title || `Ekran Görüntüsü ${index + 1}`,
+            image: screenshot.image || ''
+          });
+        });
+        
+        renderScreenshots();
+        showAlert(`✅ Play Store'dan bilgiler çekildi! ${data.screenshots.length} ekran görüntüsü eklendi.`, 'success');
+      } else {
+        showAlert('✅ Play Store\'dan bilgiler çekildi!', 'success');
+      }
       
       // Otomatik kaydet
       autoSaveApp();
@@ -1948,6 +2002,7 @@ function editApp(index) {
       appCategoryEl.appendChild(option);
     }
     appCategoryEl.value = app.category;
+    lastCategoryValue = app.category; // Son değeri kaydet
   }
   
   if (appRatingEl) appRatingEl.value = app.rating || 4.5;

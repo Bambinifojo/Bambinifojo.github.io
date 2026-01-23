@@ -71,7 +71,8 @@ exports.handler = async (event, context) => {
       description: null,
       rating: null,
       downloads: null,
-      icon: null
+      icon: null,
+      screenshots: []
     };
 
     // Title çıkar (meta tag veya h1'den)
@@ -108,6 +109,28 @@ exports.handler = async (event, context) => {
                      html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i);
     if (iconMatch) {
       data.icon = iconMatch[1].trim();
+    }
+
+    // Screenshots çıkar (Google Play Store sayfasından)
+    // Screenshot URL'lerini bul (genellikle play-lh.googleusercontent.com domain'inde)
+    const screenshotMatches = html.matchAll(/https:\/\/play-lh\.googleusercontent\.com\/[^"'\s]+/gi);
+    const screenshotUrls = Array.from(screenshotMatches).map(match => match[0]);
+    
+    // Benzersiz screenshot URL'lerini al (ilk birkaç tanesi genellikle screenshot'lar)
+    if (screenshotUrls.length > 0) {
+      // Icon'u hariç tut (genellikle ilk veya son URL icon olur)
+      const uniqueScreenshots = screenshotUrls
+        .filter(url => {
+          // Icon URL'lerini filtrele (w96-h96, w512-h512 gibi küçük boyutlar genellikle icon)
+          return !url.match(/w(96|128|192|256|512)-h(96|128|192|256|512)/i);
+        })
+        .slice(0, 5); // İlk 5 screenshot'ı al
+      
+      data.screenshots = uniqueScreenshots.map((url, index) => ({
+        icon: '📱', // Varsayılan icon
+        title: `Ekran Görüntüsü ${index + 1}`,
+        image: url
+      }));
     }
 
     return {

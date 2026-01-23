@@ -510,11 +510,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Modal overlay'e tıklandığında modal'ı kapat (sayfa refresh olmasın)
+    // Ancak dropdown açıkken veya form elemanlarına tıklanırsa kapatma
     if (e.target.classList.contains('modal-overlay')) {
+      // Dropdown açık mı kontrol et
+      const activeSelect = document.querySelector('select:focus');
+      if (activeSelect) {
+        // Dropdown açıksa, blur event'ini tetikle ama modal'ı kapatma
+        activeSelect.blur();
+        return false;
+      }
+      
       e.preventDefault();
       e.stopPropagation();
       closeAllModals();
       return false;
+    }
+    
+    // Modal içinde ama overlay değilse, dropdown'ları kontrol et
+    const modal = e.target.closest('.modal-content');
+    if (modal) {
+      const clickedSelect = e.target.closest('select');
+      if (!clickedSelect) {
+        // Select dışına tıklandıysa, açık dropdown'ları kapat
+        const openSelect = modal.querySelector('select:focus');
+        if (openSelect) {
+          openSelect.blur();
+        }
+      }
     }
   });
   
