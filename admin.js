@@ -1011,6 +1011,8 @@ function updateGitHubSettingsUI() {
   const githubModeInfo = document.getElementById('githubModeInfo');
   const localModeInfoInSettings = document.getElementById('localModeInfoInSettings');
   
+  const saveLocalToGitHubBtn = document.getElementById('saveLocalToGitHubBtn');
+  
   if (currentMode === 'github') {
     if (tokenGroup) tokenGroup.style.display = 'block';
     if (testBtn) testBtn.style.display = 'inline-flex';
@@ -1022,12 +1024,17 @@ function updateGitHubSettingsUI() {
     }
     if (token) {
       if (saveBtn) saveBtn.style.display = 'inline-flex';
+      // LocalStorage'da veri varsa ve GitHub moduna geçildiyse, LocalStorage'dan GitHub'a kaydet butonunu göster
+      if (saveLocalToGitHubBtn && appsData && Object.keys(appsData).length > 0) {
+        saveLocalToGitHubBtn.style.display = 'inline-flex';
+      }
       if (statusText) {
         statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
         statusText.style.color = '#10b981';
       }
     } else {
       if (saveBtn) saveBtn.style.display = 'none';
+      if (saveLocalToGitHubBtn) saveLocalToGitHubBtn.style.display = 'none';
       if (statusText) {
         statusText.innerHTML = 'GitHub modu aktif ama token gerekli. Token\'ı girin ve "Token\'ı Test Et" butonuna tıklayın.';
         statusText.style.color = '#f59e0b';
@@ -1037,10 +1044,11 @@ function updateGitHubSettingsUI() {
     if (tokenGroup) tokenGroup.style.display = 'none';
     if (saveBtn) saveBtn.style.display = 'none';
     if (testBtn) testBtn.style.display = 'none';
+    if (saveLocalToGitHubBtn) saveLocalToGitHubBtn.style.display = 'none';
     if (githubModeInfo) githubModeInfo.style.display = 'none';
     if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'block';
     if (statusText) {
-      statusText.innerHTML = 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.';
+      statusText.innerHTML = 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır. GitHub\'a kaydetmek için GitHub moduna geçin.';
       statusText.style.color = '#6b7280';
     }
   }
@@ -1053,6 +1061,40 @@ function loadGitHubSettings() {
     tokenInput.value = token || '';
   }
   updateGitHubSettingsUI();
+}
+
+// LocalStorage'daki verileri GitHub'a kaydet (LocalStorage modundan GitHub moduna geçerken kullanılır)
+async function saveLocalStorageToGitHub() {
+  if (currentMode !== 'github' || !token) {
+    showAlert('❌ GitHub modunda ve token gerekli!', 'error');
+    return;
+  }
+  
+  if (!appsData || Object.keys(appsData).length === 0) {
+    showAlert('⚠️ LocalStorage\'da kaydedilecek veri yok!', 'warning');
+    return;
+  }
+  
+  // Token geçerliliğini kontrol et
+  const tokenValid = await checkTokenBeforeSave();
+  if (!tokenValid) {
+    return;
+  }
+  
+  try {
+    showAlert('⏳ LocalStorage\'daki veriler GitHub\'a kaydediliyor...', 'info');
+    await saveToGitHub();
+    showAlert('✅ LocalStorage\'daki tüm değişiklikler GitHub\'a kaydedildi! Artık yayında görünecek.', 'success');
+    
+    // GitHub'dan güncel verileri yükle
+    await loadFromGitHub();
+    updateStats();
+    renderApps();
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('GitHub kaydetme hatası:', error);
+    showAlert(`❌ GitHub'a kaydetme hatası: ${errorMessage}`, 'error');
+  }
 }
 
 // GitHub token'ı UI'dan test et
