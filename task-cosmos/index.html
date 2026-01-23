@@ -301,6 +301,20 @@
             margin-bottom: 15px;
         }
 
+        .screenshot-image {
+            width: 100%;
+            aspect-ratio: 9/16;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot-card:hover .screenshot-image {
+            transform: scale(1.02);
+        }
+
         .screenshot-card p {
             color: #6b7280;
             margin: 0;
@@ -943,12 +957,24 @@ document.addEventListener('DOMContentLoaded', () => {
           
           // Ekran görüntülerini yükle
           if (taskCosmos.screenshots.items && taskCosmos.screenshots.items.length > 0 && screenshotsGridEl) {
-            screenshotsGridEl.innerHTML = taskCosmos.screenshots.items.map(screenshot => `
-              <div class="screenshot-card">
-                <div class="screenshot-placeholder">${screenshot.icon || '📱'}</div>
-                <p>${escapeHtml(screenshot.title || '')}</p>
-              </div>
-            `).join('');
+            screenshotsGridEl.innerHTML = taskCosmos.screenshots.items.map(screenshot => {
+              // Eğer image URL'i varsa gerçek resim göster, yoksa placeholder göster
+              if (screenshot.image && screenshot.image.trim() !== '') {
+                return `
+                  <div class="screenshot-card">
+                    <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="screenshot-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'screenshot-placeholder\\'>${screenshot.icon || '📱'}</div><p>${escapeHtml(screenshot.title || '')}</p>';"/>
+                    <p>${escapeHtml(screenshot.title || '')}</p>
+                  </div>
+                `;
+              } else {
+                return `
+                  <div class="screenshot-card">
+                    <div class="screenshot-placeholder">${screenshot.icon || '📱'}</div>
+                    <p>${escapeHtml(screenshot.title || '')}</p>
+                  </div>
+                `;
+              }
+            }).join('');
           }
         }
       }
