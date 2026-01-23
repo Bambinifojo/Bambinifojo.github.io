@@ -930,32 +930,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hakkında sayfası içeriğini apps.json'dan yükle
   async function loadAboutContent() {
     try {
-      let data = null;
-      
-      // Önce LocalStorage'dan yüklemeyi dene (admin panelinden yapılan değişiklikler için)
-      const savedData = localStorage.getItem('appsData');
-      if (savedData) {
-        try {
-          data = JSON.parse(savedData);
-          console.log('💾 LocalStorage\'dan yüklendi');
-        } catch (e) {
-          console.warn('LocalStorage verisi parse edilemedi, JSON dosyasından yüklenecek');
+      // Her zaman JSON dosyasından yükle (tarayıcılar arası tutarlılık için)
+      // Admin panelinden yapılan değişiklikler GitHub/Netlify üzerinden JSON dosyasına kaydediliyor
+      const timestamp = new Date().getTime();
+      const response = await fetch(`../data/apps.json?t=${timestamp}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`JSON dosyası yüklenemedi: ${response.status}`);
       }
       
-      // LocalStorage'da yoksa veya parse edilemediyse JSON dosyasından yükle
-      if (!data || !data.apps) {
-        const timestamp = new Date().getTime();
-        const response = await fetch(`../data/apps.json?t=${timestamp}`, {
-          cache: 'no-cache',
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        });
-        data = await response.json();
-        console.log('📄 JSON dosyasından yüklendi');
-      }
+      const data = await response.json();
+      console.log('📄 JSON dosyasından yüklendi (tüm tarayıcılarda geçerli)');
       
       // Task Cosmos uygulamasını bul
       const taskCosmos = data.apps?.find(app => app.title === 'Task Cosmos');
