@@ -3082,8 +3082,8 @@ function importData() {
 
 // Site Ayarları Fonksiyonları
 function showSiteSettings() {
-  // Settings section'ına geç
-  showSection('settings');
+  // Site section'ına geç (settings değil, site)
+  showSection('site');
   
   // Kısa bir gecikme ile modal'ı aç
   setTimeout(() => {
