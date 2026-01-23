@@ -1512,9 +1512,15 @@ function renderApps() {
 }
 
 // Kategorileri yükle ve dropdown'ı doldur
-function loadCategories() {
+function loadCategories(preserveSelection = false) {
   const categorySelect = document.getElementById('appCategory');
   if (!categorySelect) return;
+  
+  // Mevcut seçili değeri koru
+  const currentValue = preserveSelection ? (categorySelect.value || lastCategoryValue || '') : '';
+  const valueToPreserve = currentValue && currentValue.trim() ? currentValue.trim() : '';
+  
+  console.log('📂 Kategoriler yükleniyor, korunacak değer:', valueToPreserve || 'yok');
   
   // Mevcut kategorileri apps.json'dan çıkar
   const categories = new Set();
@@ -1524,6 +1530,12 @@ function loadCategories() {
         categories.add(app.category.trim());
       }
     });
+  }
+  
+  // Eğer mevcut seçili değer varsa ve kategorilerde yoksa, ekle
+  if (valueToPreserve && !categories.has(valueToPreserve)) {
+    categories.add(valueToPreserve);
+    console.log('➕ Kategori dropdown\'a eklendi:', valueToPreserve);
   }
   
   // Dropdown'ı temizle ve seçenekleri ekle
@@ -1536,6 +1548,17 @@ function loadCategories() {
     option.textContent = category;
     categorySelect.appendChild(option);
   });
+  
+  // Mevcut seçili değeri geri yükle
+  if (valueToPreserve) {
+    categorySelect.value = valueToPreserve;
+    lastCategoryValue = valueToPreserve;
+    console.log('✅ Kategori geri yüklendi:', valueToPreserve);
+  } else {
+    // Eğer korunacak değer yoksa, dropdown'ı boş bırak
+    categorySelect.value = '';
+    console.log('ℹ️ Kategori dropdown temizlendi');
+  }
 }
 
 // Yeni kategori ekleme modal'ını göster
@@ -1704,13 +1727,19 @@ async function fetchPlayStoreData() {
     
     try {
       // Netlify Function kullanarak veri çek
-      const response = await fetch(`/.netlify/functions/fetchPlayStore?appId=${encodeURIComponent(appId)}`);
+      const functionUrl = `/.netlify/functions/fetchPlayStore?appId=${encodeURIComponent(appId)}`;
+      console.log('📱 Play Store veri çekiliyor:', functionUrl);
+      
+      const response = await fetch(functionUrl);
       
       if (!response.ok) {
-        throw new Error('Veri çekilemedi');
+        const errorText = await response.text().catch(() => 'Bilinmeyen hata');
+        console.error('❌ HTTP Hatası:', response.status, errorText);
+        throw new Error(`Sunucu hatası: ${response.status} - ${errorText}`);
       }
       
       const data = await response.json();
+      console.log('✅ Play Store verisi alındı:', data);
       
       if (data.error) {
         throw new Error(data.error);
@@ -1776,8 +1805,25 @@ async function fetchPlayStoreData() {
       autoSaveApp();
       
     } catch (error) {
-      console.error('Play Store veri çekme hatası:', error);
-      showAlert(`⚠️ Veri çekilemedi: ${error.message}. Lütfen bilgileri manuel olarak girin.`, 'error');
+      console.error('❌ Play Store veri çekme hatası:', error);
+      console.error('Hata detayları:', {
+        message: error.message,
+        stack: error.stack,
+        appId: appId
+      });
+      
+      let errorMessage = `⚠️ Veri çekilemedi: ${error.message}`;
+      
+      // Özel hata mesajları
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        errorMessage = '⚠️ Ağ hatası: Netlify Function\'a bağlanılamadı. Lütfen internet bağlantınızı kontrol edin.';
+      } else if (error.message.includes('404')) {
+        errorMessage = '⚠️ Netlify Function bulunamadı. Lütfen site yöneticisine bildirin.';
+      } else if (error.message.includes('500')) {
+        errorMessage = '⚠️ Sunucu hatası: Play Store\'dan veri çekilemedi. Google Play Store\'un HTML yapısı değişmiş olabilir.';
+      }
+      
+      showAlert(`${errorMessage}\n\nLütfen bilgileri manuel olarak girin.`, 'error');
     } finally {
       if (fetchBtn) {
         fetchBtn.disabled = false;
@@ -1835,7 +1881,15 @@ function autoSaveApp() {
       app.title = title;
       if (appDescriptionEl) app.description = appDescriptionEl.value.trim();
       if (appIconEl) app.icon = appIconEl.value.trim();
-      if (appCategoryEl) app.category = appCategoryEl.value.trim();
+      // Kategori kaydet - boş değilse kaydet
+      if (appCategoryEl) {
+        const categoryValue = appCategoryEl.value.trim();
+        app.category = categoryValue || '';
+        if (categoryValue) {
+          lastCategoryValue = categoryValue; // Son değeri kaydet
+          console.log('💾 Kategori kaydedildi:', categoryValue);
+        }
+      }
       if (appRatingEl) app.rating = parseFloat(appRatingEl.value || 0);
       if (appDownloadsEl) app.downloads = appDownloadsEl.value.trim();
       if (appDetailsEl) app.details = appDetailsEl.value.trim() || '#';
@@ -1911,7 +1965,13 @@ function autoSaveApp() {
       });
       updateStats();
       renderApps();
-      loadCategories(); // Kategorileri yeniden yükle
+      // Kategorileri yeniden yükle ama mevcut seçili kategoriyi koru
+      const categorySelect = document.getElementById('appCategory');
+      if (categorySelect && categorySelect.value) {
+        loadCategories(true);
+      } else {
+        loadCategories();
+      }
     } catch (error) {
       console.error('⚠️ Otomatik kaydetme hatası:', error);
     }
@@ -1991,18 +2051,44 @@ function editApp(index) {
   if (appIconEl) appIconEl.value = app.icon || '';
   
   // Kategorileri yükle ve seçili kategoriyi ayarla
-  loadCategories();
-  if (appCategoryEl && app.category) {
-    // Kategori dropdown'ında yoksa ekle
-    const categoryExists = Array.from(appCategoryEl.options).some(opt => opt.value === app.category);
-    if (!categoryExists && app.category.trim()) {
+  // Önce kategoriyi geçici olarak set et (loadCategories bunu koruyacak)
+  const categoryToSet = app.category && app.category.trim() ? app.category.trim() : '';
+  if (appCategoryEl && categoryToSet) {
+    // Geçici olarak kategoriyi set et (loadCategories bunu koruyacak)
+    appCategoryEl.value = categoryToSet;
+    lastCategoryValue = categoryToSet;
+  }
+  
+  // Kategorileri yükle (mevcut seçili kategoriyi koru)
+  loadCategories(true);
+  
+  // Kategori dropdown'ında yoksa ekle ve set et
+  if (appCategoryEl && categoryToSet) {
+    const categoryExists = Array.from(appCategoryEl.options).some(opt => opt.value === categoryToSet);
+    if (!categoryExists) {
       const option = document.createElement('option');
-      option.value = app.category;
-      option.textContent = app.category;
-      appCategoryEl.appendChild(option);
+      option.value = categoryToSet;
+      option.textContent = categoryToSet;
+      // Alfabetik sıraya göre ekle
+      const options = Array.from(appCategoryEl.options);
+      let insertIndex = 1;
+      for (let i = 1; i < options.length; i++) {
+        if (options[i].value > categoryToSet) {
+          insertIndex = i;
+          break;
+        }
+        insertIndex = i + 1;
+      }
+      appCategoryEl.insertBefore(option, options[insertIndex] || null);
     }
-    appCategoryEl.value = app.category;
-    lastCategoryValue = app.category; // Son değeri kaydet
+    // Kategoriyi set et (tekrar, emin olmak için)
+    appCategoryEl.value = categoryToSet;
+    lastCategoryValue = categoryToSet;
+    console.log('✅ Kategori yüklendi:', categoryToSet);
+  } else if (!categoryToSet) {
+    // Kategori yoksa normal yükle
+    loadCategories();
+    console.log('ℹ️ Kategori yok, dropdown temizlendi');
   }
   
   if (appRatingEl) appRatingEl.value = app.rating || 4.5;
