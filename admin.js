@@ -836,8 +836,10 @@ function getDefaultSiteData() {
 // Mode değiştirme
 function setMode(mode) {
   currentMode = mode;
-  document.getElementById('localModeBtn').classList.toggle('active', mode === 'local');
-  document.getElementById('githubModeBtn').classList.toggle('active', mode === 'github');
+  const localModeBtn = document.getElementById('localModeBtn');
+  const githubModeBtn = document.getElementById('githubModeBtn');
+  if (localModeBtn) localModeBtn.classList.toggle('active', mode === 'local');
+  if (githubModeBtn) githubModeBtn.classList.toggle('active', mode === 'github');
   const saveGitHubBtn = document.getElementById('saveGitHubBtn');
   if (saveGitHubBtn) {
     if (mode === 'github') {
@@ -851,7 +853,12 @@ function setMode(mode) {
 // Giriş
 async function login() {
   if (currentMode === 'github') {
-    token = document.getElementById('token').value.trim();
+    const tokenEl = document.getElementById('token');
+    if (!tokenEl) {
+      alert('Token alanı bulunamadı!');
+      return;
+    }
+    token = tokenEl.value.trim();
     if (!token) {
       alert('GitHub Token girin!');
       return;
@@ -1504,9 +1511,13 @@ function showAddForm() {
   
   // Kısa bir gecikme ile modal'ı aç (section değişimi animasyonu için)
   setTimeout(() => {
-    document.getElementById('formTitle').textContent = 'Yeni Uygulama Ekle';
-    document.getElementById('appForm').reset();
-    document.getElementById('appIndex').value = '-1';
+    const formTitleEl = document.getElementById('formTitle');
+    const appFormEl = document.getElementById('appForm');
+    const appIndexEl = document.getElementById('appIndex');
+    
+    if (formTitleEl) formTitleEl.textContent = 'Yeni Uygulama Ekle';
+    if (appFormEl) appFormEl.reset();
+    if (appIndexEl) appIndexEl.value = '-1';
     currentFeatures = [];
     renderFeatures();
     
@@ -2972,9 +2983,13 @@ function renderUsers() {
 function showAddUserForm() {
   showSection('users');
   setTimeout(() => {
-    document.getElementById('userFormTitle').textContent = 'Yeni Kullanıcı Ekle';
-    document.getElementById('userForm').reset();
-    document.getElementById('userIndex').value = '-1';
+    const userFormTitleEl = document.getElementById('userFormTitle');
+    const userFormEl = document.getElementById('userForm');
+    const userIndexEl = document.getElementById('userIndex');
+    
+    if (userFormTitleEl) userFormTitleEl.textContent = 'Yeni Kullanıcı Ekle';
+    if (userFormEl) userFormEl.reset();
+    if (userIndexEl) userIndexEl.value = '-1';
     document.getElementById('userPasswordConfirmGroup').style.display = 'block';
     document.getElementById('userPassword').required = true;
     document.getElementById('userPasswordConfirm').required = true;
@@ -2998,13 +3013,21 @@ function editUser(index) {
   const user = usersData[index];
   if (!user) return;
   
-  document.getElementById('userFormTitle').textContent = 'Kullanıcı Düzenle';
-  document.getElementById('userIndex').value = index;
-  document.getElementById('userName').value = user.username || '';
-  document.getElementById('userEmail').value = user.email || '';
-  document.getElementById('userRole').value = user.role || 'viewer';
-  document.getElementById('userPassword').value = '';
-  document.getElementById('userPasswordConfirm').value = '';
+  const userFormTitleEl = document.getElementById('userFormTitle');
+  const userIndexEl = document.getElementById('userIndex');
+  const userNameEl = document.getElementById('userName');
+  const userEmailEl = document.getElementById('userEmail');
+  const userRoleEl = document.getElementById('userRole');
+  const userPasswordEl = document.getElementById('userPassword');
+  const userPasswordConfirmEl = document.getElementById('userPasswordConfirm');
+  
+  if (userFormTitleEl) userFormTitleEl.textContent = 'Kullanıcı Düzenle';
+  if (userIndexEl) userIndexEl.value = index;
+  if (userNameEl) userNameEl.value = user.username || '';
+  if (userEmailEl) userEmailEl.value = user.email || '';
+  if (userRoleEl) userRoleEl.value = user.role || 'viewer';
+  if (userPasswordEl) userPasswordEl.value = '';
+  if (userPasswordConfirmEl) userPasswordConfirmEl.value = '';
   
   // Düzenleme modunda şifre opsiyonel
   document.getElementById('userPasswordConfirmGroup').style.display = 'block';
@@ -3254,9 +3277,19 @@ async function changePassword(event) {
     loadUsers();
   }
   
-  const currentPassword = document.getElementById('currentPassword').value;
-  const newPassword = document.getElementById('newPassword').value;
-  const confirmPassword = document.getElementById('confirmNewPassword').value;
+  const currentPasswordEl = document.getElementById('currentPassword');
+  const newPasswordEl = document.getElementById('newPassword');
+  const confirmPasswordEl = document.getElementById('confirmNewPassword');
+  
+  if (!currentPasswordEl || !newPasswordEl || !confirmPasswordEl) {
+    console.error('❌ Şifre form elemanları bulunamadı!');
+    showAlert('❌ Form elemanları bulunamadı. Sayfayı yenileyin.', 'error');
+    return;
+  }
+  
+  const currentPassword = currentPasswordEl.value;
+  const newPassword = newPasswordEl.value;
+  const confirmPassword = confirmPasswordEl.value;
   
   console.log('📝 Form verileri:', {
     currentPasswordLength: currentPassword.length,
@@ -3270,26 +3303,26 @@ async function changePassword(event) {
   const confirmPasswordError = document.getElementById('confirmPasswordError');
   
   // Hata mesajlarını temizle
-  currentPasswordError.textContent = '';
-  newPasswordError.textContent = '';
-  confirmPasswordError.textContent = '';
+  if (currentPasswordError) currentPasswordError.textContent = '';
+  if (newPasswordError) newPasswordError.textContent = '';
+  if (confirmPasswordError) confirmPasswordError.textContent = '';
   
   // Validasyon
   if (!currentPassword) {
-    currentPasswordError.textContent = '⚠️ Mevcut şifrenizi girin.';
-    document.getElementById('currentPassword').classList.add('error');
+    if (currentPasswordError) currentPasswordError.textContent = '⚠️ Mevcut şifrenizi girin.';
+    if (currentPasswordEl) currentPasswordEl.classList.add('error');
     return;
   }
   
   if (!newPassword || newPassword.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
-    newPasswordError.textContent = `⚠️ Yeni şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır.`;
-    document.getElementById('newPassword').classList.add('error');
+    if (newPasswordError) newPasswordError.textContent = `⚠️ Yeni şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır.`;
+    if (newPasswordEl) newPasswordEl.classList.add('error');
     return;
   }
   
   if (newPassword !== confirmPassword) {
-    confirmPasswordError.textContent = '❌ Şifreler eşleşmiyor.';
-    document.getElementById('confirmNewPassword').classList.add('error');
+    if (confirmPasswordError) confirmPasswordError.textContent = '❌ Şifreler eşleşmiyor.';
+    if (confirmPasswordEl) confirmPasswordEl.classList.add('error');
     return;
   }
   
@@ -3373,8 +3406,8 @@ async function changePassword(event) {
       currentUser: currentUser ? currentUser.username : null,
       loggedInUsername
     });
-    currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
-    document.getElementById('currentPassword').classList.add('error');
+    if (currentPasswordError) currentPasswordError.textContent = '❌ Mevcut şifre hatalı.';
+    if (currentPasswordEl) currentPasswordEl.classList.add('error');
     return;
   }
   
@@ -3428,9 +3461,13 @@ async function changePassword(event) {
     document.getElementById('changePasswordForm').reset();
     
     // Hata sınıflarını temizle
-    document.getElementById('currentPassword').classList.remove('error');
-    document.getElementById('newPassword').classList.remove('error');
-    document.getElementById('confirmNewPassword').classList.remove('error');
+    const currentPasswordEl = document.getElementById('currentPassword');
+    const newPasswordEl = document.getElementById('newPassword');
+    const confirmPasswordEl = document.getElementById('confirmNewPassword');
+    
+    if (currentPasswordEl) currentPasswordEl.classList.remove('error');
+    if (newPasswordEl) newPasswordEl.classList.remove('error');
+    if (confirmPasswordEl) confirmPasswordEl.classList.remove('error');
     
     console.log('✅ Şifre başarıyla değiştirildi. Kullanıcı:', currentUser.username);
     
@@ -3447,8 +3484,10 @@ async function changePassword(event) {
     closeChangePasswordModal();
   } catch (error) {
     console.error('❌ Şifre değiştirme hatası:', error);
-    currentPasswordError.textContent = '❌ Şifre değiştirilemedi. Lütfen tekrar deneyin.';
-    document.getElementById('currentPassword').classList.add('error');
+    const currentPasswordError = document.getElementById('currentPasswordError');
+    const currentPasswordEl = document.getElementById('currentPassword');
+    if (currentPasswordError) currentPasswordError.textContent = '❌ Şifre değiştirilemedi. Lütfen tekrar deneyin.';
+    if (currentPasswordEl) currentPasswordEl.classList.add('error');
   }
 }
 
