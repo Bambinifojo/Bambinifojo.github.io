@@ -6,7 +6,7 @@ const CONSTANTS = {
   MOBILE_BREAKPOINT: 768, // px
   MODAL_ANIMATION_DURATION: 300, // ms
   ALERT_DISPLAY_DURATION: 3000, // ms
-  MIN_PASSWORD_LENGTH: 6,
+  MIN_PASSWORD_LENGTH: 8, // Minimum 8 karakter (güvenlik için artırıldı)
   MAX_ACTIVITIES: 20,
   RECENT_ACTIVITIES_LIMIT: 5
 };
@@ -32,8 +32,40 @@ async function hashPassword(password) {
   return hashHex;
 }
 
-// Admin şifre hash (varsayılan: "admin123")
-const ADMIN_PASSWORD_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
+// Şifre güvenlik kontrolü
+function validatePasswordStrength(password) {
+  const errors = [];
+  
+  if (password.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
+    errors.push(`En az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır`);
+  }
+  
+  if (!/[a-z]/.test(password)) {
+    errors.push('En az bir küçük harf içermelidir');
+  }
+  
+  if (!/[A-Z]/.test(password)) {
+    errors.push('En az bir büyük harf içermelidir');
+  }
+  
+  if (!/[0-9]/.test(password)) {
+    errors.push('En az bir rakam içermelidir');
+  }
+  
+  if (!/[^a-zA-Z0-9]/.test(password)) {
+    errors.push('En az bir özel karakter içermelidir (!@#$%^&* vb.)');
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors: errors
+  };
+}
+
+// Admin şifre hash (varsayılan: "Admin@2025Secure!")
+// Güvenli varsayılan şifre: Büyük harf, küçük harf, rakam ve özel karakter içerir
+// İlk girişte mutlaka şifrenizi değiştirin!
+const ADMIN_PASSWORD_HASH = '20f46ed4821a3cae172ba46638433dd35356ec26bdb14980abd3bd84bab4deee';
 
 // Admin giriş kontrolü
 function checkAdminSession() {
@@ -4348,14 +4380,26 @@ async function saveUser(event) {
   // Şifre kontrolü
   if (index === -1) {
     // Yeni kullanıcı - şifre zorunlu
-    if (!password || password.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
-      showAlert(`⚠️ Şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır!`, 'error');
+    if (!password) {
+      showAlert('⚠️ Şifre gereklidir!', 'error');
       if (userPasswordEl) {
         userPasswordEl.focus();
         userPasswordEl.classList.add('error');
       }
       return;
     }
+    
+    // Şifre güvenlik kontrolü
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      showAlert(`⚠️ Şifre gereksinimleri:\n${passwordValidation.errors.join('\n')}`, 'error');
+      if (userPasswordEl) {
+        userPasswordEl.focus();
+        userPasswordEl.classList.add('error');
+      }
+      return;
+    }
+    
     if (password !== passwordConfirm) {
       showAlert('❌ Şifreler eşleşmiyor!', 'error');
       if (userPasswordConfirmEl) {
@@ -4370,14 +4414,17 @@ async function saveUser(event) {
   } else {
     // Düzenleme - şifre değiştiriliyorsa kontrol et
     if (password) {
-      if (password.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
-        showAlert(`⚠️ Şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır!`, 'error');
+      // Şifre güvenlik kontrolü
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.isValid) {
+        showAlert(`⚠️ Şifre gereksinimleri:\n${passwordValidation.errors.join('\n')}`, 'error');
         if (userPasswordEl) {
           userPasswordEl.focus();
           userPasswordEl.classList.add('error');
         }
         return;
       }
+      
       if (password !== passwordConfirm) {
         showAlert('❌ Şifreler eşleşmiyor!', 'error');
         if (userPasswordConfirmEl) {
@@ -4639,8 +4686,18 @@ async function changePassword(event) {
     return;
   }
   
-  if (!newPassword || newPassword.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
-    if (newPasswordError) newPasswordError.textContent = `⚠️ Yeni şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır.`;
+  if (!newPassword) {
+    if (newPasswordError) newPasswordError.textContent = '⚠️ Yeni şifre gereklidir.';
+    if (newPasswordEl) newPasswordEl.classList.add('error');
+    return;
+  }
+  
+  // Şifre güvenlik kontrolü
+  const passwordValidation = validatePasswordStrength(newPassword);
+  if (!passwordValidation.isValid) {
+    if (newPasswordError) {
+      newPasswordError.textContent = `⚠️ Şifre gereksinimleri:\n${passwordValidation.errors.join('\n')}`;
+    }
     if (newPasswordEl) newPasswordEl.classList.add('error');
     return;
   }

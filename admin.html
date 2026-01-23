@@ -7742,13 +7742,13 @@
                     </svg>
                   </button>
                 </div>
-                <small>Minimum 6 karakter olmalıdır</small>
+                <small>Minimum 8 karakter, büyük harf, küçük harf, rakam ve özel karakter içermelidir</small>
               </div>
 
               <div class="form-group" id="userPasswordConfirmGroup">
                 <label for="userPasswordConfirm">Şifre Tekrar *</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="userPasswordConfirm" name="userPasswordConfirm" required placeholder="Şifreyi tekrar girin" minlength="6" autocomplete="new-password"/>
+                  <input type="password" id="userPasswordConfirm" name="userPasswordConfirm" required placeholder="Şifreyi tekrar girin" minlength="8" autocomplete="new-password"/>
                   <button type="button" onclick="toggleUserPasswordConfirm()" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="userEyeIconConfirm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -7823,7 +7823,7 @@
               <div class="form-group">
                 <label>Yeni Şifre Tekrar *</label>
                 <div class="admin-password-wrapper">
-                  <input type="password" id="confirmNewPassword" name="confirmNewPassword" required placeholder="Yeni şifreyi tekrar girin" minlength="6" autocomplete="off"/>
+                  <input type="password" id="confirmNewPassword" name="confirmNewPassword" required placeholder="Yeni şifreyi tekrar girin" minlength="8" autocomplete="off"/>
                   <button type="button" onclick="togglePasswordVisibility('confirmNewPassword', 'confirmNewPasswordEye')" class="admin-password-toggle" aria-label="Şifreyi göster/gizle">
                     <svg id="confirmNewPasswordEye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>

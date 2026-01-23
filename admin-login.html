@@ -1415,8 +1415,9 @@
       return hashHex;
     }
 
-    // Şifre kontrolü (varsayılan şifre: "admin123" - hash'lenmiş hali)
-    const ADMIN_PASSWORD_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'; // "admin123"
+    // Şifre kontrolü (varsayılan şifre: "Admin@2025Secure!" - hash'lenmiş hali)
+    // Güvenli varsayılan şifre: Büyük harf, küçük harf, rakam ve özel karakter içerir
+    const ADMIN_PASSWORD_HASH = '20f46ed4821a3cae172ba46638433dd35356ec26bdb14980abd3bd84bab4deee';
     
     // 2FA Secret Key (localStorage'da saklanır, ilk kurulumda oluşturulur)
     let twoFactorSecret = localStorage.getItem('admin2FASecret');
