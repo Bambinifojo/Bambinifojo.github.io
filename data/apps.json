@@ -20,7 +20,51 @@
         "subtitle": "Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama",
         "description": "Task Cosmos, günlük işlerinizi kolayca takip etmenizi ve organize etmenizi sağlayan kapsamlı bir görev yönetim uygulamasıdır. Modern ve kullanıcı dostu arayüzü ile görevlerinizi kategorilere ayırabilir, hatırlatıcılar oluşturabilir ve widget desteği sayesinde görevlerinizi ana ekranınızdan hızlıca görüntüleyebilirsiniz."
       },
-      "featuresSubtitle": "Task Cosmos'un güçlü özelliklerini keşfedin"
+      "featuresTitle": "Özellikler",
+      "featuresSubtitle": "Task Cosmos'un güçlü özelliklerini keşfedin",
+      "featureCards": [
+        {
+          "icon": "✓",
+          "title": "Görev Takibi",
+          "description": "Günlük görevlerinizi kolayca oluşturun, düzenleyin ve tamamlayın. Görevlerinizi öncelik sırasına göre organize edin."
+        },
+        {
+          "icon": "⏰",
+          "title": "Hatırlatıcılar",
+          "description": "Önemli görevler için hatırlatıcılar ayarlayın. Zamanında bildirim alın ve hiçbir şeyi kaçırmayın."
+        },
+        {
+          "icon": "📁",
+          "title": "Kategoriler",
+          "description": "Görevlerinizi kategorilere ayırın. İş, kişisel, alışveriş ve daha fazlası için özel kategoriler oluşturun."
+        },
+        {
+          "icon": "📱",
+          "title": "Widget Desteği",
+          "description": "Ana ekranınıza widget ekleyin ve görevlerinizi hızlıca görüntüleyin. Uygulamayı açmadan görevlerinizi yönetin."
+        }
+      ],
+      "screenshots": {
+        "title": "Ekran Görüntüleri",
+        "subtitle": "Uygulamanın görsel özelliklerini keşfedin",
+        "items": [
+          {
+            "icon": "📱",
+            "title": "Ana Ekran",
+            "image": ""
+          },
+          {
+            "icon": "✓",
+            "title": "Görev Listesi",
+            "image": ""
+          },
+          {
+            "icon": "📁",
+            "title": "Kategoriler",
+            "image": ""
+          }
+        ]
+      }
     },
     {
       "title": "Weather Pro",

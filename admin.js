@@ -16,6 +16,8 @@ let currentMode = 'local'; // 'local' veya 'github'
 let token = '';
 let appsData = { apps: [], site: null };
 let currentFeatures = [];
+let currentFeatureCards = []; // Detaylı özellik kartları (icon, title, description)
+let currentScreenshots = []; // Ekran görüntüleri (icon, title, image)
 let currentSiteSection = 'header';
 let usersData = []; // Kullanıcı verileri
 let lastSessionCheck = 0; // Session kontrolü için throttle
@@ -1731,7 +1733,11 @@ function showAddForm() {
     // Kategorileri yükle
     loadCategories();
     currentFeatures = [];
+    currentFeatureCards = [];
+    currentScreenshots = [];
     renderFeatures();
+    renderFeatureCards();
+    renderScreenshots();
     
     // Select elementlerini varsayılan değerlere sıfırla
     const appNotificationForceUpdateEl = document.getElementById('appNotificationForceUpdate');
@@ -1801,7 +1807,11 @@ function editApp(index) {
   if (appPrivacyEl) appPrivacyEl.value = app.privacy && app.privacy !== '#' ? app.privacy : '';
   
   currentFeatures = [...(app.features || [])];
+  currentFeatureCards = [...(app.featureCards || [])];
+  currentScreenshots = [...(app.screenshots?.items || [])];
   renderFeatures();
+  renderFeatureCards();
+  renderScreenshots();
   
   // Hakkında sayfası içeriği
   const appAboutTitleEl = document.getElementById('appAboutTitle');
@@ -1813,6 +1823,22 @@ function editApp(index) {
   if (appAboutSubtitleEl) appAboutSubtitleEl.value = app.about?.subtitle || '';
   if (appAboutDescriptionEl) appAboutDescriptionEl.value = app.about?.description || '';
   if (appFeaturesSubtitleEl) appFeaturesSubtitleEl.value = app.featuresSubtitle || '';
+  
+  // Özellikler başlığı
+  const appFeaturesTitleEl = document.getElementById('appFeaturesTitle');
+  if (appFeaturesTitleEl) appFeaturesTitleEl.value = app.featuresTitle || '';
+  
+  // Detaylı özellik kartları
+  currentFeatureCards = [...(app.featureCards || [])];
+  renderFeatureCards();
+  
+  // Ekran görüntüleri
+  const appScreenshotsTitleEl = document.getElementById('appScreenshotsTitle');
+  const appScreenshotsSubtitleEl = document.getElementById('appScreenshotsSubtitle');
+  if (appScreenshotsTitleEl) appScreenshotsTitleEl.value = app.screenshots?.title || '';
+  if (appScreenshotsSubtitleEl) appScreenshotsSubtitleEl.value = app.screenshots?.subtitle || '';
+  currentScreenshots = [...(app.screenshots?.items || [])];
+  renderScreenshots();
   
   // Bildirim ayarları
   const notification = app.notification || {};
@@ -1969,6 +1995,13 @@ async function saveApp(event) {
   const aboutSubtitle = appAboutSubtitleEl?.value.trim() || '';
   const aboutDescription = appAboutDescriptionEl?.value.trim() || '';
   const featuresSubtitle = appFeaturesSubtitleEl?.value.trim() || '';
+  const appFeaturesTitleEl = document.getElementById('appFeaturesTitle');
+  const appScreenshotsTitleEl = document.getElementById('appScreenshotsTitle');
+  const appScreenshotsSubtitleEl = document.getElementById('appScreenshotsSubtitle');
+  
+  const featuresTitle = appFeaturesTitleEl?.value.trim() || '';
+  const screenshotsTitle = appScreenshotsTitleEl?.value.trim() || '';
+  const screenshotsSubtitle = appScreenshotsSubtitleEl?.value.trim() || '';
   
   if (aboutTitle || aboutSubtitle || aboutDescription) {
     app.about = {
@@ -1978,8 +2011,26 @@ async function saveApp(event) {
     };
   }
   
+  if (featuresTitle) {
+    app.featuresTitle = featuresTitle;
+  }
+  
   if (featuresSubtitle) {
     app.featuresSubtitle = featuresSubtitle;
+  }
+  
+  // Detaylı özellik kartları
+  if (currentFeatureCards && currentFeatureCards.length > 0) {
+    app.featureCards = currentFeatureCards;
+  }
+  
+  // Ekran görüntüleri
+  if (screenshotsTitle || screenshotsSubtitle || (currentScreenshots && currentScreenshots.length > 0)) {
+    app.screenshots = {
+      title: screenshotsTitle || 'Ekran Görüntüleri',
+      subtitle: screenshotsSubtitle || '',
+      items: currentScreenshots || []
+    };
   }
   
   // AppId ve Package bilgileri (bildirim sistemi için)
@@ -2425,12 +2476,201 @@ function removeFeature(index) {
 // Özellikleri render et
 function renderFeatures() {
   const container = document.getElementById('featuresList');
+  if (!container) return;
   container.innerHTML = currentFeatures.map((feature, index) => `
     <div class="feature-tag-input">
       <span>${feature}</span>
       <button type="button" onclick="removeFeature(${index})">×</button>
     </div>
   `).join('');
+}
+
+// Detaylı özellik kartlarını render et
+function renderFeatureCards() {
+  const container = document.getElementById('featureCardsList');
+  if (!container) return;
+  
+  if (currentFeatureCards.length === 0) {
+    container.innerHTML = '<p style="color: #6b7280; font-size: 0.9rem; padding: 10px;">Henüz özellik kartı eklenmemiş</p>';
+    return;
+  }
+  
+  container.innerHTML = currentFeatureCards.map((card, index) => `
+    <div class="feature-card-item" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+        <div style="font-size: 2rem;">${card.icon || '📱'}</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">${escapeHtml(card.title || '')}</div>
+          <div style="font-size: 0.85rem; color: #6b7280;">${escapeHtml(card.description || '').substring(0, 60)}${card.description && card.description.length > 60 ? '...' : ''}</div>
+        </div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeFeatureCard(${index})" title="Sil">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Ekran görüntülerini render et
+function renderScreenshots() {
+  const container = document.getElementById('screenshotsList');
+  if (!container) return;
+  
+  if (currentScreenshots.length === 0) {
+    container.innerHTML = '<p style="color: #6b7280; font-size: 0.9rem; padding: 10px;">Henüz ekran görüntüsü eklenmemiş</p>';
+    return;
+  }
+  
+  container.innerHTML = currentScreenshots.map((screenshot, index) => `
+    <div class="screenshot-item" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="font-size: 2rem;">${screenshot.icon || '📱'}</div>
+        <div style="flex: 1;">
+          <div style="font-weight: 600; color: #1a1a1a;">${escapeHtml(screenshot.title || '')}</div>
+          ${screenshot.image ? `<div style="font-size: 0.85rem; color: #6b7280; margin-top: 4px;">${escapeHtml(screenshot.image)}</div>` : ''}
+        </div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeScreenshot(${index})" title="Sil">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Yeni özellik kartı ekleme modal'ını göster
+function showAddFeatureCardModal() {
+  const modal = document.getElementById('addFeatureCardModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+    const iconInput = document.getElementById('newFeatureCardIcon');
+    if (iconInput) {
+      iconInput.value = '';
+      setTimeout(() => iconInput.focus(), 100);
+    }
+  }
+}
+
+// Yeni özellik kartı ekleme modal'ını kapat
+function closeAddFeatureCardModal() {
+  const modal = document.getElementById('addFeatureCardModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    const iconInput = document.getElementById('newFeatureCardIcon');
+    const titleInput = document.getElementById('newFeatureCardTitle');
+    const descInput = document.getElementById('newFeatureCardDescription');
+    if (iconInput) iconInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (descInput) descInput.value = '';
+  }
+}
+
+// Yeni özellik kartı ekle
+function addNewFeatureCard() {
+  const iconInput = document.getElementById('newFeatureCardIcon');
+  const titleInput = document.getElementById('newFeatureCardTitle');
+  const descInput = document.getElementById('newFeatureCardDescription');
+  
+  if (!iconInput || !titleInput || !descInput) return;
+  
+  const icon = iconInput.value.trim();
+  const title = titleInput.value.trim();
+  const description = descInput.value.trim();
+  
+  if (!icon || !title || !description) {
+    showAlert('⚠️ Tüm alanları doldurun!', 'error');
+    return;
+  }
+  
+  currentFeatureCards.push({
+    icon: icon,
+    title: title,
+    description: description
+  });
+  
+  renderFeatureCards();
+  showAlert('✅ Özellik kartı eklendi!', 'success');
+  closeAddFeatureCardModal();
+  autoSaveApp();
+}
+
+// Özellik kartı sil
+function removeFeatureCard(index) {
+  currentFeatureCards.splice(index, 1);
+  renderFeatureCards();
+  autoSaveApp();
+}
+
+// Yeni ekran görüntüsü ekleme modal'ını göster
+function showAddScreenshotModal() {
+  const modal = document.getElementById('addScreenshotModal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+    const iconInput = document.getElementById('newScreenshotIcon');
+    if (iconInput) {
+      iconInput.value = '';
+      setTimeout(() => iconInput.focus(), 100);
+    }
+  }
+}
+
+// Yeni ekran görüntüsü ekleme modal'ını kapat
+function closeAddScreenshotModal() {
+  const modal = document.getElementById('addScreenshotModal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    const iconInput = document.getElementById('newScreenshotIcon');
+    const titleInput = document.getElementById('newScreenshotTitle');
+    const imageInput = document.getElementById('newScreenshotImage');
+    if (iconInput) iconInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (imageInput) imageInput.value = '';
+  }
+}
+
+// Yeni ekran görüntüsü ekle
+function addNewScreenshot() {
+  const iconInput = document.getElementById('newScreenshotIcon');
+  const titleInput = document.getElementById('newScreenshotTitle');
+  const imageInput = document.getElementById('newScreenshotImage');
+  
+  if (!iconInput || !titleInput) return;
+  
+  const icon = iconInput.value.trim();
+  const title = titleInput.value.trim();
+  const image = imageInput?.value.trim() || '';
+  
+  if (!icon || !title) {
+    showAlert('⚠️ İkon ve başlık gereklidir!', 'error');
+    return;
+  }
+  
+  currentScreenshots.push({
+    icon: icon,
+    title: title,
+    image: image
+  });
+  
+  renderScreenshots();
+  showAlert('✅ Ekran görüntüsü eklendi!', 'success');
+  closeAddScreenshotModal();
+  autoSaveApp();
+}
+
+// Ekran görüntüsü sil
+function removeScreenshot(index) {
+  currentScreenshots.splice(index, 1);
+  renderScreenshots();
+  autoSaveApp();
 }
 
 // Veriyi dışa aktar

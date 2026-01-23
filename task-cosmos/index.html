@@ -646,6 +646,7 @@
         <p class="section-subtitle">Task Cosmos'un güçlü özelliklerini keşfedin</p>
         
         <div class="features-grid">
+            <!-- Dinamik olarak yüklenecek -->
             <div class="feature-card">
                 <div class="feature-icon">✓</div>
                 <h3 class="feature-title">Görev Takibi</h3>
@@ -678,6 +679,7 @@
         <p class="section-subtitle">Uygulamanın görsel özelliklerini keşfedin</p>
         
         <div class="screenshots-grid">
+            <!-- Dinamik olarak yüklenecek -->
             <div class="screenshot-card">
                 <div class="screenshot-placeholder">📱</div>
                 <p>Ana Ekran</p>
@@ -877,15 +879,64 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         
-        // Özellikler bölümünün alt başlığını güncelle
+        // Özellikler bölümünü güncelle
+        const featuresTitleEl = document.querySelector('.app-features-section .section-title');
         const featuresSubtitleEl = document.querySelector('.app-features-section .section-subtitle');
+        const featuresGridEl = document.querySelector('.app-features-section .features-grid');
+        
+        if (taskCosmos.featuresTitle && featuresTitleEl) {
+          featuresTitleEl.textContent = taskCosmos.featuresTitle;
+        }
         if (taskCosmos.featuresSubtitle && featuresSubtitleEl) {
           featuresSubtitleEl.textContent = taskCosmos.featuresSubtitle;
+        }
+        
+        // Detaylı özellik kartlarını yükle
+        if (taskCosmos.featureCards && taskCosmos.featureCards.length > 0 && featuresGridEl) {
+          featuresGridEl.innerHTML = taskCosmos.featureCards.map(card => `
+            <div class="feature-card">
+              <div class="feature-icon">${card.icon || '📱'}</div>
+              <h3 class="feature-title">${escapeHtml(card.title || '')}</h3>
+              <p class="feature-description">${escapeHtml(card.description || '')}</p>
+            </div>
+          `).join('');
+        }
+        
+        // Ekran görüntüleri bölümünü güncelle
+        const screenshotsTitleEl = document.querySelector('.app-screenshots-section .section-title');
+        const screenshotsSubtitleEl = document.querySelector('.app-screenshots-section .section-subtitle');
+        const screenshotsGridEl = document.querySelector('.app-screenshots-section .screenshots-grid');
+        
+        if (taskCosmos.screenshots) {
+          if (taskCosmos.screenshots.title && screenshotsTitleEl) {
+            screenshotsTitleEl.textContent = taskCosmos.screenshots.title;
+          }
+          if (taskCosmos.screenshots.subtitle && screenshotsSubtitleEl) {
+            screenshotsSubtitleEl.textContent = taskCosmos.screenshots.subtitle;
+          }
+          
+          // Ekran görüntülerini yükle
+          if (taskCosmos.screenshots.items && taskCosmos.screenshots.items.length > 0 && screenshotsGridEl) {
+            screenshotsGridEl.innerHTML = taskCosmos.screenshots.items.map(screenshot => `
+              <div class="screenshot-card">
+                <div class="screenshot-placeholder">${screenshot.icon || '📱'}</div>
+                <p>${escapeHtml(screenshot.title || '')}</p>
+              </div>
+            `).join('');
+          }
         }
       }
     } catch (error) {
       console.error('Hakkında içeriği yüklenirken hata:', error);
     }
+  }
+  
+  // HTML escape fonksiyonu
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
   }
 
   // Sayfa yüklendiğinde içeriği yükle

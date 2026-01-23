@@ -6523,3 +6523,36 @@ body.ai-modal-open .hamburger {
 .category-modal-content {
     max-width: 400px;
 }
+
+/* Feature Cards ve Screenshots Yönetimi */
+.feature-cards-input,
+.screenshots-input {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.feature-card-item,
+.screenshot-item {
+    transition: all 0.2s ease;
+}
+
+.feature-card-item:hover,
+.screenshot-item:hover {
+    background: #f3f4f6 !important;
+    border-color: #d1d5db !important;
+}
+
+.textarea-medium {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.add-feature-card,
+.add-screenshot {
+    margin-top: 10px;
+}
+
+.btn-icon-left {
+    margin-right: 6px;
+}
