@@ -158,9 +158,12 @@ async function handleAdminLogin() {
     authenticatedUser = AdminState.usersData.find(user => user.passwordHash === hashedPassword);
     
     // Bulunamazsa varsayılan admin şifresini kontrol et
+    // NOT: Admin kullanıcısı varsa, varsayılan şifre ile giriş yapılmasına izin verilmez
+    // Bu, şifre değiştirme işleminin çalışması için gereklidir
     if (!authenticatedUser && hashedPassword === AdminState.ADMIN_PASSWORD_HASH) {
-      authenticatedUser = AdminState.usersData.find(user => user.username === 'admin');
-      if (!authenticatedUser) {
+      const adminUserExists = AdminState.usersData.find(user => user.username === 'admin');
+      if (!adminUserExists) {
+        // Admin kullanıcısı yok - yeni admin kullanıcısı oluştur (sadece ilk kurulumda)
         authenticatedUser = {
           id: Date.now().toString(),
           username: 'admin',
@@ -174,6 +177,11 @@ async function handleAdminLogin() {
         if (typeof saveUsers === 'function') {
           saveUsers();
         }
+        console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
+      } else {
+        // Admin kullanıcısı var - varsayılan şifre ile giriş yapılmasına izin verilmez
+        console.log('❌ Admin kullanıcısı mevcut. Varsayılan şifre ile giriş yapılamaz.');
+        console.log('💡 İpucu: Şifrenizi değiştirdiyseniz, yeni şifrenizle giriş yapın.');
       }
     }
     

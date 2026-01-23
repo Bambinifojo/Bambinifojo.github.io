@@ -144,14 +144,15 @@ async function handleAdminLogin() {
     authenticatedUser = usersData.find(user => user.passwordHash === hashedPassword);
     
     // Bulunamazsa ve usersData içinde admin kullanıcısı yoksa, varsayılan admin şifresini kontrol et
-    // Eğer admin kullanıcısı zaten varsa, varsayılan şifre ile giriş yapıldığında şifresini güncelle
+    // NOT: Admin kullanıcısı varsa, varsayılan şifre ile giriş yapılmasına izin verilmez
+    // Bu, şifre değiştirme işleminin çalışması için gereklidir
     if (!authenticatedUser) {
       const adminUserExists = usersData.find(user => user.username === 'admin');
       
       if (hashedPassword === ADMIN_PASSWORD_HASH) {
         // Varsayılan şifre ile giriş yapılıyor
         if (!adminUserExists) {
-          // Admin kullanıcısı yok - yeni admin kullanıcısı oluştur
+          // Admin kullanıcısı yok - yeni admin kullanıcısı oluştur (sadece ilk kurulumda)
           authenticatedUser = {
             id: Date.now().toString(),
             username: 'admin',
@@ -165,20 +166,11 @@ async function handleAdminLogin() {
           saveUsers();
           console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
         } else {
-          // Admin kullanıcısı var ama şifre eşleşmiyor - varsayılan şifre ile giriş yapıldığında şifresini güncelle
-          console.log('⚠️ Admin kullanıcısı mevcut ama şifre eşleşmiyor - varsayılan şifre ile güncelleniyor');
-          adminUserExists.passwordHash = ADMIN_PASSWORD_HASH;
-          usersData = usersData.map(user => 
-            user.username === 'admin' ? adminUserExists : user
-          );
-          saveUsers();
-          authenticatedUser = adminUserExists;
-          console.log('✅ Admin kullanıcısı şifresi varsayılan şifre ile güncellendi');
+          // Admin kullanıcısı var - varsayılan şifre ile giriş yapılmasına izin verilmez
+          // Kullanıcı şifresini değiştirdiyse, varsayılan şifre ile giriş yapamaz
+          console.log('❌ Admin kullanıcısı mevcut. Varsayılan şifre ile giriş yapılamaz.');
+          console.log('💡 İpucu: Şifrenizi değiştirdiyseniz, yeni şifrenizle giriş yapın.');
         }
-      } else if (adminUserExists) {
-        // Admin kullanıcısı var ama şifre eşleşmiyor ve varsayılan şifre değil - hata
-        console.log('❌ Admin kullanıcısı mevcut ama şifre eşleşmiyor');
-        console.log('💡 İpucu: Varsayılan şifre "admin123" ile giriş yaparak şifrenizi sıfırlayabilirsiniz');
       }
     }
     
@@ -1574,6 +1566,17 @@ function editApp(index) {
   currentFeatures = [...(app.features || [])];
   renderFeatures();
   
+  // Hakkında sayfası içeriği
+  const appAboutTitleEl = document.getElementById('appAboutTitle');
+  const appAboutSubtitleEl = document.getElementById('appAboutSubtitle');
+  const appAboutDescriptionEl = document.getElementById('appAboutDescription');
+  const appFeaturesSubtitleEl = document.getElementById('appFeaturesSubtitle');
+  
+  if (appAboutTitleEl) appAboutTitleEl.value = app.about?.title || '';
+  if (appAboutSubtitleEl) appAboutSubtitleEl.value = app.about?.subtitle || '';
+  if (appAboutDescriptionEl) appAboutDescriptionEl.value = app.about?.description || '';
+  if (appFeaturesSubtitleEl) appFeaturesSubtitleEl.value = app.featuresSubtitle || '';
+  
   // Bildirim ayarları
   const notification = app.notification || {};
   const appNotificationIdEl = document.getElementById('appNotificationId');
@@ -1682,6 +1685,29 @@ async function saveApp(event) {
     privacy: privacyValue || '#',
     features: currentFeatures
   };
+  
+  // Hakkında sayfası içeriği
+  const appAboutTitleEl = document.getElementById('appAboutTitle');
+  const appAboutSubtitleEl = document.getElementById('appAboutSubtitle');
+  const appAboutDescriptionEl = document.getElementById('appAboutDescription');
+  const appFeaturesSubtitleEl = document.getElementById('appFeaturesSubtitle');
+  
+  const aboutTitle = appAboutTitleEl?.value.trim() || '';
+  const aboutSubtitle = appAboutSubtitleEl?.value.trim() || '';
+  const aboutDescription = appAboutDescriptionEl?.value.trim() || '';
+  const featuresSubtitle = appFeaturesSubtitleEl?.value.trim() || '';
+  
+  if (aboutTitle || aboutSubtitle || aboutDescription) {
+    app.about = {
+      title: aboutTitle || 'Hakkında',
+      subtitle: aboutSubtitle || '',
+      description: aboutDescription || ''
+    };
+  }
+  
+  if (featuresSubtitle) {
+    app.featuresSubtitle = featuresSubtitle;
+  }
   
   // AppId ve Package bilgileri (bildirim sistemi için)
   const appId = appNotificationIdEl?.value.trim();
@@ -3134,15 +3160,82 @@ function showChangePasswordModal() {
       sidebarOverlay.style.display = 'none';
     }
     
+    // Form alanlarını temizle
+    const form = document.getElementById('changePasswordForm');
+    if (form) {
+      form.reset();
+    }
+    
+    // Şifre alanlarını manuel olarak temizle (autocomplete'i bypass etmek için)
+    const currentPasswordEl = document.getElementById('currentPassword');
+    const newPasswordEl = document.getElementById('newPassword');
+    const confirmPasswordEl = document.getElementById('confirmNewPassword');
+    
+    if (currentPasswordEl) {
+      currentPasswordEl.value = '';
+      currentPasswordEl.type = 'password'; // Şifre tipini sıfırla
+      currentPasswordEl.classList.remove('error');
+    }
+    if (newPasswordEl) {
+      newPasswordEl.value = '';
+      newPasswordEl.classList.remove('error');
+    }
+    if (confirmPasswordEl) {
+      confirmPasswordEl.value = '';
+      confirmPasswordEl.classList.remove('error');
+    }
+    
+    // Hata mesajlarını temizle
+    const currentPasswordError = document.getElementById('currentPasswordError');
+    const newPasswordError = document.getElementById('newPasswordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+    
+    if (currentPasswordError) currentPasswordError.textContent = '';
+    if (newPasswordError) newPasswordError.textContent = '';
+    if (confirmPasswordError) confirmPasswordError.textContent = '';
+    
     modal.classList.add('active');
     document.body.classList.add('modal-open');
     const scrollY = window.scrollY;
     document.body.style.top = `-${scrollY}px`;
+    
+    // Focus'u mevcut şifre alanına ver
+    setTimeout(() => {
+      if (currentPasswordEl) {
+        currentPasswordEl.focus();
+      }
+    }, 100);
   }
 }
 
 function closeChangePasswordModal() {
   closeModal('changePasswordModal', 'changePasswordForm');
+  
+  // Form alanlarını temizle
+  const form = document.getElementById('changePasswordForm');
+  if (form) {
+    form.reset();
+  }
+  
+  // Şifre alanlarını manuel olarak temizle
+  const currentPasswordEl = document.getElementById('currentPassword');
+  const newPasswordEl = document.getElementById('newPassword');
+  const confirmPasswordEl = document.getElementById('confirmNewPassword');
+  
+  if (currentPasswordEl) {
+    currentPasswordEl.value = '';
+    currentPasswordEl.type = 'password';
+    currentPasswordEl.classList.remove('error');
+  }
+  if (newPasswordEl) {
+    newPasswordEl.value = '';
+    newPasswordEl.classList.remove('error');
+  }
+  if (confirmPasswordEl) {
+    confirmPasswordEl.value = '';
+    confirmPasswordEl.classList.remove('error');
+  }
+  
   // Hata mesajlarını temizle
   document.querySelectorAll('.error-message').forEach(el => {
     el.textContent = '';
@@ -3216,16 +3309,18 @@ async function changePassword(event) {
     if (currentUser) {
       if (currentUser.passwordHash === hashedCurrentPassword) {
         isPasswordValid = true;
-      } else if (hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
-        // Varsayılan admin şifresi kontrolü (geriye dönük uyumluluk için)
+      } else if (hashedCurrentPassword === ADMIN_PASSWORD_HASH && currentUser.passwordHash === ADMIN_PASSWORD_HASH) {
+        // Sadece kullanıcının şifresi hala varsayılan şifre ise, varsayılan şifre ile değiştirmesine izin ver
+        // Bu, ilk kurulumda şifre değiştirme için gereklidir
         isPasswordValid = true;
       }
     } else {
-      // Kullanıcı bulunamadıysa, varsayılan admin şifresi kontrolü
+      // Kullanıcı bulunamadıysa ve varsayılan şifre ile giriş yapılıyorsa,
+      // sadece admin kullanıcısı yoksa oluştur (ilk kurulum)
       if (hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
-        // Varsayılan admin kullanıcısını oluştur veya bul
-        currentUser = usersData.find(user => user.username === 'admin');
-        if (!currentUser) {
+        const adminUserExists = usersData.find(user => user.username === 'admin');
+        if (!adminUserExists) {
+          // İlk kurulum - varsayılan admin kullanıcısını oluştur
           currentUser = {
             id: Date.now().toString(),
             username: 'admin',
@@ -3236,8 +3331,9 @@ async function changePassword(event) {
             lastLogin: null
           };
           usersData.push(currentUser);
+          isPasswordValid = true;
         }
-        isPasswordValid = true;
+        // Admin kullanıcısı varsa ama session'daki kullanıcı adı eşleşmiyorsa, hata ver
       }
     }
   } else {
@@ -3247,9 +3343,10 @@ async function changePassword(event) {
     if (currentUser) {
       isPasswordValid = true;
     } else if (hashedCurrentPassword === ADMIN_PASSWORD_HASH) {
-      // Varsayılan admin şifresi kontrolü
+      // Varsayılan admin şifresi kontrolü - sadece ilk kurulum için
       currentUser = usersData.find(user => user.username === 'admin');
       if (!currentUser) {
+        // İlk kurulum - varsayılan admin kullanıcısını oluştur
         currentUser = {
           id: Date.now().toString(),
           username: 'admin',
@@ -3260,8 +3357,12 @@ async function changePassword(event) {
           lastLogin: null
         };
         usersData.push(currentUser);
+        isPasswordValid = true;
+      } else if (currentUser.passwordHash === ADMIN_PASSWORD_HASH) {
+        // Admin kullanıcısı var ve şifresi hala varsayılan şifre - şifre değiştirmesine izin ver
+        isPasswordValid = true;
       }
-      isPasswordValid = true;
+      // Admin kullanıcısı var ama şifresi varsayılan şifre değil - hata (isPasswordValid zaten false)
     }
   }
   
@@ -3332,7 +3433,17 @@ async function changePassword(event) {
     document.getElementById('confirmNewPassword').classList.remove('error');
     
     console.log('✅ Şifre başarıyla değiştirildi. Kullanıcı:', currentUser.username);
-    showAlert('✅ Şifre değiştirildi!', 'success');
+    
+    // Şifre değiştirildikten sonra kullanıcıyı bilgilendir ve çıkış yapmasını öner
+    showAlert('✅ Şifre başarıyla değiştirildi! Güvenlik için lütfen çıkış yapıp yeni şifrenizle tekrar giriş yapın.', 'success');
+    
+    // 3 saniye sonra çıkış yapmayı öner
+    setTimeout(() => {
+      if (confirm('Şifreniz başarıyla değiştirildi. Güvenlik için şimdi çıkış yapıp yeni şifrenizle tekrar giriş yapmak ister misiniz?')) {
+        logout();
+      }
+    }, 2000);
+    
     closeChangePasswordModal();
   } catch (error) {
     console.error('❌ Şifre değiştirme hatası:', error);

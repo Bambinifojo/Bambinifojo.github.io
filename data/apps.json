@@ -14,7 +14,13 @@
         "Hatırlatıcılar",
         "Kategoriler",
         "Widget Desteği"
-      ]
+      ],
+      "about": {
+        "title": "Hakkında",
+        "subtitle": "Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama",
+        "description": "Task Cosmos, günlük işlerinizi kolayca takip etmenizi ve organize etmenizi sağlayan kapsamlı bir görev yönetim uygulamasıdır. Modern ve kullanıcı dostu arayüzü ile görevlerinizi kategorilere ayırabilir, hatırlatıcılar oluşturabilir ve widget desteği sayesinde görevlerinizi ana ekranınızdan hızlıca görüntüleyebilirsiniz."
+      },
+      "featuresSubtitle": "Task Cosmos'un güçlü özelliklerini keşfedin"
     },
     {
       "title": "Weather Pro",

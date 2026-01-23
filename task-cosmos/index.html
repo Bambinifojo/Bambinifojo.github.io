@@ -849,6 +849,51 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Hakkında sayfası içeriğini apps.json'dan yükle
+  async function loadAboutContent() {
+    try {
+      const response = await fetch('../data/apps.json');
+      const data = await response.json();
+      
+      // Task Cosmos uygulamasını bul
+      const taskCosmos = data.apps?.find(app => app.title === 'Task Cosmos');
+      
+      if (taskCosmos) {
+        // Hakkında bölümünü güncelle
+        const aboutTitleEl = document.querySelector('.app-description-section .section-title');
+        const aboutSubtitleEl = document.querySelector('.app-description-section .section-subtitle');
+        const aboutDescriptionEl = document.querySelector('.app-description-section .app-description-text');
+        
+        if (taskCosmos.about) {
+          if (taskCosmos.about.title && aboutTitleEl) {
+            aboutTitleEl.textContent = taskCosmos.about.title;
+          }
+          if (taskCosmos.about.subtitle && aboutSubtitleEl) {
+            aboutSubtitleEl.textContent = taskCosmos.about.subtitle;
+          }
+          if (taskCosmos.about.description && aboutDescriptionEl) {
+            aboutDescriptionEl.textContent = taskCosmos.about.description;
+          }
+        }
+        
+        // Özellikler bölümünün alt başlığını güncelle
+        const featuresSubtitleEl = document.querySelector('.app-features-section .section-subtitle');
+        if (taskCosmos.featuresSubtitle && featuresSubtitleEl) {
+          featuresSubtitleEl.textContent = taskCosmos.featuresSubtitle;
+        }
+      }
+    } catch (error) {
+      console.error('Hakkında içeriği yüklenirken hata:', error);
+    }
+  }
+
+  // Sayfa yüklendiğinde içeriği yükle
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadAboutContent);
+  } else {
+    loadAboutContent();
+  }
 });
 </script>
 </body>
