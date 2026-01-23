@@ -7160,6 +7160,18 @@
                       <strong>Gerekli izin:</strong> <code>repo</code> (Full control of private repositories)
                     </small>
                   </div>
+                  
+                  <div id="githubModeInfo" class="margin-top-20" style="padding: 12px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b; display: none;">
+                    <p style="margin: 0; color: #92400e; font-size: 0.875rem;">
+                      <strong>💡 GitHub API Modu:</strong> Token gerektirir ama ayarlarınız tüm tarayıcılarda ve cihazlarda geçerli olur. Başka tarayıcıdan erişmek istiyorsanız bu modu kullanın.
+                    </p>
+                  </div>
+                  
+                  <div id="localModeInfoInSettings" class="margin-top-20" style="padding: 12px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    <p style="margin: 0; color: #1e40af; font-size: 0.875rem;">
+                      <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. İstediğiniz gibi ayarları değiştirebilirsiniz. Başka tarayıcıdan erişmek için GitHub API modunu kullanın.
+                    </p>
+                  </div>
 
                   <div class="form-actions margin-top-20">
                     <button type="button" class="btn btn-info" onclick="testGitHubTokenFromUI()" id="testTokenBtn" style="display: none;">
@@ -7356,9 +7368,21 @@
                 <button type="button" id="localModeBtn" class="active" onclick="setMode('local')">LocalStorage</button>
                 <button type="button" id="githubModeBtn" onclick="setMode('github')">GitHub API</button>
               </div>
-              <div class="form-group margin-top-20">
-                <label for="token">GitHub Token</label>
-                <input type="password" id="token" name="token" placeholder="GitHub Token (opsiyonel)" autocomplete="off"/>
+              <div class="form-group margin-top-20" id="tokenGroupInLogin" style="display: none;">
+                <label for="token">GitHub Personal Access Token</label>
+                <input type="password" id="token" name="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+                <small style="display: block; margin-top: 8px; color: #6b7280; font-size: 0.875rem;">
+                  <strong>⚠️ ÖNEMLİ:</strong> GitHub artık şifre kabul etmiyor! Personal Access Token gerekiyor.
+                  <br>
+                  Token oluşturmak için: GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic)
+                  <br>
+                  <strong>Gerekli izin:</strong> <code>repo</code>
+                </small>
+              </div>
+              <div id="localModeInfo" class="margin-top-20" style="padding: 12px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                <p style="margin: 0; color: #1e40af; font-size: 0.875rem;">
+                  <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. Başka tarayıcıdan erişmek için GitHub API modunu kullanın.
+                </p>
               </div>
               <div class="button-group margin-top-20">
                 <button type="submit" class="btn btn-primary btn-flex">
