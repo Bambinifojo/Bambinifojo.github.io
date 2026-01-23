@@ -1164,47 +1164,65 @@ async function checkTokenValidity() {
     
     if (!result.valid) {
       if (result.expired) {
-        // Token süresi dolmuş - KULLANICIYI UYAR ama mod değiştirme
-        // Yayın sitesi için token zorunlu!
-        const alertMessage = '🚨 TOKEN SÜRESİ DOLMUŞ!\n\n' +
-          'Yayın için token zorunludur. Değişiklikler GitHub\'a kaydedilemez ve yayında görünmez!\n\n' +
-          'Lütfen hemen yeni token oluşturun:\n' +
-          '1. GitHub Ayarları bölümüne gidin\n' +
-          '2. Yeni token oluşturun\n' +
-          '3. Token\'ı girin ve kaydedin';
+        // Token süresi dolmuş - kullanıcıya seçenek sun
+        const alertMessage = '⚠️ TOKEN SÜRESİ DOLMUŞ!\n\n' +
+          'Değişiklikler GitHub\'a kaydedilemez ve yayında görünmez.\n\n' +
+          'Seçenekleriniz:\n' +
+          '1. LocalStorage moduna geçip çalışmaya devam edin (sonra token yenileyip GitHub\'a kaydedebilirsiniz)\n' +
+          '2. Token\'ı şimdi yenileyin';
         
-        // Büyük ve belirgin bir uyarı göster
-        showAlert(alertMessage, 'error');
+        // Kullanıcıya seçenek sun
+        const userChoice = confirm(alertMessage + '\n\n"Tamam" = LocalStorage moduna geç\n"İptal" = Token yenileme sayfasına git');
         
-        // GitHub Ayarları sayfasına yönlendir
-        setTimeout(() => {
-          if (typeof showSection === 'function') {
-            showSection('github-settings');
+        if (userChoice) {
+          // LocalStorage moduna geç - çalışmaya devam et
+          currentMode = 'local';
+          token = '';
+          localStorage.setItem('currentMode', 'local');
+          localStorage.removeItem('githubToken');
+          
+          // UI'ı güncelle
+          updateGitHubSettingsUI();
+          
+          // GitHub'a Kaydet butonlarını gizle
+          const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+          const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+          if (saveGitHubBtnTopbar) saveGitHubBtnTopbar.classList.add('hidden');
+          if (saveGitHubBtnMobile) saveGitHubBtnMobile.classList.add('hidden');
+          
+          showAlert('✅ LocalStorage moduna geçildi. Çalışmaya devam edebilirsiniz. Token yeniledikten sonra GitHub\'a kaydedebilirsiniz.', 'success');
+        } else {
+          // Token yenileme sayfasına git
+          showAlert('💡 GitHub Ayarları bölümünden yeni token oluşturun ve girin.', 'info');
+          setTimeout(() => {
+            if (typeof showSection === 'function') {
+              showSection('github-settings');
+            }
+          }, 1000);
+          
+          // Status mesajını güncelle
+          const statusText = document.getElementById('githubModeStatus');
+          if (statusText) {
+            statusText.innerHTML = '⚠️ <strong>TOKEN SÜRESİ DOLMUŞ!</strong> Yeni token gerekli!';
+            statusText.style.color = '#f59e0b';
+            statusText.style.fontWeight = 'bold';
           }
-        }, 2000);
-        
-        // Status mesajını güncelle
-        const statusText = document.getElementById('githubModeStatus');
-        if (statusText) {
-          statusText.innerHTML = '🚨 <strong>TOKEN SÜRESİ DOLMUŞ!</strong> Yayın için yeni token gerekli!';
-          statusText.style.color = '#ef4444';
-          statusText.style.fontWeight = 'bold';
-        }
-        
-        // GitHub'a Kaydet butonlarını devre dışı bırak ama görünür tut (kullanıcı token yenileyene kadar)
-        const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
-        const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
-        if (saveGitHubBtnTopbar) {
-          saveGitHubBtnTopbar.disabled = true;
-          saveGitHubBtnTopbar.title = 'Token süresi dolmuş! Yeni token gerekli.';
-          saveGitHubBtnTopbar.style.opacity = '0.5';
-          saveGitHubBtnTopbar.style.cursor = 'not-allowed';
-        }
-        if (saveGitHubBtnMobile) {
-          saveGitHubBtnMobile.disabled = true;
-          saveGitHubBtnMobile.title = 'Token süresi dolmuş! Yeni token gerekli.';
-          saveGitHubBtnMobile.style.opacity = '0.5';
-          saveGitHubBtnMobile.style.cursor = 'not-allowed';
+          
+          // GitHub'a Kaydet butonlarını devre dışı bırak
+          const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+          const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+          if (saveGitHubBtnTopbar) {
+            saveGitHubBtnTopbar.disabled = true;
+            saveGitHubBtnTopbar.title = 'Token süresi dolmuş! Yeni token gerekli.';
+            saveGitHubBtnTopbar.style.opacity = '0.5';
+            saveGitHubBtnTopbar.style.cursor = 'not-allowed';
+          }
+          if (saveGitHubBtnMobile) {
+            saveGitHubBtnMobile.disabled = true;
+            saveGitHubBtnMobile.title = 'Token süresi dolmuş! Yeni token gerekli.';
+            saveGitHubBtnMobile.style.opacity = '0.5';
+            saveGitHubBtnMobile.style.cursor = 'not-allowed';
+          }
         }
       }
     } else {
@@ -1249,7 +1267,32 @@ async function checkTokenBeforeSave() {
     const result = await testGitHubToken(token);
     if (!result.valid) {
       if (result.expired) {
-        showAlert('❌ Token süresi dolmuş! Yeni token gerekli. GitHub Ayarları bölümünden yeni token girin.', 'error');
+        // Token süresi dolmuş - kullanıcıya seçenek sun
+        const userChoice = confirm('⚠️ Token süresi dolmuş!\n\nGitHub\'a kaydedemezsiniz.\n\nLocalStorage moduna geçip çalışmaya devam etmek ister misiniz?\n\n"Tamam" = LocalStorage moduna geç\n"İptal" = Token yenileme sayfasına git');
+        
+        if (userChoice) {
+          // LocalStorage moduna geç
+          currentMode = 'local';
+          token = '';
+          localStorage.setItem('currentMode', 'local');
+          localStorage.removeItem('githubToken');
+          updateGitHubSettingsUI();
+          
+          const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+          const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+          if (saveGitHubBtnTopbar) saveGitHubBtnTopbar.classList.add('hidden');
+          if (saveGitHubBtnMobile) saveGitHubBtnMobile.classList.add('hidden');
+          
+          showAlert('✅ LocalStorage moduna geçildi. Çalışmaya devam edebilirsiniz. Token yeniledikten sonra GitHub\'a kaydedebilirsiniz.', 'success');
+        } else {
+          // Token yenileme sayfasına git
+          setTimeout(() => {
+            if (typeof showSection === 'function') {
+              showSection('github-settings');
+            }
+          }, 500);
+        }
+        
         return false;
       } else {
         showAlert(`❌ Token hatası: ${result.error}`, 'error');
@@ -3881,22 +3924,38 @@ async function saveSiteSection(section, event) {
           const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
           console.error('GitHub kaydetme hatası:', githubError);
           
-          // Token süresi dolmuşsa özel mesaj
+          // Token süresi dolmuşsa özel mesaj ve LocalStorage'a geçme seçeneği
           if (githubErrorMessage.includes('401') || githubErrorMessage.includes('süresi dolmuş')) {
-            showAlert('🚨 Token süresi dolmuş! Yayın için yeni token gerekli. GitHub Ayarları bölümünden token yenileyin.', 'error');
-            setTimeout(() => {
-              if (typeof showSection === 'function') {
-                showSection('github-settings');
-              }
-            }, 2000);
+            const userChoice = confirm('⚠️ Token süresi dolmuş!\n\nGitHub\'a kaydedilemedi.\n\nLocalStorage moduna geçip çalışmaya devam etmek ister misiniz?\n\n"Tamam" = LocalStorage moduna geç\n"İptal" = Token yenileme sayfasına git');
+            
+            if (userChoice) {
+              // LocalStorage moduna geç
+              currentMode = 'local';
+              token = '';
+              localStorage.setItem('currentMode', 'local');
+              localStorage.removeItem('githubToken');
+              updateGitHubSettingsUI();
+              
+              const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+              const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+              if (saveGitHubBtnTopbar) saveGitHubBtnTopbar.classList.add('hidden');
+              if (saveGitHubBtnMobile) saveGitHubBtnMobile.classList.add('hidden');
+              
+              showAlert('✅ LocalStorage moduna geçildi. Çalışmaya devam edebilirsiniz. Token yeniledikten sonra GitHub\'a kaydedebilirsiniz.', 'success');
+            } else {
+              showAlert('💡 GitHub Ayarları bölümünden token yenileyin.', 'info');
+              setTimeout(() => {
+                if (typeof showSection === 'function') {
+                  showSection('github-settings');
+                }
+              }, 1000);
+            }
           } else {
             showAlert(`⚠️ LocalStorage'a kaydedildi ama GitHub'a kaydedilemedi: ${githubErrorMessage}`, 'warning');
           }
         }
-      } else {
-        // Token geçersiz - kullanıcıyı uyar
-        showAlert('🚨 Token geçersiz! Yayın için token gerekli. GitHub Ayarları bölümünden token girin.', 'error');
       }
+      // Token geçersiz durumunda checkTokenBeforeSave zaten kullanıcıya seçenek sunuyor
     }
     
     autoRefreshPreview();
@@ -3952,22 +4011,38 @@ async function saveSiteSection(section, event) {
             const githubErrorMessage = githubError instanceof Error ? githubError.message : 'Bilinmeyen hata';
             console.error('GitHub kaydetme hatası:', githubError);
             
-            // Token süresi dolmuşsa özel mesaj
+            // Token süresi dolmuşsa özel mesaj ve LocalStorage'a geçme seçeneği
             if (githubErrorMessage.includes('401') || githubErrorMessage.includes('süresi dolmuş')) {
-              showAlert('🚨 Token süresi dolmuş! Yayın için yeni token gerekli. GitHub Ayarları bölümünden token yenileyin.', 'error');
-              setTimeout(() => {
-                if (typeof showSection === 'function') {
-                  showSection('github-settings');
-                }
-              }, 2000);
+              const userChoice = confirm('⚠️ Token süresi dolmuş!\n\nGitHub\'a kaydedilemedi.\n\nLocalStorage moduna geçip çalışmaya devam etmek ister misiniz?\n\n"Tamam" = LocalStorage moduna geç\n"İptal" = Token yenileme sayfasına git');
+              
+              if (userChoice) {
+                // LocalStorage moduna geç
+                currentMode = 'local';
+                token = '';
+                localStorage.setItem('currentMode', 'local');
+                localStorage.removeItem('githubToken');
+                updateGitHubSettingsUI();
+                
+                const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
+                const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
+                if (saveGitHubBtnTopbar) saveGitHubBtnTopbar.classList.add('hidden');
+                if (saveGitHubBtnMobile) saveGitHubBtnMobile.classList.add('hidden');
+                
+                showAlert('✅ LocalStorage moduna geçildi. Çalışmaya devam edebilirsiniz. Token yeniledikten sonra GitHub\'a kaydedebilirsiniz.', 'success');
+              } else {
+                showAlert('💡 GitHub Ayarları bölümünden token yenileyin.', 'info');
+                setTimeout(() => {
+                  if (typeof showSection === 'function') {
+                    showSection('github-settings');
+                  }
+                }, 1000);
+              }
             } else {
               showAlert(`⚠️ GitHub kaydetme hatası: ${githubErrorMessage}`, 'warning');
             }
           }
-        } else {
-          // Token geçersiz - kullanıcıyı uyar
-          showAlert('🚨 Token geçersiz! Yayın için token gerekli. GitHub Ayarları bölümünden token girin.', 'error');
         }
+        // Token geçersiz durumunda checkTokenBeforeSave zaten kullanıcıya seçenek sunuyor
       }
     }
     
