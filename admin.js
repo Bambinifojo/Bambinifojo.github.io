@@ -2848,10 +2848,10 @@ function renderScreenshots() {
     <div class="screenshot-item" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 10px; background: #f9fafb;">
       <div style="display: flex; align-items: flex-start; gap: 15px;">
         ${screenshot.image ? `
-          <div class="screenshot-container" style="width: 120px; min-width: 120px; flex-shrink: 0;">
-            <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'font-size: 2rem; display: flex; align-items: center; justify-content: center; height: 100%;\\'>${screenshot.icon || '📱'}</div>';"/>
+          <div class="screenshot-container" style="width: 90px; height: 160px; min-width: 90px; max-width: 90px; flex-shrink: 0;">
+            <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="auto-scale-image" loading="lazy" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\'font-size: 1.5rem; display: flex; align-items: center; justify-content: center; height: 100%;\\'>${screenshot.icon || '📱'}</div>';"/>
           </div>
-        ` : `<div style="font-size: 2rem; flex-shrink: 0;">${screenshot.icon || '📱'}</div>`}
+        ` : `<div style="font-size: 1.5rem; flex-shrink: 0;">${screenshot.icon || '📱'}</div>`}
         <div style="flex: 1;">
           <div style="font-weight: 600; color: #1a1a1a;">${escapeHtml(screenshot.title || '')}</div>
           ${screenshot.image ? `<div style="font-size: 0.85rem; color: #6b7280; margin-top: 4px; word-break: break-all;">${escapeHtml(screenshot.image)}</div>` : ''}
