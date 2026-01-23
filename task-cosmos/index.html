@@ -855,11 +855,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hakkında sayfası içeriğini apps.json'dan yükle
   async function loadAboutContent() {
     try {
-      const response = await fetch('../data/apps.json');
+      // Cache bypass için timestamp ekle
+      const timestamp = new Date().getTime();
+      const response = await fetch(`../data/apps.json?t=${timestamp}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       const data = await response.json();
       
       // Task Cosmos uygulamasını bul
       const taskCosmos = data.apps?.find(app => app.title === 'Task Cosmos');
+      
+      console.log('📱 Task Cosmos verisi yüklendi:', taskCosmos);
       
       if (taskCosmos) {
         // Hakkında bölümünü güncelle

@@ -1656,6 +1656,9 @@ function autoSaveApp() {
       const appAboutSubtitleEl = document.getElementById('appAboutSubtitle');
       const appAboutDescriptionEl = document.getElementById('appAboutDescription');
       const appFeaturesSubtitleEl = document.getElementById('appFeaturesSubtitle');
+      const appFeaturesTitleEl = document.getElementById('appFeaturesTitle');
+      const appScreenshotsTitleEl = document.getElementById('appScreenshotsTitle');
+      const appScreenshotsSubtitleEl = document.getElementById('appScreenshotsSubtitle');
       
       // Uygulama bilgilerini güncelle
       app.title = title;
@@ -1672,6 +1675,9 @@ function autoSaveApp() {
       const aboutSubtitle = appAboutSubtitleEl?.value.trim() || '';
       const aboutDescription = appAboutDescriptionEl?.value.trim() || '';
       const featuresSubtitle = appFeaturesSubtitleEl?.value.trim() || '';
+      const featuresTitle = appFeaturesTitleEl?.value.trim() || '';
+      const screenshotsTitle = appScreenshotsTitleEl?.value.trim() || '';
+      const screenshotsSubtitle = appScreenshotsSubtitleEl?.value.trim() || '';
       
       if (aboutTitle || aboutSubtitle || aboutDescription) {
         app.about = {
@@ -1681,8 +1687,26 @@ function autoSaveApp() {
         };
       }
       
+      if (featuresTitle) {
+        app.featuresTitle = featuresTitle;
+      }
+      
       if (featuresSubtitle) {
         app.featuresSubtitle = featuresSubtitle;
+      }
+      
+      // Detaylı özellik kartları
+      if (currentFeatureCards && currentFeatureCards.length > 0) {
+        app.featureCards = currentFeatureCards;
+      }
+      
+      // Ekran görüntüleri
+      if (screenshotsTitle || screenshotsSubtitle || (currentScreenshots && currentScreenshots.length > 0)) {
+        app.screenshots = {
+          title: screenshotsTitle || 'Ekran Görüntüleri',
+          subtitle: screenshotsSubtitle || '',
+          items: currentScreenshots || []
+        };
       }
       
       // Otomatik kaydet
