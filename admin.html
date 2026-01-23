@@ -6768,7 +6768,7 @@
               <p class="admin-page-subtitle">Bildirimlerin performansını takip edin</p>
               
               <!-- İstatistik Filtreleri -->
-              <div class="stats-filters" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <div class="stats-filters">
                 <select id="statsNotificationFilter" class="filter-select" onchange="loadNotificationStats()" title="Bildirim filtresi">
                   <option value="all">Tüm Bildirimler</option>
                 </select>
@@ -6789,30 +6789,30 @@
               </div>
 
               <!-- İstatistik Kartları -->
-              <div class="stats-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">
+              <div class="stats-cards">
                 <div class="stat-card">
-                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">👁️</div>
+                  <div class="stat-card-icon">👁️</div>
                   <div class="stat-card-content">
                     <div class="stat-card-label">Toplam Görüntülenme</div>
                     <div class="stat-card-value" id="statTotalViews">0</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">👆</div>
+                  <div class="stat-card-icon icon-green">👆</div>
                   <div class="stat-card-content">
                     <div class="stat-card-label">Toplam Tıklama</div>
                     <div class="stat-card-value" id="statTotalClicks">0</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">🔄</div>
+                  <div class="stat-card-icon icon-blue">🔄</div>
                   <div class="stat-card-content">
                     <div class="stat-card-label">Güncelleme Tıklama</div>
                     <div class="stat-card-value" id="statUpdateClicks">0</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-card-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">📈</div>
+                  <div class="stat-card-icon icon-orange">📈</div>
                   <div class="stat-card-content">
                     <div class="stat-card-label">Dönüşüm Oranı</div>
                     <div class="stat-card-value" id="statConversionRate">0%</div>
@@ -6821,17 +6821,17 @@
               </div>
 
               <!-- Grafikler -->
-              <div class="stats-charts" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+              <div class="stats-charts">
                 <div class="chart-container">
-                  <h3 style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 600;">Günlük Görüntülenme</h3>
+                  <h3>Günlük Görüntülenme</h3>
                   <canvas id="viewsChart"></canvas>
                 </div>
                 <div class="chart-container">
-                  <h3 style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 600;">Günlük Tıklama</h3>
+                  <h3>Günlük Tıklama</h3>
                   <canvas id="clicksChart"></canvas>
                 </div>
-                <div class="chart-container" style="grid-column: 1 / -1;">
-                  <h3 style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 600;">Bildirim Performansı</h3>
+                <div class="chart-container full-width">
+                  <h3>Bildirim Performansı</h3>
                   <canvas id="performanceChart"></canvas>
                 </div>
               </div>
@@ -6964,7 +6964,7 @@
                 </div>
 
                 <div class="form-actions hidden" id="appNotificationActions">
-                  <button type="button" class="btn btn-secondary" onclick="previewAppNotification()" title="Bildirimi önizle" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                  <button type="button" class="btn btn-secondary btn-preview-notification" onclick="previewAppNotification()" title="Bildirimi önizle">
                     <span>👁️ Önizle</span>
                   </button>
                   <button type="submit" class="btn btn-primary" id="saveAppNotificationBtn">
