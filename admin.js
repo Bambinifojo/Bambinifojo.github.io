@@ -4002,13 +4002,20 @@ async function saveUsers() {
     
     return true;
   } catch (error) {
-    console.error('❌ Kullanıcılar kaydedilemedi:', error);
-    // Sadece localStorage başarısızsa hata göster
+    console.error('❌ Kullanıcılar kaydedilirken hata:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    
+    // localStorage başarısızsa hata göster
     if (!localStorage.getItem('adminUsers')) {
-      showAlert('❌ Veriler kaydedilemedi. Lütfen tekrar deneyin.', 'error');
+      showAlert(`❌ Veriler kaydedilemedi: ${errorMessage}`, 'error');
       return false;
     }
+    
     // localStorage başarılı ama GitHub başarısızsa uyarı göster
+    if (currentMode === 'github' && token) {
+      showAlert(`⚠️ Veriler localStorage'a kaydedildi ama GitHub'a kaydedilemedi: ${errorMessage}. Lütfen GitHub Ayarları bölümünden kontrol edin.`, 'warning');
+    }
+    
     return true; // localStorage başarılı olduğu için true döndür
   }
 }
@@ -4069,10 +4076,20 @@ async function saveUsersToGitHub() {
     }
 
     console.log('✅ Kullanıcılar GitHub\'a kaydedildi');
+    showAlert('✅ Kullanıcılar GitHub\'a başarıyla kaydedildi!', 'success');
     return true;
   } catch (error) {
     console.error('GitHub kaydetme hatası:', error);
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    const errorDetails = error.response ? await error.response.json().catch(() => null) : null;
+    
+    // Daha detaylı hata mesajı
+    let detailedError = errorMessage;
+    if (errorDetails && errorDetails.message) {
+      detailedError = errorDetails.message;
+    }
+    
+    throw new Error(`GitHub kaydetme hatası: ${detailedError}`);
   }
 }
 
@@ -4301,13 +4318,30 @@ async function saveUser(event) {
   // Validasyon
   if (!username) {
     showAlert('⚠️ Kullanıcı adı gereklidir!', 'error');
+    if (userNameEl) {
+      userNameEl.focus();
+      userNameEl.classList.add('error');
+    }
+    return;
+  }
+  
+  if (username.length < 3) {
+    showAlert('⚠️ Kullanıcı adı en az 3 karakter olmalıdır!', 'error');
+    if (userNameEl) {
+      userNameEl.focus();
+      userNameEl.classList.add('error');
+    }
     return;
   }
   
   // Kullanıcı adı benzersizlik kontrolü
   const existingUser = usersData.find((u, i) => u.username.toLowerCase() === username.toLowerCase() && i !== index);
   if (existingUser) {
-    showAlert('❌ Bu kullanıcı adı zaten kullanılıyor!', 'error');
+    showAlert(`❌ "${username}" kullanıcı adı zaten kullanılıyor!`, 'error');
+    if (userNameEl) {
+      userNameEl.focus();
+      userNameEl.classList.add('error');
+    }
     return;
   }
   
@@ -4316,10 +4350,21 @@ async function saveUser(event) {
     // Yeni kullanıcı - şifre zorunlu
     if (!password || password.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
       showAlert(`⚠️ Şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır!`, 'error');
+      if (userPasswordEl) {
+        userPasswordEl.focus();
+        userPasswordEl.classList.add('error');
+      }
       return;
     }
     if (password !== passwordConfirm) {
       showAlert('❌ Şifreler eşleşmiyor!', 'error');
+      if (userPasswordConfirmEl) {
+        userPasswordConfirmEl.focus();
+        userPasswordConfirmEl.classList.add('error');
+      }
+      if (userPasswordEl) {
+        userPasswordEl.classList.add('error');
+      }
       return;
     }
   } else {
@@ -4327,10 +4372,21 @@ async function saveUser(event) {
     if (password) {
       if (password.length < CONSTANTS.MIN_PASSWORD_LENGTH) {
         showAlert(`⚠️ Şifre en az ${CONSTANTS.MIN_PASSWORD_LENGTH} karakter olmalıdır!`, 'error');
+        if (userPasswordEl) {
+          userPasswordEl.focus();
+          userPasswordEl.classList.add('error');
+        }
         return;
       }
       if (password !== passwordConfirm) {
         showAlert('❌ Şifreler eşleşmiyor!', 'error');
+        if (userPasswordConfirmEl) {
+          userPasswordConfirmEl.focus();
+          userPasswordConfirmEl.classList.add('error');
+        }
+        if (userPasswordEl) {
+          userPasswordEl.classList.add('error');
+        }
         return;
       }
     }
@@ -4354,22 +4410,65 @@ async function saveUser(event) {
       userData.passwordHash = usersData[index].passwordHash;
     }
     
-    if (index === -1) {
-      // Yeni kullanıcı ekle
-      usersData.push(userData);
-      showAlert('✅ Eklendi!', 'success');
-    } else {
-      // Kullanıcı güncelle
-      usersData[index] = userData;
-      showAlert('✅ Güncellendi!', 'success');
+    // Loading state göster
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.querySelector('span')?.textContent : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      const btnSpan = submitBtn.querySelector('span');
+      if (btnSpan) btnSpan.textContent = '⏳ Kaydediliyor...';
     }
     
-    await saveUsers();
-    renderUsers();
-    closeUserModal();
+    try {
+      if (index === -1) {
+        // Yeni kullanıcı ekle
+        usersData.push(userData);
+        console.log('📝 Yeni kullanıcı eklendi:', userData.username);
+      } else {
+        // Kullanıcı güncelle
+        usersData[index] = userData;
+        console.log('📝 Kullanıcı güncellendi:', userData.username);
+      }
+      
+      // Kaydet
+      const saveResult = await saveUsers();
+      
+      if (!saveResult) {
+        throw new Error('Kullanıcı kaydedilemedi');
+      }
+      
+      // Başarı mesajı
+      if (index === -1) {
+        if (currentMode === 'github' && token) {
+          showAlert('✅ Kullanıcı başarıyla eklendi ve GitHub\'a kaydedildi!', 'success');
+        } else {
+          showAlert('✅ Kullanıcı başarıyla eklendi! (LocalStorage)', 'success');
+        }
+      } else {
+        if (currentMode === 'github' && token) {
+          showAlert('✅ Kullanıcı başarıyla güncellendi ve GitHub\'a kaydedildi!', 'success');
+        } else {
+          showAlert('✅ Kullanıcı başarıyla güncellendi! (LocalStorage)', 'success');
+        }
+      }
+      
+      renderUsers();
+      closeUserModal();
+    } catch (saveError) {
+      console.error('Kaydetme hatası:', saveError);
+      throw saveError; // Hata yukarıdaki catch bloğuna gidecek
+    } finally {
+      // Loading state'i kaldır
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        const btnSpan = submitBtn.querySelector('span');
+        if (btnSpan && originalBtnText) btnSpan.textContent = originalBtnText;
+      }
+    }
   } catch (error) {
     console.error('Kullanıcı kaydedilirken hata:', error);
-    showAlert('❌ Bir hata oluştu!', 'error');
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
+    showAlert(`❌ Bir hata oluştu: ${errorMessage}`, 'error');
   }
 }
 
