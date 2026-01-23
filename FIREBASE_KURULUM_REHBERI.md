@@ -25,8 +25,10 @@
 1. Firebase Console'da sol menüden **"Realtime Database"** seçin
 2. **"Create Database"** butonuna tıklayın
 3. **Lokasyon**: `us-central1` (veya size en yakın)
-4. **Security Rules**: **"Start in test mode"** seçin (sonra güvenli hale getireceğiz)
+4. **Security Rules**: **"Start in locked mode"** seçin (daha güvenli, sonra rules'u düzenleyeceğiz)
 5. **"Enable"** butonuna tıklayın
+
+**Not:** Locked mode seçerseniz, hemen sonra Rules'u düzenlemeniz gerekecek (Adım 6'da).
 
 ### Adım 3: Firebase Web App Ekleme
 
@@ -58,9 +60,12 @@ Admin panelinde Firebase config bilgilerini girmeniz gerekecek:
 2. **"Sign-in method"** sekmesine gidin
 3. **"Email/Password"** → **Enable** → **Save**
 
-### Adım 6: Security Rules Ayarlama
+### Adım 6: Security Rules Ayarlama (ÖNEMLİ!)
 
-Firebase Console → Realtime Database → **"Rules"** sekmesi:
+**Locked mode seçtiyseniz, database oluşturulduktan hemen sonra Rules'u düzenlemeniz gerekiyor!**
+
+1. Firebase Console → Realtime Database → **"Rules"** sekmesine gidin
+2. Mevcut kuralları silin ve aşağıdakini yapıştırın:
 
 **Yayın sitesi için (herkes okuyabilsin, sadece admin yazabilsin):**
 
@@ -83,7 +88,9 @@ Firebase Console → Realtime Database → **"Rules"** sekmesi:
 - `.read: true` → Herkes okuyabilir (yayın sitesi için gerekli)
 - `.write: "auth != null"` → Sadece giriş yapmış kullanıcılar yazabilir (admin paneli)
 
-**"Publish"** butonuna tıklayarak kuralları kaydedin.
+3. **"Publish"** butonuna tıklayarak kuralları kaydedin.
+
+**⚠️ ÖNEMLİ:** Rules olmadan yayın sitesi verileri okuyamaz! Mutlaka yukarıdaki rules'u ekleyin.
 
 ---
 
