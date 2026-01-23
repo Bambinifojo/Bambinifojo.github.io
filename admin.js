@@ -978,9 +978,12 @@ function updateGitHubSettingsUI() {
   if (localBtn) localBtn.classList.toggle('active', currentMode === 'local');
   if (githubBtn) githubBtn.classList.toggle('active', currentMode === 'github');
   
+  const testBtn = document.getElementById('testTokenBtn');
+  
   if (currentMode === 'github' && token) {
     if (tokenGroup) tokenGroup.style.display = 'block';
     if (saveBtn) saveBtn.style.display = 'inline-flex';
+    if (testBtn) testBtn.style.display = 'inline-flex';
     if (tokenInput) tokenInput.value = token;
     if (statusText) {
       statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
@@ -989,6 +992,7 @@ function updateGitHubSettingsUI() {
   } else {
     if (tokenGroup) tokenGroup.style.display = currentMode === 'github' ? 'block' : 'none';
     if (saveBtn) saveBtn.style.display = (currentMode === 'github' && token) ? 'inline-flex' : 'none';
+    if (testBtn) testBtn.style.display = currentMode === 'github' ? 'inline-flex' : 'none';
     if (statusText) {
       statusText.innerHTML = currentMode === 'github' 
         ? 'GitHub modu aktif ama token gerekli.'
@@ -1007,6 +1011,104 @@ function loadGitHubSettings() {
   updateGitHubSettingsUI();
 }
 
+// GitHub token'ı UI'dan test et
+async function testGitHubTokenFromUI() {
+  const tokenInput = document.getElementById('githubSettingsToken');
+  const testBtn = document.getElementById('testTokenBtn');
+  
+  if (!tokenInput) {
+    showAlert('❌ Token alanı bulunamadı!', 'error');
+    return;
+  }
+  
+  const testToken = tokenInput.value.trim();
+  
+  if (!testToken) {
+    showAlert('⚠️ Önce token girin!', 'warning');
+    tokenInput.focus();
+    return;
+  }
+  
+  // Token format kontrolü
+  if (!testToken.startsWith('ghp_') && !testToken.startsWith('github_pat_')) {
+    showAlert('⚠️ Token formatı hatalı!\n\nGitHub Personal Access Token "ghp_" veya "github_pat_" ile başlamalıdır.\n\nŞifre değil, token girmelisiniz!', 'error');
+    tokenInput.focus();
+    tokenInput.classList.add('error');
+    return;
+  }
+  
+  // Loading state
+  if (testBtn) {
+    testBtn.disabled = true;
+    const btnSpan = testBtn.querySelector('span');
+    if (btnSpan) btnSpan.textContent = '⏳ Test ediliyor...';
+  }
+  
+  try {
+    const result = await testGitHubToken(testToken);
+    
+    if (result.valid) {
+      showAlert('✅ Token geçerli! GitHub API\'ye erişim başarılı.', 'success');
+      tokenInput.classList.remove('error');
+      tokenInput.classList.add('success');
+      setTimeout(() => {
+        tokenInput.classList.remove('success');
+      }, 2000);
+    } else {
+      showAlert(`❌ Token hatası: ${result.error}\n\nLütfen:\n1. Token'ın doğru kopyalandığından emin olun\n2. Token'ın "repo" iznine sahip olduğunu kontrol edin\n3. Token'ın süresinin dolmadığını kontrol edin`, 'error');
+      tokenInput.focus();
+      tokenInput.classList.add('error');
+    }
+  } catch (error) {
+    showAlert(`❌ Test hatası: ${error.message}`, 'error');
+    tokenInput.classList.add('error');
+  } finally {
+    // Loading state'i kaldır
+    if (testBtn) {
+      testBtn.disabled = false;
+      const btnSpan = testBtn.querySelector('span');
+      if (btnSpan) btnSpan.textContent = '🔍 Token'ı Test Et';
+    }
+  }
+}
+
+// GitHub token'ı test et
+async function testGitHubToken(testToken) {
+  if (!testToken || testToken.trim() === '') {
+    return { valid: false, error: 'Token boş olamaz' };
+  }
+  
+  const REPO_OWNER = 'Bambinifojo';
+  const REPO_NAME = 'Bambinifojo.github.io';
+  const TEST_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`;
+  
+  try {
+    const response = await fetch(TEST_URL, {
+      headers: {
+        'Authorization': `token ${testToken.trim()}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    
+    if (response.status === 401) {
+      return { valid: false, error: 'Token geçersiz veya süresi dolmuş' };
+    }
+    
+    if (response.status === 403) {
+      return { valid: false, error: 'Token yetersiz izinlere sahip. "repo" izni gerekli!' };
+    }
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Bilinmeyen hata' }));
+      return { valid: false, error: errorData.message || `HTTP ${response.status}` };
+    }
+    
+    return { valid: true, message: 'Token geçerli!' };
+  } catch (error) {
+    return { valid: false, error: error.message || 'Bağlantı hatası' };
+  }
+}
+
 // GitHub ayarlarını kaydet
 async function saveGitHubSettings() {
   const tokenInput = document.getElementById('githubSettingsToken');
@@ -1014,12 +1116,40 @@ async function saveGitHubSettings() {
   const newMode = currentMode;
   
   if (newMode === 'github' && !newToken) {
-    alert('GitHub modu için token gerekli!');
+    showAlert('❌ GitHub modu için token gerekli!', 'error');
+    if (tokenInput) {
+      tokenInput.focus();
+      tokenInput.classList.add('error');
+    }
     return;
   }
   
-  // Token'ı güncelle
-  if (newMode === 'github') {
+  // Token validasyonu
+  if (newMode === 'github' && newToken) {
+    // Token format kontrolü
+    if (!newToken.startsWith('ghp_') && !newToken.startsWith('github_pat_')) {
+      showAlert('⚠️ Token formatı hatalı! GitHub Personal Access Token "ghp_" veya "github_pat_" ile başlamalıdır.', 'warning');
+      if (tokenInput) {
+        tokenInput.focus();
+        tokenInput.classList.add('error');
+      }
+      return;
+    }
+    
+    // Token'ı test et
+    showAlert('⏳ Token test ediliyor...', 'info');
+    const tokenTest = await testGitHubToken(newToken);
+    
+    if (!tokenTest.valid) {
+      showAlert(`❌ Token hatası: ${tokenTest.error}\n\nLütfen:\n1. Token\'ın doğru kopyalandığından emin olun\n2. Token\'ın "repo" iznine sahip olduğunu kontrol edin\n3. Token\'ın süresinin dolmadığını kontrol edin`, 'error');
+      if (tokenInput) {
+        tokenInput.focus();
+        tokenInput.classList.add('error');
+      }
+      return;
+    }
+    
+    // Token geçerli - kaydet
     token = newToken;
     
     // GitHub'dan veri yüklemeyi dene
@@ -1027,7 +1157,8 @@ async function saveGitHubSettings() {
       await loadFromGitHub();
       showAlert('✅ GitHub ayarları kaydedildi ve veriler yüklendi!', 'success');
     } catch (error) {
-      showAlert('⚠️ Token kaydedildi ama veri yüklenemedi: ' + error.message, 'warning');
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      showAlert(`⚠️ Token geçerli ama veri yüklenemedi: ${errorMessage}`, 'warning');
     }
   } else {
     showAlert('✅ LocalStorage modu aktif edildi!', 'success');
@@ -1065,9 +1196,23 @@ async function login() {
     }
     token = tokenEl.value.trim();
     if (!token) {
-      alert('GitHub Token girin!');
+      alert('GitHub Token girin!\n\nGitHub artık şifre kabul etmiyor. Personal Access Token gerekiyor.\n\nToken oluşturmak için:\nGitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic)');
       return;
     }
+    
+    // Token format kontrolü
+    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+      alert('⚠️ Token formatı hatalı!\n\nGitHub Personal Access Token "ghp_" veya "github_pat_" ile başlamalıdır.\n\nŞifre değil, token girmelisiniz!');
+      return;
+    }
+    
+    // Token'ı test et
+    const tokenTest = await testGitHubToken(token);
+    if (!tokenTest.valid) {
+      alert(`❌ Token hatası: ${tokenTest.error}\n\nLütfen:\n1. Token'ın doğru kopyalandığından emin olun\n2. Token'ın "repo" iznine sahip olduğunu kontrol edin\n3. Token'ın süresinin dolmadığını kontrol edin`);
+      return;
+    }
+    
     try {
       await loadFromGitHub();
     } catch (error) {

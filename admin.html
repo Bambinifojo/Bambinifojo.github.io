@@ -7139,13 +7139,32 @@
                     <label for="githubSettingsToken">GitHub Personal Access Token</label>
                     <input type="password" id="githubSettingsToken" name="githubSettingsToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
                     <small>
-                      Token oluşturmak için: GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic)
+                      <strong>⚠️ ÖNEMLİ:</strong> GitHub artık şifre kabul etmiyor! Personal Access Token gerekiyor.
+                      <br><br>
+                      <strong>Token oluşturmak için:</strong>
                       <br>
+                      1. GitHub → Sağ üstteki profil fotoğrafı → <strong>Settings</strong>
+                      <br>
+                      2. Sol menüden en altta → <strong>Developer settings</strong>
+                      <br>
+                      3. <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong>
+                      <br>
+                      4. <strong>Generate new token (classic)</strong>
+                      <br>
+                      5. Token'a bir isim verin (örn: "Admin Panel")
+                      <br>
+                      6. <strong>"repo"</strong> iznini işaretleyin
+                      <br>
+                      7. <strong>Generate token</strong> → Token'ı kopyalayın (bir daha gösterilmez!)
+                      <br><br>
                       <strong>Gerekli izin:</strong> <code>repo</code> (Full control of private repositories)
                     </small>
                   </div>
 
                   <div class="form-actions margin-top-20">
+                    <button type="button" class="btn btn-info" onclick="testGitHubTokenFromUI()" id="testTokenBtn" style="display: none;">
+                      <span>🔍 Token'ı Test Et</span>
+                    </button>
                     <button type="submit" class="btn btn-primary">
                       <span>💾 Ayarları Kaydet</span>
                     </button>
