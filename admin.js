@@ -933,6 +933,30 @@ function setMode(mode) {
     }
   }
   
+  // Token alanını göster/gizle (login formunda)
+  const tokenGroup = document.getElementById('tokenGroupInLogin');
+  const localModeInfo = document.getElementById('localModeInfo');
+  const tokenInput = document.getElementById('token');
+  
+  if (mode === 'local') {
+    // LocalStorage modunda token alanını gizle
+    if (tokenGroup) tokenGroup.style.display = 'none';
+    if (localModeInfo) localModeInfo.style.display = 'block';
+    if (tokenInput) {
+      tokenInput.value = ''; // Token'ı temizle
+      tokenInput.disabled = true;
+    }
+    token = ''; // Token değişkenini temizle
+  } else {
+    // GitHub modunda token alanını göster
+    if (tokenGroup) tokenGroup.style.display = 'block';
+    if (localModeInfo) localModeInfo.style.display = 'none';
+    if (tokenInput) {
+      tokenInput.disabled = false;
+      tokenInput.focus();
+    }
+  }
+  
   // GitHub Settings sayfasındaki butonları da güncelle
   updateGitHubSettingsUI();
 }
