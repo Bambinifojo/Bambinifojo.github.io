@@ -1480,4 +1480,53 @@ document.addEventListener('DOMContentLoaded', () => {
   skillProgressBars.forEach(bar => {
     skillObserver.observe(bar);
   });
-});
+
+  // Hash navigation handler
+  function handleHashNavigation() {
+    const hash = window.location.hash.slice(1); // Remove # symbol
+    
+    if (hash) {
+      const element = document.getElementById(hash);
+      if (element) {
+        // Close menu if open
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const hamburger = document.getElementById('hamburger');
+        if (sidebar && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          overlay?.classList.remove('active');
+          hamburger?.classList.remove('active');
+          document.body.style.overflow = '';
+          document.body.classList.remove('menu-open');
+        }
+        
+        // Scroll to element with smooth behavior
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    } else {
+      // If no hash, scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  // Handle hash on page load
+  if (window.location.hash) {
+    handleHashNavigation();
+  }
+
+  // Handle hash changes
+  window.addEventListener('hashchange', handleHashNavigation);
+
+  // Handle anchor clicks
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href !== '#') {
+        e.preventDefault();
+        window.location.hash = href;
+        handleHashNavigation();
+      }
+    });
+  });
