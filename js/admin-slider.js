@@ -62,30 +62,32 @@ function populateSliderForm(sliderData) {
 // Uygulamaları slider listesi olarak render et
 function renderSliderApps() {
   const container = document.getElementById('sliderAppsList');
-  if (!container) return;
+  if (!container) {
+    console.warn('⚠️ sliderAppsList container bulunamadı');
+    return;
+  }
 
   if (!appsData || !appsData.apps || appsData.apps.length === 0) {
-    container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 20px;">Henüz uygulama yok</p>';
+    container.innerHTML = '<p class="slider-empty-message">Henüz uygulama yok</p>';
     return;
   }
 
   container.innerHTML = appsData.apps.map((app, index) => {
     const inSlider = isAppInSlider(app.appId || app.title);
     return `
-      <div class="slider-app-item" style="display: flex; align-items: center; padding: 12px; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 8px; background: ${inSlider ? '#f0fdf4' : '#fff'};">
+      <div class="slider-app-item${inSlider ? ' slider-app-in' : ''}">
         <input 
           type="checkbox" 
           class="slider-app-checkbox" 
-          data-app-id="${app.appId || app.title}" 
+          data-app-id="${escapeHtml(app.appId || app.title)}" 
           ${inSlider ? 'checked' : ''}
           onchange="updateSliderApps()"
-          style="margin-right: 12px; cursor: pointer; width: 18px; height: 18px;"
         />
-        <div style="flex: 1;">
-          <div style="font-weight: 600; color: #1a1a1a;">${escapeHtml(app.title || 'İsimsiz')}</div>
-          <div style="font-size: 0.85rem; color: #6b7280;">${escapeHtml(app.description || '').substring(0, 60)}${app.description && app.description.length > 60 ? '...' : ''}</div>
+        <div class="slider-app-info">
+          <div class="slider-app-title">${escapeHtml(app.title || 'İsimsiz')}</div>
+          <div class="slider-app-desc">${escapeHtml(app.description || '').substring(0, 60)}${app.description && app.description.length > 60 ? '...' : ''}</div>
         </div>
-        <div style="margin-left: 12px; color: ${inSlider ? '#10b981' : '#9ca3af'};">
+        <div class="slider-app-status${inSlider ? ' slider-app-status-in' : ''}">
           ${inSlider ? '✓ Slider\'da' : '○ Değil'}
         </div>
       </div>

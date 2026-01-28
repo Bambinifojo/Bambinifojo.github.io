@@ -424,6 +424,23 @@ function showSection(section) {
   // Slider section'ı açıldığında verileri yükle
   if (section === 'slider') {
     setTimeout(() => {
+      // appsData'nın yüklü olduğundan emin ol
+      if (!appsData || !appsData.apps) {
+        console.warn('⚠️ appsData henüz yüklenmedi, yükleniyor...');
+        // localStorage'dan yükle
+        const saved = localStorage.getItem('appsData');
+        if (saved) {
+          try {
+            appsData = JSON.parse(saved);
+          } catch (e) {
+            console.error('appsData parse hatası:', e);
+            appsData = { apps: [], site: null };
+          }
+        } else {
+          appsData = { apps: [], site: null };
+        }
+      }
+      
       if (typeof onSliderSectionShow === 'function') {
         onSliderSectionShow();
       } else {
