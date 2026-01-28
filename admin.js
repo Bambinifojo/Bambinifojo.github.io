@@ -420,6 +420,17 @@ function showSection(section) {
       }
     }, 100);
   }
+
+  // Slider section'ı açıldığında verileri yükle
+  if (section === 'slider') {
+    setTimeout(() => {
+      if (typeof onSliderSectionShow === 'function') {
+        onSliderSectionShow();
+      } else {
+        console.warn('⚠️ onSliderSectionShow fonksiyonu bulunamadı');
+      }
+    }, 100);
+  }
   
   // GitHub Settings section'ı açıldığında ayarları yükle
   if (section === 'github-settings') {
