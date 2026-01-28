@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
           platform: 'Android',
           icon: '🚀',
           links: [
-            { text: 'Play Store', url: 'https://play.google.com/', icon: '📱' },
+            { text: 'Play Store', url: 'https://play.google.com/store/apps/details?id=com.taskcosmos.app', icon: '📱' },
             { text: 'Detaylar', url: '#apps' }
           ]
         }
