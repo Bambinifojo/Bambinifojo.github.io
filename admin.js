@@ -527,9 +527,15 @@ function isSidebarOpen() {
 
 // Sidebar toggle (Mobile) - Basit versiyon
 function toggleSidebar() {
+  console.log('📱 toggleSidebar çağrıldı');
+  
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
   const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
+  
+  console.log('🔍 Sidebar:', sidebar);
+  console.log('🔍 Overlay:', overlay);
+  console.log('🔍 Hamburger:', hamburger);
   
   if (!sidebar || !overlay) {
     console.error('❌ Sidebar veya overlay bulunamadı');
@@ -537,6 +543,7 @@ function toggleSidebar() {
   }
   
   const isOpen = sidebar.classList.contains('open');
+  console.log('📊 Sidebar açık mı?', isOpen);
   
   if (isOpen) {
     // Sidebar açık - kapat
@@ -549,6 +556,7 @@ function toggleSidebar() {
     if (hamburger) {
       hamburger.classList.remove('active');
     }
+    console.log('✅ Sidebar kapatıldı');
   } else {
     // Sidebar kapalı - aç
     sidebar.classList.add('open');
@@ -560,8 +568,25 @@ function toggleSidebar() {
     if (hamburger) {
       hamburger.classList.add('active');
     }
+    console.log('✅ Sidebar açıldı');
   }
 }
+
+// Overlay overlay'e tıklandığında sidebar'ı kapat
+setTimeout(() => {
+  const overlay = document.getElementById('adminSidebarOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        console.log('📍 Overlay tıklandı, sidebar kapatılıyor');
+        const sidebar = document.getElementById('adminSidebar');
+        if (sidebar && sidebar.classList.contains('open')) {
+          toggleSidebar();
+        }
+      }
+    });
+  }
+}, 500);
 
 // Global scope'a ekle (HTML onclick için) - İlk ekleme
 if (typeof window !== 'undefined') {
