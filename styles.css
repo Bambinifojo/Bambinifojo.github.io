@@ -6887,3 +6887,59 @@ body.ai-modal-open .hamburger {
     color: #1e40af;
     font-size: 0.875rem;
 }
+
+/* Console warning fix classes */
+.doc-list {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.card-info {
+    margin-bottom: 20px;
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.info-icon {
+    font-size: 1.2em;
+}
+
+.info-text {
+    margin: 0;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.contact-icon {
+    font-size: 28px;
+}
+
+.btn-reload {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-reload:hover {
+    background: #1976d2;
+}
+
+button.btn-reload[style] {
+    background: #667eea;
+}
+
+button.btn-reload[style]:hover {
+    background: #5568d3;
+}
