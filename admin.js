@@ -740,8 +740,6 @@ function closeTopbarMenu() {
 
 // Global scope'a ekle (HTML onclick için)
 if (typeof window !== 'undefined') {
-  window.toggleTopbarMenu = toggleTopbarMenu;
-  window.closeTopbarMenu = closeTopbarMenu;
   window.toggleSidebar = toggleSidebar;
   window.openSidebar = openSidebar;
   window.closeSidebar = closeSidebar;
@@ -760,7 +758,6 @@ function setupHamburgerMenu() {
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
   const hamburger = document.getElementById('hamburgerMenuBtn');
-  const mobileMenuBtn = document.getElementById('topbarMenuBtn');
   
   if (!sidebar || !overlay) {
     console.warn('⚠️ Sidebar veya overlay bulunamadı');
@@ -769,39 +766,37 @@ function setupHamburgerMenu() {
   
   console.log('✅ Admin hamburger menü kurulumu başlatılıyor...');
   
-  // Desktop hamburger menüsü (tablet için)
+  // Hamburger menüsü (tüm cihazlar için)
   if (hamburger) {
     hamburger.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('🍔 Desktop hamburger menü tıklandı');
+      console.log('🍔 Hamburger menü tıklandı');
       toggleSidebar();
     });
-    console.log('✅ Desktop hamburger menü event listener eklendi');
-  }
-  
-  // Mobil hamburger menüsü
-  if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('🍔 Mobil hamburger menü tıklandı');
-      toggleTopbarMenu();
-    });
-    console.log('✅ Mobil hamburger menü event listener eklendi');
+    console.log('✅ Hamburger menü event listener eklendi');
   }
   
   // Overlay event listener
   overlay.addEventListener('click', (e) => {
-    // Overlay'e tıklandığında sidebar'ı kapat
-    if (sidebar.classList.contains('open')) {
-      e.preventDefault();
-      e.stopPropagation();
+    if (e.target === overlay) {
+      console.log('🌑 Overlay tıklandı, menü kapatılıyor');
       closeSidebar();
     }
   });
   
+  // ESC tuşu ile kapat
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const sidebar = document.getElementById('adminSidebar');
+      if (sidebar && sidebar.classList.contains('open')) {
+        toggleSidebar();
+      }
+    }
+  });
+  
   hamburgerMenuSetup = true;
+  console.log('✅ Admin hamburger menü kurulumu tamamlandı');
 }
 
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
