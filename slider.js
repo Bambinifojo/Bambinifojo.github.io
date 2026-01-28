@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
           icon: '🚀',
           links: [
             { text: 'Play Store', url: 'https://play.google.com/store/apps/details?id=com.taskcosmos.app', icon: '📱' },
-            { text: 'Detaylar', url: '#apps' }
+            { text: 'Detaylar', url: 'https://bambinifojo.github.io/task-cosmos/' }
           ]
         }
       ];
