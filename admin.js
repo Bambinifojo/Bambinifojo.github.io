@@ -309,6 +309,10 @@ function showSection(section) {
   let sectionId = section + 'Section';
   if (section === 'ai-settings') {
     sectionId = 'aiSettingsSection';
+    // AI ayarlarını yükle
+    if (typeof loadAISettings === 'function') {
+      loadAISettings();
+    }
   }
   if (section === 'settings') {
     sectionId = 'siteSection';
@@ -8595,5 +8599,152 @@ if (typeof window !== 'undefined') {
   window.loadNotificationStats = loadNotificationStats;
   window.exportNotificationStats = exportNotificationStats;
   window.trackNotificationStat = trackNotificationStat;
+}
+
+// ==================== AI ASISTAN AYARLARI ====================
+
+// AI Ayarlarını Kaydet
+function saveAISettings(event) {
+  if (event) event.preventDefault();
+  
+  const aiEnabled = document.getElementById('ai_enabled')?.checked || false;
+  const aiModel = document.getElementById('ai_model')?.value || 'gpt-3.5-turbo';
+  const aiApiKey = document.getElementById('ai_api_key')?.value.trim() || '';
+  const aiDailyCredit = parseInt(document.getElementById('ai_daily_credit')?.value || '5');
+  const aiMaxTokens = parseInt(document.getElementById('ai_max_tokens')?.value || '400');
+  const aiSystemPrompt = document.getElementById('ai_system_prompt')?.value.trim() || '';
+  const aiFloatingButton = document.getElementById('ai_floating_button')?.checked || false;
+  const aiShowOnHome = document.getElementById('ai_show_on_home')?.checked || false;
+  const aiSaveChatHistory = document.getElementById('ai_save_chat_history')?.checked || false;
+  
+  // EmailJS ayarları
+  const emailEnabled = document.getElementById('ai_email_enabled')?.checked || false;
+  const emailjsServiceId = document.getElementById('emailjs_service_id')?.value.trim() || '';
+  const emailjsTemplateId = document.getElementById('emailjs_template_id')?.value.trim() || '';
+  const emailjsPublicKey = document.getElementById('emailjs_public_key')?.value.trim() || '';
+  const emailjsToEmail = document.getElementById('emailjs_to_email')?.value.trim() || 'bambinifojo@gmail.com';
+  
+  // EmailJS ayarlarını kaydet
+  if (emailEnabled && emailjsServiceId && emailjsTemplateId && emailjsPublicKey) {
+    const emailjsConfig = {
+      serviceId: emailjsServiceId,
+      templateId: emailjsTemplateId,
+      publicKey: emailjsPublicKey,
+      toEmail: emailjsToEmail || 'bambinifojo@gmail.com',
+      enabled: emailEnabled
+    };
+    localStorage.setItem('emailjsConfig', JSON.stringify(emailjsConfig));
+    console.log('✅ EmailJS ayarları kaydedildi');
+  } else if (emailEnabled) {
+    showAlert('⚠️ E-posta aktif ama EmailJS bilgileri eksik!', 'warning');
+  } else {
+    // E-posta kapalıysa config'i temizle
+    localStorage.removeItem('emailjsConfig');
+  }
+  
+  // AI ayarlarını kaydet
+  const aiConfig = {
+    enabled: aiEnabled,
+    model: aiModel,
+    apiKey: aiApiKey,
+    dailyCredit: aiDailyCredit,
+    maxTokens: aiMaxTokens,
+    systemPrompt: aiSystemPrompt,
+    floatingButton: aiFloatingButton,
+    showOnHome: aiShowOnHome,
+    saveChatHistory: aiSaveChatHistory,
+    emailEnabled: emailEnabled
+  };
+  
+  localStorage.setItem('aiConfig', JSON.stringify(aiConfig));
+  
+  // Firebase'e kaydet (eğer Firebase modu aktifse)
+  if (currentMode === 'firebase' && firebaseDatabase) {
+    try {
+      firebaseDatabase.ref('aiConfig').set(aiConfig);
+      if (emailEnabled) {
+        firebaseDatabase.ref('emailjsConfig').set(emailjsConfig);
+      }
+    } catch (error) {
+      console.error('Firebase kaydetme hatası:', error);
+    }
+  }
+  
+  showAlert('✅ AI ayarları kaydedildi!', 'success');
+}
+
+// AI Ayarlarını Yükle
+function loadAISettings() {
+  // LocalStorage'dan yükle
+  const saved = localStorage.getItem('aiConfig');
+  if (saved) {
+    try {
+      const config = JSON.parse(saved);
+      if (document.getElementById('ai_enabled')) document.getElementById('ai_enabled').checked = config.enabled || false;
+      if (document.getElementById('ai_model')) document.getElementById('ai_model').value = config.model || 'gpt-3.5-turbo';
+      if (document.getElementById('ai_api_key')) document.getElementById('ai_api_key').value = config.apiKey || '';
+      if (document.getElementById('ai_daily_credit')) document.getElementById('ai_daily_credit').value = config.dailyCredit || 5;
+      if (document.getElementById('ai_max_tokens')) document.getElementById('ai_max_tokens').value = config.maxTokens || 400;
+      if (document.getElementById('ai_system_prompt')) document.getElementById('ai_system_prompt').value = config.systemPrompt || '';
+      if (document.getElementById('ai_floating_button')) document.getElementById('ai_floating_button').checked = config.floatingButton || false;
+      if (document.getElementById('ai_show_on_home')) document.getElementById('ai_show_on_home').checked = config.showOnHome || false;
+      if (document.getElementById('ai_save_chat_history')) document.getElementById('ai_save_chat_history').checked = config.saveChatHistory || false;
+    } catch (e) {
+      console.error('AI config parse hatası:', e);
+    }
+  }
+  
+  // EmailJS ayarlarını yükle
+  const emailjsSaved = localStorage.getItem('emailjsConfig');
+  if (emailjsSaved) {
+    try {
+      const emailjsConfig = JSON.parse(emailjsSaved);
+      if (document.getElementById('ai_email_enabled')) document.getElementById('ai_email_enabled').checked = emailjsConfig.enabled || false;
+      if (document.getElementById('emailjs_service_id')) document.getElementById('emailjs_service_id').value = emailjsConfig.serviceId || '';
+      if (document.getElementById('emailjs_template_id')) document.getElementById('emailjs_template_id').value = emailjsConfig.templateId || '';
+      if (document.getElementById('emailjs_public_key')) document.getElementById('emailjs_public_key').value = emailjsConfig.publicKey || '';
+      if (document.getElementById('emailjs_to_email')) document.getElementById('emailjs_to_email').value = emailjsConfig.toEmail || 'bambinifojo@gmail.com';
+    } catch (e) {
+      console.error('EmailJS config parse hatası:', e);
+    }
+  }
+}
+
+// EmailJS Public Key göster/gizle
+function toggleEmailJSKey() {
+  const input = document.getElementById('emailjs_public_key');
+  const icon = document.getElementById('emailjsKeyEyeIcon');
+  if (!input || !icon) return;
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+  }
+}
+
+// AI API Key göster/gizle
+function toggleAIApiKey() {
+  const input = document.getElementById('ai_api_key');
+  const icon = document.getElementById('aiApiKeyEyeIcon');
+  if (!input || !icon) return;
+  
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+  }
+}
+
+// Global scope'a ekle
+if (typeof window !== 'undefined') {
+  window.saveAISettings = saveAISettings;
+  window.loadAISettings = loadAISettings;
+  window.toggleEmailJSKey = toggleEmailJSKey;
+  window.toggleAIApiKey = toggleAIApiKey;
 }
 

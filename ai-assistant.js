@@ -293,6 +293,9 @@ function sendAIMessage() {
         hideAITyping();
         const response = generateAIResponse(message, aiCurrentType);
         addAIMessage('assistant', response);
+        
+        // AI yanıtı geldiğinde e-posta gönder
+        sendChatToEmail(message, response);
     }, 1000 + Math.random() * 1000);
 }
 
@@ -1022,5 +1025,81 @@ function getSystemPrompt(type) {
         code: 'Sen kod yazma konusunda uzmansın.'
     };
     return prompts[type] || prompts.chat;
+}
+
+// Chat mesajlarını e-posta ile gönder
+async function sendChatToEmail(userMessage, aiResponse) {
+    try {
+        // EmailJS ayarlarını kontrol et
+        const emailjsConfig = getEmailJSConfig();
+        if (!emailjsConfig || !emailjsConfig.enabled) {
+            console.log('📧 EmailJS aktif değil, e-posta gönderilmedi');
+            return;
+        }
+        if (!emailjsConfig.serviceId || !emailjsConfig.templateId || !emailjsConfig.publicKey) {
+            console.log('📧 EmailJS yapılandırılmamış, e-posta gönderilmedi');
+            return;
+        }
+        
+        // EmailJS'i başlat
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init(emailjsConfig.publicKey);
+        } else {
+            console.warn('📧 EmailJS yüklenmemiş');
+            return;
+        }
+        
+        // E-posta içeriğini hazırla
+        const chatHistory = aiMessages.slice(-5).map(msg => {
+            const role = msg.role === 'user' ? 'Kullanıcı' : 'AI Asistan';
+            const time = new Date(msg.timestamp).toLocaleString('tr-TR');
+            return `[${time}] ${role}: ${msg.content}`;
+        }).join('\n\n');
+        
+        const emailContent = {
+            to_email: emailjsConfig.toEmail || 'bambinifojo@gmail.com',
+            from_name: 'AI Asistan Chat',
+            subject: `AI Asistan Sohbet - ${new Date().toLocaleString('tr-TR')}`,
+            message: `Yeni bir sohbet mesajı alındı:\n\n${chatHistory}\n\n---\n\nBu mesaj otomatik olarak gönderilmiştir.`,
+            user_message: userMessage,
+            ai_response: aiResponse || 'Yanıt bekleniyor...',
+            timestamp: new Date().toLocaleString('tr-TR'),
+            site_url: window.location.href
+        };
+        
+        // E-posta gönder
+        await emailjs.send(
+            emailjsConfig.serviceId,
+            emailjsConfig.templateId,
+            emailContent
+        );
+        
+        console.log('✅ Chat mesajı e-postaya gönderildi');
+    } catch (error) {
+        console.error('❌ E-posta gönderme hatası:', error);
+        // Hata olsa bile chat devam etsin, sessizce log'la
+    }
+}
+
+// EmailJS yapılandırmasını al (localStorage'dan veya varsayılan)
+function getEmailJSConfig() {
+    // Önce localStorage'dan kontrol et
+    const saved = localStorage.getItem('emailjsConfig');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.warn('EmailJS config parse hatası:', e);
+        }
+    }
+    
+    // Varsayılan config (kullanıcı admin panelinden ayarlayacak)
+    return {
+        enabled: false,
+        serviceId: '',
+        templateId: '',
+        publicKey: '',
+        toEmail: 'bambinifojo@gmail.com'
+    };
 }
 
