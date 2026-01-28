@@ -395,13 +395,17 @@ async function loadSiteData() {
 
 async function loadApps(){
   try {
+    console.log('📱 loadApps() fonksiyonu çağrıldı');
     const container = document.getElementById("apps-container");
     if (!container) {
+      console.warn('⚠️ apps-container elementi bulunamadı');
       // task-cosmos/index.html gibi detay sayfalarında apps-container yok, bu normal
       // Admin paneli veya diğer sayfalarda da apps-container olmayabilir
       // Bu durum normal olduğu için uyarı göstermiyoruz
       return;
     }
+    
+    console.log('✅ apps-container bulundu');
     
     // Loading state göster
     container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 20px; color: #666; opacity: 0.8;">Uygulamalar yükleniyor...</p></div>';
@@ -414,34 +418,44 @@ async function loadApps(){
         console.log('🔥 Firebase\'den veri yükleniyor...');
         const snapshot = await firebaseDatabase.ref('apps').once('value');
         const appsData = snapshot.val();
-        if (appsData && appsData.apps) {
+        console.log('🔥 Firebase snapshot:', appsData);
+        if (appsData && appsData.apps && appsData.apps.length > 0) {
           data = appsData;
-          console.log('✅ Firebase\'den veri yüklendi');
+          console.log('✅ Firebase\'den veri yüklendi:', appsData.apps.length, 'uygulama');
+        } else {
+          console.warn('⚠️ Firebase\'den boş veri geldi, JSON\'dan yüklenecek');
         }
       } catch (firebaseError) {
-        console.warn('Firebase\'den yükleme hatası, JSON dosyasından yüklenecek:', firebaseError);
+        console.warn('❌ Firebase\'den yükleme hatası, JSON dosyasından yüklenecek:', firebaseError);
       }
+    } else {
+      console.log('ℹ️ Firebase database tanımlı değil, JSON\'dan yüklenecek');
     }
     
     // Firebase'den yüklenemediyse JSON dosyasından yükle
-    if (!data) {
+    if (!data || !data.apps || data.apps.length === 0) {
       // Path'i mevcut dizine göre ayarla (root veya task-cosmos/)
       const appsPath = window.location.pathname.includes('/task-cosmos/') 
         ? '../data/apps.json' 
         : 'data/apps.json';
+      console.log('📄 JSON dosyası yükleniyor:', appsPath);
       const res = await fetch(appsPath);
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       data = await res.json();
-      console.log('📄 JSON dosyasından veri yüklendi');
+      console.log('✅ JSON dosyasından veri yüklendi:', data.apps?.length || 0, 'uygulama');
     }
+    
     container.innerHTML = "";
     
-    if (!data.apps || data.apps.length === 0) {
+    if (!data || !data.apps || data.apps.length === 0) {
+      console.error('❌ Uygulama verisi bulunamadı!');
       container.innerHTML = '<p style="color: #666; text-align: center; padding: 40px; opacity: 0.8;">Henüz uygulama eklenmemiş.</p>';
       return;
     }
+    
+    console.log('🎨', data.apps.length, 'uygulama render ediliyor...');
     
     // Helper function: Icon'un URL mi emoji mi olduğunu kontrol et
     const renderIcon = (icon) => {
@@ -549,11 +563,26 @@ async function loadApps(){
       
       container.appendChild(card);
     });
+    
+    console.log('✅ Uygulamalar başarıyla render edildi');
   } catch (error) {
-    console.error('Uygulamalar yüklenirken hata:', error);
+    console.error('❌ Uygulamalar yüklenirken hata:', error);
+    console.error('❌ Hata detayları:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     const container = document.getElementById("apps-container");
     if (container) {
-      container.innerHTML = '<p style="color: #666; text-align: center; padding: 40px; opacity: 0.8;">Uygulamalar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.</p>';
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+          <p style="color: #ef4444; margin-bottom: 10px; font-weight: 600;">⚠️ Uygulamalar yüklenirken bir hata oluştu</p>
+          <p style="color: #666; opacity: 0.8; margin-bottom: 20px;">${error.message}</p>
+          <button onclick="location.reload()" style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            Sayfayı Yenile
+          </button>
+        </div>
+      `;
     }
   }
 }
