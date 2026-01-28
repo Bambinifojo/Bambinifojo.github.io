@@ -7387,7 +7387,7 @@ button.btn-reload[style]:hover {
 
 /* Hamburger Menu Button Stili */
 .admin-menu-toggle {
-    display: none;
+    display: flex;
     background: none;
     border: none;
     cursor: pointer;
@@ -7418,6 +7418,6 @@ button.btn-reload[style]:hover {
 /* Mobil view'de hamburger menüsünü göster */
 @media (max-width: 768px) {
     .admin-menu-toggle {
-        display: flex;
+        display: flex !important;
     }
 }

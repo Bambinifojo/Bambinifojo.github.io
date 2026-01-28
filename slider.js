@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Firebase'den slider verilerini yükle
   function loadSliderFromFirebase() {
     // Firebase SDK'nın yüklenmesini bekle
-    if (typeof firebase === 'undefined' || !firebaseDatabase) {
+    if (typeof firebase === 'undefined' || typeof firebaseDatabase === 'undefined') {
       console.warn('⚠️ Firebase SDK yüklenmedi, localStorage fallback kullanılıyor');
       loadSliderFromLocalStorage();
       return;
