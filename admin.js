@@ -1,6 +1,7 @@
 // Admin Panel JavaScript
 
 // ==================== SABİTLER ====================
+const DEBUG = false; // Production: false, Development: true
 const CONSTANTS = {
   SESSION_TIMEOUT: 8 * 60 * 60 * 1000, // 8 saat (milisaniye)
   MOBILE_BREAKPOINT: 768, // px
@@ -10,6 +11,19 @@ const CONSTANTS = {
   MAX_ACTIVITIES: 20,
   RECENT_ACTIVITIES_LIMIT: 5
 };
+
+// Debug logger fonksiyonu
+function debugLog(...args) {
+  if (DEBUG) console.log(...args);
+}
+
+function debugWarn(...args) {
+  if (DEBUG) console.warn(...args);
+}
+
+function debugError(...args) {
+  if (DEBUG) console.error(...args);
+}
 
 // ==================== DEĞİŞKENLER ====================
 let currentMode = 'firebase'; // 'local', 'github' veya 'firebase' - Varsayılan: Firebase
@@ -68,8 +82,12 @@ function validatePasswordStrength(password) {
 
 // Admin şifre hash (varsayılan: "Admin@2025Secure!")
 // Güvenli varsayılan şifre: Büyük harf, küçük harf, rakam ve özel karakter içerir
+// Environment variable'dan yükle veya varsayılan değeri kullan
 // İlk girişte mutlaka şifrenizi değiştirin!
-const ADMIN_PASSWORD_HASH = '20f46ed4821a3cae172ba46638433dd35356ec26bdb14980abd3bd84bab4deee';
+const ADMIN_PASSWORD_HASH = 
+  (typeof process !== 'undefined' && process.env && process.env.ADMIN_PASSWORD_HASH) ||
+  window.__adminPasswordHash ||
+  '20f46ed4821a3cae172ba46638433dd35356ec26bdb14980abd3bd84bab4deee';
 
 // Admin giriş kontrolü
 function checkAdminSession() {
@@ -206,12 +224,12 @@ async function handleAdminLogin() {
           };
           usersData.push(authenticatedUser);
           await saveUsers();
-          console.log('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
+          debugLog('✅ Yeni admin kullanıcısı oluşturuldu (varsayılan şifre ile)');
         } else {
           // Admin kullanıcısı var - varsayılan şifre ile giriş yapılmasına izin verilmez
           // Kullanıcı şifresini değiştirdiyse, varsayılan şifre ile giriş yapamaz
-          console.log('❌ Admin kullanıcısı mevcut. Varsayılan şifre ile giriş yapılamaz.');
-          console.log('💡 İpucu: Şifrenizi değiştirdiyseniz, yeni şifrenizle giriş yapın.');
+          debugLog('❌ Admin kullanıcısı mevcut. Varsayılan şifre ile giriş yapılamaz.');
+          debugLog('💡 İpucu: Şifrenizi değiştirdiyseniz, yeni şifrenizle giriş yapın.');
         }
       }
     }
@@ -726,6 +744,7 @@ function setupHamburgerMenu() {
 // Sayfa yüklendiğinde otomatik giriş (LocalStorage modunda)
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📄 DOMContentLoaded event tetiklendi');
+  debugLog('📄 DOMContentLoaded event tetiklendi');
   
   // Mod ve token'ı localStorage'dan yükle (GitHub modu devre dışı, varsayılan Firebase)
   const savedMode = localStorage.getItem('currentMode');

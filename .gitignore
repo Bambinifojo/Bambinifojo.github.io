@@ -11,6 +11,9 @@ yarn.lock
 # Firebase config (contains sensitive API keys)
 firebase-config.js
 
+# Admin password test script (contains password hashes for testing)
+test-admin-password.js
+
 # Logs
 logs/
 *.log
