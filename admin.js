@@ -1045,6 +1045,36 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hamburger menü event listener'larını tekrar ekle (güvenlik için)
   setupHamburgerMenu();
   
+  // Enter tuşu ile özellik ekleme
+  const newFeatureInput = document.getElementById('newFeature');
+  if (newFeatureInput) {
+    newFeatureInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addFeature();
+      }
+    });
+  }
+  
+  // Kullanıcı verilerini yükle
+  loadUsers();
+  
+  // Kullanıcılar bölümüne geçildiğinde listeyi yenile
+  const usersSection = document.getElementById('usersSection');
+  if (usersSection) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          if (!usersSection.classList.contains('hidden')) {
+            renderUsers();
+          }
+        }
+      });
+    });
+    
+    observer.observe(usersSection, { attributes: true });
+  }
+  
   // Sidebar linklerine click event listener ekle (hash-based routing için)
   document.querySelectorAll('.admin-nav-item[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
@@ -5213,37 +5243,6 @@ function addContactItem() {
     }
   }
 }
-
-// Enter tuşu ile özellik ekleme
-document.addEventListener('DOMContentLoaded', () => {
-  const newFeatureInput = document.getElementById('newFeature');
-  if (newFeatureInput) {
-    newFeatureInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addFeature();
-      }
-    });
-  }
-  
-  // Kullanıcı verilerini yükle
-  loadUsers();
-  
-  // Kullanıcılar bölümüne geçildiğinde listeyi yenile
-  const usersSection = document.getElementById('usersSection');
-  if (usersSection) {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          if (!usersSection.classList.contains('hidden')) {
-            renderUsers();
-          }
-        }
-      });
-    });
-    observer.observe(usersSection, { attributes: true });
-  }
-});
 
 // ==================== KULLANICI YÖNETİMİ ====================
 
