@@ -7384,3 +7384,40 @@ button.btn-reload[style]:hover {
     padding: 20px;
     margin: 0;
 }
+
+/* Hamburger Menu Button Stili */
+.admin-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: #333;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-menu-toggle:hover {
+    background-color: rgba(106, 90, 205, 0.1);
+}
+
+.admin-menu-toggle svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+}
+
+.admin-menu-toggle.active {
+    background-color: rgba(106, 90, 205, 0.2);
+}
+
+/* Mobil view'de hamburger menüsünü göster */
+@media (max-width: 768px) {
+    .admin-menu-toggle {
+        display: flex;
+    }
+}
