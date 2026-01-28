@@ -156,7 +156,7 @@
     justify-content: space-between;
     position: sticky;
     top: 0;
-    z-index: 10002; /* Modal'lardan yüksek olmalı (modal: 10001) */
+    z-index: 1000; /* Düzenlendi: Modal'lardan düşük (modal: 10001) */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
@@ -165,7 +165,7 @@
     align-items: center;
     gap: 20px;
     position: relative;
-    z-index: 10003; /* Topbar'dan yüksek */
+    z-index: 1001; /* Topbar'dan bir yüksek */
   }
 
   .admin-menu-toggle {
@@ -180,7 +180,7 @@
     color: #4b5563;
     transition: all 0.3s ease;
     position: relative;
-    z-index: 10003 !important; /* Topbar'dan da yüksek */
+    z-index: 1002; /* Topbar-left'dan bir yüksek */
     width: 40px;
     height: 40px;
     min-width: 40px;
@@ -251,7 +251,7 @@
     right: 0;
     bottom: 0;
     background: transparent;
-    z-index: 9998;
+    z-index: 999; /* Topbar'dan düşük, sidebar'dan yüksek */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -642,7 +642,7 @@
     overflow-y: auto;
     flex-shrink: 0;
     pointer-events: auto;
-    z-index: 100;
+    z-index: 998; /* Overlay'den düşük, topbar'dan düşük */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
@@ -661,7 +661,7 @@
       background: #fff;
       transform: translateX(-260px);
       transition: transform 0.3s ease;
-      z-index: 9999;
+      z-index: 1001; /* Topbar'dan yüksek, modal'dan düşük */
       overflow-y: auto;
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
     }
@@ -677,7 +677,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
-      z-index: 9998;
+      z-index: 1000; /* Topbar ile aynı, sidebar'dan düşük */
     }
     
     #adminSidebarOverlay.active {

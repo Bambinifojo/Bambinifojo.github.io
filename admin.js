@@ -531,11 +531,7 @@ function toggleSidebar() {
   
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
-  const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
-  
-  console.log('🔍 Sidebar:', sidebar);
-  console.log('🔍 Overlay:', overlay);
-  console.log('🔍 Hamburger:', hamburger);
+  const hamburgerBtn = document.getElementById('hamburgerMenuBtn');
   
   if (!sidebar || !overlay) {
     console.error('❌ Sidebar veya overlay bulunamadı');
@@ -543,32 +539,48 @@ function toggleSidebar() {
   }
   
   const isOpen = sidebar.classList.contains('open');
-  console.log('📊 Sidebar açık mı?', isOpen);
   
   if (isOpen) {
-    // Sidebar açık - kapat
+    // Kapat
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
-    document.body.style.overflow = '';
     document.body.classList.remove('sidebar-open');
     
-    // Hamburger butonunu güncelle
-    if (hamburger) {
-      hamburger.classList.remove('active');
+    // Scroll'u serbest bırak
+    const scrollY = document.body.style.top;
+    document.body.style.top = '';
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    if (scrollY) {
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
     }
-    console.log('✅ Sidebar kapatıldı');
+    
+    // Buton durumunu güncelle
+    if (hamburgerBtn) {
+      hamburgerBtn.classList.remove('active');
+    }
+    
+    console.log('📱 Sidebar kapatıldı');
   } else {
-    // Sidebar kapalı - aç
+    // Aç
     sidebar.classList.add('open');
     overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
     document.body.classList.add('sidebar-open');
     
-    // Hamburger butonunu güncelle
-    if (hamburger) {
-      hamburger.classList.add('active');
+    // Scroll'u kilitle
+    const scrollY = window.scrollY;
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    
+    // Buton durumunu güncelle
+    if (hamburgerBtn) {
+      hamburgerBtn.classList.add('active');
     }
-    console.log('✅ Sidebar açıldı');
+    
+    console.log('📱 Sidebar açıldı');
   }
 }
 
@@ -644,42 +656,54 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// Topbar Menu Toggle (Mobile)
+// Topbar Menu Toggle (Mobile) - Sadece mobilde çalış
 function toggleTopbarMenu() {
   try {
-    const modal = document.getElementById('topbarMenuModal');
-    const overlay = document.getElementById('topbarMenuOverlay');
-    const menuBtn = document.getElementById('topbarMenuBtn');
-    const sidebar = document.getElementById('adminSidebar');
-    const sidebarOverlay = document.getElementById('adminSidebarOverlay');
-    
-    // Eğer sidebar varsa sidebar'ı toggle et
-    if (sidebar && sidebarOverlay) {
-      toggleSidebar();
+    // Sadece mobil cihazlarda çalış
+    if (window.innerWidth > 768) {
+      console.log('📱 toggleTopbarMenu sadece mobil cihazlarda çalışır');
       return;
     }
     
-    // Eğer topbar menu modal varsa onu toggle et
-    if (modal && overlay) {
-      const isOpen = modal.classList.toggle('active');
-      overlay.classList.toggle('active');
-      
-      // Body scroll lock
-      if (isOpen) {
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('topbar-menu-open');
-      } else {
-        document.body.style.overflow = '';
-        document.body.classList.remove('topbar-menu-open');
-      }
-      
-      // Menu button active state
-      if (menuBtn) {
-        menuBtn.classList.toggle('active');
-      }
-    } else {
+    const modal = document.getElementById('topbarMenuModal');
+    const overlay = document.getElementById('topbarMenuOverlay');
+    
+    if (!modal || !overlay) {
       console.warn('⚠️ Topbar menu modal veya overlay bulunamadı');
+      // Fallback: sidebar'ı kullan
+      const sidebar = document.getElementById('adminSidebar');
+      const sidebarOverlay = document.getElementById('adminSidebarOverlay');
+      if (sidebar && sidebarOverlay) {
+        toggleSidebar();
+        return;
+      }
     }
+    
+    const isOpen = modal.classList.contains('active');
+    
+    if (isOpen) {
+      // Kapat
+      modal.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.classList.remove('topbar-menu-open');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    } else {
+      // Aç
+      modal.classList.add('active');
+      overlay.classList.add('active');
+      document.body.classList.add('topbar-menu-open');
+      
+      // Scroll'u kilitle
+      const scrollY = window.scrollY;
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    }
+    
+    console.log('📱 Topbar menu toggle edildi:', !isOpen);
   } catch (error) {
     console.error('❌ toggleTopbarMenu hatası:', error);
   }
@@ -727,61 +751,47 @@ if (typeof window !== 'undefined') {
 let hamburgerMenuSetup = false; // Çift event listener eklenmesini önle
 
 function setupHamburgerMenu() {
+  // Çift çalışmayı önle
+  if (hamburgerMenuSetup) {
+    console.log('⚠️ Hamburger menü zaten kurulmuş');
+    return;
+  }
+  
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
-  const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
+  const hamburger = document.getElementById('hamburgerMenuBtn');
+  const mobileMenuBtn = document.getElementById('topbarMenuBtn');
   
   if (!sidebar || !overlay) {
     console.warn('⚠️ Sidebar veya overlay bulunamadı');
     return;
   }
   
-  // Çift event listener eklenmesini önle
-  if (hamburgerMenuSetup) {
-    return;
-  }
+  console.log('✅ Admin hamburger menü kurulumu başlatılıyor...');
   
-  // Hamburger butonuna event listener ekle
+  // Desktop hamburger menüsü (tablet için)
   if (hamburger) {
-    // Önce mevcut event listener'ları temizle (çift eklenmeyi önle)
-    const newHamburger = hamburger.cloneNode(true);
-    hamburger.parentNode.replaceChild(newHamburger, hamburger);
-    
-    // Yeni element'i al
-    const hamburgerBtn = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
-    if (hamburgerBtn) {
-      hamburgerBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // Mobilde sidebar'ı toggle et
-        if (window.innerWidth <= 768) {
-          toggleSidebar();
-        } else {
-          toggleTopbarMenu();
-        }
-      });
-    }
+    hamburger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🍔 Desktop hamburger menü tıklandı');
+      toggleSidebar();
+    });
+    console.log('✅ Desktop hamburger menü event listener eklendi');
   }
   
-  // Topbar menu butonuna da event listener ekle (mobil için)
-  const topbarMenuBtn = document.getElementById('topbarMenuBtn');
-  if (topbarMenuBtn) {
-    // Önce mevcut event listener'ları temizle
-    const newTopbarBtn = topbarMenuBtn.cloneNode(true);
-    topbarMenuBtn.parentNode.replaceChild(newTopbarBtn, topbarMenuBtn);
-    
-    // Yeni element'i al ve event listener ekle
-    const topbarBtn = document.getElementById('topbarMenuBtn');
-    if (topbarBtn) {
-      topbarBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleTopbarMenu();
-      });
-    }
+  // Mobil hamburger menüsü
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🍔 Mobil hamburger menü tıklandı');
+      toggleTopbarMenu();
+    });
+    console.log('✅ Mobil hamburger menü event listener eklendi');
   }
   
-  // Overlay'e tıklandığında sidebar'ı kapat (sadece kapat, toggle değil)
+  // Overlay event listener
   overlay.addEventListener('click', (e) => {
     // Overlay'e tıklandığında sidebar'ı kapat
     if (sidebar.classList.contains('open')) {
