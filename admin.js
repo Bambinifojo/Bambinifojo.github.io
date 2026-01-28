@@ -8749,6 +8749,10 @@ async function reloadAppsFromJSON() {
   try {
     showAlert('⏳ apps.json yükleniyor...', 'info');
     
+    // LocalStorage'ı temizle
+    localStorage.removeItem('appsData');
+    localStorage.removeItem('appData');
+    
     // apps.json'dan yükle
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const dataPath = isLocalhost ? 'data/apps.json' : '/data/apps.json';
