@@ -1,47 +1,89 @@
 // ==================== APP SLIDER ANIMASYON SİSTEMİ ====================
+// Firebase'den dinamik olarak slider verilerini yükler
 
 document.addEventListener('DOMContentLoaded', () => {
   let currentSlideIndex = 0;
   let sliderAutoPlayTimer = null;
-  const SLIDER_AUTO_PLAY_INTERVAL = 6000; // 6 saniye
+  let sliderAutoPlayInterval = 6000; // 6 saniye (default)
+  let sliderData = null;
 
-  function initializeAppSlider() {
+  // Firebase'den slider verilerini yükle
+  function loadSliderFromFirebase() {
+    // Firebase SDK'nın yüklenmesini bekle
+    if (typeof firebase === 'undefined' || !firebaseDatabase) {
+      console.warn('⚠️ Firebase SDK yüklenmedi, localStorage fallback kullanılıyor');
+      loadSliderFromLocalStorage();
+      return;
+    }
+
+    const firebaseRef = firebaseDatabase.ref('site/slider');
+    firebaseRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.slides && data.slides.length > 0) {
+        sliderData = data;
+        sliderAutoPlayInterval = data.autoPlayInterval || 6000;
+        currentSlideIndex = 0;
+        initializeAppSlider(data.slides);
+      } else {
+        console.warn('⚠️ Firebase slider verisi bulunamadı, fallback kullanılıyor');
+        loadSliderFromLocalStorage();
+      }
+    }, (error) => {
+      console.error('❌ Firebase veri yükleme hatası:', error);
+      loadSliderFromLocalStorage();
+    });
+  }
+
+  // LocalStorage fallback (offline/debug)
+  function loadSliderFromLocalStorage() {
+    const savedSlider = localStorage.getItem('sliderData');
+    if (savedSlider) {
+      const data = JSON.parse(savedSlider);
+      sliderData = data;
+      sliderAutoPlayInterval = data.autoPlayInterval || 6000;
+      initializeAppSlider(data.slides || []);
+    } else {
+      // Varsayılan slides
+      const defaultSlides = [
+        {
+          name: 'Task Scanner',
+          slogan: 'Ağınız Hakkında Her Şeyi Öğrenin',
+          description: 'Yerel ağınızdaki cihazları tek tuşla tarayın. IP, MAC, port ve cihaz türü bilgilerini anında görüntüleyin.',
+          status: 'published',
+          version: 'v1.4.2',
+          updated: '12 Ocak 2026',
+          platform: 'Android',
+          icon: '🔍',
+          links: [
+            { text: 'Play Store', url: 'https://play.google.com/', icon: '📱' },
+            { text: 'Detaylar', url: '#apps' }
+          ]
+        },
+        {
+          name: 'Task Cosmos',
+          slogan: 'Uzay Yolculuğunuza Başlayın',
+          description: 'Gezegenleri keşfedin, uzay bilimi öğrenin ve eğlenceli mini oyunlarla uzayı explore edin.',
+          status: 'published',
+          version: 'v2.1.0',
+          updated: '5 Ocak 2026',
+          platform: 'Android',
+          icon: '🚀',
+          links: [
+            { text: 'Play Store', url: 'https://play.google.com/', icon: '📱' },
+            { text: 'Detaylar', url: '#apps' }
+          ]
+        }
+      ];
+      initializeAppSlider(defaultSlides);
+    }
+  }
+
+  function initializeAppSlider(slides) {
     const slidesContainer = document.getElementById('appSlides');
     const paginationContainer = document.getElementById('sliderPagination');
 
     if (!slidesContainer || !paginationContainer) return;
-
-    // Default slides (apps.json'dan yüklenir, şu an mock data)
-    const slides = [
-      {
-        name: 'Task Scanner',
-        slogan: 'Ağınız Hakkında Her Şeyi Öğrenin',
-        description: 'Yerel ağınızdaki cihazları tek tuşla tarayın. IP, MAC, port ve cihaz türü bilgilerini anında görüntüleyin.',
-        status: 'published',
-        version: 'v1.4.2',
-        updated: '12 Ocak 2026',
-        platform: 'Android',
-        icon: '🔍',
-        links: [
-          { text: 'Play Store', url: 'https://play.google.com/', icon: '📱' },
-          { text: 'Detaylar', url: '#apps' }
-        ]
-      },
-      {
-        name: 'Task Cosmos',
-        slogan: 'Uzay Yolculuğunuza Başlayın',
-        description: 'Gezegenleri keşfedin, uzay bilimi öğrenin ve eğlenceli mini oyunlarla uzayı explore edin.',
-        status: 'published',
-        version: 'v2.1.0',
-        updated: '5 Ocak 2026',
-        platform: 'Android',
-        icon: '🚀',
-        links: [
-          { text: 'Play Store', url: 'https://play.google.com/', icon: '📱' },
-          { text: 'Detaylar', url: '#apps' }
-        ]
-      }
-    ];
+    if (!slides || slides.length === 0) return;
 
     // Render slides
     slidesContainer.innerHTML = slides.map((slide, index) => `
@@ -127,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function startSliderAutoPlay() {
     sliderAutoPlayTimer = setTimeout(() => {
       nextSlide();
-    }, SLIDER_AUTO_PLAY_INTERVAL);
+    }, sliderAutoPlayInterval); // Dinamik interval kullan
   }
 
   // Stop auto-play on user interaction
@@ -136,6 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
     startSliderAutoPlay();
   });
 
-  // Initialize slider
-  initializeAppSlider();
+  // Firebase'den veya fallback'ten slider verilerini yükle
+  loadSliderFromFirebase();
 });
