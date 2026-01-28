@@ -666,14 +666,14 @@
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
     }
     
-    .admin-sidebar.active {
+    .admin-sidebar.open {
       transform: translateX(0);
     }
     
     #adminSidebarOverlay {
       position: fixed;
       inset: 0;
-      background: transparent;
+      background: rgba(0, 0, 0, 0.5);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
@@ -683,12 +683,7 @@
     #adminSidebarOverlay.active {
       opacity: 1;
       pointer-events: all;
-      background: transparent;
-    }
-    
-    /* Mobilde hamburger menüyü gizle */
-    .admin-menu-toggle {
-      display: none !important;
+      background: rgba(0, 0, 0, 0.5);
     }
   }
 
