@@ -1454,6 +1454,45 @@
     align-items: center;
   }
 
+  /* Soluk görünme - olmayan/placeholder uygulamalar için */
+  .app-item-coming-soon {
+    opacity: 0.4;
+    filter: grayscale(80%) brightness(0.85);
+    pointer-events: auto;
+    position: relative;
+  }
+
+  .app-item-coming-soon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%);
+    border-radius: 16px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .app-item-coming-soon:hover {
+    opacity: 0.5;
+    filter: grayscale(70%) brightness(0.9);
+  }
+
+  .app-item-coming-soon .app-item-icon {
+    filter: grayscale(100%);
+    opacity: 0.6;
+  }
+
+  .app-item-coming-soon .app-item-title-text {
+    color: #9ca3af !important;
+  }
+
+  .app-item-coming-soon .app-item-desc {
+    color: #9ca3af !important;
+  }
+
   .btn-sm {
     padding: 10px 18px;
     font-size: 0.9rem;

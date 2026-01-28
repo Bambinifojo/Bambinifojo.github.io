@@ -2777,10 +2777,12 @@ function renderApps() {
     const category = app.category || 'Kategori yok';
     const rating = app.rating || '0';
     const downloads = app.downloads || '0';
-    const hasDetails = app.details && app.details.trim() !== '';
+    // details linki # veya boş ise soluk görün
+    const hasDetails = app.details && app.details.trim() !== '' && app.details.trim() !== '#';
+    const isComingSoon = !hasDetails;
     
     return `
-    <div class="app-item">
+    <div class="app-item${isComingSoon ? ' app-item-coming-soon' : ''}">
       <div class="app-item-icon">${renderIcon(icon)}</div>
       <div class="app-item-info">
         <div class="app-item-title">

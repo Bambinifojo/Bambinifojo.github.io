@@ -410,7 +410,8 @@ async function loadApps(){
       const downloads = app.downloads || '1K+';
       const category = app.category || 'Uygulama';
       const features = app.features || [];
-      const hasPlayStore = app.details && app.details !== '#';
+      // details linki # veya boş ise soluk görün
+      const hasPlayStore = app.details && app.details.trim() !== '' && app.details.trim() !== '#';
       
       const card = document.createElement('div');
       card.className = 'app-card';
