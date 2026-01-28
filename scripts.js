@@ -99,56 +99,91 @@ function closeMenu() {
 
 // Hamburger menü event listener'larını ekle
 function setupHamburgerMenu() {
+  console.log('🔧 Hamburger menü kurulumu başlatılıyor...');
+  
   // Hamburger butonuna event listener ekle
   const hamburger = document.getElementById('hamburger');
-  if (hamburger) {
-    // Eğer zaten event listener eklenmemişse ekle
-    if (!hamburger.hasAttribute('data-listener-added')) {
-      hamburger.setAttribute('data-listener-added', 'true');
-      
-      // Click event
-      hamburger.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleMenu();
-      });
-      
-      // Touch event (mobil cihazlar için)
-      hamburger.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-      
-      hamburger.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleMenu();
-      });
-    }
+  if (!hamburger) {
+    console.error('❌ Hamburger butonu bulunamadı!');
+    return;
   }
   
-  // Overlay'e tıklandığında menüyü kapat (hamburger butonunun üzerine gelmemesi için)
+  console.log('✅ Hamburger butonu bulundu');
+  
+  // Eğer zaten event listener eklenmemişse ekle
+  if (!hamburger.hasAttribute('data-listener-added')) {
+    hamburger.setAttribute('data-listener-added', 'true');
+    
+    // Click event
+    hamburger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🍔 Hamburger butonuna tıklandı');
+      toggleMenu();
+    });
+    
+    // Touch event (mobil cihazlar için)
+    hamburger.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    
+    hamburger.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🍔 Hamburger butonuna dokunuldu (touch)');
+      toggleMenu();
+    });
+    
+    console.log('✅ Hamburger buton event listener\'ları eklendi');
+  } else {
+    console.log('⚠️ Hamburger buton event listener\'ları zaten eklenmiş');
+  }
+  
+  // Overlay'e tıklandığında menüyü kapat
   const overlay = document.getElementById('overlay');
   if (overlay) {
-    overlay.addEventListener('click', (e) => {
-      // Hamburger butonuna tıklanırsa menüyü kapatma
-      const hamburger = document.getElementById('hamburger');
-      if (hamburger && hamburger.contains(e.target)) {
-        return;
-      }
-      closeMenu();
-    });
+    // Önce mevcut listener'ı kaldır (çift eklenmeyi önle)
+    const newOverlay = overlay.cloneNode(true);
+    overlay.parentNode.replaceChild(newOverlay, overlay);
+    
+    // Yeni overlay'i al
+    const newOverlayEl = document.getElementById('overlay');
+    if (newOverlayEl) {
+      newOverlayEl.addEventListener('click', (e) => {
+        // Hamburger butonuna tıklanırsa menüyü kapatma
+        const hamburger = document.getElementById('hamburger');
+        if (hamburger && hamburger.contains(e.target)) {
+          return;
+        }
+        console.log('🌑 Overlay\'e tıklandı, menü kapatılıyor');
+        closeMenu();
+      });
+      console.log('✅ Overlay event listener eklendi');
+    }
+  } else {
+    console.warn('⚠️ Overlay bulunamadı');
   }
   
   // Close butonuna event listener ekle
   const closeBtn = document.getElementById('closeMenuBtn');
   if (closeBtn) {
-    closeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleMenu();
-    });
+    // Önce mevcut listener'ı kaldır (çift eklenmeyi önle)
+    if (!closeBtn.hasAttribute('data-listener-added')) {
+      closeBtn.setAttribute('data-listener-added', 'true');
+      closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('❌ Close butonuna tıklandı');
+        toggleMenu();
+      });
+      console.log('✅ Close buton event listener eklendi');
+    }
+  } else {
+    console.warn('⚠️ Close butonu bulunamadı');
   }
+  
+  console.log('✅ Hamburger menü kurulumu tamamlandı');
 }
 
 // Site verilerini yükle
