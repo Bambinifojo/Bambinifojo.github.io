@@ -7273,3 +7273,61 @@ button.btn-reload[style]:hover {
         font-size: 1rem;
     }
 }
+/* ==================== SLIDER YÖNETIMI CSS ==================== */
+
+.slider-settings-container {
+    margin-bottom: 24px;
+}
+
+.slider-settings-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.slider-input {
+    margin-bottom: 8px;
+}
+
+.slider-hint {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.slider-button-full {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.slider-apps-container {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.slider-update-button {
+    width: 100%;
+    margin-top: 16px;
+}
+
+.slider-icon-margin {
+    margin-right: 6px;
+}
+
+.slider-tips-card {
+    background: #fef3c7;
+    border-color: #fcd34d;
+    color: #92400e;
+}
+
+.slider-tips-title {
+    margin-top: 0;
+    color: #92400e;
+}
+
+.slider-tips-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #92400e;
+}
