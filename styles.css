@@ -6888,6 +6888,12 @@ body.ai-modal-open .hamburger {
     font-size: 0.875rem;
 }
 
+.apps-header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 /* Console warning fix classes */
 .doc-list {
     margin-left: 20px;
