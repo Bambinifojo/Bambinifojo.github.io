@@ -1,47 +1,58 @@
 {
   "apps": [
     {
-      "title": "Task Cosmos",
-      "description": "Uzay görevlerini yönetin, gezegenleri keşfedin ve kozmik yolculuğunuza keşfedin.",
-      "icon": "📱",
-      "category": "Üretkenlik",
-      "rating": 4.8,
-      "downloads": "10K+",
-      "details": "https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos",
-      "privacy": "https://bambinifojo.netlify.app/task-cosmos/privacy-policy.html",
+      "title": "Task Scanner",
+      "description": "Yerel ağdaki cihazları tek tuşla tarayan; IP, MAC, üretici, açık portlar üzerinden cihaz türü tahmini yapan, Fing benzeri fakat şeffaf ve genişletilebilir bir mobil uygulama.",
+      "icon": "🔍",
+      "category": "Ağ & Güvenlik",
+      "rating": 4.7,
+      "downloads": "8K+",
+      "details": "#",
+      "privacy": "https://bambinifojo.github.io/task-scanner/privacy-policy.html",
+      "detailPage": "task-scanner/",
       "features": [
-        "Görev Takibi",
-        "Hatırlatıcılar",
-        "Kategoriler",
-        "Widget Desteği"
+        "Tek Tuşla Tarama",
+        "IP ve MAC Adresi",
+        "Cihaz Türü Tahmini",
+        "Açık Port Analizi"
       ],
       "about": {
         "title": "Hakkında",
-        "subtitle": "Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama",
-        "description": "Task Cosmos, günlük işlerinizi kolayca takip etmenizi ve organize etmenizi sağlayan kapsamlı bir görev yönetim uygulamasıdır. Modern ve kullanıcı dostu arayüzü ile görevlerinizi kategorilere ayırabilir, hatırlatıcılar oluşturabilir ve widget desteği sayesinde görevlerinizi ana ekranınızdan hızlıca görüntüleyebilirsiniz."
+        "subtitle": "Yerel ağ tarama ve cihaz analizi için geliştirilmiş şeffaf ve genişletilebilir bir mobil uygulama",
+        "description": "Task Scanner, yerel ağınızdaki tüm cihazları tek tuşla taramanızı ve detaylı analiz yapmanızı sağlayan şeffaf ve genişletilebilir bir ağ analiz uygulamasıdır. IP adresleri, MAC adresleri, üretici bilgileri ve açık portlar hakkında anında bilgi alın. Modern ve kullanıcı dostu arayüzü ile cihaz türlerini otomatik tahmin edin, port analizi yapın ve ağ güvenliğinizi artırın. Fing benzeri profesyonel özellikler sunarken, açık kaynak kodlu ve tamamen şeffaf bir yapıya sahiptir."
       },
       "featuresTitle": "Özellikler",
-      "featuresSubtitle": "Task Cosmos'un güçlü özelliklerini keşfedin",
+      "featuresSubtitle": "Task Scanner'ın güçlü özelliklerini keşfedin",
       "featureCards": [
         {
-          "icon": "✓",
-          "title": "Görev Takibi",
-          "description": "Günlük görevlerinizi kolayca oluşturun, düzenleyin ve tamamlayın. Görevlerinizi öncelik sırasına göre organize edin."
+          "icon": "🔍",
+          "title": "Hızlı Ağ Taraması",
+          "description": "Yerel ağınızdaki tüm cihazları tek tuşla tarayın. IP adresleri, MAC adresleri ve cihaz bilgilerini anında görüntüleyin. Hızlı ve verimli tarama algoritması ile sonuçları saniyeler içinde alın."
         },
         {
-          "icon": "⏰",
-          "title": "Hatırlatıcılar",
-          "description": "Önemli görevler için hatırlatıcılar ayarlayın. Zamanında bildirim alın ve hiçbir şeyi kaçırmayın."
+          "icon": "📡",
+          "title": "Cihaz Türü Tahmini",
+          "description": "MAC adresi ve açık portlar üzerinden cihaz türünü otomatik olarak tahmin edin. Telefon, tablet, bilgisayar, router ve diğer IoT cihazlarını kolayca tanımlayın."
         },
         {
-          "icon": "📁",
-          "title": "Kategoriler",
-          "description": "Görevlerinizi kategorilere ayırın. İş, kişisel, alışveriş ve daha fazlası için özel kategoriler oluşturun."
+          "icon": "🔐",
+          "title": "Port Analizi",
+          "description": "Her cihazın açık portlarını tespit edin ve hangi servislerin çalıştığını görün. Ağ güvenliğinizi artırmak için potansiyel güvenlik açıklarını belirleyin."
         },
         {
-          "icon": "📱",
-          "title": "Widget Desteği",
-          "description": "Ana ekranınıza widget ekleyin ve görevlerinizi hızlıca görüntüleyin. Uygulamayı açmadan görevlerinizi yönetin."
+          "icon": "🏭",
+          "title": "Üretici Bilgisi",
+          "description": "MAC adresi veritabanı kullanarak cihaz üreticilerini görüntüleyin. Hangi marka ve model cihazların ağınıza bağlı olduğunu öğrenin."
+        },
+        {
+          "icon": "🔓",
+          "title": "Şeffaf ve Açık Kaynak",
+          "description": "Tamamen şeffaf ve açık kaynak kodlu bir uygulama. Kodları inceleyebilir, geliştirebilir ve kendi ihtiyaçlarınıza göre özelleştirebilirsiniz."
+        },
+        {
+          "icon": "⚙️",
+          "title": "Genişletilebilir Yapı",
+          "description": "Modüler yapısı sayesinde kolayca yeni özellikler ekleyebilirsiniz. Plugin sistemi ile uygulamayı kendi ihtiyaçlarınıza göre genişletin."
         }
       ],
       "screenshots": {
@@ -49,19 +60,105 @@
         "subtitle": "Uygulamanın görsel özelliklerini keşfedin",
         "items": [
           {
+            "icon": "🔍",
+            "title": "Ana Ekran • Tarama Başlat",
+            "image": "task-scanner/screenshots/Screenshot_20260128_202426.png"
+          },
+          {
             "icon": "📱",
-            "title": "Ana Ekran",
-            "image": ""
+            "title": "Cihaz Listesi • Detaylı Bilgiler",
+            "image": "task-scanner/screenshots/Screenshot_20260128_202433.png"
           },
           {
-            "icon": "✓",
-            "title": "Görev Listesi",
-            "image": ""
+            "icon": "🔐",
+            "title": "Port Analizi • Güvenlik",
+            "image": "task-scanner/screenshots/Screenshot_20260128_202445.png"
           },
           {
-            "icon": "📁",
-            "title": "Kategoriler",
-            "image": ""
+            "icon": "📊",
+            "title": "Ağ Haritası • Görselleştirme",
+            "image": "task-scanner/screenshots/Screenshot_20260128_202456.png"
+          }
+        ]
+      }
+    },
+    {
+      "title": "Task Cosmos",
+      "description": "Uzay görevlerini yönetin, gezegenleri keşfedin ve kozmik yolculuğunuza çıkın.",
+      "icon": "🚀",
+      "category": "Eğitim",
+      "rating": 4.8,
+      "downloads": "10K+",
+      "details": "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
+      "privacy": "https://bambinifojo.netlify.app/task-cosmos/privacy-policy.html",
+      "features": [
+        "Gezegen Keşfi",
+        "Uzay ve Bilim İçerikleri",
+        "Modern Tasarım",
+        "Gizlilik Odaklı"
+      ],
+      "about": {
+        "title": "Hakkında",
+        "subtitle": "Uzay meraklıları ve öğrenciler için geliştirilmiş modern bir gezegen atlası ve uzay keşfi uygulaması",
+        "description": "Task Cosmos, uzay meraklıları ve öğrenciler için geliştirilmiş modern bir gezegen atlası ve uzay keşfi uygulamasıdır. Güneş Sistemini keşfedin, gezegenleri detaylı inceleyin ve evren hakkında bilginizi derinleştirin. Yüksek çözünürlüklü gezegen görüntüleri, bilimsel veriler ve eğitici içeriklerle uzayı cebinize getirin."
+      },
+      "featuresTitle": "Özellikler",
+      "featuresSubtitle": "Task Cosmos'un güçlü özelliklerini keşfedin",
+      "featureCards": [
+        {
+          "icon": "🌍",
+          "title": "Gezegen Keşfi",
+          "description": "Güneş Sistemi'ndeki tüm gezegenler hakkında detaylı bilgi. Boyut, kütle, yörünge ve atmosfer verileri. Yüksek çözünürlüklü gezegen görüntüleri. Gezegenleri karşılaştırın ve favorilerinize ekleyin."
+        },
+        {
+          "icon": "🚀",
+          "title": "Uzay ve Bilim İçerikleri",
+          "description": "Gezegenler hakkında bilimsel ve eğitici açıklamalar. Astronomi meraklıları için basit ve anlaşılır içerik. Öğrenciler ve eğitim kullanımı için uygun."
+        },
+        {
+          "icon": "🎨",
+          "title": "Modern ve Kullanışlı Tasarım",
+          "description": "Hızlı ve akıcı kullanıcı arayüzü. Açık/Koyu tema desteği. Mobil cihazlar için optimize edilmiş basit tasarım."
+        },
+        {
+          "icon": "🔒",
+          "title": "Gizlilik",
+          "description": "Uygulama kullanıcı gizliliğine önem verir. Kişisel veriler üçüncü taraflarla paylaşılmaz."
+        }
+      ],
+      "screenshots": {
+        "title": "Ekran Görüntüleri",
+        "subtitle": "Uygulamanın görsel özelliklerini keşfedin",
+        "items": [
+          {
+            "icon": "🌍",
+            "title": "Keşfet • Öğren • İncele",
+            "image": "task-cosmos/screenshots/screenshot-3.png"
+          },
+          {
+            "icon": "🚀",
+            "title": "Gerçek Uzay Deneyimi",
+            "image": "task-cosmos/screenshots/screenshot-3.png"
+          },
+          {
+            "icon": "⭐",
+            "title": "Evrene Yaklaş",
+            "image": "task-cosmos/screenshots/screenshot-3.png"
+          },
+          {
+            "icon": "🌌",
+            "title": "Her Gezegen Cebinde",
+            "image": "task-cosmos/screenshots/screenshot-3.png"
+          },
+          {
+            "icon": "🔭",
+            "title": "Güneş Sistemi Rehberin",
+            "image": "task-cosmos/screenshots/screenshot-3.png"
+          },
+          {
+            "icon": "📱",
+            "title": "Özellikler",
+            "image": "task-cosmos/screenshots/screenshot-1.png"
           }
         ]
       }

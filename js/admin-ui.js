@@ -36,8 +36,17 @@ function showSection(section) {
   // Seçilen section'ı göster
   const targetSection = document.getElementById(sectionId);
   if (targetSection) {
-    targetSection.classList.remove('hidden');
-    console.log('✅ Section gösterildi:', section, 'ID:', sectionId);
+    try {
+      targetSection.classList.remove('hidden');
+      // display: none !important override için style ekle
+      targetSection.style.display = 'block';
+      console.log('✅ Section gösterildi:', section, 'ID:', sectionId);
+    } catch (error) {
+      console.error('❌ Section gösterilirken hata:', error);
+      // Hata durumunda bile göster
+      targetSection.style.display = 'block';
+      targetSection.classList.remove('hidden');
+    }
   } else {
     console.error('❌ Section bulunamadı:', sectionId);
     console.log('🔍 Mevcut section ID\'leri:', Array.from(document.querySelectorAll('.admin-section')).map(s => s.id));
@@ -103,8 +112,24 @@ function showSection(section) {
   if (section === 'github-settings') {
     // GitHub Settings section'ı açıldığında ayarları yükle
     setTimeout(() => {
-      if (typeof loadGitHubSettings === 'function') {
-        loadGitHubSettings();
+      try {
+        if (typeof loadGitHubSettings === 'function') {
+          loadGitHubSettings();
+        } else {
+          console.warn('⚠️ loadGitHubSettings fonksiyonu bulunamadı');
+          // Fallback: UI'ı manuel güncelle
+          if (typeof updateGitHubSettingsUI === 'function') {
+            updateGitHubSettingsUI();
+          }
+        }
+      } catch (error) {
+        console.error('❌ GitHub Settings yükleme hatası:', error);
+        // Hata durumunda bile section'ı göster
+        const githubSection = document.getElementById('githubSettingsSection');
+        if (githubSection) {
+          githubSection.classList.remove('hidden');
+          githubSection.style.display = 'block';
+        }
       }
     }, 100);
   }

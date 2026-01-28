@@ -8,6 +8,9 @@ yarn.lock
 .env.local
 .env.*.local
 
+# Firebase config (contains sensitive API keys)
+firebase-config.js
+
 # Logs
 logs/
 *.log

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <title>Gizlilik Politikası - Task Scanner</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .privacy-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 20px 60px;
+            min-height: 100vh;
+            background: #ffffff;
+        }
+
+        .privacy-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(33, 147, 176, 0.1);
+            animation: fadeIn 0.6s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .privacy-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #2193b0;
+        }
+
+        .privacy-header h1 {
+            font-size: 2.5rem;
+            color: #2193b0;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .privacy-header p {
+            color: #444;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(33, 147, 176, 0.3);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(33, 147, 176, 0.4);
+        }
+
+        .privacy-content {
+            margin-top: 30px;
+        }
+
+        .privacy-content h2 {
+            color: #2193b0;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .privacy-content h3 {
+            color: #2193b0;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .privacy-content p {
+            margin-bottom: 15px;
+            color: #333;
+            text-align: justify;
+            line-height: 1.9;
+            font-size: 1.05rem;
+        }
+
+        .privacy-content ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        .privacy-content li {
+            margin-bottom: 10px;
+            color: #333;
+            line-height: 1.9;
+            font-size: 1.05rem;
+        }
+
+        .highlight-box {
+            background: rgba(33, 147, 176, 0.05);
+            border-left: 4px solid #2193b0;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(33, 147, 176, 0.3);
+        }
+
+        .contact-info h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .contact-info p {
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .contact-info a {
+            color: rgba(255,255,255,0.95);
+            text-decoration: underline;
+        }
+
+        .contact-info a:hover {
+            color: white;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .last-updated p {
+            color: #666;
+        }
+
+        [data-theme="dark"] .privacy-section {
+            background: var(--background-gradient, linear-gradient(135deg, #1a1a2e 0%, #16213e 100%));
+        }
+
+        [data-theme="dark"] .privacy-container {
+            background: rgba(30, 30, 46, 0.95);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="dark"] .privacy-header h1 {
+            color: #6dd5ed;
+        }
+
+        [data-theme="dark"] .privacy-content h2 {
+            color: #6dd5ed;
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .privacy-content h3 {
+            color: #6dd5ed;
+        }
+
+        [data-theme="dark"] .privacy-content p,
+        [data-theme="dark"] .privacy-content li {
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 400;
+        }
+
+        [data-theme="dark"] .privacy-header p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        [data-theme="dark"] .highlight-box {
+            background: rgba(33, 147, 176, 0.2);
+            border-left-color: #6dd5ed;
+        }
+
+        [data-theme="dark"] .last-updated {
+            color: rgba(255, 255, 255, 0.7);
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .last-updated p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        [data-theme="dark"] .back-link {
+            box-shadow: 0 4px 15px rgba(109, 213, 237, 0.4);
+        }
+
+        body.privacy-page .header-tagline {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .privacy-section {
+                padding: 100px 15px 40px;
+            }
+
+            .privacy-container {
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            .privacy-header {
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+            }
+
+            .privacy-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .privacy-header p {
+                font-size: 1rem;
+            }
+
+            .privacy-content h2 {
+                font-size: 1.4rem;
+                margin-top: 25px;
+            }
+
+            .privacy-content h3 {
+                font-size: 1.2rem;
+                margin-top: 20px;
+            }
+
+            .privacy-content p,
+            .privacy-content li {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .highlight-box {
+                padding: 15px;
+                margin: 20px 0;
+            }
+
+            .contact-info {
+                padding: 20px;
+            }
+
+            .back-link {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .privacy-section {
+                padding: 90px 10px 30px;
+            }
+
+            .privacy-container {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+
+            .privacy-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .privacy-content h2 {
+                font-size: 1.25rem;
+            }
+
+            .privacy-content h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body class="privacy-page">
+<!-- Search Bar -->
+<div class="search-container" id="searchContainer">
+  <div class="search-box">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="m21 21-4.35-4.35"></path>
+    </svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="Uygulama, kategori veya özellik ara...">
+    <button class="search-close" id="searchClose" title="Kapat" aria-label="Aramayı kapat">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- Koyu Blur Arkaplan -->
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
+
+<!-- Menü Paneli -->
+<div id="sidebar" class="sidebar">
+  <button class="close-btn" onclick="toggleMenu()">✖</button>
+
+  <a href="../#home" class="menu-item">🏠 Ana Sayfa</a>
+  <a href="../#about" class="menu-item">👤 Hakkımda</a>
+  <a href="../#skills" class="menu-item">⚡ Yetenekler</a>
+  <a href="../#apps" class="menu-item">📱 Uygulamalar</a>
+  <a href="../contact.html" class="menu-item">✉️ İletişim</a>
+  <a href="../admin-login.html" class="menu-item">⚙️ Admin Paneli</a>
+</div>
+
+<!-- Header Section -->
+<header id="home" class="main-header">
+  <div class="header-container">
+    <a href="../#home" class="logo-wrapper">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L13.5 8.5L18 10L13.5 11.5L12 18L10.5 11.5L6 10L10.5 8.5L12 2Z" fill="white" stroke="#1a1a1a" stroke-width="0.5"/>
+          <path d="M12 2L13.5 8.5L12 6L10.5 8.5L12 2Z" fill="#ff4444"/>
+          <circle cx="12" cy="9" r="1.5" fill="#87ceeb" stroke="#1a1a1a" stroke-width="0.3"/>
+          <path d="M6 10L8 12L6 14L6 10Z" fill="#4a90e2" stroke="#1a1a1a" stroke-width="0.5"/>
+          <path d="M18 10L16 12L18 14L18 10Z" fill="#4a90e2" stroke="#1a1a1a" stroke-width="0.5"/>
+          <path d="M10.5 11.5L11 15L12 16L13 15L13.5 11.5Z" fill="#ff8800"/>
+          <path d="M11 15L11.5 17L12 17.5L12.5 17L13 15Z" fill="#ffaa00"/>
+        </svg>
+      </div>
+      <h1 class="logo">
+        <span class="logo-letter logo-accent">B</span>
+        <span class="logo-letter">a</span>
+        <span class="logo-letter">m</span>
+        <span class="logo-letter">b</span>
+        <span class="logo-letter">i</span>
+        <span class="logo-letter">n</span>
+        <span class="logo-letter">i</span>
+        <span class="logo-letter">f</span>
+        <span class="logo-letter">o</span>
+        <span class="logo-letter">j</span>
+        <span class="logo-letter">o</span>
+      </h1>
+    </a>
+    <div class="header-tagline">Mobil Uygulama Geliştirici</div>
+    <div class="header-buttons">
+      <button class="search-toggle" id="searchToggle" title="Ara" aria-label="Arama">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+      </button>
+      <div class="theme-toggle" id="themeToggle" title="Tema Değiştir">
+        <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" type="button" aria-label="Menüyü aç/kapat" title="Menü">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Privacy Policy Section -->
+<section class="privacy-section">
+
+    <div class="privacy-container">
+        <header class="privacy-header">
+            <h1>🔒 Gizlilik Politikası</h1>
+            <p>Task Scanner</p>
+            <a href="index.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Uygulama Sayfasına Dön
+            </a>
+        </header>
+
+        <div class="privacy-content">
+            <div class="highlight-box">
+                <p><strong>Son Güncelleme:</strong> 28 Ocak 2026</p>
+            </div>
+
+            <h2>1. Giriş</h2>
+            <p>Task Scanner ("Biz", "Bizim", "Uygulama") olarak, kullanıcılarımızın gizliliğini korumayı taahhüt ediyoruz. Bu Gizlilik Politikası, uygulamamızı kullandığınızda topladığımız, kullandığımız ve paylaştığımız bilgileri açıklar.</p>
+
+            <h2>2. Toplanan Bilgiler</h2>
+            <h3>2.1. Ağ Tarama Verileri</h3>
+            <p>Task Scanner, yerel ağınızdaki cihazları taramak için aşağıdaki bilgileri toplar:</p>
+            <ul>
+                <li><strong>IP Adresleri:</strong> Yerel ağınızdaki cihazların IP adresleri</li>
+                <li><strong>MAC Adresleri:</strong> Cihazların fiziksel adresleri</li>
+                <li><strong>Ağ Bilgileri:</strong> Ağ yapılandırması, alt ağ maskesi, gateway bilgileri</li>
+                <li><strong>Port Bilgileri:</strong> Açık portlar ve çalışan servisler</li>
+                <li><strong>Cihaz Bilgileri:</strong> Üretici bilgileri ve cihaz türü tahminleri</li>
+            </ul>
+
+            <h3>2.2. Cihaz Bilgileri</h3>
+            <p>Uygulama aşağıdaki cihaz bilgilerini toplayabilir:</p>
+            <ul>
+                <li>Cihaz modeli ve işletim sistemi versiyonu</li>
+                <li>Benzersiz cihaz tanımlayıcıları</li>
+                <li>Ağ izinleri ve konum izinleri (sadece ağ taraması için)</li>
+            </ul>
+
+            <h3>2.3. Kullanım Verileri</h3>
+            <p>Uygulama içi etkileşimler ve özellik kullanımı hakkında anonim veriler toplanabilir:</p>
+            <ul>
+                <li>Tarama sıklığı ve kullanılan özellikler</li>
+                <li>Hata raporları ve teknik loglar</li>
+                <li>Uygulama performans metrikleri</li>
+            </ul>
+
+            <h2>3. Bilgilerin Kullanımı</h2>
+            <p>Topladığımız bilgileri aşağıdaki amaçlarla kullanırız:</p>
+            <ul>
+                <li>Ağ tarama ve cihaz keşfi işlevselliğini sağlamak</li>
+                <li>Uygulama performansını iyileştirmek ve hataları düzeltmek</li>
+                <li>Kullanıcı deneyimini geliştirmek</li>
+                <li>Güvenlik açıklarını tespit etmek ve kullanıcıları bilgilendirmek</li>
+                <li>Yasal yükümlülüklerimizi yerine getirmek</li>
+            </ul>
+
+            <h2>4. Veri Saklama ve İşleme</h2>
+            <h3>4.1. Yerel Veri Saklama</h3>
+            <p>Tüm ağ tarama verileri yalnızca cihazınızda yerel olarak saklanır. Bu veriler:</p>
+            <ul>
+                <li>Hiçbir zaman internet üzerinden gönderilmez</li>
+                <li>Üçüncü taraflarla paylaşılmaz</li>
+                <li>Uygulama silindiğinde otomatik olarak temizlenir</li>
+            </ul>
+
+            <h3>4.2. Veri İşleme</h3>
+            <p>Ağ tarama işlemleri tamamen cihazınızda gerçekleştirilir. Verileriniz:</p>
+            <ul>
+                <li>Bulut sunucularına yüklenmez</li>
+                <li>Harici servislere gönderilmez</li>
+                <li>Sadece uygulama içinde kullanılır</li>
+            </ul>
+
+            <h2>5. Bilgilerin Paylaşımı</h2>
+            <p>Task Scanner, topladığı verileri üçüncü taraflarla paylaşmaz. Ancak, aşağıdaki durumlarda bilgileriniz paylaşılabilir:</p>
+            <ul>
+                <li><strong>Yasal Gereklilikler:</strong> Yasal bir zorunluluk veya mahkeme kararı durumunda</li>
+                <li><strong>Hizmet Sağlayıcılar:</strong> Uygulamanın çalışması için gerekli olan güvenilir üçüncü taraf hizmet sağlayıcılar (analitik, hata raporlama vb.)</li>
+                <li><strong>İş Transferleri:</strong> Birleşme, satın alma veya varlık satışı durumunda</li>
+            </ul>
+
+            <h2>6. Veri Güvenliği</h2>
+            <p>Verilerinizin güvenliğini sağlamak için endüstri standardı güvenlik önlemleri kullanıyoruz:</p>
+            <ul>
+                <li>Tüm veriler yerel olarak şifrelenmiş depolamada saklanır</li>
+                <li>Ağ iletişimi güvenli protokoller kullanır</li>
+                <li>Düzenli güvenlik güncellemeleri yapılır</li>
+            </ul>
+            <p>Ancak, internet üzerinden veri iletiminin %100 güvenli olmadığını unutmayın.</p>
+
+            <h2>7. Ağ İzinleri</h2>
+            <p>Task Scanner, ağ taraması yapabilmek için aşağıdaki izinlere ihtiyaç duyar:</p>
+            <ul>
+                <li><strong>Ağ Erişimi:</strong> Yerel ağınızdaki cihazları taramak için</li>
+                <li><strong>Konum İzni:</strong> Android'in Wi-Fi tarama özelliğini kullanmak için (Android 9+)</li>
+            </ul>
+            <p>Bu izinler sadece ağ tarama işlevselliği için kullanılır ve başka amaçlarla kullanılmaz.</p>
+
+            <h2>8. Üçüncü Taraf Hizmetler</h2>
+            <p>Uygulamamız, analitik ve hata raporlama için üçüncü taraf hizmetler kullanabilir. Bu hizmetler:</p>
+            <ul>
+                <li>Sadece anonim kullanım verilerini toplar</li>
+                <li>Kişisel bilgilerinizi veya ağ verilerinizi toplamaz</li>
+                <li>Kendi gizlilik politikalarına tabidir</li>
+            </ul>
+
+            <h2>9. Açık Kaynak Kod</h2>
+            <p>Task Scanner açık kaynak kodlu bir uygulamadır. Kaynak kodunu inceleyerek:</p>
+            <ul>
+                <li>Verilerinizin nasıl işlendiğini görebilirsiniz</li>
+                <li>Güvenlik açıklarını bildirebilirsiniz</li>
+                <li>Uygulamayı kendi ihtiyaçlarınıza göre özelleştirebilirsiniz</li>
+            </ul>
+
+            <h2>10. Çocukların Gizliliği</h2>
+            <p>Uygulamamız 13 yaş altındaki çocuklardan bilerek bilgi toplamaz. 13 yaş altındaki bir çocuğun bilgilerini topladığımızı fark edersek, bu bilgileri derhal sileriz.</p>
+
+            <h2>11. Kullanıcı Hakları</h2>
+            <p>Aşağıdaki haklara sahipsiniz:</p>
+            <ul>
+                <li>Kişisel bilgilerinize erişim hakkı</li>
+                <li>Yanlış bilgileri düzeltme hakkı</li>
+                <li>Bilgilerinizin silinmesini talep etme hakkı</li>
+                <li>Veri işlemeye itiraz etme hakkı</li>
+                <li>Veri taşınabilirliği hakkı</li>
+                <li>Ağ izinlerini yönetme hakkı (cihaz ayarlarından)</li>
+            </ul>
+
+            <h2>12. Gizlilik Politikası Değişiklikleri</h2>
+            <p>Bu Gizlilik Politikasını zaman zaman güncelleyebiliriz. Önemli değişiklikler yaptığımızda, uygulama içinde veya e-posta yoluyla sizi bilgilendireceğiz.</p>
+
+            <h2>13. İletişim</h2>
+            <div class="contact-info">
+                <p>
+                    Gizlilik ile ilgili sorularınız veya endişeleriniz için bizimle iletişime geçebilirsiniz:
+                </p>
+                <p>
+                    <strong>Geliştirici:</strong> Bambinifojo<br>
+                    <strong>E-posta:</strong> <a href="mailto:bambinifojo@gmail.com">bambinifojo@gmail.com</a><br>
+                    <strong>Web Sitesi:</strong> <a href="https://bambinifojo.github.io" target="_blank" rel="noopener">https://bambinifojo.github.io</a>
+                </p>
+            </div>
+
+            <h2>14. Yürürlük</h2>
+            <p>Bu Gizlilik Politikası, uygulamamızı kullanmaya devam ettiğiniz sürece geçerlidir. Bu politikayı kabul etmiyorsanız, lütfen uygulamayı kullanmayı bırakın.</p>
+
+            <div class="last-updated">
+                <p>Son güncelleme: 28 Ocak 2026</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer id="contact">
+  <div class="footer-content">
+    <div class="footer-links">
+      <a href="../#home">Ana Sayfa</a>
+      <a href="../#apps">Uygulamalar</a>
+      <a href="../#contact-section">İletişim</a>
+    </div>
+    
+    <div class="social-links">
+      <a href="https://github.com/Bambinifojo" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+      <a href="mailto:bambinifojo@gmail.com" target="_blank" rel="noopener" title="E-posta" aria-label="E-posta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+      </a>
+      <a href="https://play.google.com/store/apps/developer?id=Bambinifojo" target="_blank" rel="noopener" title="Google Play" aria-label="Google Play">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+        </svg>
+      </a>
+    </div>
+    
+    <div class="footer-copyright">
+      <p>© 2025 Bambinifojo. Tüm hakları saklıdır.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../scripts.js"></script>
+<script>
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+const currentTheme = localStorage.getItem('theme') || (prefersDark.matches ? 'dark' : 'light');
+
+document.documentElement.setAttribute('data-theme', currentTheme);
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+});
+
+// Header scroll effect
+const header = document.querySelector('.main-header');
+if (header) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+}
+
+// Search functionality
+function initSearch() {
+  const searchToggle = document.getElementById('searchToggle');
+  const searchInput = document.getElementById('searchInput');
+  const searchClose = document.getElementById('searchClose');
+  const searchContainer = document.getElementById('searchContainer');
+  
+  if (!searchToggle || !searchInput || !searchClose || !searchContainer) return;
+  
+  searchToggle.addEventListener('click', () => {
+    searchContainer.classList.toggle('active');
+    if (searchContainer.classList.contains('active')) {
+      setTimeout(() => searchInput.focus(), 100);
+    }
+  });
+  
+  searchClose.addEventListener('click', () => {
+    searchContainer.classList.remove('active');
+    searchInput.value = '';
+    searchClose.classList.remove('show');
+  });
+  
+  searchInput.addEventListener('input', (e) => {
+    if (e.target.value.length > 0) {
+      searchClose.classList.add('show');
+    } else {
+      searchClose.classList.remove('show');
+    }
+  });
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (searchContainer.classList.contains('active')) {
+        searchContainer.classList.remove('active');
+        searchInput.value = '';
+        searchClose.classList.remove('show');
+      }
+    }
+  });
+  
+  document.addEventListener('click', (e) => {
+    if (searchContainer.classList.contains('active')) {
+      const searchBox = searchContainer.querySelector('.search-box');
+      if (searchBox && !searchBox.contains(e.target) && !searchToggle.contains(e.target)) {
+        searchContainer.classList.remove('active');
+        searchInput.value = '';
+        searchClose.classList.remove('show');
+      }
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof setupHamburgerMenu === 'function') {
+    setupHamburgerMenu();
+  }
+  
+  if (typeof initSearch === 'function') {
+    initSearch();
+  } else {
+    initSearch();
+  }
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar && sidebar.classList.contains('active')) {
+        if (typeof toggleMenu === 'function') {
+          toggleMenu();
+        }
+      }
+    }
+  });
+  
+  const menuItems = document.querySelectorAll('.sidebar .menu-item');
+  menuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      const href = item.getAttribute('href');
+      
+      if (href && (href.includes('admin.html') || href.includes('admin-login.html'))) {
+        if (typeof toggleMenu === 'function') {
+          toggleMenu();
+        }
+        return;
+      }
+      
+      if (typeof toggleMenu === 'function') {
+        toggleMenu();
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -12,7 +12,7 @@ const CONSTANTS = {
 };
 
 // ==================== DEĞİŞKENLER ====================
-let currentMode = 'local'; // 'local', 'github' veya 'firebase'
+let currentMode = 'firebase'; // 'local', 'github' veya 'firebase' - Varsayılan: Firebase
 let token = '';
 let firebaseConfig = null;
 let firebaseApp = null;
@@ -102,7 +102,8 @@ function checkAdminSession() {
 // Login sayfasına yönlendir
 function redirectToLogin() {
   // Eğer zaten login sayfasındaysak yönlendirme yapma
-  if (window.location.pathname.includes('admin-login.html')) {
+  const currentPath = window.location.pathname || window.location.href;
+  if (currentPath.includes('admin-login.html') || currentPath.includes('admin-login')) {
     return;
   }
   
@@ -110,8 +111,11 @@ function redirectToLogin() {
   const message = 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.';
   sessionStorage.setItem('sessionTimeoutMessage', message);
   
-  // Login sayfasına yönlendir (replace kullanarak history'yi temizle)
-  window.location.replace('/admin-login.html');
+  // Login sayfasına yönlendir (localhost için relative path kullan)
+  const loginPath = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+    ? 'admin-login.html' 
+    : '/admin-login.html';
+  window.location.replace(loginPath);
 }
 
 // Admin giriş formunu göster/gizle
@@ -294,6 +298,8 @@ function toggleAdminPassword() {
 
 // Section yönetimi
 function showSection(section) {
+  console.log('🔵 showSection çağrıldı:', section);
+  
   // Tüm section'ları gizle
   document.querySelectorAll('.admin-section').forEach(sec => {
     sec.classList.add('hidden');
@@ -311,9 +317,33 @@ function showSection(section) {
     sectionId = 'githubSettingsSection';
   }
   
+  console.log('🔍 Aranan section ID:', sectionId);
   const targetSection = document.getElementById(sectionId);
   if (targetSection) {
-    targetSection.classList.remove('hidden');
+    try {
+      targetSection.classList.remove('hidden');
+      // display: none !important override için style ekle
+      targetSection.style.display = 'block';
+      console.log('✅ Section gösterildi:', sectionId);
+    } catch (error) {
+      console.error('❌ Section gösterilirken hata:', error);
+      // Hata durumunda bile göster
+      targetSection.style.display = 'block';
+      targetSection.classList.remove('hidden');
+    }
+  } else {
+    console.error('❌ Section bulunamadı:', sectionId);
+    console.log('🔍 Mevcut section ID\'leri:', Array.from(document.querySelectorAll('.admin-section')).map(s => s.id));
+    
+    // Fallback: Dashboard'u göster
+    if (section !== 'dashboard') {
+      console.warn('⚠️ Fallback: Dashboard gösteriliyor');
+      const dashboardSection = document.getElementById('dashboardSection');
+      if (dashboardSection) {
+        dashboardSection.classList.remove('hidden');
+        dashboardSection.style.display = 'block';
+      }
+    }
   }
   
   // Tüm nav item'ları pasif yap ve seçileni aktif yap (hash-based routing için)
@@ -372,8 +402,23 @@ function showSection(section) {
   // GitHub Settings section'ı açıldığında ayarları yükle
   if (section === 'github-settings') {
     setTimeout(() => {
-      if (typeof loadGitHubSettings === 'function') {
-        loadGitHubSettings();
+      try {
+        if (typeof loadGitHubSettings === 'function') {
+          loadGitHubSettings();
+        } else {
+          console.warn('⚠️ loadGitHubSettings fonksiyonu bulunamadı');
+          // Fallback: UI'ı manuel güncelle
+          if (typeof updateGitHubSettingsUI === 'function') {
+            updateGitHubSettingsUI();
+          }
+        }
+      } catch (error) {
+        console.error('❌ GitHub Settings yükleme hatası:', error);
+        // Hata durumunda bile section'ı göster
+        const githubSection = document.getElementById('githubSettingsSection');
+        if (githubSection) {
+          githubSection.classList.remove('hidden');
+        }
       }
     }, 100);
   }
@@ -468,12 +513,14 @@ function toggleSidebar() {
   }
 }
 
-// Global scope'a ekle (HTML onclick için)
+// Global scope'a ekle (HTML onclick için) - İlk ekleme
 if (typeof window !== 'undefined') {
   window.toggleSidebar = toggleSidebar;
   window.openSidebar = openSidebar;
   window.closeSidebar = closeSidebar;
-  console.log('✅ toggleSidebar global scope\'a eklendi');
+  window.toggleTopbarMenu = toggleTopbarMenu;
+  window.closeTopbarMenu = closeTopbarMenu;
+  console.log('✅ Sidebar fonksiyonları global scope\'a eklendi');
 }
 
 // Sidebar'ı aç
@@ -524,46 +571,81 @@ document.addEventListener('keydown', function(e) {
 
 // Topbar Menu Toggle (Mobile)
 function toggleTopbarMenu() {
-  const modal = document.getElementById('topbarMenuModal');
-  const overlay = document.getElementById('topbarMenuOverlay');
-  const menuBtn = document.getElementById('topbarMenuBtn');
-  
-  if (modal && overlay) {
-    const isOpen = modal.classList.toggle('active');
-    overlay.classList.toggle('active');
+  try {
+    const modal = document.getElementById('topbarMenuModal');
+    const overlay = document.getElementById('topbarMenuOverlay');
+    const menuBtn = document.getElementById('topbarMenuBtn');
+    const sidebar = document.getElementById('adminSidebar');
+    const sidebarOverlay = document.getElementById('adminSidebarOverlay');
     
-    // Body scroll lock
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('topbar-menu-open');
+    // Eğer sidebar varsa sidebar'ı toggle et
+    if (sidebar && sidebarOverlay) {
+      toggleSidebar();
+      return;
+    }
+    
+    // Eğer topbar menu modal varsa onu toggle et
+    if (modal && overlay) {
+      const isOpen = modal.classList.toggle('active');
+      overlay.classList.toggle('active');
+      
+      // Body scroll lock
+      if (isOpen) {
+        document.body.style.overflow = 'hidden';
+        document.body.classList.add('topbar-menu-open');
+      } else {
+        document.body.style.overflow = '';
+        document.body.classList.remove('topbar-menu-open');
+      }
+      
+      // Menu button active state
+      if (menuBtn) {
+        menuBtn.classList.toggle('active');
+      }
     } else {
-      document.body.style.overflow = '';
-      document.body.classList.remove('topbar-menu-open');
+      console.warn('⚠️ Topbar menu modal veya overlay bulunamadı');
     }
-    
-    // Menu button active state
-    if (menuBtn) {
-      menuBtn.classList.toggle('active');
-    }
+  } catch (error) {
+    console.error('❌ toggleTopbarMenu hatası:', error);
   }
 }
 
 // Topbar Menu'yu kapat
 function closeTopbarMenu() {
-  const modal = document.getElementById('topbarMenuModal');
-  const overlay = document.getElementById('topbarMenuOverlay');
-  const menuBtn = document.getElementById('topbarMenuBtn');
-  
-  if (modal && overlay) {
-    modal.classList.remove('active');
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-    document.body.classList.remove('topbar-menu-open');
+  try {
+    const modal = document.getElementById('topbarMenuModal');
+    const overlay = document.getElementById('topbarMenuOverlay');
+    const menuBtn = document.getElementById('topbarMenuBtn');
+    const sidebar = document.getElementById('adminSidebar');
     
-    if (menuBtn) {
-      menuBtn.classList.remove('active');
+    // Mobilde sidebar varsa sidebar'ı kapat
+    if (window.innerWidth <= 768 && sidebar) {
+      closeSidebar();
+      return;
     }
+    
+    if (modal && overlay) {
+      modal.classList.remove('active');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      document.body.classList.remove('topbar-menu-open');
+      
+      if (menuBtn) {
+        menuBtn.classList.remove('active');
+      }
+    }
+  } catch (error) {
+    console.error('❌ closeTopbarMenu hatası:', error);
   }
+}
+
+// Global scope'a ekle (HTML onclick için)
+if (typeof window !== 'undefined') {
+  window.toggleTopbarMenu = toggleTopbarMenu;
+  window.closeTopbarMenu = closeTopbarMenu;
+  window.toggleSidebar = toggleSidebar;
+  window.openSidebar = openSidebar;
+  window.closeSidebar = closeSidebar;
 }
 
 // Hamburger menü event listener'larını ekle (her zaman çalışmalı)
@@ -586,11 +668,42 @@ function setupHamburgerMenu() {
   
   // Hamburger butonuna event listener ekle
   if (hamburger) {
-    hamburger.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleSidebar();
-    });
+    // Önce mevcut event listener'ları temizle (çift eklenmeyi önle)
+    const newHamburger = hamburger.cloneNode(true);
+    hamburger.parentNode.replaceChild(newHamburger, hamburger);
+    
+    // Yeni element'i al
+    const hamburgerBtn = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Mobilde sidebar'ı toggle et
+        if (window.innerWidth <= 768) {
+          toggleSidebar();
+        } else {
+          toggleTopbarMenu();
+        }
+      });
+    }
+  }
+  
+  // Topbar menu butonuna da event listener ekle (mobil için)
+  const topbarMenuBtn = document.getElementById('topbarMenuBtn');
+  if (topbarMenuBtn) {
+    // Önce mevcut event listener'ları temizle
+    const newTopbarBtn = topbarMenuBtn.cloneNode(true);
+    topbarMenuBtn.parentNode.replaceChild(newTopbarBtn, topbarMenuBtn);
+    
+    // Yeni element'i al ve event listener ekle
+    const topbarBtn = document.getElementById('topbarMenuBtn');
+    if (topbarBtn) {
+      topbarBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTopbarMenu();
+      });
+    }
   }
   
   // Overlay'e tıklandığında sidebar'ı kapat (sadece kapat, toggle değil)
@@ -610,25 +723,70 @@ function setupHamburgerMenu() {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📄 DOMContentLoaded event tetiklendi');
   
-  // Mod ve token'ı localStorage'dan yükle
+  // Mod ve token'ı localStorage'dan yükle (GitHub modu devre dışı, varsayılan Firebase)
   const savedMode = localStorage.getItem('currentMode');
-  if (savedMode && (savedMode === 'local' || savedMode === 'github' || savedMode === 'firebase')) {
+  if (savedMode && (savedMode === 'local' || savedMode === 'firebase')) {
     currentMode = savedMode;
+  } else {
+    // GitHub modu artık desteklenmiyor, Firebase'e geç
+    if (savedMode === 'github') {
+      currentMode = 'firebase';
+      localStorage.setItem('currentMode', 'firebase');
+    } else {
+      // Varsayılan mod Firebase
+      currentMode = 'firebase';
+      localStorage.setItem('currentMode', 'firebase');
+    }
   }
+  
+  // UI'ı varsayılan moda göre güncelle
+  setTimeout(() => {
+    setMode(currentMode);
+    updateGitHubSettingsUI();
+  }, 100);
   
   const savedToken = localStorage.getItem('githubToken');
   if (savedToken) {
     token = savedToken;
   }
   
-  // Firebase config'i yükle
+  // Firebase config'i yükle ve otomatik başlat
   const savedFirebaseConfig = localStorage.getItem('firebaseConfig');
   if (savedFirebaseConfig) {
     try {
       firebaseConfig = JSON.parse(savedFirebaseConfig);
+      console.log('🔥 Firebase config yüklendi, otomatik başlatılıyor...');
+      
+      // Firebase modunda ise otomatik başlat
+      if (currentMode === 'firebase') {
+        initializeFirebase(firebaseConfig).then(() => {
+          console.log('✅ Firebase otomatik başlatıldı');
+          
+          // Firebase auth state kontrolü ve otomatik giriş
+          if (firebaseAuth) {
+            const savedEmail = localStorage.getItem('firebaseEmail');
+            const savedPassword = localStorage.getItem('firebasePassword');
+            
+            if (savedEmail && savedPassword) {
+              firebaseAuth.signInWithEmailAndPassword(savedEmail, savedPassword)
+                .then(() => {
+                  console.log('✅ Firebase\'e otomatik giriş yapıldı');
+                })
+                .catch((error) => {
+                  console.warn('⚠️ Firebase otomatik giriş hatası:', error);
+                });
+            }
+          }
+        }).catch((error) => {
+          console.error('❌ Firebase otomatik başlatma hatası:', error);
+        });
+      }
     } catch (error) {
       console.error('Firebase config parse hatası:', error);
     }
+  } else {
+    // Firebase config yoksa varsayılan olarak Firebase modunu kullan
+    console.log('ℹ️ Firebase config bulunamadı, Firebase modu varsayılan olarak aktif');
   }
   
   // Kategorileri yükle (appsData yüklendikten sonra)
@@ -659,9 +817,24 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Path'den section'ı oku ve göster
   const section = getSectionFromPath();
+  console.log('📍 Section from path:', section);
   if (section) {
+    console.log('✅ Showing section:', section);
     showSection(section);
+  } else {
+    // Section yoksa varsayılan olarak dashboard'u göster
+    console.log('⚠️ No section found, showing dashboard');
+    showSection('dashboard');
   }
+  
+  // Eğer hiçbir section görünmüyorsa dashboard'u göster (güvenlik)
+  setTimeout(() => {
+    const visibleSections = document.querySelectorAll('.admin-section:not(.hidden)');
+    if (visibleSections.length === 0) {
+      console.warn('⚠️ No visible sections found, forcing dashboard display');
+      showSection('dashboard');
+    }
+  }, 100);
   
   // Browser back/forward butonları için (hash-based routing)
   window.addEventListener('hashchange', (e) => {
@@ -748,19 +921,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('appsData')) {
       autoLogin();
     } else {
-      // İlk kez, apps.json'dan yükle
-      const dataPath = '/data/apps.json';
+      // İlk kez, apps.json'dan yükle (localhost için relative path)
+      const dataPath = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'data/apps.json'
+        : '/data/apps.json';
       fetch(dataPath)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) throw new Error('Veri yüklenemedi');
+          return res.json();
+        })
         .then(data => {
           appsData = data;
           saveToLocal();
           autoLogin();
         })
-        .catch(() => {
-          appsData = { apps: [] };
+        .catch((error) => {
+          console.warn('⚠️ Veri yüklenemedi, boş veri ile başlatılıyor:', error);
+          appsData = { apps: [], site: null };
+          autoLogin();
         });
     }
+  } else {
+    // Session yoksa sayfa içeriğini gizle ve loading göster
+    console.log('⚠️ Session yok, login sayfasına yönlendiriliyor...');
   }
   
   // Enter tuşu ile admin girişi
@@ -815,6 +998,21 @@ async function autoLogin() {
         const config = JSON.parse(savedConfig);
         await initializeFirebase(config);
         
+        // Firebase auth state kontrolü ve otomatik giriş
+        const savedEmail = localStorage.getItem('firebaseEmail');
+        const savedPassword = localStorage.getItem('firebasePassword');
+        
+        // Email ve password varsa otomatik giriş yap
+        if (savedEmail && savedPassword && firebaseAuth) {
+          try {
+            await firebaseAuth.signInWithEmailAndPassword(savedEmail, savedPassword);
+            console.log('✅ Firebase\'e otomatik giriş yapıldı');
+          } catch (authError) {
+            console.warn('⚠️ Firebase otomatik giriş hatası:', authError);
+            // Giriş hatası durumunda devam et, auth state listener çalışacak
+          }
+        }
+        
         // Firebase auth state kontrolü
         firebaseAuth.onAuthStateChanged(async (user) => {
           if (user) {
@@ -861,9 +1059,10 @@ async function autoLogin() {
     if (saved) {
       appsData = JSON.parse(saved);
     } else {
-      // İlk kez, apps.json'dan yükle
-      const dataPath = '/data/apps.json';
-      const sitePath = '/data/site.json';
+      // İlk kez, apps.json'dan yükle (localhost için relative path)
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const dataPath = isLocalhost ? 'data/apps.json' : '/data/apps.json';
+      const sitePath = isLocalhost ? 'data/site.json' : '/data/site.json';
       fetch(dataPath)
         .then(res => res.json())
         .then(data => {
@@ -893,6 +1092,9 @@ async function autoLogin() {
   if (tokenInput) {
     tokenInput.disabled = currentMode === 'local' || currentMode === 'firebase';
   }
+  
+  // Dashboard'u göster
+  showSection('dashboard');
   
   updateStats();
   renderApps();
@@ -982,60 +1184,68 @@ function getDefaultSiteData() {
 
 // Mode değiştirme
 function setMode(mode) {
+  // GitHub modu artık desteklenmiyor, Firebase'e yönlendir
+  if (mode === 'github') {
+    mode = 'firebase';
+    showAlert('⚠️ GitHub modu artık desteklenmiyor. Firebase moduna geçiliyor.', 'warning');
+  }
+  
   currentMode = mode;
   const localModeBtn = document.getElementById('localModeBtn');
   const githubModeBtn = document.getElementById('githubModeBtn');
+  const firebaseModeBtn = document.getElementById('firebaseModeBtn');
+  
   if (localModeBtn) localModeBtn.classList.toggle('active', mode === 'local');
   if (githubModeBtn) githubModeBtn.classList.toggle('active', mode === 'github');
+  if (firebaseModeBtn) firebaseModeBtn.classList.toggle('active', mode === 'firebase');
+  
   const saveGitHubBtn = document.getElementById('saveGitHubBtn');
   if (saveGitHubBtn) {
-    if (mode === 'github') {
-      saveGitHubBtn.classList.remove('hidden');
-    } else {
-      saveGitHubBtn.classList.add('hidden');
-    }
+    // GitHub butonu artık gösterilmiyor
+    saveGitHubBtn.classList.add('hidden');
   }
   
-  // Topbar ve mobile butonlarını güncelle
+  // Topbar ve mobile butonlarını güncelle (GitHub butonları gizle)
   const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
   const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
   if (saveGitHubBtnTopbar) {
-    if (mode === 'github' && token) {
-      saveGitHubBtnTopbar.classList.remove('hidden');
-    } else {
-      saveGitHubBtnTopbar.classList.add('hidden');
-    }
+    saveGitHubBtnTopbar.classList.add('hidden');
   }
   if (saveGitHubBtnMobile) {
-    if (mode === 'github' && token) {
-      saveGitHubBtnMobile.classList.remove('hidden');
-    } else {
-      saveGitHubBtnMobile.classList.add('hidden');
-    }
+    saveGitHubBtnMobile.classList.add('hidden');
   }
   
   // Token alanını göster/gizle (login formunda)
   const tokenGroup = document.getElementById('tokenGroupInLogin');
   const localModeInfo = document.getElementById('localModeInfo');
+  const firebaseModeInfo = document.getElementById('firebaseModeInfoInLogin');
   const tokenInput = document.getElementById('token');
   
   if (mode === 'local') {
     // LocalStorage modunda token alanını gizle
     if (tokenGroup) tokenGroup.style.display = 'none';
     if (localModeInfo) localModeInfo.style.display = 'block';
+    if (firebaseModeInfo) firebaseModeInfo.style.display = 'none';
     if (tokenInput) {
       tokenInput.value = ''; // Token'ı temizle
       tokenInput.disabled = true;
     }
     token = ''; // Token değişkenini temizle
-  } else {
-    // GitHub modunda token alanını göster
-    if (tokenGroup) tokenGroup.style.display = 'block';
+  } else if (mode === 'firebase') {
+    // Firebase modunda token alanını gizle
+    if (tokenGroup) tokenGroup.style.display = 'none';
     if (localModeInfo) localModeInfo.style.display = 'none';
+    if (firebaseModeInfo) firebaseModeInfo.style.display = 'block';
     if (tokenInput) {
-      tokenInput.disabled = false;
-      tokenInput.focus();
+      tokenInput.value = '';
+      tokenInput.disabled = true;
     }
+    token = '';
+  } else {
+    // GitHub modu (artık kullanılmıyor ama yine de gizle)
+    if (tokenGroup) tokenGroup.style.display = 'none';
+    if (localModeInfo) localModeInfo.style.display = 'none';
+    if (firebaseModeInfo) firebaseModeInfo.style.display = 'none';
   }
   
   // GitHub Settings sayfasındaki butonları da güncelle
@@ -1044,6 +1254,12 @@ function setMode(mode) {
 
 // GitHub Settings sayfası için mod değiştirme
 function setGitHubSettingsMode(mode) {
+  // GitHub modu artık desteklenmiyor, Firebase'e yönlendir
+  if (mode === 'github') {
+    mode = 'firebase';
+    showAlert('⚠️ GitHub modu artık desteklenmiyor. Firebase moduna geçiliyor.', 'warning');
+  }
+  
   currentMode = mode;
   const localBtn = document.getElementById('githubSettingsLocalModeBtn');
   const githubBtn = document.getElementById('githubSettingsGithubModeBtn');
@@ -1073,122 +1289,148 @@ function setGitHubSettingsMode(mode) {
 
 // GitHub Settings UI'ı güncelle
 function updateGitHubSettingsUI() {
-  const localBtn = document.getElementById('githubSettingsLocalModeBtn');
-  const githubBtn = document.getElementById('githubSettingsGithubModeBtn');
-  const firebaseBtn = document.getElementById('githubSettingsFirebaseModeBtn');
-  const tokenGroup = document.getElementById('githubTokenGroup');
-  const firebaseConfigGroup = document.getElementById('firebaseConfigGroup');
-  const firebaseAuthGroup = document.getElementById('firebaseAuthGroup');
-  const saveBtn = document.getElementById('githubSettingsSaveBtn');
-  const statusText = document.getElementById('githubModeStatus');
-  const tokenInput = document.getElementById('githubSettingsToken');
-  
-  if (localBtn) localBtn.classList.toggle('active', currentMode === 'local');
-  if (githubBtn) githubBtn.classList.toggle('active', currentMode === 'github');
-  if (firebaseBtn) firebaseBtn.classList.toggle('active', currentMode === 'firebase');
-  
-  const testBtn = document.getElementById('testTokenBtn');
-  const githubModeInfo = document.getElementById('githubModeInfo');
-  const firebaseModeInfo = document.getElementById('firebaseModeInfo');
-  const localModeInfoInSettings = document.getElementById('localModeInfoInSettings');
-  
-  const saveLocalToGitHubBtn = document.getElementById('saveLocalToGitHubBtn');
-  
-  if (currentMode === 'github') {
-    if (tokenGroup) tokenGroup.style.display = 'block';
-    if (firebaseConfigGroup) firebaseConfigGroup.style.display = 'none';
-    if (firebaseAuthGroup) firebaseAuthGroup.style.display = 'none';
-    if (testBtn) testBtn.style.display = 'inline-flex';
-    if (githubModeInfo) githubModeInfo.style.display = 'block';
-    if (firebaseModeInfo) firebaseModeInfo.style.display = 'none';
-    if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'none';
-    if (tokenInput) {
-      tokenInput.value = token || '';
-      tokenInput.classList.remove('error', 'success');
-    }
-    if (token) {
-      if (saveBtn) saveBtn.style.display = 'inline-flex';
-      if (saveLocalToGitHubBtn && appsData && Object.keys(appsData).length > 0) {
-        saveLocalToGitHubBtn.style.display = 'inline-flex';
+  try {
+    const localBtn = document.getElementById('githubSettingsLocalModeBtn');
+    const githubBtn = document.getElementById('githubSettingsGithubModeBtn');
+    const firebaseBtn = document.getElementById('githubSettingsFirebaseModeBtn');
+    const tokenGroup = document.getElementById('githubTokenGroup');
+    const firebaseConfigGroup = document.getElementById('firebaseConfigGroup');
+    const firebaseAuthGroup = document.getElementById('firebaseAuthGroup');
+    const saveBtn = document.getElementById('githubSettingsSaveBtn');
+    const statusText = document.getElementById('githubModeStatus');
+    const tokenInput = document.getElementById('githubSettingsToken');
+    
+    if (localBtn) localBtn.classList.toggle('active', currentMode === 'local');
+    if (githubBtn) githubBtn.classList.toggle('active', currentMode === 'github');
+    if (firebaseBtn) firebaseBtn.classList.toggle('active', currentMode === 'firebase');
+    
+    const testBtn = document.getElementById('testTokenBtn');
+    const githubModeInfo = document.getElementById('githubModeInfo');
+    const firebaseModeInfo = document.getElementById('firebaseModeInfo');
+    const localModeInfoInSettings = document.getElementById('localModeInfoInSettings');
+    
+    const saveLocalToGitHubBtn = document.getElementById('saveLocalToGitHubBtn');
+    
+    if (currentMode === 'github') {
+      if (tokenGroup) tokenGroup.style.display = 'block';
+      if (firebaseConfigGroup) firebaseConfigGroup.style.display = 'none';
+      if (firebaseAuthGroup) firebaseAuthGroup.style.display = 'none';
+      if (testBtn) testBtn.style.display = 'inline-flex';
+      if (githubModeInfo) githubModeInfo.style.display = 'block';
+      if (firebaseModeInfo) firebaseModeInfo.style.display = 'none';
+      if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'none';
+      if (tokenInput) {
+        tokenInput.value = token || '';
+        tokenInput.classList.remove('error', 'success');
       }
-      if (statusText) {
-        statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
-        statusText.style.color = '#10b981';
+      if (token) {
+        if (saveBtn) saveBtn.style.display = 'inline-flex';
+        if (saveLocalToGitHubBtn && appsData && Object.keys(appsData).length > 0) {
+          saveLocalToGitHubBtn.style.display = 'inline-flex';
+        }
+        if (statusText) {
+          statusText.innerHTML = 'Şu anda <strong>GitHub API</strong> modu aktif. Değişiklikler GitHub\'a kaydedilir.';
+          statusText.style.color = '#10b981';
+        }
+      } else {
+        if (saveBtn) saveBtn.style.display = 'none';
+        if (saveLocalToGitHubBtn) saveLocalToGitHubBtn.style.display = 'none';
+        if (statusText) {
+          statusText.innerHTML = 'GitHub modu aktif ama token gerekli. Token\'ı girin ve "Token\'ı Test Et" butonuna tıklayın.';
+          statusText.style.color = '#f59e0b';
+        }
       }
-    } else {
-      if (saveBtn) saveBtn.style.display = 'none';
+    } else if (currentMode === 'firebase') {
+      if (tokenGroup) tokenGroup.style.display = 'none';
+      if (firebaseConfigGroup) firebaseConfigGroup.style.display = 'block';
+      if (firebaseAuthGroup) firebaseAuthGroup.style.display = 'block';
+      if (testBtn) testBtn.style.display = 'none';
+      if (githubModeInfo) githubModeInfo.style.display = 'none';
+      if (firebaseModeInfo) firebaseModeInfo.style.display = 'block';
+      if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'none';
       if (saveLocalToGitHubBtn) saveLocalToGitHubBtn.style.display = 'none';
-      if (statusText) {
-        statusText.innerHTML = 'GitHub modu aktif ama token gerekli. Token\'ı girin ve "Token\'ı Test Et" butonuna tıklayın.';
-        statusText.style.color = '#f59e0b';
-      }
-    }
-  } else if (currentMode === 'firebase') {
-    if (tokenGroup) tokenGroup.style.display = 'none';
-    if (firebaseConfigGroup) firebaseConfigGroup.style.display = 'block';
-    if (firebaseAuthGroup) firebaseAuthGroup.style.display = 'block';
-    if (testBtn) testBtn.style.display = 'none';
-    if (githubModeInfo) githubModeInfo.style.display = 'none';
-    if (firebaseModeInfo) firebaseModeInfo.style.display = 'block';
-    if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'none';
-    if (saveLocalToGitHubBtn) saveLocalToGitHubBtn.style.display = 'none';
-    
-    // Firebase config değerlerini yükle
-    if (firebaseConfig) {
-      const apiKeyInput = document.getElementById('firebaseApiKey');
-      const authDomainInput = document.getElementById('firebaseAuthDomain');
-      const databaseURLInput = document.getElementById('firebaseDatabaseURL');
-      const projectIdInput = document.getElementById('firebaseProjectId');
-      const storageBucketInput = document.getElementById('firebaseStorageBucket');
-      const messagingSenderIdInput = document.getElementById('firebaseMessagingSenderId');
-      const appIdInput = document.getElementById('firebaseAppId');
       
-      if (apiKeyInput) apiKeyInput.value = firebaseConfig.apiKey || '';
-      if (authDomainInput) authDomainInput.value = firebaseConfig.authDomain || '';
-      if (databaseURLInput) databaseURLInput.value = firebaseConfig.databaseURL || '';
-      if (projectIdInput) projectIdInput.value = firebaseConfig.projectId || '';
-      if (storageBucketInput) storageBucketInput.value = firebaseConfig.storageBucket || '';
-      if (messagingSenderIdInput) messagingSenderIdInput.value = firebaseConfig.messagingSenderId || '';
-      if (appIdInput) appIdInput.value = firebaseConfig.appId || '';
-    }
-    
-    if (firebaseApp && firebaseAuth) {
-      if (saveBtn) saveBtn.style.display = 'inline-flex';
-      if (statusText) {
-        statusText.innerHTML = 'Şu anda <strong>Firebase</strong> modu aktif. Değişiklikler gerçek zamanlı olarak Firebase\'e kaydedilir.';
-        statusText.style.color = '#ff9800';
+      // Firebase config değerlerini yükle
+      if (firebaseConfig) {
+        const apiKeyInput = document.getElementById('firebaseApiKey');
+        const authDomainInput = document.getElementById('firebaseAuthDomain');
+        const databaseURLInput = document.getElementById('firebaseDatabaseURL');
+        const projectIdInput = document.getElementById('firebaseProjectId');
+        const storageBucketInput = document.getElementById('firebaseStorageBucket');
+        const messagingSenderIdInput = document.getElementById('firebaseMessagingSenderId');
+        const appIdInput = document.getElementById('firebaseAppId');
+        
+        if (apiKeyInput) apiKeyInput.value = firebaseConfig.apiKey || '';
+        if (authDomainInput) authDomainInput.value = firebaseConfig.authDomain || '';
+        if (databaseURLInput) databaseURLInput.value = firebaseConfig.databaseURL || '';
+        if (projectIdInput) projectIdInput.value = firebaseConfig.projectId || '';
+        if (storageBucketInput) storageBucketInput.value = firebaseConfig.storageBucket || '';
+        if (messagingSenderIdInput) messagingSenderIdInput.value = firebaseConfig.messagingSenderId || '';
+        if (appIdInput) appIdInput.value = firebaseConfig.appId || '';
+      }
+      
+      if (firebaseApp && firebaseAuth) {
+        if (saveBtn) saveBtn.style.display = 'inline-flex';
+        if (statusText) {
+          statusText.innerHTML = 'Şu anda <strong>Firebase</strong> modu aktif. Değişiklikler gerçek zamanlı olarak Firebase\'e kaydedilir.';
+          statusText.style.color = '#ff9800';
+        }
+      } else {
+        if (saveBtn) saveBtn.style.display = 'inline-flex';
+        if (statusText) {
+          statusText.innerHTML = 'Firebase modu aktif. Config bilgilerini girin ve Firebase\'e giriş yapın.';
+          statusText.style.color = '#f59e0b';
+        }
       }
     } else {
-      if (saveBtn) saveBtn.style.display = 'inline-flex';
+      if (tokenGroup) tokenGroup.style.display = 'none';
+      if (firebaseConfigGroup) firebaseConfigGroup.style.display = 'none';
+      if (firebaseAuthGroup) firebaseAuthGroup.style.display = 'none';
+      if (saveBtn) saveBtn.style.display = 'none';
+      if (testBtn) testBtn.style.display = 'none';
+      if (saveLocalToGitHubBtn) saveLocalToGitHubBtn.style.display = 'none';
+      if (githubModeInfo) githubModeInfo.style.display = 'none';
+      if (firebaseModeInfo) firebaseModeInfo.style.display = 'none';
+      if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'block';
       if (statusText) {
-        statusText.innerHTML = 'Firebase modu aktif. Config bilgilerini girin ve Firebase\'e giriş yapın.';
-        statusText.style.color = '#f59e0b';
+        statusText.innerHTML = 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır. Yayın için Firebase veya GitHub modunu kullanın.';
+        statusText.style.color = '#6b7280';
       }
     }
-  } else {
-    if (tokenGroup) tokenGroup.style.display = 'none';
-    if (firebaseConfigGroup) firebaseConfigGroup.style.display = 'none';
-    if (firebaseAuthGroup) firebaseAuthGroup.style.display = 'none';
-    if (saveBtn) saveBtn.style.display = 'none';
-    if (testBtn) testBtn.style.display = 'none';
-    if (saveLocalToGitHubBtn) saveLocalToGitHubBtn.style.display = 'none';
-    if (githubModeInfo) githubModeInfo.style.display = 'none';
-    if (firebaseModeInfo) firebaseModeInfo.style.display = 'none';
-    if (localModeInfoInSettings) localModeInfoInSettings.style.display = 'block';
-    if (statusText) {
-      statusText.innerHTML = 'Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır. Yayın için Firebase veya GitHub modunu kullanın.';
-      statusText.style.color = '#6b7280';
+  } catch (error) {
+    console.error('❌ updateGitHubSettingsUI hatası:', error);
+    // Hata durumunda bile section'ı göster
+    const githubSection = document.getElementById('githubSettingsSection');
+    if (githubSection) {
+      githubSection.classList.remove('hidden');
+      githubSection.style.display = 'block';
     }
   }
 }
 
 // GitHub ayarlarını yükle
 function loadGitHubSettings() {
-  const tokenInput = document.getElementById('githubSettingsToken');
-  if (tokenInput) {
-    tokenInput.value = token || '';
+  try {
+    const tokenInput = document.getElementById('githubSettingsToken');
+    if (tokenInput) {
+      tokenInput.value = token || '';
+    }
+    
+    // UI'ı güncelle
+    if (typeof updateGitHubSettingsUI === 'function') {
+      updateGitHubSettingsUI();
+    } else {
+      console.warn('⚠️ updateGitHubSettingsUI fonksiyonu bulunamadı');
+    }
+  } catch (error) {
+    console.error('❌ GitHub Settings yükleme hatası:', error);
+    // Hata durumunda bile section'ı göster
+    const githubSection = document.getElementById('githubSettingsSection');
+    if (githubSection) {
+      githubSection.classList.remove('hidden');
+      githubSection.style.display = 'block';
+    }
   }
-  updateGitHubSettingsUI();
 }
 
 // LocalStorage'daki verileri GitHub'a kaydet (LocalStorage modundan GitHub moduna geçerken kullanılır)
@@ -1269,7 +1511,7 @@ async function testGitHubTokenFromUI() {
         tokenInput.classList.remove('success');
       }, 2000);
     } else {
-      showAlert(`❌ Token hatası: ${result.error}\n\nLütfen:\n1. Token'ın doğru kopyalandığından emin olun\n2. Token'ın "repo" iznine sahip olduğunu kontrol edin\n3. Token'ın süresinin dolmadığını kontrol edin`, 'error');
+      showAlert(`❌ Token hatası: ${result.error}\n\nLütfen:\n1. Token\'ın doğru kopyalandığından emin olun\n2. Token\'ın "repo" iznine sahip olduğunu kontrol edin\n3. Token\'ın süresinin dolmadığını kontrol edin`, 'error');
       tokenInput.focus();
       tokenInput.classList.add('error');
     }
@@ -1281,7 +1523,7 @@ async function testGitHubTokenFromUI() {
     if (testBtn) {
       testBtn.disabled = false;
       const btnSpan = testBtn.querySelector('span');
-      if (btnSpan) btnSpan.textContent = '🔍 Token'ı Test Et';
+      if (btnSpan) btnSpan.textContent = '🔍 Token\'ı Test Et';
     }
   }
 }
@@ -1488,8 +1730,77 @@ async function saveGitHubSettings() {
     return;
   }
   
+  // Firebase modu
+  if (newMode === 'firebase') {
+    // Firebase config bilgilerini al
+    const apiKey = document.getElementById('firebaseApiKey')?.value.trim() || '';
+    const authDomain = document.getElementById('firebaseAuthDomain')?.value.trim() || '';
+    const databaseURL = document.getElementById('firebaseDatabaseURL')?.value.trim() || '';
+    const projectId = document.getElementById('firebaseProjectId')?.value.trim() || '';
+    const storageBucket = document.getElementById('firebaseStorageBucket')?.value.trim() || '';
+    const messagingSenderId = document.getElementById('firebaseMessagingSenderId')?.value.trim() || '';
+    const appId = document.getElementById('firebaseAppId')?.value.trim() || '';
+    
+    // Firebase email ve password
+    const firebaseEmail = document.getElementById('firebaseEmail')?.value.trim() || '';
+    const firebasePassword = document.getElementById('firebasePassword')?.value.trim() || '';
+    
+    // Config kontrolü
+    if (!apiKey || !authDomain || !databaseURL || !projectId) {
+      showAlert('❌ Firebase config bilgileri eksik! Lütfen tüm alanları doldurun.', 'error');
+      return;
+    }
+    
+    // Firebase config oluştur
+    const config = {
+      apiKey,
+      authDomain,
+      databaseURL,
+      projectId,
+      storageBucket,
+      messagingSenderId,
+      appId
+    };
+    
+    // Config'i kaydet
+    firebaseConfig = config;
+    localStorage.setItem('firebaseConfig', JSON.stringify(config));
+    
+    // Email ve password'ü kaydet (admin login'de kullanılacak)
+    if (firebaseEmail && firebasePassword) {
+      localStorage.setItem('firebaseEmail', firebaseEmail);
+      localStorage.setItem('firebasePassword', firebasePassword);
+    }
+    
+    // Firebase'i başlat ve giriş yap
+    try {
+      showAlert('⏳ Firebase başlatılıyor...', 'info');
+      await initializeFirebase(config);
+      
+      if (firebaseEmail && firebasePassword) {
+        showAlert('⏳ Firebase\'e giriş yapılıyor...', 'info');
+        await firebaseAuth.signInWithEmailAndPassword(firebaseEmail, firebasePassword);
+        console.log('✅ Firebase\'e giriş yapıldı');
+        
+        // Verileri yükle
+        await loadFromFirebase();
+        updateStats();
+        renderApps();
+        startFirebaseRealtimeListener();
+        
+        showAlert('✅ Firebase ayarları kaydedildi ve veriler yüklendi!', 'success');
+      } else {
+        showAlert('✅ Firebase config kaydedildi! Email ve şifre ile giriş yapabilirsiniz.', 'success');
+      }
+    } catch (error) {
+      console.error('Firebase başlatma/giriş hatası:', error);
+      const errorMessage = error.message || 'Bilinmeyen hata';
+      showAlert(`❌ Firebase hatası: ${errorMessage}`, 'error');
+      return;
+    }
+  }
   // Token validasyonu
-  if (newMode === 'github' && newToken) {
+  else if (newMode === 'github' && newToken) {
     // Token format kontrolü
     if (!newToken.startsWith('ghp_') && !newToken.startsWith('github_pat_')) {
       showAlert('⚠️ Token formatı hatalı! GitHub Personal Access Token "ghp_" veya "github_pat_" ile başlamalıdır.', 'warning');
@@ -1535,18 +1846,149 @@ async function saveGitHubSettings() {
   const saveGitHubBtnTopbar = document.getElementById('saveGitHubBtnTopbar');
   const saveGitHubBtnMobile = document.getElementById('saveGitHubBtnMobile');
   if (saveGitHubBtnTopbar) {
-    if (currentMode === 'github' && token) {
+    if ((currentMode === 'github' && token) || currentMode === 'firebase') {
       saveGitHubBtnTopbar.classList.remove('hidden');
     } else {
       saveGitHubBtnTopbar.classList.add('hidden');
     }
   }
   if (saveGitHubBtnMobile) {
-    if (currentMode === 'github' && token) {
+    if ((currentMode === 'github' && token) || currentMode === 'firebase') {
       saveGitHubBtnMobile.classList.remove('hidden');
     } else {
       saveGitHubBtnMobile.classList.add('hidden');
     }
+  }
+}
+
+// Firebase'i başlat
+async function initializeFirebase(config) {
+  if (!config) {
+    throw new Error('Firebase config bulunamadı');
+  }
+  
+  try {
+    // Firebase SDK'yı kontrol et
+    if (typeof firebase === 'undefined') {
+      throw new Error('Firebase SDK yüklenemedi. Firebase SDK script tag\'ini eklediğinizden emin olun.');
+    }
+    
+    // Firebase'i başlat
+    if (!firebaseApp) {
+      firebaseApp = firebase.initializeApp(config);
+      firebaseAuth = firebase.auth();
+      firebaseDatabase = firebase.database();
+      firebaseConfig = config;
+      console.log('✅ Firebase başlatıldı');
+    }
+    
+    return { firebaseApp, firebaseAuth, firebaseDatabase };
+  } catch (error) {
+    console.error('Firebase başlatma hatası:', error);
+    throw error;
+  }
+}
+
+// Firebase'den veri yükle
+async function loadFromFirebase() {
+  if (!firebaseDatabase) {
+    throw new Error('Firebase database başlatılmamış');
+  }
+  
+  try {
+    // Apps verilerini yükle
+    const appsSnapshot = await firebaseDatabase.ref('apps').once('value');
+    const appsDataFromFirebase = appsSnapshot.val();
+    
+    // Site verilerini yükle
+    const siteSnapshot = await firebaseDatabase.ref('site').once('value');
+    const siteDataFromFirebase = siteSnapshot.val();
+    
+    // Verileri birleştir
+    if (appsDataFromFirebase) {
+      appsData = appsDataFromFirebase;
+    } else {
+      appsData = { apps: [], site: null };
+    }
+    
+    if (siteDataFromFirebase) {
+      appsData.site = siteDataFromFirebase;
+    }
+    
+    // LocalStorage'a da kaydet (fallback için)
+    saveToLocal();
+    
+    console.log('✅ Firebase\'den veri yüklendi');
+    return appsData;
+  } catch (error) {
+    console.error('Firebase\'den yükleme hatası:', error);
+    throw error;
+  }
+}
+
+// Firebase'e kaydet
+async function saveToFirebase(silent = false) {
+  if (currentMode !== 'firebase') {
+    return false;
+  }
+  
+  if (!firebaseDatabase) {
+    if (!silent) {
+      showAlert('❌ Firebase database başlatılmamış!', 'error');
+    }
+    return false;
+  }
+  
+  try {
+    // Apps verilerini kaydet
+    await firebaseDatabase.ref('apps').set(appsData);
+    
+    // Site verilerini kaydet
+    if (appsData.site) {
+      await firebaseDatabase.ref('site').set(appsData.site);
+    }
+    
+    if (!silent) {
+      console.log('✅ Firebase\'e kaydedildi');
+    }
+    return true;
+  } catch (error) {
+    console.error('Firebase\'e kaydetme hatası:', error);
+    if (!silent) {
+      showAlert('❌ Firebase\'e kaydetme hatası: ' + error.message, 'error');
+    }
+    return false;
+  }
+}
+
+// Firebase realtime listener başlat
+function startFirebaseRealtimeListener() {
+  if (!firebaseDatabase || currentMode !== 'firebase') {
+    return;
+  }
+  
+  try {
+    // Apps verilerini dinle
+    firebaseDatabase.ref('apps').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        appsData = data;
+        updateStats();
+        renderApps();
+      }
+    });
+    
+    // Site verilerini dinle
+    firebaseDatabase.ref('site').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data && appsData) {
+        appsData.site = data;
+      }
+    });
+    
+    console.log('✅ Firebase realtime listener başlatıldı');
+  } catch (error) {
+    console.error('Firebase listener başlatma hatası:', error);
   }
 }
 
@@ -1560,42 +2002,105 @@ async function login() {
         const config = JSON.parse(savedConfig);
         await initializeFirebase(config);
         
-        // Firebase'e giriş yap (email/password localStorage'da saklanmaz, kullanıcıdan istenir)
+        // Firebase auth state kontrolü
+        firebaseAuth.onAuthStateChanged(async (user) => {
+          if (user) {
+            // Giriş yapılmış - verileri yükle
+            try {
+              await loadFromFirebase();
+              updateStats();
+              renderApps();
+              startFirebaseRealtimeListener();
+            } catch (error) {
+              console.error('Firebase\'den yükleme hatası:', error);
+              // Hata durumunda LocalStorage'dan yükle
+              const saved = localStorage.getItem('appsData');
+              if (saved) {
+                appsData = JSON.parse(saved);
+                updateStats();
+                renderApps();
+              }
+            }
+          } else {
+            // Giriş yapılmamış - LocalStorage'dan yükle
+            const saved = localStorage.getItem('appsData');
+            if (saved) {
+              appsData = JSON.parse(saved);
+              updateStats();
+              renderApps();
+            } else {
+              // LocalStorage'da da yoksa varsayılan veriler
+              appsData = { apps: [], site: getDefaultSiteData() };
+              updateStats();
+              renderApps();
+            }
+            showAlert('💡 Firebase\'e giriş yapmak için GitHub Ayarları bölümünden email/password girin.', 'info');
+          }
+        });
+      } catch (error) {
+        console.error('Firebase başlatma hatası:', error);
+        // Hata durumunda LocalStorage'dan yükle
+        const saved = localStorage.getItem('appsData');
+        if (saved) {
+          appsData = JSON.parse(saved);
+          updateStats();
+          renderApps();
+        }
+      }
+    } else {
+      // Firebase config yok - LocalStorage'dan yükle
+      const saved = localStorage.getItem('appsData');
+      if (saved) {
+        appsData = JSON.parse(saved);
+        updateStats();
+        renderApps();
+      } else {
+        // İlk kez, data/apps.json'dan yükle
+        try {
+          const dataPath = '/data/apps.json';
+          const sitePath = '/data/site.json';
+          const res = await fetch(dataPath);
+          appsData = await res.json();
+          if (!appsData.site) {
+            try {
+              const siteRes = await fetch(sitePath);
+              const siteData = await siteRes.json();
+              appsData.site = siteData.site;
+            } catch {
+              appsData.site = getDefaultSiteData();
+            }
+          }
+          saveToLocal();
+          updateStats();
+          renderApps();
+        } catch (error) {
+          console.error('Veri yüklenirken hata:', error);
+          appsData = { apps: [], site: getDefaultSiteData() };
+          updateStats();
+          renderApps();
+        }
+      }
+      showAlert('💡 Firebase modunu kullanmak için GitHub Ayarları bölümünden Firebase config bilgilerini girin.', 'info');
+    }
+  } else if (currentMode === 'github') {
+    // GitHub modu artık desteklenmiyor, Firebase'e yönlendir
+    showAlert('⚠️ GitHub modu artık desteklenmiyor. Firebase moduna geçiliyor.', 'warning');
+    currentMode = 'firebase';
+    localStorage.setItem('currentMode', 'firebase');
+    setMode('firebase');
+    
+    // Firebase modunda devam et
+    const savedConfig = localStorage.getItem('firebaseConfig');
+    if (savedConfig) {
+      try {
+        const config = JSON.parse(savedConfig);
+        await initializeFirebase(config);
         showAlert('💡 Firebase modunda çalışmak için GitHub Ayarları bölümünden Firebase config ve email/password girin.', 'info');
       } catch (error) {
         console.error('Firebase başlatma hatası:', error);
       }
-    }
-  } else if (currentMode === 'github') {
-    const tokenEl = document.getElementById('token');
-    if (!tokenEl) {
-      alert('Token alanı bulunamadı!');
-      return;
-    }
-    token = tokenEl.value.trim();
-    if (!token) {
-      alert('GitHub Token girin!\n\nGitHub artık şifre kabul etmiyor. Personal Access Token gerekiyor.\n\nToken oluşturmak için:\nGitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic)');
-      return;
-    }
-    
-    // Token format kontrolü
-    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
-      alert('⚠️ Token formatı hatalı!\n\nGitHub Personal Access Token "ghp_" veya "github_pat_" ile başlamalıdır.\n\nŞifre değil, token girmelisiniz!');
-      return;
-    }
-    
-    // Token'ı test et
-    const tokenTest = await testGitHubToken(token);
-    if (!tokenTest.valid) {
-      alert(`❌ Token hatası: ${tokenTest.error}\n\nLütfen:\n1. Token'ın doğru kopyalandığından emin olun\n2. Token'ın "repo" iznine sahip olduğunu kontrol edin\n3. Token'ın süresinin dolmadığını kontrol edin`);
-      return;
-    }
-    
-    try {
-      await loadFromGitHub();
-    } catch (error) {
-      alert('GitHub\'dan veri yüklenirken hata: ' + error.message);
-      return;
+    } else {
+      showAlert('💡 Firebase modunu kullanmak için GitHub Ayarları bölümünden Firebase config bilgilerini girin.', 'info');
     }
   } else {
     // LocalStorage'dan yükle
@@ -1834,10 +2339,39 @@ async function saveToGitHub() {
 // LocalStorage'a kaydet
 function saveToLocal() {
   localStorage.setItem('appsData', JSON.stringify(appsData));
+  
+  // Firebase modunda ise otomatik olarak Firebase'e de kaydet (sessiz mod)
+  if (currentMode === 'firebase') {
+    // Firebase config varsa ve database başlatılmışsa kaydet
+    if (firebaseConfig && firebaseDatabase) {
+      // Async işlem olduğu için hata yakalama ile sessizce devam et
+      saveToFirebase(true).catch((error) => {
+        console.warn('⚠️ Firebase otomatik kaydetme hatası (sessizce devam ediliyor):', error);
+      });
+    } else if (firebaseConfig && !firebaseDatabase) {
+      // Firebase config var ama database başlatılmamışsa başlat ve kaydet
+      initializeFirebase(firebaseConfig).then(() => {
+        if (firebaseDatabase) {
+          saveToFirebase(true).catch((error) => {
+            console.warn('⚠️ Firebase otomatik kaydetme hatası:', error);
+          });
+        }
+      }).catch((error) => {
+        console.warn('⚠️ Firebase otomatik başlatma hatası:', error);
+      });
+    }
+  }
 }
 
 // İstatistikleri güncelle
 function updateStats() {
+  // appsData kontrolü
+  if (!appsData || !appsData.apps || !Array.isArray(appsData.apps)) {
+    console.warn('⚠️ appsData henüz yüklenmedi veya geçersiz');
+    appsData = appsData || { apps: [], site: null };
+    appsData.apps = appsData.apps || [];
+  }
+  
   const total = appsData.apps.length;
   const published = appsData.apps.filter(app => app.details && app.details !== '#').length;
   const comingSoon = total - published;
@@ -1946,6 +2480,14 @@ function updateTrends() {
 
 // Grafikleri güncelle
 function updateCharts() {
+  // appsData kontrolü
+  if (!appsData || !appsData.apps || !Array.isArray(appsData.apps)) {
+    console.warn('⚠️ Grafikler için appsData henüz yüklenmedi');
+    renderCategoryChart({});
+    renderRatingChart({});
+    return;
+  }
+  
   // Kategori dağılımı
   const categories = {};
   appsData.apps.forEach(app => {
@@ -1979,19 +2521,23 @@ function updateCharts() {
 // Kategori grafiği
 function renderCategoryChart(categories) {
   const container = document.getElementById('categoryChart');
-  if (!container) return;
+  if (!container) {
+    console.warn('⚠️ categoryChart container bulunamadı');
+    return;
+  }
   
   const entries = Object.entries(categories).sort((a, b) => b[1] - a[1]);
   if (entries.length === 0) {
-    container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 40px;">Henüz kategori yok</p>';
+    container.innerHTML = '<p class="chart-empty-message">Henüz kategori yok</p>';
     return;
   }
   
   const maxValue = Math.max(...entries.map(e => e[1]));
+  const totalApps = (appsData && appsData.apps && appsData.apps.length) || entries.reduce((sum, e) => sum + e[1], 0);
   
   container.innerHTML = entries.map(([category, count]) => {
-    const percentage = (count / appsData.apps.length) * 100;
-    const barWidth = (count / maxValue) * 100;
+    const percentage = totalApps > 0 ? (count / totalApps) * 100 : 0;
+    const barWidth = maxValue > 0 ? (count / maxValue) * 100 : 0;
     
     return `
       <div class="chart-item">
@@ -2010,10 +2556,20 @@ function renderCategoryChart(categories) {
 // Rating grafiği
 function renderRatingChart(ratingRanges) {
   const container = document.getElementById('ratingChart');
-  if (!container) return;
+  if (!container) {
+    console.warn('⚠️ ratingChart container bulunamadı');
+    return;
+  }
   
   const entries = Object.entries(ratingRanges).reverse();
   const maxValue = Math.max(...entries.map(e => e[1]), 1);
+  
+  // Eğer hiç rating yoksa boş mesaj göster
+  const totalRatings = entries.reduce((sum, e) => sum + e[1], 0);
+  if (totalRatings === 0) {
+    container.innerHTML = '<p class="chart-empty-message">Henüz rating yok</p>';
+    return;
+  }
   
   container.innerHTML = entries.map(([range, count]) => {
     const barWidth = (count / maxValue) * 100;
@@ -2517,6 +3073,20 @@ async function fetchPlayStoreData() {
     fetchBtn.innerHTML = '<span class="spinner"></span> Çekiliyor...';
     
     try {
+      // Localhost kontrolü - Netlify function'ları sadece Netlify'da çalışır
+      const isLocalhost = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' ||
+                         window.location.hostname === '';
+      
+      if (isLocalhost) {
+        showAlert('⚠️ Play Store veri çekme özelliği sadece Netlify\'da çalışır. Lütfen bilgileri manuel olarak girin.', 'warning');
+        if (fetchBtn) {
+          fetchBtn.disabled = false;
+          fetchBtn.innerHTML = originalHTML;
+        }
+        return;
+      }
+      
       // Netlify Function kullanarak veri çek
       const functionUrl = `/.netlify/functions/fetchPlayStore?appId=${encodeURIComponent(appId)}`;
       console.log('📱 Play Store veri çekiliyor:', functionUrl);
@@ -2524,9 +3094,18 @@ async function fetchPlayStoreData() {
       const response = await fetch(functionUrl);
       
       if (!response.ok) {
+        // 404 hatası için özel mesaj
+        if (response.status === 404) {
+          throw new Error('Play Store veri çekme servisi bulunamadı. Lütfen bilgileri manuel olarak girin.');
+        }
         const errorText = await response.text().catch(() => 'Bilinmeyen hata');
-        console.error('❌ HTTP Hatası:', response.status, errorText);
-        throw new Error(`Sunucu hatası: ${response.status} - ${errorText}`);
+        // HTML yanıtı yerine sadece status kodu göster
+        const isHtmlResponse = errorText.trim().startsWith('<!DOCTYPE') || errorText.trim().startsWith('<html');
+        const errorMessage = isHtmlResponse 
+          ? `Sunucu hatası: ${response.status}`
+          : `Sunucu hatası: ${response.status} - ${errorText.substring(0, 100)}`;
+        console.error('❌ HTTP Hatası:', response.status);
+        throw new Error(errorMessage);
       }
       
       const data = await response.json();
@@ -2736,7 +3315,16 @@ function autoSaveApp() {
       
       if (isGitHubPages) {
         saveToLocal();
-        if (currentMode === 'github' && token) {
+        
+        // Firebase modunda ise Firebase'e de kaydet
+        if (currentMode === 'firebase' && firebaseDatabase) {
+          try {
+            await saveToFirebase();
+            console.log('✅ Firebase\'e otomatik kaydedildi');
+          } catch (firebaseError) {
+            console.warn('⚠️ Firebase\'e otomatik kaydetme hatası:', firebaseError);
+          }
+        } else if (currentMode === 'github' && token) {
           await saveToGitHub();
         }
       } else {
@@ -3193,10 +3781,20 @@ async function saveApp(event) {
       featureCards: app.featureCards,
       screenshots: app.screenshots
     });
-    showAlert('✅ Kaydedildi!', 'success');
     
-    // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
-    if (currentMode === 'github' && token) {
+    // Firebase modunda ise Firebase'e de kaydet
+    if (currentMode === 'firebase' && firebaseDatabase) {
+      try {
+        await saveToFirebase();
+        console.log('✅ Firebase\'e kaydedildi');
+        showAlert('✅ Firebase\'e kaydedildi! Yayında görünecek.', 'success');
+      } catch (firebaseError) {
+        const firebaseErrorMessage = firebaseError instanceof Error ? firebaseError.message : 'Bilinmeyen hata';
+        console.error('Firebase kaydetme hatası:', firebaseError);
+        showAlert(`⚠️ LocalStorage'a kaydedildi ama Firebase'e kaydedilemedi: ${firebaseErrorMessage}`, 'warning');
+      }
+    } else if (currentMode === 'github' && token) {
+      // Eğer GitHub modu aktifse ve token varsa, manuel kaydetmeyi dene
       try {
         await saveToGitHub();
         showAlert('✅ GitHub\'a manuel olarak kaydedildi!', 'success');
@@ -3205,6 +3803,8 @@ async function saveApp(event) {
         console.error('GitHub kaydetme hatası:', githubError);
         showAlert(`❌ GitHub kaydetme hatası: ${githubErrorMessage}`, 'error');
       }
+    } else {
+      showAlert('✅ LocalStorage\'a kaydedildi! (Firebase veya GitHub moduna geçerek yayında görünebilir)', 'success');
     }
     
     // Önizlemeyi otomatik yenile
@@ -4561,7 +5161,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Kullanıcıları LocalStorage'dan yükle
 async function loadUsers() {
-  // Önce GitHub'dan yüklemeyi dene (eğer GitHub modu aktifse ve token varsa)
+  // Önce Firebase'den yüklemeyi dene (eğer Firebase modu aktifse)
+  if (currentMode === 'firebase' && firebaseDatabase) {
+    try {
+      const firebaseUsers = await loadUsersFromFirebase();
+      if (firebaseUsers && firebaseUsers.length > 0) {
+        usersData = firebaseUsers;
+        // LocalStorage'a da kaydet (senkronizasyon için)
+        localStorage.setItem('adminUsers', JSON.stringify(usersData));
+        console.log('✅ Kullanıcılar Firebase\'den yüklendi:', usersData.length, 'kullanıcı');
+        renderUsers();
+        return;
+      }
+    } catch (error) {
+      console.warn('⚠️ Firebase\'den yükleme başarısız, localStorage\'dan yükleniyor:', error);
+    }
+  }
+  
+  // GitHub'dan yüklemeyi dene (eğer GitHub modu aktifse ve token varsa)
   if (currentMode === 'github' && token) {
     try {
       const githubUsers = await loadUsersFromGitHub();
@@ -4618,6 +5235,26 @@ async function loadUsers() {
     await saveUsers();
   }
   renderUsers();
+}
+
+// Kullanıcıları Firebase'den yükle
+async function loadUsersFromFirebase() {
+  if (!firebaseDatabase || currentMode !== 'firebase') {
+    throw new Error('Firebase database başlatılmamış veya Firebase modu aktif değil');
+  }
+  
+  try {
+    const snapshot = await firebaseDatabase.ref('adminUsers').once('value');
+    const users = snapshot.val();
+    if (users && Array.isArray(users)) {
+      console.log('✅ Kullanıcılar Firebase\'den yüklendi:', users.length);
+      return users;
+    }
+    return [];
+  } catch (error) {
+    console.error('Firebase\'den kullanıcı yükleme hatası:', error);
+    throw error;
+  }
 }
 
 // Kullanıcıları GitHub'dan yükle
@@ -4688,6 +5325,18 @@ async function saveUsers() {
     localStorage.setItem('adminUsers', jsonData);
     console.log('✅ Kullanıcılar localStorage\'a kaydedildi:', usersData.length, 'kullanıcı');
     
+    // Firebase modu aktifse Firebase'e kaydet
+    if (currentMode === 'firebase' && firebaseDatabase) {
+      try {
+        await saveUsersToFirebase();
+        console.log('✅ Kullanıcılar Firebase\'e kaydedildi');
+      } catch (error) {
+        console.error('⚠️ Firebase kaydetme hatası (localStorage başarılı):', error);
+        // Hata olsa bile localStorage'a kaydedildiği için devam et
+        throw error; // Hata fırlat ki çağıran fonksiyon bilgilendirilebilsin
+      }
+    }
+    
     // GitHub'a da kaydet (eğer GitHub modu aktifse ve token varsa)
     if (currentMode === 'github' && token) {
       try {
@@ -4721,12 +5370,33 @@ async function saveUsers() {
       return false;
     }
     
+    // localStorage başarılı ama Firebase başarısızsa uyarı göster
+    if (currentMode === 'firebase' && firebaseDatabase) {
+      showAlert(`⚠️ Veriler localStorage'a kaydedildi ama Firebase'e kaydedilemedi: ${errorMessage}. Lütfen Firebase bağlantınızı kontrol edin.`, 'warning');
+    }
+    
     // localStorage başarılı ama GitHub başarısızsa uyarı göster
     if (currentMode === 'github' && token) {
       showAlert(`⚠️ Veriler localStorage'a kaydedildi ama GitHub'a kaydedilemedi: ${errorMessage}. Lütfen GitHub Ayarları bölümünden kontrol edin.`, 'warning');
     }
     
     return true; // localStorage başarılı olduğu için true döndür
+  }
+}
+
+// Kullanıcıları Firebase'e kaydet
+async function saveUsersToFirebase() {
+  if (!firebaseDatabase || currentMode !== 'firebase') {
+    throw new Error('Firebase database başlatılmamış veya Firebase modu aktif değil');
+  }
+  
+  try {
+    await firebaseDatabase.ref('adminUsers').set(usersData);
+    console.log('✅ Kullanıcılar Firebase\'e kaydedildi');
+    return true;
+  } catch (error) {
+    console.error('Firebase\'e kullanıcı kaydetme hatası:', error);
+    throw error;
   }
 }
 
@@ -5496,6 +6166,17 @@ async function changePassword(event) {
       throw new Error('Şifre kaydedilemedi!');
     }
     
+    // Firebase modu aktifse Firebase'e kaydet
+    if (currentMode === 'firebase' && firebaseDatabase) {
+      try {
+        await saveUsersToFirebase();
+        console.log('✅ Şifre Firebase\'e başarıyla kaydedildi');
+      } catch (error) {
+        console.warn('⚠️ Firebase\'e kaydetme hatası (localStorage başarılı):', error);
+        showAlert('⚠️ Şifre localStorage\'a kaydedildi ama Firebase\'e kaydedilemedi. Lütfen Firebase bağlantınızı kontrol edin.', 'warning');
+      }
+    }
+    
     // GitHub modu aktifse GitHub'a kaydetmeyi bekle
     if (currentMode === 'github' && token) {
       try {
@@ -5536,8 +6217,16 @@ async function changePassword(event) {
     }
     
     // Kullanıcı listesini yeniden yükle (güncel veriler için)
-    // GitHub modu aktifse GitHub'dan yükle, değilse localStorage'dan
-    if (currentMode === 'github' && token) {
+    // Firebase modu aktifse Firebase'den yükle, GitHub modu aktifse GitHub'dan yükle, değilse localStorage'dan
+    if (currentMode === 'firebase' && firebaseDatabase) {
+      try {
+        await loadUsers();
+        console.log('✅ Kullanıcılar Firebase\'den yeniden yüklendi');
+      } catch (error) {
+        console.warn('⚠️ Firebase\'den yükleme başarısız, localStorage\'dan yükleniyor:', error);
+        await loadUsers();
+      }
+    } else if (currentMode === 'github' && token) {
       try {
         await loadUsers();
         console.log('✅ Kullanıcılar GitHub\'dan yeniden yüklendi');

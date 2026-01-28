@@ -6751,3 +6751,61 @@ body.ai-modal-open .hamburger {
 .playstore-url-input {
     flex: 1;
 }
+
+/* Inline style replacements - Admin Panel */
+.d-none {
+    display: none;
+}
+
+.info-text {
+    display: block;
+    color: #6b7280;
+}
+
+.info-text-small {
+    display: block;
+    margin-top: 8px;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.github-mode-info {
+    padding: 12px;
+    background: #fef3c7;
+    border-radius: 8px;
+    border-left: 4px solid #f59e0b;
+    display: none;
+}
+
+.github-mode-info-text {
+    margin: 0;
+    color: #92400e;
+    font-size: 0.875rem;
+}
+
+.firebase-mode-info {
+    padding: 12px;
+    background: #fff5e6;
+    border-radius: 8px;
+    border-left: 4px solid #ff9800;
+    display: none;
+}
+
+.firebase-mode-info-text {
+    margin: 0;
+    color: #e65100;
+    font-size: 0.875rem;
+}
+
+.local-mode-info {
+    padding: 12px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.local-mode-info-text {
+    margin: 0;
+    color: #1e40af;
+    font-size: 0.875rem;
+}

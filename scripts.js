@@ -140,26 +140,68 @@ function setupHamburgerMenu() {
 // Site verilerini yükle
 async function loadSiteData() {
   try {
-    // Önce site.json'dan site verilerini yükle
     let siteData = null;
-    try {
-      const siteRes = await fetch("data/site.json");
-      if (siteRes.ok) {
-        const siteJson = await siteRes.json();
-        siteData = siteJson.site;
+    
+    // Önce Firebase'den yüklemeyi dene
+    if (typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
+      try {
+        console.log('🔥 Firebase\'den site verisi yükleniyor...');
+        const snapshot = await firebaseDatabase.ref('site').once('value');
+        const siteDataFromFirebase = snapshot.val();
+        if (siteDataFromFirebase) {
+          siteData = siteDataFromFirebase;
+          console.log('✅ Firebase\'den site verisi yüklendi');
+        }
+      } catch (firebaseError) {
+        console.warn('Firebase\'den site verisi yüklenirken hata:', firebaseError);
       }
-    } catch (error) {
-      console.warn('Site verisi yüklenirken hata:', error);
+    }
+    
+    // Firebase'den yüklenemediyse site.json'dan yükle
+    if (!siteData) {
+      try {
+        // Path'i mevcut dizine göre ayarla (root veya task-cosmos/)
+        const sitePath = window.location.pathname.includes('/task-cosmos/') 
+          ? '../data/site.json' 
+          : 'data/site.json';
+        const siteRes = await fetch(sitePath);
+        if (siteRes.ok) {
+          const siteJson = await siteRes.json();
+          siteData = siteJson.site;
+        }
+      } catch (error) {
+        console.warn('Site verisi yüklenirken hata:', error);
+      }
     }
     
     // Eğer site.json'dan yüklenemediyse, apps.json'dan kontrol et (geriye dönük uyumluluk)
     if (!siteData) {
       try {
-        const res = await fetch("data/apps.json");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.site) {
-            siteData = data.site;
+        // Önce Firebase'den apps verisini kontrol et
+        if (typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
+          try {
+            const snapshot = await firebaseDatabase.ref('apps').once('value');
+            const appsData = snapshot.val();
+            if (appsData && appsData.site) {
+              siteData = appsData.site;
+            }
+          } catch (firebaseError) {
+            // Firebase'den yüklenemedi, JSON dosyasından dene
+          }
+        }
+        
+        // Firebase'den yüklenemediyse JSON dosyasından yükle
+        if (!siteData) {
+          // Path'i mevcut dizine göre ayarla (root veya task-cosmos/)
+          const appsPath = window.location.pathname.includes('/task-cosmos/') 
+            ? '../data/apps.json' 
+            : 'data/apps.json';
+          const res = await fetch(appsPath);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.site) {
+              siteData = data.site;
+            }
           }
         }
       } catch (error) {
@@ -306,19 +348,45 @@ async function loadApps(){
   try {
     const container = document.getElementById("apps-container");
     if (!container) {
-      console.error('Apps container bulunamadı');
+      // task-cosmos/index.html gibi detay sayfalarında apps-container yok, bu normal
+      // Admin paneli veya diğer sayfalarda da apps-container olmayabilir
+      // Bu durum normal olduğu için uyarı göstermiyoruz
       return;
     }
     
     // Loading state göster
     container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 20px; color: #666; opacity: 0.8;">Uygulamalar yükleniyor...</p></div>';
     
-    const res = await fetch("data/apps.json");
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+    let data = null;
+    
+    // Önce Firebase'den yüklemeyi dene
+    if (typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
+      try {
+        console.log('🔥 Firebase\'den veri yükleniyor...');
+        const snapshot = await firebaseDatabase.ref('apps').once('value');
+        const appsData = snapshot.val();
+        if (appsData && appsData.apps) {
+          data = appsData;
+          console.log('✅ Firebase\'den veri yüklendi');
+        }
+      } catch (firebaseError) {
+        console.warn('Firebase\'den yükleme hatası, JSON dosyasından yüklenecek:', firebaseError);
+      }
     }
     
-    const data = await res.json();
+    // Firebase'den yüklenemediyse JSON dosyasından yükle
+    if (!data) {
+      // Path'i mevcut dizine göre ayarla (root veya task-cosmos/)
+      const appsPath = window.location.pathname.includes('/task-cosmos/') 
+        ? '../data/apps.json' 
+        : 'data/apps.json';
+      const res = await fetch(appsPath);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      data = await res.json();
+      console.log('📄 JSON dosyasından veri yüklendi');
+    }
     container.innerHTML = "";
     
     if (!data.apps || data.apps.length === 0) {
@@ -613,7 +681,8 @@ async function loadSearchData() {
       searchData.site = siteData.site || null;
     }
   } catch (error) {
-    console.error('Arama verileri yüklenirken hata:', error);
+    // Arama verileri yüklenirken hata oluştu - sessizce devam et
+    console.warn('Arama verileri yüklenirken hata:', error);
   }
 }
 
@@ -1223,8 +1292,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hamburger menü event listener'larını ekle
   setupHamburgerMenu();
   
-  // Site verilerini yükle
-  loadSiteData();
+  // Site verilerini yükle (sadece ana sayfa için)
+  if (!window.location.pathname.includes('/task-cosmos/')) {
+    loadSiteData();
+  }
   
   // Search initialization
   initSearch();
@@ -1303,13 +1374,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Show loading state
   showLoading();
   
-  // Load apps
-  loadApps().then(() => {
-    // Enhance app cards after loading
-    setTimeout(() => {
-      enhanceAppCards();
-    }, 100);
-  });
+  // Load apps (sadece ana sayfa için)
+  if (!window.location.pathname.includes('/task-cosmos/')) {
+    loadApps().then(() => {
+      // Enhance app cards after loading
+      setTimeout(() => {
+        enhanceAppCards();
+      }, 100);
+    });
+  }
   
   // Scroll indicator'a tıklandığında uygulamalar bölümüne kaydır
   const scrollIndicator = document.querySelector('.scroll-indicator');

@@ -1084,7 +1084,11 @@
       min-height: 120px;
     }
   }
-</style>
+  </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
   <script>
@@ -1596,14 +1600,12 @@
               } else {
                 console.error('❌ showLogin fonksiyonu bulunamadı!');
               }
+              // 2FA bölümünü başlangıçta gizle - sadece şifre doğru olduğunda gösterilecek
               const twoFactorGroup = document.getElementById('twoFactorGroup');
               if (twoFactorGroup) {
-                twoFactorGroup.classList.remove('hidden');
+                twoFactorGroup.classList.add('hidden');
               }
-              // 2FA kodunu otomatik üret ve göster
-              if (typeof startAutoGenerateCode === 'function') {
-                startAutoGenerateCode();
-              }
+              // Sayfa yüklendiğinde 2FA kodunu otomatik üretme - sadece şifre doğru olduğunda üretilecek
             }
           } catch (error) {
             console.error('❌ QR kod callback hatası:', error);
@@ -2653,6 +2655,22 @@
             adminPasswordHash: ADMIN_PASSWORD_HASH.substring(0, 10) + '...',
             hashMatch: hashedPassword === ADMIN_PASSWORD_HASH
           });
+          
+          // Şifre yanlışken 2FA bölümünü gizle
+          const twoFactorGroup = document.getElementById('twoFactorGroup');
+          if (twoFactorGroup) {
+            twoFactorGroup.classList.add('hidden');
+          }
+          const twoFactorInput = document.getElementById('twoFactorCode');
+          if (twoFactorInput) {
+            twoFactorInput.value = '';
+            twoFactorInput.classList.remove('error');
+          }
+          const twoFactorError = document.getElementById('twoFactorError');
+          if (twoFactorError) {
+            twoFactorError.textContent = '';
+          }
+          
           const attemptResult = recordFailedLogin();
           
           if (attemptResult.locked) {
@@ -2686,8 +2704,34 @@
         // Başarılı şifre girişi - deneme sayacını sıfırla
         resetLoginAttempts();
 
+        // Şifre doğru - hata mesajını temizle
+        errorMessage.textContent = '';
+        passwordInput.classList.remove('error');
+
         // 2FA kontrolü (eğer aktifse)
         if (twoFactorEnabled && twoFactorSecret) {
+          // Şifre doğru olduğunda 2FA bölümünü göster
+          const twoFactorGroup = document.getElementById('twoFactorGroup');
+          if (twoFactorGroup) {
+            twoFactorGroup.classList.remove('hidden');
+          }
+          
+          // 2FA kodunu otomatik üret ve göster (eğer yoksa)
+          if (!twoFactorCode || twoFactorCode.length !== 6) {
+            try {
+              twoFactorCode = await generateTOTP(twoFactorSecret);
+              if (twoFactorInput) {
+                twoFactorInput.value = twoFactorCode;
+                twoFactorInput.classList.remove('error');
+              }
+              if (twoFactorError) {
+                twoFactorError.textContent = '';
+              }
+            } catch (error) {
+              console.error('Otomatik kod üretme hatası:', error);
+            }
+          }
+          
           if (!twoFactorCode || twoFactorCode.length !== 6 || !/^\d{6}$/.test(twoFactorCode)) {
             twoFactorError.textContent = '❌ Lütfen 6 haneli doğrulama kodunu girin!';
             if (twoFactorInput) {
@@ -2739,6 +2783,48 @@
           user.id === authenticatedUser.id ? authenticatedUser : user
         );
         localStorage.setItem('adminUsers', JSON.stringify(usersData));
+
+        // Firebase entegrasyonu - otomatik Firebase'e giriş yap
+        try {
+          const firebaseConfig = localStorage.getItem('firebaseConfig');
+          if (firebaseConfig && typeof firebase !== 'undefined') {
+            const config = JSON.parse(firebaseConfig);
+            
+            // Firebase'i başlat
+            let firebaseApp = firebase.apps.length > 0 ? firebase.apps[0] : firebase.initializeApp(config);
+            const firebaseAuth = firebase.auth();
+            
+            // Firebase Authentication bilgilerini kontrol et
+            const firebaseEmail = localStorage.getItem('firebaseEmail');
+            const firebasePassword = localStorage.getItem('firebasePassword');
+            
+            if (firebaseEmail && firebasePassword) {
+              // Firebase'e otomatik giriş yap
+              try {
+                await firebaseAuth.signInWithEmailAndPassword(firebaseEmail, firebasePassword);
+                console.log('✅ Firebase\'e otomatik giriş yapıldı');
+                
+                // Firebase modunu aktif et
+                localStorage.setItem('currentMode', 'firebase');
+              } catch (firebaseError) {
+                console.warn('⚠️ Firebase\'e otomatik giriş yapılamadı:', firebaseError.message);
+                // Firebase girişi başarısız olsa bile admin paneline giriş yapılabilir
+                // LocalStorage moduna geç
+                localStorage.setItem('currentMode', 'local');
+              }
+            } else {
+              // Firebase bilgileri yok - LocalStorage moduna geç
+              localStorage.setItem('currentMode', 'local');
+            }
+          } else {
+            // Firebase config yok - LocalStorage moduna geç
+            localStorage.setItem('currentMode', 'local');
+          }
+        } catch (firebaseError) {
+          console.warn('⚠️ Firebase entegrasyonu hatası:', firebaseError);
+          // Hata olsa bile admin paneline giriş yapılabilir
+          localStorage.setItem('currentMode', 'local');
+        }
 
         // Başarı mesajı
         const loginBtnText = document.getElementById('loginBtnText');

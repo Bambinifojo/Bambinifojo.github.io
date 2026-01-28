@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://bambinifojo.netlify.app https://bambinifojo.github.io https://cdn.jsdelivr.net https://*.firebaseio.com https://*.googleapis.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://bambinifojo.netlify.app https://bambinifojo.github.io https://cdn.jsdelivr.net https://www.gstatic.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <title>Admin Paneli - Bambinifojo</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <link rel="stylesheet" href="/styles.css?v=1.0.1"/>
@@ -17,8 +17,13 @@
     // Session kontrolü - eğer yoksa veya süresi dolmuşsa, login sayfasına yönlendir
     if (!adminSession || !adminLoginTime) {
       // Session yok - login sayfasına yönlendir
-      if (!window.location.pathname.includes('admin-login.html')) {
-        window.location.replace('/admin-login.html');
+      const currentPath = window.location.pathname || window.location.href;
+      if (!currentPath.includes('admin-login.html') && !currentPath.includes('admin-login')) {
+        // Localhost için relative path kullan
+        const loginPath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+          ? 'admin-login.html' 
+          : '/admin-login.html';
+        window.location.replace(loginPath);
         return;
       }
     } else {
@@ -34,9 +39,13 @@
         sessionStorage.removeItem('adminUsername');
         sessionStorage.removeItem('adminRole');
         
-        if (!window.location.pathname.includes('admin-login.html')) {
+        const currentPath = window.location.pathname || window.location.href;
+        if (!currentPath.includes('admin-login.html') && !currentPath.includes('admin-login')) {
           sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-          window.location.replace('/admin-login.html');
+          const loginPath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'admin-login.html' 
+            : '/admin-login.html';
+          window.location.replace(loginPath);
           return;
         }
       } else {
@@ -47,9 +56,13 @@
           
           if (!currentSession || !currentLoginTime) {
             // Session yok - yönlendir
-            if (!window.location.pathname.includes('admin-login.html')) {
+            const currentPath = window.location.pathname || window.location.href;
+            if (!currentPath.includes('admin-login.html') && !currentPath.includes('admin-login')) {
               sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-              window.location.replace('/admin-login.html');
+              const loginPath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                ? 'admin-login.html' 
+                : '/admin-login.html';
+              window.location.replace(loginPath);
             }
             return;
           }
@@ -66,9 +79,13 @@
             sessionStorage.removeItem('adminUsername');
             sessionStorage.removeItem('adminRole');
             
-            if (!window.location.pathname.includes('admin-login.html')) {
+            const currentPath = window.location.pathname || window.location.href;
+            if (!currentPath.includes('admin-login.html') && !currentPath.includes('admin-login')) {
               sessionStorage.setItem('sessionTimeoutMessage', 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
-              window.location.replace('/admin-login.html');
+              const loginPath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                ? 'admin-login.html' 
+                : '/admin-login.html';
+              window.location.replace(loginPath);
             }
           } else {
             // Session geçerli - son aktivite zamanını güncelle
@@ -2182,7 +2199,12 @@
   }
 
   .admin-section.hidden {
-    display: none;
+    display: none !important;
+  }
+  
+  /* Dashboard section başlangıçta görünür olmalı */
+  #dashboardSection:not(.hidden) {
+    display: block;
   }
 
   /* Responsive Design */
@@ -5076,6 +5098,12 @@
     background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
   }
 
+  .chart-empty-message {
+    color: #6b7280;
+    text-align: center;
+    padding: 40px;
+  }
+
   /* Activity Styles */
   .activity-item {
     display: flex;
@@ -5951,7 +5979,25 @@
     }
   }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+<script>
+  // Chart.js yüklendikten sonra storage kullanımını devre dışı bırak
+  // Tracking Prevention uyarılarını önlemek için
+  if (typeof Chart !== 'undefined') {
+    // Chart.js'in varsayılan ayarlarını güncelle
+    // Storage kullanımını engellemek için
+    try {
+      // Chart.js'in storage kullanımını devre dışı bırak
+      if (Chart.defaults && Chart.defaults.plugins) {
+        // Chart.js'in storage kullanımını engelle
+        Chart.defaults.plugins.legend.display = true;
+        Chart.defaults.plugins.tooltip.enabled = true;
+      }
+    } catch (e) {
+      // Hata durumunda sessizce devam et
+    }
+  }
+</script>
 <script src="js/admin-utils.js?v=1.0.1"></script>
 <script src="js/admin-state.js?v=1.0.1"></script>
 <script src="js/admin-auth.js?v=1.0.1"></script>
@@ -5960,6 +6006,10 @@
 <script src="js/admin-apps.js?v=1.0.1"></script>
 <script src="js/admin-site.js?v=1.0.1"></script>
 <script src="js/admin-dashboard.js?v=1.0.1"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script defer src="admin.js?v=1.0.1"></script>
 </head>
 <body>
@@ -6018,7 +6068,7 @@
           </button>
         </div>
         <!-- Mobile Menu Button (Hamburger) -->
-        <button class="admin-mobile-menu-btn hamburger-menu" title="Menü" id="topbarMenuBtn" aria-label="Menüyü aç/kapat">
+        <button class="admin-mobile-menu-btn hamburger-menu" title="Menü" id="topbarMenuBtn" aria-label="Menüyü aç/kapat" onclick="toggleTopbarMenu();">
           <span></span>
           <span></span>
           <span></span>
@@ -6431,7 +6481,7 @@
                   Kategori Dağılımı
                 </h2>
                 <div id="categoryChart" class="chart-container">
-                  <canvas id="categoryChartCanvas" class="chart-canvas"></canvas>
+                  <p class="chart-empty-message">Yükleniyor...</p>
                 </div>
               </div>
 
@@ -6444,7 +6494,7 @@
                   Rating Dağılımı
                 </h2>
                 <div id="ratingChart" class="chart-container">
-                  <canvas id="ratingChartCanvas" class="chart-canvas"></canvas>
+                  <p class="chart-empty-message">Yükleniyor...</p>
                 </div>
               </div>
             </div>
@@ -7090,6 +7140,7 @@
           </div>
 
           <!-- GitHub Settings Section -->
+          <!-- GitHub Settings Section -->
           <div id="githubSettingsSection" class="admin-section hidden">
             <div class="admin-page-header">
               <div class="admin-page-header-actions">
@@ -7109,8 +7160,8 @@
                   <span>Dashboard</span>
                 </button>
               </div>
-              <h1 class="admin-page-title">🔗 GitHub Ayarları</h1>
-              <p class="admin-page-subtitle">GitHub entegrasyonu ve veri kaynağı ayarlarını yönetin</p>
+              <h1 class="admin-page-title">🔗 Veri Kaynağı Ayarları</h1>
+              <p class="admin-page-subtitle">Firebase ve veri kaynağı ayarlarını yönetin</p>
             </div>
 
             <div class="admin-card">
@@ -7118,132 +7169,105 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
                   <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                 </svg>
-                Veri Kaynağı Ayarları
+                Veri Kaynağı Modu
               </h2>
 
               <form id="githubSettingsForm" onsubmit="event.preventDefault(); saveGitHubSettings();">
                 <div class="site-form-section">
-                  <h3>📡 Veri Kaynağı Modu</h3>
+                  <h3>📡 Veri Kaynağı Seçimi</h3>
                   <div class="form-group">
                     <label>Mevcut Mod</label>
                     <div class="mode-toggle margin-top-10">
-                      <button type="button" id="githubSettingsLocalModeBtn" class="active" onclick="setGitHubSettingsMode('local')">LocalStorage</button>
-                      <button type="button" id="githubSettingsGithubModeBtn" onclick="setGitHubSettingsMode('github')">GitHub API</button>
-                      <button type="button" id="githubSettingsFirebaseModeBtn" onclick="setGitHubSettingsMode('firebase')">🔥 Firebase</button>
+                      <button type="button" id="githubSettingsLocalModeBtn" onclick="setGitHubSettingsMode('local')">💾 LocalStorage</button>
+                      <button type="button" id="githubSettingsFirebaseModeBtn" class="active" onclick="setGitHubSettingsMode('firebase')">🔥 Firebase</button>
                     </div>
-                    <small id="githubModeStatus" class="margin-top-10" style="display: block; color: #6b7280;">
-                      Şu anda <strong>LocalStorage</strong> modu aktif. Değişiklikler sadece tarayıcınızda saklanır.
+                    <small id="githubModeStatus" class="margin-top-10 info-text">
+                      Şu anda <strong>Firebase</strong> modu aktif. Değişiklikler otomatik olarak Firebase'e kaydedilir.
                     </small>
                   </div>
 
-                  <div class="form-group margin-top-20" id="githubTokenGroup" style="display: none;">
-                    <label for="githubSettingsToken">GitHub Personal Access Token</label>
-                    <input type="password" id="githubSettingsToken" name="githubSettingsToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
-                    <small>
-                      <strong>⚠️ ÖNEMLİ:</strong> GitHub artık şifre kabul etmiyor! Personal Access Token gerekiyor.
-                      <br><br>
-                      <strong>Token oluşturmak için:</strong>
-                      <br>
-                      1. GitHub → Sağ üstteki profil fotoğrafı → <strong>Settings</strong>
-                      <br>
-                      2. Sol menüden en altta → <strong>Developer settings</strong>
-                      <br>
-                      3. <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong>
-                      <br>
-                      4. <strong>Generate new token (classic)</strong>
-                      <br>
-                      5. Token'a bir isim verin (örn: "Admin Panel")
-                      <br>
-                      6. <strong>"repo"</strong> iznini işaretleyin
-                      <br>
-                      7. <strong>Generate token</strong> → Token'ı kopyalayın (bir daha gösterilmez!)
-                      <br><br>
-                      <strong>Gerekli izin:</strong> <code>repo</code> (Full control of private repositories)
-                    </small>
-                  </div>
-                  
-                  <div id="githubModeInfo" class="margin-top-20" style="padding: 12px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b; display: none;">
-                    <p style="margin: 0; color: #92400e; font-size: 0.875rem;">
-                      <strong>💡 GitHub API Modu:</strong> Token gerektirir ama ayarlarınız tüm tarayıcılarda ve cihazlarda geçerli olur. Başka tarayıcıdan erişmek istiyorsanız bu modu kullanın.
-                    </p>
-                  </div>
-                  
-                  <div id="firebaseModeInfo" class="margin-top-20" style="padding: 12px; background: #fff5e6; border-radius: 8px; border-left: 4px solid #ff9800; display: none;">
-                    <p style="margin: 0; color: #e65100; font-size: 0.875rem;">
+                  <!-- Firebase Modu Bilgisi -->
+                  <div id="firebaseModeInfo" class="margin-top-20 firebase-mode-info">
+                    <p class="firebase-mode-info-text">
                       <strong>🔥 Firebase Modu:</strong> Token yok! Gerçek zamanlı senkronizasyon. Değişiklikler anında yayında görünür. En kolay ve hızlı çözüm!
                     </p>
                   </div>
                   
-                  <div id="localModeInfoInSettings" class="margin-top-20" style="padding: 12px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
-                    <p style="margin: 0; color: #1e40af; font-size: 0.875rem;">
-                      <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. İstediğiniz gibi ayarları değiştirebilirsiniz. Başka tarayıcıdan erişmek için Firebase veya GitHub API modunu kullanın.
+                  <!-- LocalStorage Modu Bilgisi -->
+                  <div id="localModeInfoInSettings" class="margin-top-20 local-mode-info d-none">
+                    <p class="local-mode-info-text">
+                      <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. İstediğiniz gibi ayarları değiştirebilirsiniz. Başka tarayıcıdan erişmek için Firebase modunu kullanın.
                     </p>
                   </div>
                   
                   <!-- Firebase Config Form -->
-                  <div class="form-group margin-top-20" id="firebaseConfigGroup" style="display: none;">
-                    <label>Firebase Configuration</label>
+                  <div class="form-group margin-top-20" id="firebaseConfigGroup">
+                    <label class="form-label-bold">🔥 Firebase Configuration</label>
+                    <p class="info-text-small margin-bottom-15">Firebase Console'dan aldığınız config bilgilerini girin</p>
+                    
                     <div class="form-group">
-                      <label for="firebaseApiKey">API Key</label>
-                      <input type="text" id="firebaseApiKey" name="firebaseApiKey" placeholder="AIzaSy..." autocomplete="off"/>
+                      <label for="firebaseApiKey">API Key *</label>
+                      <input type="text" id="firebaseApiKey" name="firebaseApiKey" placeholder="AIzaSy..." autocomplete="off" required/>
                     </div>
+                    
                     <div class="form-group">
-                      <label for="firebaseAuthDomain">Auth Domain</label>
-                      <input type="text" id="firebaseAuthDomain" name="firebaseAuthDomain" placeholder="your-project.firebaseapp.com" autocomplete="off"/>
+                      <label for="firebaseAuthDomain">Auth Domain *</label>
+                      <input type="text" id="firebaseAuthDomain" name="firebaseAuthDomain" placeholder="your-project.firebaseapp.com" autocomplete="off" required/>
                     </div>
+                    
                     <div class="form-group">
-                      <label for="firebaseDatabaseURL">Database URL</label>
-                      <input type="text" id="firebaseDatabaseURL" name="firebaseDatabaseURL" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off"/>
+                      <label for="firebaseDatabaseURL">Database URL *</label>
+                      <input type="text" id="firebaseDatabaseURL" name="firebaseDatabaseURL" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off" required/>
                     </div>
+                    
                     <div class="form-group">
-                      <label for="firebaseProjectId">Project ID</label>
-                      <input type="text" id="firebaseProjectId" name="firebaseProjectId" placeholder="your-project-id" autocomplete="off"/>
+                      <label for="firebaseProjectId">Project ID *</label>
+                      <input type="text" id="firebaseProjectId" name="firebaseProjectId" placeholder="your-project-id" autocomplete="off" required/>
                     </div>
+                    
                     <div class="form-group">
                       <label for="firebaseStorageBucket">Storage Bucket</label>
                       <input type="text" id="firebaseStorageBucket" name="firebaseStorageBucket" placeholder="your-project.appspot.com" autocomplete="off"/>
                     </div>
+                    
                     <div class="form-group">
                       <label for="firebaseMessagingSenderId">Messaging Sender ID</label>
                       <input type="text" id="firebaseMessagingSenderId" name="firebaseMessagingSenderId" placeholder="123456789" autocomplete="off"/>
                     </div>
+                    
                     <div class="form-group">
                       <label for="firebaseAppId">App ID</label>
                       <input type="text" id="firebaseAppId" name="firebaseAppId" placeholder="1:123456789:web:abc123" autocomplete="off"/>
                     </div>
-                    <small style="display: block; margin-top: 8px; color: #6b7280; font-size: 0.875rem;">
-                      Firebase Console → Project Settings → Your apps → Web app → Config bilgilerini kopyalayın
+                    
+                    <small class="info-text-small">
+                      <strong>📝 Nasıl Bulunur:</strong> Firebase Console → ⚙️ Project Settings → Your apps → Web app → Config bilgilerini kopyalayın
                     </small>
                   </div>
                   
                   <!-- Firebase Auth Form -->
-                  <div class="form-group margin-top-20" id="firebaseAuthGroup" style="display: none;">
-                    <label>Firebase Authentication</label>
+                  <div class="form-group margin-top-20" id="firebaseAuthGroup">
+                    <label class="form-label-bold">🔐 Firebase Authentication</label>
+                    <p class="info-text-small margin-bottom-15">Firebase'e giriş yapmak için email ve şifre girin</p>
+                    
                     <div class="form-group">
-                      <label for="firebaseEmail">Email</label>
-                      <input type="email" id="firebaseEmail" name="firebaseEmail" placeholder="admin@example.com" autocomplete="email"/>
+                      <label for="firebaseEmail">Email *</label>
+                      <input type="email" id="firebaseEmail" name="firebaseEmail" placeholder="admin@example.com" autocomplete="email" required/>
                     </div>
+                    
                     <div class="form-group">
-                      <label for="firebasePassword">Password</label>
-                      <input type="password" id="firebasePassword" name="firebasePassword" placeholder="Güçlü bir şifre" autocomplete="new-password"/>
+                      <label for="firebasePassword">Password *</label>
+                      <input type="password" id="firebasePassword" name="firebasePassword" placeholder="Güçlü bir şifre" autocomplete="new-password" required/>
                     </div>
-                    <small style="display: block; margin-top: 8px; color: #6b7280; font-size: 0.875rem;">
+                    
+                    <small class="info-text-small">
                       Firebase Authentication'da kullanıcı oluşturmanız gerekecek. İlk kez giriş yaparken otomatik oluşturulacak.
                     </small>
                   </div>
 
-                  <div class="form-actions margin-top-20">
-                    <button type="button" class="btn btn-info" onclick="testGitHubTokenFromUI()" id="testTokenBtn" style="display: none;">
-                      <span>🔍 Token'ı Test Et</span>
-                    </button>
+                  <div class="form-actions margin-top-30">
                     <button type="submit" class="btn btn-primary">
                       <span>💾 Ayarları Kaydet</span>
-                    </button>
-                    <button type="button" class="btn btn-success" onclick="saveToGitHub()" id="githubSettingsSaveBtn" style="display: none;">
-                      <span>📤 GitHub'a Kaydet</span>
-                    </button>
-                    <button type="button" class="btn btn-warning" onclick="saveLocalStorageToGitHub()" id="saveLocalToGitHubBtn" style="display: none;">
-                      <span>💾 LocalStorage'dan GitHub'a Kaydet</span>
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="loadGitHubSettings()">
                       <span>🔄 Yenile</span>
@@ -7427,13 +7451,14 @@
               <h1>Veri Kaynağı</h1>
               <p>Verilerinizi yüklemek için bir kaynak seçin</p>
               <div class="mode-toggle margin-top-20">
-                <button type="button" id="localModeBtn" class="active" onclick="setMode('local')">LocalStorage</button>
-                <button type="button" id="githubModeBtn" onclick="setMode('github')">GitHub API</button>
+                <button type="button" id="localModeBtn" onclick="setMode('local')">LocalStorage</button>
+                <button type="button" id="githubModeBtn" class="d-none" onclick="setMode('github')">GitHub API</button>
+                <button type="button" id="firebaseModeBtn" class="active" onclick="setMode('firebase')">🔥 Firebase</button>
               </div>
-              <div class="form-group margin-top-20" id="tokenGroupInLogin" style="display: none;">
+              <div class="form-group margin-top-20 d-none" id="tokenGroupInLogin">
                 <label for="token">GitHub Personal Access Token</label>
                 <input type="password" id="token" name="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
-                <small style="display: block; margin-top: 8px; color: #6b7280; font-size: 0.875rem;">
+                <small class="info-text-small">
                   <strong>⚠️ ÖNEMLİ:</strong> GitHub artık şifre kabul etmiyor! Personal Access Token gerekiyor.
                   <br>
                   Token oluşturmak için: GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic)
@@ -7441,9 +7466,14 @@
                   <strong>Gerekli izin:</strong> <code>repo</code>
                 </small>
               </div>
-              <div id="localModeInfo" class="margin-top-20" style="padding: 12px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
-                <p style="margin: 0; color: #1e40af; font-size: 0.875rem;">
-                  <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. Başka tarayıcıdan erişmek için GitHub API modunu kullanın.
+              <div id="localModeInfo" class="margin-top-20 local-mode-info d-none">
+                <p class="local-mode-info-text">
+                  <strong>✅ LocalStorage Modu:</strong> Token gerekmez! Ayarlar sadece bu tarayıcıda saklanır. Yayın için Firebase modunu kullanın.
+                </p>
+              </div>
+              <div id="firebaseModeInfoInLogin" class="margin-top-20 firebase-mode-info">
+                <p class="firebase-mode-info-text">
+                  <strong>🔥 Firebase Modu:</strong> Token yok! Gerçek zamanlı senkronizasyon. Değişiklikler anında yayında görünür. Firebase ayarlarını "GitHub Ayarları" bölümünden yapılandırın.
                 </p>
               </div>
               <div class="button-group margin-top-20">

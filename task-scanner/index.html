@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://www.gstatic.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
-    <title>Task Cosmos - Görev Yönetim Uygulaması</title>
+    <title>Task Scanner - Ağ Tarama Uygulaması</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
-        /* Task Cosmos Özel Stiller */
+        /* Task Scanner Özel Stiller */
         .app-detail-page {
             min-height: 100vh;
             background: #ffffff;
@@ -17,7 +17,7 @@
         .app-hero-section {
             position: relative;
             padding: 180px 20px 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
             color: white;
             text-align: center;
             overflow: hidden;
@@ -128,7 +128,7 @@
         .btn-hero-primary {
             padding: 16px 32px;
             background: white;
-            color: #667eea;
+            color: #2193b0;
             border: none;
             border-radius: 12px;
             font-size: 1.1rem;
@@ -230,21 +230,21 @@
 
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(106, 90, 205, 0.15);
-            border-color: #667eea;
+            box-shadow: 0 8px 25px rgba(33, 147, 176, 0.15);
+            border-color: #2193b0;
         }
 
         .feature-icon {
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
             border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
             margin: 0 auto 20px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(33, 147, 176, 0.3);
         }
 
         .feature-title {
@@ -342,7 +342,7 @@
             max-width: 180px;
             max-height: 320px;
             aspect-ratio: 9/16;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -371,7 +371,6 @@
             transform: scale(1.02);
         }
         
-        /* Play Store benzeri otomatik ölçekleme */
         .screenshot-card .screenshot-image {
             object-fit: contain;
         }
@@ -430,7 +429,6 @@
 
         /* Responsive */
         
-        /* iPad Pro (1024px - 1366px) */
         @media (min-width: 1024px) and (max-width: 1366px) {
             .app-hero-section {
                 padding: 160px 60px 80px;
@@ -456,7 +454,6 @@
             }
         }
 
-        /* iPad (768px - 1024px) */
         @media (min-width: 768px) and (max-width: 1024px) {
             .app-hero-section {
                 padding: 150px 40px 70px;
@@ -482,7 +479,6 @@
             }
         }
 
-        /* Tablet Portrait (481px - 768px) */
         @media (min-width: 481px) and (max-width: 768px) {
             .app-hero-section {
                 padding: 140px 30px 60px;
@@ -519,7 +515,6 @@
             }
         }
 
-        /* Mobile (max-width: 768px) */
         @media (max-width: 768px) {
             .app-hero-section {
                 padding: 140px 20px 60px;
@@ -556,7 +551,6 @@
             }
         }
 
-        /* Touch-friendly elements for tablets */
         @media (min-width: 481px) and (max-width: 1024px) {
             button,
             .btn,
@@ -671,29 +665,29 @@
     <!-- Hero Section -->
     <section class="app-hero-section">
         <div class="app-hero-content">
-            <div class="app-icon-hero">📱</div>
-            <div class="app-category-hero">ÜRETKENLİK</div>
-            <h1 class="app-title-hero">Task Cosmos</h1>
+            <div class="app-icon-hero">🔍</div>
+            <div class="app-category-hero">AĞ & GÜVENLİK</div>
+            <h1 class="app-title-hero">Task Scanner</h1>
             
             <div class="app-rating-hero">
                 <div class="stars">
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star half">★</span>
                 </div>
-                <span class="app-rating-value">4.8</span>
-                <span class="app-downloads-hero">10K+ indirme</span>
+                <span class="app-rating-value">4.7</span>
+                <span class="app-downloads-hero">8K+ indirme</span>
             </div>
 
             <div class="app-cta-hero">
-                <a href="https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos" target="_blank" rel="noopener" class="btn-hero-primary">
+                <button class="btn-hero-primary" disabled>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
                     </svg>
-                    Google Play'de İndir
-                </a>
+                    Yakında
+                </button>
                 <a href="privacy-policy.html" class="btn-hero-secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -707,44 +701,21 @@
     <!-- Description Section -->
     <section class="app-content-section app-description-section">
         <h2 class="section-title">Hakkında</h2>
-        <p class="section-subtitle">Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama</p>
+        <p class="section-subtitle">Yerel ağınızdaki cihazları keşfedin ve analiz edin</p>
         <p class="app-description-text">
-            Task Cosmos, günlük işlerinizi kolayca takip etmenizi ve organize etmenizi sağlayan kapsamlı bir görev yönetim uygulamasıdır. 
-            Modern ve kullanıcı dostu arayüzü ile görevlerinizi kategorilere ayırabilir, hatırlatıcılar oluşturabilir ve 
-            widget desteği sayesinde görevlerinizi ana ekranınızdan hızlıca görüntüleyebilirsiniz.
+            Task Scanner, yerel ağınızdaki tüm cihazları hızlı ve kolay bir şekilde taramanızı sağlayan şeffaf ve genişletilebilir bir ağ analiz uygulamasıdır. 
+            IP adresleri, MAC adresleri, üretici bilgileri ve açık portlar hakkında detaylı bilgi alın. 
+            Fing benzeri özellikler sunarken, açık kaynak kodlu ve tamamen şeffaf bir yapıya sahiptir.
         </p>
     </section>
 
     <!-- Features Section -->
     <section class="app-content-section app-features-section">
         <h2 class="section-title">Özellikler</h2>
-        <p class="section-subtitle">Task Cosmos'un güçlü özelliklerini keşfedin</p>
+        <p class="section-subtitle">Task Scanner'ın güçlü özelliklerini keşfedin</p>
         
         <div class="features-grid">
             <!-- Dinamik olarak yüklenecek -->
-            <div class="feature-card">
-                <div class="feature-icon">✓</div>
-                <h3 class="feature-title">Görev Takibi</h3>
-                <p class="feature-description">Günlük görevlerinizi kolayca oluşturun, düzenleyin ve tamamlayın. Görevlerinizi öncelik sırasına göre organize edin.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">⏰</div>
-                <h3 class="feature-title">Hatırlatıcılar</h3>
-                <p class="feature-description">Önemli görevler için hatırlatıcılar ayarlayın. Zamanında bildirim alın ve hiçbir şeyi kaçırmayın.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">📁</div>
-                <h3 class="feature-title">Kategoriler</h3>
-                <p class="feature-description">Görevlerinizi kategorilere ayırın. İş, kişisel, alışveriş ve daha fazlası için özel kategoriler oluşturun.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3 class="feature-title">Widget Desteği</h3>
-                <p class="feature-description">Ana ekranınıza widget ekleyin ve görevlerinizi hızlıca görüntüleyin. Uygulamayı açmadan görevlerinizi yönetin.</p>
-            </div>
         </div>
     </section>
 
@@ -755,18 +726,6 @@
         
         <div class="screenshots-grid">
             <!-- Dinamik olarak yüklenecek -->
-            <div class="screenshot-card">
-                <div class="screenshot-placeholder">📱</div>
-                <p>Ana Ekran</p>
-            </div>
-            <div class="screenshot-card">
-                <div class="screenshot-placeholder">✓</div>
-                <p>Görev Listesi</p>
-            </div>
-            <div class="screenshot-card">
-                <div class="screenshot-placeholder">📁</div>
-                <p>Kategoriler</p>
-            </div>
         </div>
     </section>
 </div>
@@ -897,7 +856,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initSearch === 'function') {
     initSearch();
   } else {
-    // Fallback: local initSearch
     initSearch();
   }
   
@@ -937,13 +895,10 @@ document.addEventListener('DOMContentLoaded', () => {
       let data = null;
       
       // Firebase SDK ve database'in yüklenmesini bekle
-      // firebase-config.js içinde firebaseDatabase global olarak tanımlanıyor
-      // Eğer henüz yüklenmemişse biraz bekle
       let firebaseReady = false;
       if (typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
         firebaseReady = true;
       } else {
-        // Firebase SDK yüklenene kadar bekle (max 2 saniye)
         let attempts = 0;
         while (attempts < 20 && !firebaseReady) {
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -986,29 +941,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         data = await response.json();
-        console.log('📄 JSON dosyasından yüklendi (tüm tarayıcılarda geçerli)');
+        console.log('📄 JSON dosyasından yüklendi');
       }
       
-      // Task Cosmos uygulamasını bul
-      const taskCosmos = data.apps?.find(app => app.title === 'Task Cosmos');
+      // Task Scanner uygulamasını bul
+      const taskScanner = data.apps?.find(app => app.title === 'Task Scanner');
       
-      console.log('📱 Task Cosmos verisi yüklendi:', taskCosmos);
+      console.log('📱 Task Scanner verisi yüklendi:', taskScanner);
       
-      if (taskCosmos) {
+      if (taskScanner) {
         // Hakkında bölümünü güncelle
         const aboutTitleEl = document.querySelector('.app-description-section .section-title');
         const aboutSubtitleEl = document.querySelector('.app-description-section .section-subtitle');
         const aboutDescriptionEl = document.querySelector('.app-description-section .app-description-text');
         
-        if (taskCosmos.about) {
-          if (taskCosmos.about.title && aboutTitleEl) {
-            aboutTitleEl.textContent = taskCosmos.about.title;
+        if (taskScanner.about) {
+          if (taskScanner.about.title && aboutTitleEl) {
+            aboutTitleEl.textContent = taskScanner.about.title;
           }
-          if (taskCosmos.about.subtitle && aboutSubtitleEl) {
-            aboutSubtitleEl.textContent = taskCosmos.about.subtitle;
+          if (taskScanner.about.subtitle && aboutSubtitleEl) {
+            aboutSubtitleEl.textContent = taskScanner.about.subtitle;
           }
-          if (taskCosmos.about.description && aboutDescriptionEl) {
-            aboutDescriptionEl.textContent = taskCosmos.about.description;
+          if (taskScanner.about.description && aboutDescriptionEl) {
+            aboutDescriptionEl.textContent = taskScanner.about.description;
           }
         }
         
@@ -1017,18 +972,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const featuresSubtitleEl = document.querySelector('.app-features-section .section-subtitle');
         const featuresGridEl = document.querySelector('.app-features-section .features-grid');
         
-        if (taskCosmos.featuresTitle && featuresTitleEl) {
-          featuresTitleEl.textContent = taskCosmos.featuresTitle;
+        if (taskScanner.featuresTitle && featuresTitleEl) {
+          featuresTitleEl.textContent = taskScanner.featuresTitle;
         }
-        if (taskCosmos.featuresSubtitle && featuresSubtitleEl) {
-          featuresSubtitleEl.textContent = taskCosmos.featuresSubtitle;
+        if (taskScanner.featuresSubtitle && featuresSubtitleEl) {
+          featuresSubtitleEl.textContent = taskScanner.featuresSubtitle;
         }
         
         // Detaylı özellik kartlarını yükle
-        if (taskCosmos.featureCards && taskCosmos.featureCards.length > 0 && featuresGridEl) {
-          featuresGridEl.innerHTML = taskCosmos.featureCards.map(card => `
+        if (taskScanner.featureCards && taskScanner.featureCards.length > 0 && featuresGridEl) {
+          featuresGridEl.innerHTML = taskScanner.featureCards.map(card => `
             <div class="feature-card">
-              <div class="feature-icon">${card.icon || '📱'}</div>
+              <div class="feature-icon">${card.icon || '🔍'}</div>
               <h3 class="feature-title">${escapeHtml(card.title || '')}</h3>
               <p class="feature-description">${escapeHtml(card.description || '')}</p>
             </div>
@@ -1040,23 +995,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const screenshotsSubtitleEl = document.querySelector('.app-screenshots-section .section-subtitle');
         const screenshotsGridEl = document.querySelector('.app-screenshots-section .screenshots-grid');
         
-        if (taskCosmos.screenshots) {
-          if (taskCosmos.screenshots.title && screenshotsTitleEl) {
-            screenshotsTitleEl.textContent = taskCosmos.screenshots.title;
+        if (taskScanner.screenshots) {
+          if (taskScanner.screenshots.title && screenshotsTitleEl) {
+            screenshotsTitleEl.textContent = taskScanner.screenshots.title;
           }
-          if (taskCosmos.screenshots.subtitle && screenshotsSubtitleEl) {
-            screenshotsSubtitleEl.textContent = taskCosmos.screenshots.subtitle;
+          if (taskScanner.screenshots.subtitle && screenshotsSubtitleEl) {
+            screenshotsSubtitleEl.textContent = taskScanner.screenshots.subtitle;
           }
           
           // Ekran görüntülerini yükle
-          if (taskCosmos.screenshots.items && taskCosmos.screenshots.items.length > 0 && screenshotsGridEl) {
-            screenshotsGridEl.innerHTML = taskCosmos.screenshots.items.map(screenshot => {
-              // Eğer image URL'i varsa gerçek resim göster, yoksa placeholder göster
+          if (taskScanner.screenshots.items && taskScanner.screenshots.items.length > 0 && screenshotsGridEl) {
+            screenshotsGridEl.innerHTML = taskScanner.screenshots.items.map(screenshot => {
               if (screenshot.image && screenshot.image.trim() !== '') {
                 return `
                   <div class="screenshot-card">
                     <div class="screenshot-container">
-                      <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="screenshot-image auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'screenshot-placeholder\\'>${screenshot.icon || '📱'}</div><p>${escapeHtml(screenshot.title || '')}</p>';"/>
+                      <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="screenshot-image auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'screenshot-placeholder\\'>${screenshot.icon || '🔍'}</div><p>${escapeHtml(screenshot.title || '')}</p>';"/>
                     </div>
                     <p>${escapeHtml(screenshot.title || '')}</p>
                   </div>
@@ -1064,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
               } else {
                 return `
                   <div class="screenshot-card">
-                    <div class="screenshot-placeholder">${screenshot.icon || '📱'}</div>
+                    <div class="screenshot-placeholder">${screenshot.icon || '🔍'}</div>
                     <p>${escapeHtml(screenshot.title || '')}</p>
                   </div>
                 `;
@@ -1088,12 +1042,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Firebase SDK ve config yüklendikten sonra içeriği yükle
   function waitForFirebaseAndLoad() {
-    // Firebase SDK ve firebaseDatabase yüklenene kadar bekle
     let attempts = 0;
-    const maxAttempts = 50; // 5 saniye
+    const maxAttempts = 50;
     const checkInterval = setInterval(() => {
       attempts++;
-      // firebase-config.js içinde firebaseDatabase global olarak tanımlanıyor
       if (typeof firebaseDatabase !== 'undefined' || attempts >= maxAttempts) {
         clearInterval(checkInterval);
         loadAboutContent();
@@ -1101,7 +1053,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   }
   
-  // Sayfa yüklendiğinde Firebase'i bekle ve içeriği yükle
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', waitForFirebaseAndLoad);
   } else {
@@ -1111,4 +1062,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-

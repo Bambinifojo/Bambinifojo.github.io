@@ -26,8 +26,9 @@ const AdminState = {
   githubAppsSha: null,
   githubSiteSha: null,
   
-  // Admin password hash (varsayılan: "admin123")
-  ADMIN_PASSWORD_HASH: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',
+  // Admin password hash (varsayılan: "Admin@2025Secure!")
+  // Güvenli varsayılan şifre: Büyük harf, küçük harf, rakam ve özel karakter içerir
+  ADMIN_PASSWORD_HASH: '20f46ed4821a3cae172ba46638433dd35356ec26bdb14980abd3bd84bab4deee',
   
   // Password icons
   PASSWORD_ICONS: {
