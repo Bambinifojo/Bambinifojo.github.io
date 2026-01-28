@@ -6,6 +6,7 @@ let aiLastCreditReset = Date.now();
 let appsData = null;
 let feedbackData = [];
 let votesData = {};
+let aiScrollPosition = 0; // Modal açılırken scroll pozisyonunu kaydet
 const AI_CREDIT_RESET_TIME = 60 * 60 * 1000; // 1 saat
 
 // Uygulamaları ve site verilerini yükle
@@ -211,9 +212,9 @@ function openAIModal() {
         // Modal'ı göster
         modal.classList.add('active');
         
-        // Body scroll lock
-        const scrollY = window.scrollY;
-        document.body.style.top = `-${scrollY}px`;
+        // Body scroll lock - scroll pozisyonunu kaydet
+        aiScrollPosition = window.scrollY || window.pageYOffset || 0;
+        document.body.style.top = `-${aiScrollPosition}px`;
         document.body.classList.add('ai-modal-open');
         
         // Chat messages'ı direkt aktif yap
@@ -246,14 +247,18 @@ function closeAIModal() {
         setTimeout(() => {
             modal.classList.remove('closing');
             
-            // Body scroll lock'u kaldır
-            const scrollY = document.body.style.top;
+            // Body scroll lock'u kaldır ve scroll pozisyonunu restore et
             document.body.style.top = '';
             document.body.classList.remove('ai-modal-open');
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.overflow = '';
             
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            // Scroll pozisyonunu restore et
+            if (aiScrollPosition > 0) {
+                window.scrollTo(0, aiScrollPosition);
             }
+            aiScrollPosition = 0;
         }, 300); // Animasyon süresi ile eşleşmeli
     }
 }

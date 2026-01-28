@@ -105,7 +105,21 @@ function setupHamburgerMenu() {
     // Eğer zaten event listener eklenmemişse ekle
     if (!hamburger.hasAttribute('data-listener-added')) {
       hamburger.setAttribute('data-listener-added', 'true');
+      
+      // Click event
       hamburger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMenu();
+      });
+      
+      // Touch event (mobil cihazlar için)
+      hamburger.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+      
+      hamburger.addEventListener('touchend', (e) => {
         e.preventDefault();
         e.stopPropagation();
         toggleMenu();
