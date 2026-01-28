@@ -7218,7 +7218,7 @@ button.btn-reload[style]:hover {
         flex-direction: column;
         padding: 30px 20px;
         gap: 30px;
-        min-height: auto;
+        height: auto;
     }
     
     .app-slide-content h3 {
@@ -7235,7 +7235,7 @@ button.btn-reload[style]:hover {
     
     .app-slider-container {
         margin-bottom: 30px;
-        min-height: auto;
+        height: auto;
     }
     
     .slider-controls {
