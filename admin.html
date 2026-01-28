@@ -6063,7 +6063,7 @@
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <a href="/" target="_blank" class="admin-logo">
+        <a href="/" target="_blank" rel="noopener noreferrer" class="admin-logo">
           <div class="admin-logo-icon">B</div>
           <div class="admin-logo-text">Admin Panel</div>
         </a>
@@ -6090,7 +6090,7 @@
             </svg>
             <span class="btn-text">Şifre Değiştir</span>
           </button>
-          <a href="/" target="_blank" class="btn btn-secondary btn-sm" title="Ana Sayfa">
+          <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" title="Ana Sayfa">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="btn-icon">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -6255,7 +6255,7 @@
           <span>Şifre Değiştir</span>
         </button>
         
-        <a href="/" target="_blank" class="admin-topbar-menu-item">
+        <a href="/" target="_blank" rel="noopener noreferrer" class="admin-topbar-menu-item">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -6445,7 +6445,7 @@
                       </svg>
                       Yenile
                     </button>
-                    <a href="/" target="_blank" class="btn btn-secondary btn-sm preview-link" title="Yeni Sekmede Aç">
+                    <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm preview-link" title="Yeni Sekmede Aç">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="icon-spacing">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>
@@ -6588,13 +6588,23 @@
                   <span>Uygulama Listesi</span>
                   <span id="appsCount" class="apps-count"></span>
                 </h2>
-                <button class="btn btn-primary btn-sm apps-add-btn" onclick="showAddForm()">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  <span>Yeni Ekle</span>
-                </button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <button class="btn btn-secondary btn-sm" onclick="reloadAppsFromJSON()" title="apps.json'dan yeniden yükle">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                      <polyline points="23 4 23 10 17 10"></polyline>
+                      <polyline points="1 20 1 14 7 14"></polyline>
+                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    <span>Yenile</span>
+                  </button>
+                  <button class="btn btn-primary btn-sm apps-add-btn" onclick="showAddForm()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Yeni Ekle</span>
+                  </button>
+                </div>
               </div>
               <div id="appsList" class="apps-list">
                 <p class="loading-text">Yükleniyor...</p>
@@ -7490,7 +7500,7 @@
                   <div class="info-box margin-top-20">
                     <p><strong>📝 EmailJS Kurulum Adımları:</strong></p>
                     <ol class="doc-list">
-                      <li><a href="https://www.emailjs.com/" target="_blank">EmailJS</a> hesabı oluşturun (ücretsiz)</li>
+                      <li><a href="https://www.emailjs.com/" target="_blank" rel="noopener noreferrer">EmailJS</a> hesabı oluşturun (ücretsiz)</li>
                       <li>Email Service ekleyin (Gmail, Outlook vb.)</li>
                       <li>Email Template oluşturun</li>
                       <li>Service ID, Template ID ve Public Key'i kopyalayın</li>

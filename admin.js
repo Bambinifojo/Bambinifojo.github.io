@@ -8740,11 +8740,55 @@ function toggleAIApiKey() {
   }
 }
 
+// apps.json'dan veriyi yeniden yükle
+async function reloadAppsFromJSON() {
+  if (!confirm('apps.json dosyasından veriyi yeniden yüklemek istediğinize emin misiniz? Mevcut değişiklikler kaybolabilir.')) {
+    return;
+  }
+  
+  try {
+    showAlert('⏳ apps.json yükleniyor...', 'info');
+    
+    // apps.json'dan yükle
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const dataPath = isLocalhost ? 'data/apps.json' : '/data/apps.json';
+    
+    const response = await fetch(dataPath + '?t=' + Date.now());
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    appsData = data;
+    
+    // LocalStorage'a kaydet
+    saveToLocal();
+    
+    // Firebase'e kaydet (eğer Firebase modu aktifse)
+    if (currentMode === 'firebase' && firebaseDatabase) {
+      await saveToFirebase(true);
+      showAlert('✅ apps.json yüklendi ve Firebase\'e kaydedildi!', 'success');
+    } else {
+      showAlert('✅ apps.json yüklendi ve LocalStorage\'a kaydedildi!', 'success');
+    }
+    
+    // UI'ı güncelle
+    updateStats();
+    renderApps();
+    
+    console.log('✅ apps.json yüklendi:', appsData.apps?.length || 0, 'uygulama');
+  } catch (error) {
+    console.error('❌ apps.json yüklenirken hata:', error);
+    showAlert(`❌ Hata: ${error.message}`, 'error');
+  }
+}
+
 // Global scope'a ekle
 if (typeof window !== 'undefined') {
   window.saveAISettings = saveAISettings;
   window.loadAISettings = loadAISettings;
   window.toggleEmailJSKey = toggleEmailJSKey;
   window.toggleAIApiKey = toggleAIApiKey;
+  window.reloadAppsFromJSON = reloadAppsFromJSON;
 }
 
