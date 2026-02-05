@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.taskcosmos.app",
+      "sha256_cert_fingerprints": [
+        "28:B8:5F:A9:B7:23:48:16:92:9A:B9:6B:6C:92:B2:13:F3:2D:32:0A:E8:20:EC:43:6F:74:2B:E1:7D:0D"
+      ]
+    }
+  }
+]
