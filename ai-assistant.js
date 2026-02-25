@@ -1107,4 +1107,3 @@ function getEmailJSConfig() {
         toEmail: 'bambinifojo@gmail.com'
     };
 }
-

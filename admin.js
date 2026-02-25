@@ -8871,4 +8871,3 @@ if (typeof window !== 'undefined') {
   window.toggleAIApiKey = toggleAIApiKey;
   window.reloadAppsFromJSON = reloadAppsFromJSON;
 }
-
