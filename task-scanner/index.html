@@ -678,16 +678,16 @@
                     <span class="star half">★</span>
                 </div>
                 <span class="app-rating-value">4.7</span>
-                <span class="app-downloads-hero">8K+ indirme</span>
+                <span class="app-downloads-hero">10+ indirme</span>
             </div>
 
             <div class="app-cta-hero">
-                <button class="btn-hero-primary" disabled>
+                <a href="https://play.google.com/store/apps/details?id=com.taskscanner.app" target="_blank" rel="noopener" class="btn-hero-primary" id="taskScannerPlayStoreBtn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
                     </svg>
-                    Yakında
-                </button>
+                    Google Play'de İndir
+                </a>
                 <a href="privacy-policy.html" class="btn-hero-secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -950,6 +950,22 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('📱 Task Scanner verisi yüklendi:', taskScanner);
       
       if (taskScanner) {
+        const playStoreUrl = taskScanner.playStoreUrl
+          || (taskScanner.details && taskScanner.details.includes('play.google.com') ? taskScanner.details : '');
+        const playStoreBtn = document.getElementById('taskScannerPlayStoreBtn');
+        if (playStoreBtn && playStoreUrl) {
+          playStoreBtn.href = playStoreUrl;
+        }
+
+        const ratingValueEl = document.querySelector('.app-rating-value');
+        const downloadsEl = document.querySelector('.app-downloads-hero');
+        if (taskScanner.rating && ratingValueEl) {
+          ratingValueEl.textContent = String(taskScanner.rating);
+        }
+        if (taskScanner.downloads && downloadsEl) {
+          downloadsEl.textContent = `${taskScanner.downloads} indirme`;
+        }
+
         // Hakkında bölümünü güncelle
         const aboutTitleEl = document.querySelector('.app-description-section .section-title');
         const aboutSubtitleEl = document.querySelector('.app-description-section .section-subtitle');
@@ -1010,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `
                   <div class="screenshot-card">
                     <div class="screenshot-container">
-                      <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="screenshot-image auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'screenshot-placeholder\\'>${screenshot.icon || '🔍'}</div><p>${escapeHtml(screenshot.title || '')}</p>';"/>
+                      <img src="${escapeHtml(resolveScreenshotSrc(screenshot.image))}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="screenshot-image auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'screenshot-placeholder\\'>${screenshot.icon || '🔍'}</div><p>${escapeHtml(screenshot.title || '')}</p>';"/>
                     </div>
                     <p>${escapeHtml(screenshot.title || '')}</p>
                   </div>
@@ -1032,6 +1048,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
+  function resolveScreenshotSrc(image) {
+    if (!image) return '';
+    if (image.startsWith('http') || image.startsWith('/') || image.startsWith('../')) return image;
+    if (image.startsWith('task-scanner/')) return image.replace(/^task-scanner\//, '');
+    return image;
+  }
+
   // HTML escape fonksiyonu
   function escapeHtml(text) {
     if (!text) return '';

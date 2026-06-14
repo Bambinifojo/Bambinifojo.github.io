@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://api.netlify.com https://www.gstatic.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';">
-    <title>Task Cosmos - Görev Yönetim Uygulaması</title>
+    <title>Task Cosmos - Gezegen Atlası</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
         /* Task Cosmos Özel Stiller */
@@ -671,24 +671,24 @@
     <!-- Hero Section -->
     <section class="app-hero-section">
         <div class="app-hero-content">
-            <div class="app-icon-hero">📱</div>
-            <div class="app-category-hero">ÜRETKENLİK</div>
+            <div class="app-icon-hero">🚀</div>
+            <div class="app-category-hero">EĞİTİM</div>
             <h1 class="app-title-hero">Task Cosmos</h1>
             
             <div class="app-rating-hero">
                 <div class="stars">
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star filled">★</span>
+                    <span class="star half">★</span>
                 </div>
                 <span class="app-rating-value">4.8</span>
-                <span class="app-downloads-hero">10K+ indirme</span>
+                <span class="app-downloads-hero">10+ indirme</span>
             </div>
 
             <div class="app-cta-hero">
-                <a href="https://play.google.com/store/apps/details?id=com.bambinifojo.taskcosmos" target="_blank" rel="noopener" class="btn-hero-primary">
+                <a href="https://play.google.com/store/apps/details?id=com.taskcosmos.app" target="_blank" rel="noopener" class="btn-hero-primary" id="taskCosmosPlayStoreBtn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
                     </svg>
@@ -707,11 +707,10 @@
     <!-- Description Section -->
     <section class="app-content-section app-description-section">
         <h2 class="section-title">Hakkında</h2>
-        <p class="section-subtitle">Görev yönetimi ve organizasyon için geliştirilmiş modern bir uygulama</p>
+        <p class="section-subtitle">Astronomi meraklıları için yapay zeka destekli kapsamlı uzay keşif platformu</p>
         <p class="app-description-text">
-            Task Cosmos, günlük işlerinizi kolayca takip etmenizi ve organize etmenizi sağlayan kapsamlı bir görev yönetim uygulamasıdır. 
-            Modern ve kullanıcı dostu arayüzü ile görevlerinizi kategorilere ayırabilir, hatırlatıcılar oluşturabilir ve 
-            widget desteği sayesinde görevlerinizi ana ekranınızdan hızlıca görüntüleyebilirsiniz.
+            Task Cosmos, canlı NASA verileri, günlük kozmik görevler ve AI rehberiyle evreni cebinize getiren kapsamlı bir gezegen atlasıdır.
+            ISS takibi, uzay hava durumu, gezegen karşılaştırma ve ansiklopedi asistanı ile interaktif bir keşif deneyimi sunar.
         </p>
     </section>
 
@@ -995,6 +994,22 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('📱 Task Cosmos verisi yüklendi:', taskCosmos);
       
       if (taskCosmos) {
+        const playStoreUrl = taskCosmos.playStoreUrl
+          || (taskCosmos.details && taskCosmos.details.includes('play.google.com') ? taskCosmos.details : '');
+        const playStoreBtn = document.getElementById('taskCosmosPlayStoreBtn');
+        if (playStoreBtn && playStoreUrl) {
+          playStoreBtn.href = playStoreUrl;
+        }
+
+        const ratingValueEl = document.querySelector('.app-rating-value');
+        const downloadsEl = document.querySelector('.app-downloads-hero');
+        if (taskCosmos.rating && ratingValueEl) {
+          ratingValueEl.textContent = String(taskCosmos.rating);
+        }
+        if (taskCosmos.downloads && downloadsEl) {
+          downloadsEl.textContent = `${taskCosmos.downloads} indirme`;
+        }
+
         // Hakkında bölümünü güncelle
         const aboutTitleEl = document.querySelector('.app-description-section .section-title');
         const aboutSubtitleEl = document.querySelector('.app-description-section .section-subtitle');
@@ -1056,7 +1071,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `
                   <div class="screenshot-card">
                     <div class="screenshot-container">
-                      <img src="${escapeHtml(screenshot.image)}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="screenshot-image auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'screenshot-placeholder\\'>${screenshot.icon || '📱'}</div><p>${escapeHtml(screenshot.title || '')}</p>';"/>
+                      <img src="${escapeHtml(resolveScreenshotSrc(screenshot.image))}" alt="${escapeHtml(screenshot.title || 'Ekran Görüntüsü')}" class="screenshot-image auto-scale-image" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'screenshot-placeholder\\'>${screenshot.icon || '📱'}</div><p>${escapeHtml(screenshot.title || '')}</p>';"/>
                     </div>
                     <p>${escapeHtml(screenshot.title || '')}</p>
                   </div>
@@ -1078,6 +1093,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
+  function resolveScreenshotSrc(image) {
+    if (!image) return '';
+    if (image.startsWith('http') || image.startsWith('/') || image.startsWith('../')) return image;
+    if (image.startsWith('task-cosmos/')) return image.replace(/^task-cosmos\//, '');
+    return image;
+  }
+
   // HTML escape fonksiyonu
   function escapeHtml(text) {
     if (!text) return '';

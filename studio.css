@@ -1108,8 +1108,342 @@ html[data-theme="dark"] body {
     color: var(--text);
 }
 
-/* ── Skills / Services ── */
-.skills-section {
+/* ── Capabilities / Skills ── */
+.capabilities-section {
+    position: relative;
+    overflow: hidden;
+    padding: 112px 0;
+    background:
+        radial-gradient(circle at 12% 20%, rgba(99, 102, 241, 0.22), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(56, 189, 248, 0.14), transparent 28%),
+        linear-gradient(180deg, rgba(16, 18, 42, 0.98), rgba(28, 27, 60, 0.98));
+}
+
+.capabilities-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.22;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.capabilities-section .section-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-inline: 24px;
+    box-sizing: border-box;
+}
+
+.capabilities-heading {
+    max-width: 820px;
+    margin: 0 auto 56px;
+    text-align: center;
+}
+
+.capabilities-heading .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+    color: #7c7cff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.capabilities-heading h2 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+}
+
+.capabilities-heading p {
+    max-width: 720px;
+    margin: 22px auto 0;
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 18px;
+    line-height: 1.75;
+}
+
+.capability-stack-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.capability-stack-row span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    color: rgba(248, 250, 252, 0.82);
+    font-size: 13px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.065);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.capability-card {
+    position: relative;
+    min-height: 286px;
+    display: flex;
+    flex-direction: column;
+    padding: 28px;
+    border-radius: 26px;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.04)),
+        rgba(19, 21, 44, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background 180ms ease;
+}
+
+.capability-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    opacity: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 18% 0%, rgba(99, 102, 241, 0.22), transparent 32%),
+        radial-gradient(circle at 86% 20%, rgba(56, 189, 248, 0.14), transparent 28%);
+    transition: opacity 180ms ease;
+}
+
+.capability-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(129, 140, 248, 0.42);
+    box-shadow:
+        0 34px 110px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(99, 102, 241, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+.capability-card:hover::before {
+    opacity: 1;
+}
+
+.capability-topline,
+.capability-card h3,
+.capability-card p,
+.capability-tags {
+    position: relative;
+    z-index: 1;
+}
+
+.capability-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.capability-icon {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    color: #a5b4fc;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(129, 140, 248, 0.36), transparent 58%),
+        rgba(99, 102, 241, 0.14);
+    border: 1px solid rgba(129, 140, 248, 0.22);
+    box-shadow:
+        0 14px 40px rgba(99, 102, 241, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    transition: transform 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.capability-card:hover .capability-icon {
+    transform: scale(1.05);
+    color: #e0e7ff;
+    box-shadow:
+        0 18px 54px rgba(99, 102, 241, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.capability-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.capability-category {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 11px;
+    border-radius: 999px;
+    color: rgba(191, 219, 254, 0.92);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    background: rgba(59, 130, 246, 0.10);
+    border: 1px solid rgba(96, 165, 250, 0.18);
+}
+
+.capability-card h3 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 22px;
+    line-height: 1.18;
+    letter-spacing: -0.025em;
+}
+
+.capability-card p {
+    margin: 14px 0 0;
+    color: rgba(226, 232, 240, 0.72);
+    font-size: 15px;
+    line-height: 1.68;
+    flex: 1;
+}
+
+.capability-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+.capability-tags span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    color: rgba(248, 250, 252, 0.78);
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+body.light .capabilities-section,
+[data-theme="light"] .capabilities-section {
+    background:
+        radial-gradient(circle at 12% 20%, rgba(99, 102, 241, 0.16), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(56, 189, 248, 0.10), transparent 28%),
+        linear-gradient(180deg, #f8fafc, #eef2ff);
+}
+
+body.light .capabilities-heading h2,
+[data-theme="light"] .capabilities-heading h2,
+body.light .capability-card h3,
+[data-theme="light"] .capability-card h3 {
+    color: #0f172a;
+}
+
+body.light .capabilities-heading p,
+[data-theme="light"] .capabilities-heading p,
+body.light .capability-card p,
+[data-theme="light"] .capability-card p {
+    color: rgba(51, 65, 85, 0.78);
+}
+
+body.light .capability-card,
+[data-theme="light"] .capability-card {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.76)),
+        #ffffff;
+    border-color: rgba(99, 102, 241, 0.12);
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.10);
+}
+
+body.light .capability-tags span,
+[data-theme="light"] .capability-tags span,
+body.light .capability-stack-row span,
+[data-theme="light"] .capability-stack-row span {
+    color: rgba(15, 23, 42, 0.72);
+    background: rgba(99, 102, 241, 0.06);
+    border-color: rgba(99, 102, 241, 0.12);
+}
+
+@media (max-width: 1024px) {
+    .capabilities-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .capabilities-section {
+        padding: 76px 0;
+    }
+
+    .capabilities-section .section-container {
+        padding-inline: 16px;
+    }
+
+    .capabilities-heading {
+        margin-bottom: 36px;
+    }
+
+    .capabilities-heading h2 {
+        font-size: clamp(32px, 9vw, 42px);
+    }
+
+    .capabilities-heading p {
+        font-size: 16px;
+    }
+
+    .capabilities-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .capability-card {
+        min-height: 0;
+        padding: 22px;
+        border-radius: 22px;
+    }
+
+    .capability-topline {
+        margin-bottom: 18px;
+    }
+
+    .capability-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
+    }
+}
+
+/* Legacy service cards (other pages) */
+.skills-section:not(.capabilities-section) {
     padding: 80px 24px;
     max-width: var(--max-width);
     margin: 0 auto;
@@ -1117,7 +1451,7 @@ html[data-theme="dark"] body {
 }
 
 .services-grid,
-.skills-grid {
+.skills-grid:not(.capabilities-grid) {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
@@ -1976,6 +2310,7 @@ body:not(.ai-assistant-open) .ai-assistant-toggle {
 .process-section,
 .vision-section,
 .skills-section,
+.capabilities-section,
 .apps-section,
 .contact-section,
 footer {

@@ -29,37 +29,51 @@
       ]
     },
     "skills": {
-      "title": "Teknolojiler & Hizmetler",
+      "title": "Teknoloji Yığını ve Ürün Yetenekleri",
+      "subtitle": "Mobil ürün geliştirmeden arayüz tasarımına ve backend altyapısına kadar uçtan uca dijital ürün deneyimi.",
+      "stackChips": ["Android", "Flutter", "Firebase", "UI/UX", "Backend", "Product Thinking"],
       "items": [
         {
           "name": "Android Development",
-          "icon": "📱",
-          "description": "Native Android deneyimleri, performanslı arayüzler."
+          "iconKey": "android",
+          "description": "Native Android uygulamaları için performanslı ve kullanıcı odaklı deneyimler geliştiriyorum.",
+          "tags": ["Kotlin", "Java", "Material UI"],
+          "category": "Core Stack"
         },
         {
-          "name": "Flutter Apps",
-          "icon": "🎯",
-          "description": "Tek kod tabanıyla mobil uygulamalar."
+          "name": "Flutter",
+          "iconKey": "flutter",
+          "description": "Tek kod tabanıyla hızlı, modern ve ölçeklenebilir mobil uygulamalar geliştiriyorum.",
+          "tags": ["Dart", "Cross Platform", "Responsive UI"],
+          "category": "Core Stack"
         },
         {
-          "name": "Firebase Backend",
-          "icon": "🔥",
-          "description": "Auth, Firestore, Storage ve bildirim altyapısı."
+          "name": "Firebase",
+          "iconKey": "firebase",
+          "description": "Kimlik doğrulama, veritabanı, depolama ve gerçek zamanlı servislerle backend akışları kuruyorum.",
+          "tags": ["Auth", "Firestore", "Storage"],
+          "category": "Backend"
         },
         {
           "name": "UI/UX Design",
-          "icon": "✨",
-          "description": "Sade, anlaşılır ve modern kullanıcı deneyimi."
+          "iconKey": "design",
+          "description": "Sade, anlaşılır ve dönüşüm odaklı kullanıcı arayüzleri tasarlıyorum.",
+          "tags": ["Wireframe", "UX Flow", "Design System"],
+          "category": "Product Design"
         },
         {
-          "name": "Web Development",
-          "icon": "🌐",
-          "description": "Modern web arayüzleri ve landing sayfaları."
+          "name": "Backend Development",
+          "iconKey": "backend",
+          "description": "Ürünlerin ihtiyaç duyduğu veri, servis ve iş mantığı katmanlarını tasarlıyorum.",
+          "tags": ["API", "Data Flow", "Integrations"],
+          "category": "Infrastructure"
         },
         {
-          "name": "Performance Optimization",
-          "icon": "⚡",
-          "description": "Hızlı açılan, düşük kaynak tüketen uygulamalar."
+          "name": "Game Development",
+          "iconKey": "game",
+          "description": "2D oyun prototipleri ve etkileşimli deneyimler geliştiriyorum.",
+          "tags": ["Godot", "Gameplay", "UI"],
+          "category": "Experimental"
         }
       ]
     },

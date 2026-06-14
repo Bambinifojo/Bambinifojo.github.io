@@ -193,6 +193,71 @@ function applyStoredSiteSettings() {
   if (saved) SiteSettingsStore.applyToDocument(saved);
 }
 
+const CAPABILITY_ICONS = {
+  android: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10v9.5A2.5 2.5 0 0 1 14.5 20h-5A2.5 2.5 0 0 1 7 17.5V8Z"/><path d="M9 5 7.8 3.5M15 5l1.2-1.5M9 8V6.8A3.2 3.2 0 0 1 12.2 3.6h0A3.2 3.2 0 0 1 15.4 6.8V8"/><path d="M10 12h.01M14 12h.01"/></svg>`,
+  flutter: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 11l4 4 4-4 4 4 4-4-8-8Z"/><path d="m8 15 4 4 4-4"/></svg>`,
+  firebase: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 14 3-11 3 7 3-4 5 15L5 14Z"/><path d="m5 14 7 7 7-7"/></svg>`,
+  design: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/><path d="M7 7h3v3H7zM14 14h3v3h-3zM14 7h3v3h-3zM7 14h3v3H7z"/></svg>`,
+  backend: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><path d="M7 7v10M17 7v10"/></svg>`,
+  game: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 15h8l2 4h2l-1.5-9A4 4 0 0 0 14.6 7H9.4a4 4 0 0 0-3.9 3L4 19h2l2-4Z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/><path d="M9 13h6"/></svg>`,
+  default: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg>`
+};
+
+const CAPABILITY_CATEGORY_SLUGS = {
+  'Core Stack': 'core-stack',
+  Backend: 'backend',
+  'Product Design': 'product-design',
+  Infrastructure: 'infrastructure',
+  Experimental: 'experimental'
+};
+
+function slugifyCapabilityCategory(label) {
+  if (!label) return 'core-stack';
+  return CAPABILITY_CATEGORY_SLUGS[label] || label.toLowerCase().replace(/\s+/g, '-');
+}
+
+function resolveCapabilityIcon(skill) {
+  const key = skill.iconKey || skill.icon;
+  if (key && CAPABILITY_ICONS[key]) return CAPABILITY_ICONS[key];
+  const name = (skill.name || '').toLowerCase();
+  if (name.includes('android')) return CAPABILITY_ICONS.android;
+  if (name.includes('flutter')) return CAPABILITY_ICONS.flutter;
+  if (name.includes('firebase')) return CAPABILITY_ICONS.firebase;
+  if (name.includes('ui') || name.includes('ux') || name.includes('design')) return CAPABILITY_ICONS.design;
+  if (name.includes('backend') || name.includes('api')) return CAPABILITY_ICONS.backend;
+  if (name.includes('game') || name.includes('godot')) return CAPABILITY_ICONS.game;
+  return CAPABILITY_ICONS.default;
+}
+
+function normalizeCapabilityItem(skill) {
+  const tags = Array.isArray(skill.tags) ? skill.tags : [];
+  const category = skill.category || 'Core Stack';
+  return {
+    name: skill.name || 'Capability',
+    description: skill.description || '',
+    tags: tags.length ? tags : ['Mobile', 'Product', 'Studio'],
+    category,
+    categorySlug: slugifyCapabilityCategory(category),
+    icon: resolveCapabilityIcon(skill)
+  };
+}
+
+function renderCapabilityCard(skill, index) {
+  const item = normalizeCapabilityItem(skill);
+  const tagsHtml = item.tags.map((tag) => `<span>${tag}</span>`).join('');
+  return `
+    <article class="capability-card" data-aos="fade-up" data-aos-delay="${100 + index * 50}ms">
+      <div class="capability-topline">
+        <div class="capability-icon">${item.icon}</div>
+        <span class="capability-category">${item.category}</span>
+      </div>
+      <h3>${item.name}</h3>
+      <p>${item.description}</p>
+      <div class="capability-tags">${tagsHtml}</div>
+    </article>
+  `;
+}
+
 async function loadSiteData() {
   try {
     let siteData = null;
@@ -341,23 +406,32 @@ async function loadSiteData() {
       }
     }
     
-    // Skills Section
+    // Capabilities / Skills Section
     if (data.site.skills) {
-      const skillsTitle = document.querySelector('#skills .section-title');
-      const skillsGrid = document.querySelector('.skills-grid');
-      
+      const skillsSection = document.querySelector('#skills');
+      const skillsTitle = document.querySelector('#skills .capabilities-heading h2');
+      const skillsDesc = document.querySelector('#skills .capabilities-heading p');
+      const skillsGrid = document.querySelector('#capabilitiesGrid, #skills .capabilities-grid');
+
       if (skillsTitle && data.site.skills.title) {
         skillsTitle.textContent = data.site.skills.title;
       }
-      
-      if (skillsGrid && data.site.skills.items) {
-        skillsGrid.innerHTML = data.site.skills.items.map((skill, index) => `
-          <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="${index * 50}ms">
-            <div class="service-icon skill-icon">${skill.icon}</div>
-            <h4>${skill.name}</h4>
-            <p class="service-desc skill-desc">${skill.description || ''}</p>
-          </div>
-        `).join('');
+
+      if (skillsDesc && data.site.skills.subtitle) {
+        skillsDesc.textContent = data.site.skills.subtitle;
+      }
+
+      if (skillsGrid && data.site.skills.items && data.site.skills.items.length) {
+        skillsGrid.innerHTML = data.site.skills.items.map((skill, index) => renderCapabilityCard(skill, index)).join('');
+      }
+
+      if (skillsSection && data.site.skills.stackChips && Array.isArray(data.site.skills.stackChips)) {
+        const stackRow = skillsSection.querySelector('.capability-stack-row');
+        if (stackRow) {
+          stackRow.innerHTML = data.site.skills.stackChips
+            .map((chip) => `<span>${chip}</span>`)
+            .join('');
+        }
       }
     }
     

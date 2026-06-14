@@ -4,11 +4,12 @@
       "title": "Task Scanner",
       "description": "Ağ cihazlarını analiz eden modern LAN scanner. IP, MAC ve port taraması ile şeffaf ağ analizi.",
       "icon": "🔍",
-      "status": "beta",
+      "status": "live",
       "tags": ["Android", "Network", "Utility"],
       "category": "Ağ & Güvenlik",
       "rating": 4.7,
-      "downloads": "8K+",
+      "downloads": "10+",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.taskscanner.app",
       "details": "https://bambinifojo.github.io/task-scanner/",
       "privacy": "https://bambinifojo.github.io/task-scanner/privacy-policy.html",
       "detailPage": "task-scanner/",
@@ -63,72 +64,73 @@
         "items": [
           {
             "icon": "🔍",
-            "title": "Ana Ekran • Tarama Başlat",
-            "image": "task-scanner/screenshots/Screenshot_20260128_202426.png"
-          },
-          {
-            "icon": "📱",
-            "title": "Cihaz Listesi • Detaylı Bilgiler",
-            "image": "task-scanner/screenshots/Screenshot_20260128_202433.png"
-          },
-          {
-            "icon": "🔐",
-            "title": "Port Analizi • Güvenlik",
-            "image": "task-scanner/screenshots/Screenshot_20260128_202445.png"
+            "title": "Ana Ekran: Hızlı ve Kolay",
+            "image": "task-scanner/screenshots/play-main-screen.png"
           },
           {
             "icon": "📊",
-            "title": "Ağ Haritası • Görselleştirme",
-            "image": "task-scanner/screenshots/Screenshot_20260128_202456.png"
+            "title": "Geçmiş Özeti",
+            "image": "task-scanner/screenshots/play-history-summary.png"
+          },
+          {
+            "icon": "⭐",
+            "title": "Favori Cihazlar",
+            "image": "task-scanner/screenshots/play-favorite-devices.png"
+          },
+          {
+            "icon": "⚙️",
+            "title": "Ayarlar ve Destek",
+            "image": "task-scanner/screenshots/play-settings-support.png"
           }
         ]
       }
     },
     {
       "title": "Task Cosmos",
-      "description": "Güneş sistemini keşfedin. Gezegen atlası, bilimsel içerikler ve modern uzay deneyimi.",
+      "description": "Yapay zeka destekli gezegen atlası. Canlı NASA verileri, kozmik görevler ve uzay keşfi tek uygulamada.",
       "icon": "🚀",
       "status": "live",
       "tags": ["Android", "Education", "Science"],
       "detailPage": "task-cosmos/",
       "category": "Eğitim",
       "rating": 4.8,
-      "downloads": "10K+",
-      "details": "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
+      "downloads": "10+",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
+      "details": "https://bambinifojo.github.io/task-cosmos/",
       "privacy": "https://bambinifojo.github.io/task-cosmos/privacy-policy.html",
       "features": [
-        "Gezegen Keşfi",
-        "Uzay ve Bilim İçerikleri",
-        "Modern Tasarım",
-        "Gizlilik Odaklı"
+        "Gezegen Atlası",
+        "Canlı NASA Verileri",
+        "Kozmik Görevler",
+        "AI Uzay Rehberi"
       ],
       "about": {
         "title": "Hakkında",
-        "subtitle": "Uzay meraklıları ve öğrenciler için geliştirilmiş modern bir gezegen atlası ve uzay keşfi uygulaması",
-        "description": "Task Cosmos, uzay meraklıları ve öğrenciler için geliştirilmiş modern bir gezegen atlası ve uzay keşfi uygulamasıdır. Güneş Sistemini keşfedin, gezegenleri detaylı inceleyin ve evren hakkında bilginizi derinleştirin. Yüksek çözünürlüklü gezegen görüntüleri, bilimsel veriler ve eğitici içeriklerle uzayı cebinize getirin."
+        "subtitle": "Astronomi meraklıları için yapay zeka destekli kapsamlı uzay keşif platformu",
+        "description": "Task Cosmos, canlı NASA verileri, günlük kozmik görevler ve AI rehberiyle evreni cebinize getiren kapsamlı bir gezegen atlasıdır. ISS takibi, uzay hava durumu, gezegen karşılaştırma, uzay görevleri arşivi ve ansiklopedi asistanı ile öğrenciler, eğitmenler ve uzay meraklıları için interaktif bir keşif deneyimi sunar."
       },
       "featuresTitle": "Özellikler",
       "featuresSubtitle": "Task Cosmos'un güçlü özelliklerini keşfedin",
       "featureCards": [
         {
+          "icon": "🎮",
+          "title": "Günlük Kozmik Görevler",
+          "description": "Her gün yeni eğitici görevler tamamlayın, mini testler çözün ve rozetler kazanarak kozmik rütbenizi yükseltin."
+        },
+        {
+          "icon": "🛰️",
+          "title": "Canlı Uzay Verileri",
+          "description": "ISS konumunu anlık izleyin, NASA DONKI ile uzay hava durumunu takip edin ve günün astronomi fotoğrafını AI ile keşfedin."
+        },
+        {
+          "icon": "🤖",
+          "title": "AI Uzay Uzmanı",
+          "description": "Ansiklopedi asistanına sorular sorun, karmaşık kavramları çocuk gibi anlat moduyla öğrenin ve canlı verilerle sohbet edin."
+        },
+        {
           "icon": "🌍",
-          "title": "Gezegen Keşfi",
-          "description": "Güneş Sistemi'ndeki tüm gezegenler hakkında detaylı bilgi. Boyut, kütle, yörünge ve atmosfer verileri. Yüksek çözünürlüklü gezegen görüntüleri. Gezegenleri karşılaştırın ve favorilerinize ekleyin."
-        },
-        {
-          "icon": "🚀",
-          "title": "Uzay ve Bilim İçerikleri",
-          "description": "Gezegenler hakkında bilimsel ve eğitici açıklamalar. Astronomi meraklıları için basit ve anlaşılır içerik. Öğrenciler ve eğitim kullanımı için uygun."
-        },
-        {
-          "icon": "🎨",
-          "title": "Modern ve Kullanışlı Tasarım",
-          "description": "Hızlı ve akıcı kullanıcı arayüzü. Açık/Koyu tema desteği. Mobil cihazlar için optimize edilmiş basit tasarım."
-        },
-        {
-          "icon": "🔒",
-          "title": "Gizlilik",
-          "description": "Uygulama kullanıcı gizliliğine önem verir. Kişisel veriler üçüncü taraflarla paylaşılmaz."
+          "title": "Gezegen Atlası",
+          "description": "Güneş sistemindeki gezegenleri keşfedin, boyut ve yerçekimi verilerini karşılaştırın, uzay görevlerini detaylı inceleyin."
         }
       ],
       "screenshots": {
@@ -136,34 +138,44 @@
         "subtitle": "Uygulamanın görsel özelliklerini keşfedin",
         "items": [
           {
-            "icon": "🌍",
-            "title": "Keşfet • Öğren • İncele",
-            "image": "task-cosmos/screenshots/Screenshot_3.png"
+            "icon": "🎮",
+            "title": "Günlük Kozmik Görevler",
+            "image": "task-cosmos/screenshots/play-daily-cosmic-missions.png"
           },
           {
-            "icon": "🚀",
-            "title": "Gerçek Uzay Deneyimi",
-            "image": "task-cosmos/screenshots/Screenshot_1.png"
+            "icon": "🛰️",
+            "title": "Görev Detayları ve Analiz",
+            "image": "task-cosmos/screenshots/play-mission-details.png"
           },
           {
-            "icon": "⭐",
-            "title": "Evrene Yaklaş",
-            "image": "task-cosmos/screenshots/Screenshot_4.png"
-          },
-          {
-            "icon": "🌌",
-            "title": "Her Gezegen Cebinde",
-            "image": "task-cosmos/screenshots/Screenshot_2.png"
+            "icon": "🌐",
+            "title": "Canlı Uzay Takibi ve ISS",
+            "image": "task-cosmos/screenshots/play-live-iss-tracking.png"
           },
           {
             "icon": "🔭",
-            "title": "Güneş Sistemi Rehberin",
-            "image": "task-cosmos/screenshots/Screenshot_6.png"
+            "title": "Evreni Keşfetmeye Başlayın",
+            "image": "task-cosmos/screenshots/play-explore-universe.png"
           },
           {
-            "icon": "📱",
-            "title": "Özellikler",
-            "image": "task-cosmos/screenshots/Screenshot_5.png"
+            "icon": "☀️",
+            "title": "Uzay Hava Durumunu İzleyin",
+            "image": "task-cosmos/screenshots/play-space-weather.png"
+          },
+          {
+            "icon": "🤖",
+            "title": "Yapay Zeka ile Uzay Sohbeti",
+            "image": "task-cosmos/screenshots/play-ai-space-chat.png"
+          },
+          {
+            "icon": "⚖️",
+            "title": "Gezegenleri Karşılaştırın",
+            "image": "task-cosmos/screenshots/play-compare-planets.png"
+          },
+          {
+            "icon": "📚",
+            "title": "Kapsamlı Uzay Kütüphanesi",
+            "image": "task-cosmos/screenshots/play-space-library.png"
           }
         ]
       }
