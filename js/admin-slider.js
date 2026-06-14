@@ -169,6 +169,8 @@ async function updateSliderApps() {
   // LocalStorage'a da kaydet (fallback)
   localStorage.setItem('sliderData', JSON.stringify(sliderData));
   console.log('✅ Slider localStorage\'a kaydedildi');
+
+  syncSliderManagerStore();
   
   // Slider uygulamalarını yeniden render et
   renderSliderApps();
@@ -219,13 +221,32 @@ async function updateSliderAutoPlayInterval() {
 
 // Slider paneline geçildiğinde verileri yükle
 function onSliderSectionShow() {
-  // Apps data'yı kontrol et
+  if (typeof AdminSliderManager !== 'undefined' && document.getElementById('adminSliderRoot')) {
+    AdminSliderManager.refreshItems();
+    if (typeof appsData !== 'undefined') {
+      if (typeof renderSliderApps === 'function') renderSliderApps();
+    }
+    return;
+  }
+
   if (!appsData || !appsData.apps) {
     appsData = { apps: [], site: null };
   }
-  
-  // Slider ayarlarını yükle
   loadSliderSettings();
+}
+
+function syncSliderManagerStore() {
+  if (typeof SliderManagerStore === 'undefined') return;
+  try {
+    const saved = localStorage.getItem(SliderManagerStore.LEGACY_KEY);
+    if (!saved) return;
+    const parsed = JSON.parse(saved);
+    if (Array.isArray(parsed?.slides) && parsed.slides.length) {
+      SliderManagerStore.save(SliderManagerStore.syncFromLegacySlides(parsed.slides));
+    }
+  } catch (e) {
+    console.warn('Slider manager senkronizasyonu atlandı:', e.message);
+  }
 }
 
 // Global scope'a ekle

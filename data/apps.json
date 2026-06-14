@@ -2,8 +2,10 @@
   "apps": [
     {
       "title": "Task Scanner",
-      "description": "Yerel ağdaki cihazları tek tuşla tarayan; IP, MAC, üretici, açık portlar üzerinden cihaz türü tahmini yapan, Fing benzeri fakat şeffaf ve genişletilebilir bir mobil uygulama.",
+      "description": "Ağ cihazlarını analiz eden modern LAN scanner. IP, MAC ve port taraması ile şeffaf ağ analizi.",
       "icon": "🔍",
+      "status": "beta",
+      "tags": ["Android", "Network", "Utility"],
       "category": "Ağ & Güvenlik",
       "rating": 4.7,
       "downloads": "8K+",
@@ -84,8 +86,11 @@
     },
     {
       "title": "Task Cosmos",
-      "description": "Uzay görevlerini yönetin, gezegenleri keşfedin ve kozmik yolculuğunuza çıkın.",
+      "description": "Güneş sistemini keşfedin. Gezegen atlası, bilimsel içerikler ve modern uzay deneyimi.",
       "icon": "🚀",
+      "status": "live",
+      "tags": ["Android", "Education", "Science"],
+      "detailPage": "task-cosmos/",
       "category": "Eğitim",
       "rating": 4.8,
       "downloads": "10K+",

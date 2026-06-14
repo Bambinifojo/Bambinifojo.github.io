@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.github.com https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com https://www.google.com https://www.google.com.tr; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://www.google.com.tr; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://api.github.com https://api.netlify.com https://*.firebaseio.com https://*.firebaseapp.com https://api.emailjs.com https://*.firebaseio.com https://*.firebaseapp.com https://www.google-analytics.com https://www.googletagmanager.com; media-src 'self' https: blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
-<title>Bambinifojo - Uygulamalarım</title>
+<title>Bambinifojo — Mobile Product Studio</title>
+<meta name="description" content="Mobil uygulamalar, SaaS araçları ve geleceğe dönük dijital ürünler geliştiren bağımsız mobile product studio."/>
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-<link rel="stylesheet" href="styles.css?v=1.0.1"/>
-<!-- Firebase SDK -->
+<link rel="stylesheet" href="styles.css?v=1.0.2"/>
+<link rel="stylesheet" href="studio.css?v=1.1.0"/>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<!-- Firebase config kaldırıldı - 404 hatası önleme -->
-<script defer src="scripts.js?v=1.0.1"></script>
+<script src="firebase-init.js"></script>
+<script src="js/apps-manager.js?v=1.0.0"></script>
+<script src="js/site-settings.js?v=1.0.0"></script>
+<script defer src="scripts.js?v=1.0.4"></script>
 </head>
 <body>
+
 <!-- Search Bar -->
 <div class="search-container" id="searchContainer">
   <div class="search-box">
@@ -32,66 +36,53 @@
   <div class="search-results" id="searchResults"></div>
 </div>
 
-
-<!-- Koyu Blur Arkaplan -->
 <div id="overlay" class="overlay"></div>
 
-<!-- Menü Paneli -->
+<!-- Mobile Sidebar -->
 <div id="sidebar" class="sidebar">
-  <button class="close-btn" id="closeMenuBtn">✖</button>
-
-  <a href="#home" class="menu-item">🏠 Ana Sayfa</a>
-  <a href="#about" class="menu-item">👤 Hakkımda</a>
-  <a href="#skills" class="menu-item">⚡ Yetenekler</a>
-  <a href="#apps" class="menu-item">📱 Uygulamalar</a>
-  <a href="contact.html" class="menu-item">✉️ İletişim</a>
-  <a href="/admin-login" class="menu-item">⚙️ Panel</a>
+  <button class="close-btn" id="closeMenuBtn" aria-label="Menüyü kapat">✕</button>
+  <a href="#home" class="menu-item">Ana Sayfa</a>
+  <a href="#about" class="menu-item">Hakkımda</a>
+  <a href="#skills" class="menu-item">Yetenekler</a>
+  <a href="#apps" class="menu-item">Uygulamalar</a>
+  <a href="contact.html" class="menu-item">İletişim</a>
+  <a href="/admin-login" class="menu-item admin-link">Panel</a>
 </div>
 
-<!-- Header Section -->
+<!-- Header -->
 <header id="home" class="main-header">
   <div class="header-container">
-    <a href="#home" class="logo-wrapper">
+    <a href="#home" class="brand-block logo-wrapper">
       <div class="logo-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-          <!-- Rocket Body -->
-          <path d="M12 2L13.5 8.5L18 10L13.5 11.5L12 18L10.5 11.5L6 10L10.5 8.5L12 2Z" fill="white" stroke="#1a1a1a" stroke-width="0.5"/>
-          <!-- Rocket Nose (Red) -->
-          <path d="M12 2L13.5 8.5L12 6L10.5 8.5L12 2Z" fill="#ff4444"/>
-          <!-- Rocket Window -->
-          <circle cx="12" cy="9" r="1.5" fill="#87ceeb" stroke="#1a1a1a" stroke-width="0.3"/>
-          <!-- Left Fin (Blue) -->
-          <path d="M6 10L8 12L6 14L6 10Z" fill="#4a90e2" stroke="#1a1a1a" stroke-width="0.5"/>
-          <!-- Right Fin -->
-          <path d="M18 10L16 12L18 14L18 10Z" fill="#4a90e2" stroke="#1a1a1a" stroke-width="0.5"/>
-          <!-- Flame (Orange) -->
-          <path d="M10.5 11.5L11 15L12 16L13 15L13.5 11.5Z" fill="#ff8800"/>
-          <path d="M11 15L11.5 17L12 17.5L12.5 17L13 15Z" fill="#ffaa00"/>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="24" height="24">
+          <path d="M12 2L13.5 8.5L18 10L13.5 11.5L12 18L10.5 11.5L6 10L10.5 8.5L12 2Z" fill="currentColor" opacity="0.9"/>
+          <circle cx="12" cy="9" r="1.5" fill="var(--accent)"/>
         </svg>
       </div>
-      <h1 class="logo">
-        <span class="logo-letter logo-accent">B</span>
-        <span class="logo-letter">a</span>
-        <span class="logo-letter">m</span>
-        <span class="logo-letter">b</span>
-        <span class="logo-letter">i</span>
-        <span class="logo-letter">n</span>
-        <span class="logo-letter">i</span>
-        <span class="logo-letter">f</span>
-        <span class="logo-letter">o</span>
-        <span class="logo-letter">j</span>
-        <span class="logo-letter">o</span>
-      </h1>
+      <div class="brand-text">
+        <span class="brand-name brand-title">Bambinifojo</span>
+        <span class="brand-subtitle header-tagline">Mobile Product Studio</span>
+      </div>
+      <h1 class="logo" aria-hidden="true"><span class="logo-letter logo-accent">B</span>ambinifojo</h1>
     </a>
-    <div class="header-tagline">Mobil Uygulama Geliştirici</div>
+
+    <nav class="desktop-nav main-nav" aria-label="Ana menü">
+      <a href="#home">Ana Sayfa</a>
+      <a href="#about">Hakkımda</a>
+      <a href="#skills">Yetenekler</a>
+      <a href="#apps">Uygulamalar</a>
+      <a href="contact.html">İletişim</a>
+    </nav>
+
     <div class="header-buttons">
+      <a href="/admin-login" class="btn-panel">Panel</a>
       <button class="search-toggle" id="searchToggle" title="Ara" aria-label="Arama">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.35-4.35"></path>
         </svg>
       </button>
-      <div class="theme-toggle" id="themeToggle" title="Tema Değiştir">
+      <div class="theme-toggle" id="themeToggle" title="Tema Değiştir" role="button" tabindex="0" aria-label="Tema değiştir">
         <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -116,234 +107,442 @@
   </div>
 </header>
 
-<!-- Hero Section -->
+<!-- Hero -->
 <section class="hero-section">
   <div class="hero-pattern"></div>
-  
-  <!-- App Slider -->
+
+  <!-- Slider (hidden via studio.css, kept for slider.js compatibility) -->
   <div class="app-slider-container">
     <div class="app-slider">
       <div id="appSlides" class="app-slides"></div>
     </div>
-    
-    <!-- Slider Controls -->
     <div class="slider-controls">
       <button class="slider-btn slider-prev" onclick="previousSlide()">❮</button>
       <div class="slider-pagination" id="sliderPagination"></div>
       <button class="slider-btn slider-next" onclick="nextSlide()">❯</button>
     </div>
   </div>
-  
+
   <div class="hero-container">
-    <div class="hero-content">
-      <h1 class="hero-brand" data-aos="fade-up">
-        <span class="brand-letter brand-accent" data-letter="B">B</span>
-        <span class="brand-letter" data-letter="a">a</span>
-        <span class="brand-letter" data-letter="m">m</span>
-        <span class="brand-letter" data-letter="b">b</span>
-        <span class="brand-letter" data-letter="i">i</span>
-        <span class="brand-letter" data-letter="n">n</span>
-        <span class="brand-letter" data-letter="i">i</span>
-        <span class="brand-letter" data-letter="f">f</span>
-        <span class="brand-letter" data-letter="o">o</span>
-        <span class="brand-letter" data-letter="j">j</span>
-        <span class="brand-letter" data-letter="o">o</span>
-      </h1>
-      <p class="hero-tagline" data-aos="fade-up" data-aos-delay="100ms">
-        Android cihazlar için güzel ve kullanımı kolay arayüzlere sahip uygulamalar geliştiriyoruz
-      </p>
-      
-      <div class="hero-cta" data-aos="fade-up" data-aos-delay="200ms">
-        <a href="https://play.google.com/store/apps/developer?id=Bambinifojo" target="_blank" rel="noopener" class="btn-playstore">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-          </svg>
-          <span>Play Store</span>
-        </a>
+    <div class="hero-grid">
+      <div class="hero-content">
+        <span class="hero-eyebrow">Mobile Product Studio</span>
+        <h2 class="hero-title" data-aos="fade-up">Mobil uygulamalar, SaaS araçları ve geleceğe dönük dijital ürünler.</h2>
+        <p class="hero-subtitle hero-tagline" data-aos="fade-up" data-aos-delay="100ms">
+          Android, Flutter, Firebase ve yapay zeka destekli geliştirme süreçleriyle; hızlı, sade ve kullanıcı odaklı ürünler geliştiriyorum.
+        </p>
+
+        <div class="hero-cta" data-aos="fade-up" data-aos-delay="200ms">
+          <a href="#apps" class="btn-primary">Uygulamaları İncele</a>
+          <a href="https://play.google.com/store/apps/developer?id=Bambinifojo" target="_blank" rel="noopener" class="btn-playstore">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+            </svg>
+            <span>Play Store</span>
+          </a>
+        </div>
+
+        <div class="hero-tech-badges" data-aos="fade-up" data-aos-delay="300ms">
+          <span class="tech-badge">Android</span>
+          <span class="tech-badge">Flutter</span>
+          <span class="tech-badge">Firebase</span>
+          <span class="tech-badge">AI</span>
+          <span class="tech-badge">UI/UX</span>
+        </div>
       </div>
-      
-      <div class="hero-stats" data-aos="fade-up" data-aos-delay="300ms">
-        <div class="stat-item">
-          <div class="stat-number">2+</div>
-          <div class="stat-label">Uygulama</div>
+
+      <div class="hero-dashboard" id="heroMediaVitrine" hidden aria-hidden="true">
+        <div class="hero-media-vitrine">
+          <div class="hero-media-slides" id="heroMediaSlides"></div>
+          <div class="hero-media-controls">
+            <button type="button" class="hero-media-btn hero-media-prev" id="heroMediaPrev" aria-label="Önceki">❮</button>
+            <div class="hero-media-dots" id="heroMediaDots"></div>
+            <button type="button" class="hero-media-btn hero-media-next" id="heroMediaNext" aria-label="Sonraki">❯</button>
+          </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Kalite</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">∞</div>
-          <div class="stat-label">İnovasyon</div>
+      </div>
+
+      <div class="hero-dashboard" id="heroStaticDashboard" data-aos="fade-up" data-aos-delay="150ms">
+        <div class="studio-dashboard">
+          <div class="studio-dashboard-header">
+            <span class="studio-dashboard-title">Bambinifojo Studio</span>
+            <span class="studio-dashboard-status">Aktif</span>
+          </div>
+          <div class="studio-dashboard-metrics">
+            <div class="studio-metric">
+              <div class="studio-metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+              </div>
+              <div class="studio-metric-text">
+                <strong>2+ Aktif Uygulama</strong>
+                <span>Yayında ve geliştirilen ürünler</span>
+              </div>
+            </div>
+            <div class="studio-metric">
+              <div class="studio-metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              </div>
+              <div class="studio-metric-text">
+                <strong>100% Mobil Öncelikli</strong>
+                <span>Kullanıcı odaklı ürün tasarımı</span>
+              </div>
+            </div>
+            <div class="studio-metric">
+              <div class="studio-metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <div class="studio-metric-text">
+                <strong>AI Destekli Geliştirme</strong>
+                <span>Akıllı araçlar ve otomasyon</span>
+              </div>
+            </div>
+            <div class="studio-metric">
+              <div class="studio-metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div class="studio-metric-text">
+                <strong>Sürekli İyileştirme</strong>
+                <span>Yayın sonrası bakım ve geliştirme</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- About Section -->
+<!-- Stats -->
+<section class="stats-section" aria-label="İstatistikler">
+  <div class="stats-grid hero-stats" data-aos="fade-up">
+    <div class="stat-item">
+      <div class="stat-number">2+</div>
+      <div class="stat-label">Yayındaki Uygulama</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Mobil Öncelikli Tasarım</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">∞</div>
+      <div class="stat-label">Sürekli Gelişim</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">⚡</div>
+      <div class="stat-label">Flutter / Android / Firebase Stack</div>
+    </div>
+  </div>
+</section>
+
+<!-- Process -->
+<section id="process" class="process-section">
+  <div class="section-inner">
+    <span class="section-eyebrow">Süreç</span>
+    <h2 class="section-title" data-aos="fade-up">Görünen ürünlerin arkasında güçlü bir geliştirme süreci var.</h2>
+    <p class="section-desc" data-aos="fade-up" data-aos-delay="50ms">
+      Her ürün; fikir, tasarım, kod, test, yayınlama ve sürekli geliştirme adımlarından geçen bütünlüklü bir süreçtir.
+    </p>
+    <div class="process-grid" data-aos="fade-up" data-aos-delay="100ms">
+      <article class="process-card">
+        <div class="process-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+        </div>
+        <h3>Fikirden Ürüne</h3>
+        <p>Kullanıcı ihtiyacını analiz edip çalışan mobil ürüne dönüştürme.</p>
+      </article>
+      <article class="process-card">
+        <div class="process-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <h3>Modern Teknoloji Stack'i</h3>
+        <p>Flutter, Android, Firebase ve yapay zeka destekli geliştirme süreçleri.</p>
+      </article>
+      <article class="process-card">
+        <div class="process-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <h3>Sürekli İyileştirme</h3>
+        <p>Yayın sonrası bakım, performans, kullanıcı geri bildirimi ve yeni özellikler.</p>
+      </article>
+    </div>
+    <p class="process-footnote" data-aos="fade-up" data-aos-delay="150ms">
+      Görünen ürünlerin arkasında; araştırma, tasarım, yazılım mimarisi, test, performans ve sürekli geliştirme var.
+    </p>
+  </div>
+</section>
+
+<!-- Vision -->
+<section id="vision" class="vision-section">
+  <div class="section-inner">
+    <span class="section-eyebrow">Vizyon</span>
+    <h2 class="section-title" data-aos="fade-up">Bağımsız üretim kültürüyle geliştirilen dijital ürünler.</h2>
+    <p class="vision-lead" data-aos="fade-up" data-aos-delay="50ms">
+      Sadece uygulama geliştirmiyorum; gerçek problemleri çözen, sürdürülebilir ve kullanıcı dostu dijital ürünler inşa ediyorum.
+    </p>
+    <div class="vision-grid" data-aos="fade-up" data-aos-delay="100ms">
+      <article class="vision-card">
+        <div class="vision-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </div>
+        <h3>Ürün Odaklılık</h3>
+        <p>Her uygulama belirli bir ihtiyacı çözmek için tasarlanır.</p>
+      </article>
+      <article class="vision-card">
+        <div class="vision-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Teknolojik Bağımsızlık</h3>
+        <p>Modern araçlarla kendi ürünlerimi geliştiriyor, yayınlıyor ve sürdürüyorum.</p>
+      </article>
+      <article class="vision-card">
+        <div class="vision-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>Geleceğe Hazırlık</h3>
+        <p>Yapay zeka, otomasyon ve mobil deneyimleri ürünlerin merkezine alıyorum.</p>
+      </article>
+    </div>
+    <p class="vision-footnote" data-aos="fade-up" data-aos-delay="150ms">
+      Yerelden başlayan, globale açılabilecek dijital ürünler.
+    </p>
+  </div>
+</section>
+
+<!-- About -->
 <section id="about" class="about-section">
   <div class="about-content">
-    <h2 class="section-title" data-aos="fade-up">Hakkımda</h2>
-    <div class="about-main" data-aos="fade-up" data-aos-delay="100ms">
-      <p class="about-text">
-        Bağımsız bir mobil uygulama geliştiricisiyim. Android, Flutter, Firebase ve oyun motorları ile uygulamalar ve mini oyunlar geliştiriyorum.
-      </p>
-      <p class="about-text">
-        Amacım, herkesin kolayca kullanabileceği sade ve işlevsel deneyimler oluşturmak.
-      </p>
-    </div>
-    <div class="about-tech" data-aos="fade-up" data-aos-delay="200ms">
-      <div class="tech-item">
-        <div class="tech-icon">🤖</div>
-        <span>Android</span>
+    <span class="section-eyebrow">Hakkımda</span>
+    <h2 class="section-title" data-aos="fade-up">Ürün odaklı mobil geliştirme</h2>
+    <div class="about-layout" data-aos="fade-up" data-aos-delay="100ms">
+      <div class="about-main">
+        <p class="about-text">
+          Bağımsız bir mobil ürün geliştiricisiyim. Android, Flutter, Firebase ve yapay zeka destekli süreçlerle; kullanıcı ihtiyacını çözen, ölçeklenebilir dijital ürünler geliştiriyorum.
+        </p>
+        <p class="about-text">
+          Amacım; karmaşık problemleri sade, hızlı ve güvenilir dijital ürünlere dönüştürmek.
+        </p>
+        <div class="about-tech">
+          <div class="tech-item"><div class="tech-icon">📱</div><span>Android</span></div>
+          <div class="tech-item"><div class="tech-icon">🎯</div><span>Flutter</span></div>
+          <div class="tech-item"><div class="tech-icon">🔥</div><span>Firebase</span></div>
+          <div class="tech-item"><div class="tech-icon">🤖</div><span>AI</span></div>
+        </div>
       </div>
-      <div class="tech-item">
-        <div class="tech-icon">🎨</div>
-        <span>Flutter</span>
-      </div>
-      <div class="tech-item">
-        <div class="tech-icon">🔥</div>
-        <span>Firebase</span>
-      </div>
-      <div class="tech-item">
-        <div class="tech-icon">🎮</div>
-        <span>Oyun Motorları</span>
+      <div class="about-features">
+        <div class="about-feature-card">
+          <div class="about-feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <strong>Bağımsız Geliştirici</strong>
+            <span>Tek kişilik stüdyo, tam kontrol</span>
+          </div>
+        </div>
+        <div class="about-feature-card">
+          <div class="about-feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div>
+            <strong>Ürün Odaklı Yaklaşım</strong>
+            <span>Kullanıcı değeri öncelikli</span>
+          </div>
+        </div>
+        <div class="about-feature-card">
+          <div class="about-feature-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div>
+            <strong>Kullanıcı Dostu Arayüz</strong>
+            <span>Sade, anlaşılır, modern UX</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Skills Section -->
+<!-- Skills -->
 <section id="skills" class="skills-section">
   <div class="skills-content">
-    <h2 class="section-title" data-aos="fade-up">Teknolojiler & Yetenekler</h2>
-    <div class="skills-grid">
-      <div class="skill-item" data-aos="fade-up" data-aos-delay="50ms">
-        <div class="skill-icon">📱</div>
+    <span class="section-eyebrow">Yetenekler</span>
+    <h2 class="section-title" data-aos="fade-up">Teknolojiler &amp; Hizmetler</h2>
+    <p class="section-desc" data-aos="fade-up" data-aos-delay="50ms">Mobil ürün geliştirmeden backend altyapısına kadar uçtan uca deneyim.</p>
+    <div class="services-grid skills-grid">
+      <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="50ms">
+        <div class="service-icon skill-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
+        </div>
         <h4>Android Development</h4>
-        <div class="skill-bar">
-          <div class="skill-progress" data-width="95"></div>
-        </div>
+        <p class="service-desc skill-desc">Native Android deneyimleri, performanslı arayüzler.</p>
       </div>
-      <div class="skill-item" data-aos="fade-up" data-aos-delay="100ms">
-        <div class="skill-icon">☕</div>
-        <h4>Java & Kotlin</h4>
-        <div class="skill-bar">
-          <div class="skill-progress" data-width="90"></div>
+      <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="100ms">
+        <div class="service-icon skill-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
         </div>
+        <h4>Flutter Apps</h4>
+        <p class="service-desc skill-desc">Tek kod tabanıyla mobil uygulamalar.</p>
       </div>
-      <div class="skill-item" data-aos="fade-up" data-aos-delay="150ms">
-        <div class="skill-icon">🎨</div>
+      <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="150ms">
+        <div class="service-icon skill-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h4>Firebase Backend</h4>
+        <p class="service-desc skill-desc">Auth, Firestore, Storage ve bildirim altyapısı.</p>
+      </div>
+      <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="200ms">
+        <div class="service-icon skill-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
         <h4>UI/UX Design</h4>
-        <div class="skill-bar">
-          <div class="skill-progress" data-width="85"></div>
-        </div>
+        <p class="service-desc skill-desc">Sade, anlaşılır ve modern kullanıcı deneyimi.</p>
       </div>
-      <div class="skill-item" data-aos="fade-up" data-aos-delay="200ms">
-        <div class="skill-icon">🌐</div>
+      <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="250ms">
+        <div class="service-icon skill-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
         <h4>Web Development</h4>
-        <div class="skill-bar">
-          <div class="skill-progress" data-width="80"></div>
-        </div>
+        <p class="service-desc skill-desc">Modern web arayüzleri ve landing sayfaları.</p>
       </div>
-      <div class="skill-item" data-aos="fade-up" data-aos-delay="250ms">
-        <div class="skill-icon">🔥</div>
-        <h4>Firebase</h4>
-        <div class="skill-bar">
-          <div class="skill-progress" data-width="88"></div>
+      <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="300ms">
+        <div class="service-icon skill-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
-      </div>
-      <div class="skill-item" data-aos="fade-up" data-aos-delay="300ms">
-        <div class="skill-icon">⚡</div>
         <h4>Performance Optimization</h4>
-        <div class="skill-bar">
-          <div class="skill-progress" data-width="92"></div>
-        </div>
+        <p class="service-desc skill-desc">Hızlı açılan, düşük kaynak tüketen uygulamalar.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Apps Section -->
+<!-- Apps -->
 <section id="apps" class="apps-section">
+  <span class="section-eyebrow">Ürünler</span>
   <h2 class="section-title" data-aos="fade-up">Uygulamalar</h2>
+  <p class="section-desc" data-aos="fade-up" data-aos-delay="50ms">Yayında ve geliştirme aşamasındaki mobil ürünler.</p>
   <div id="apps-container"></div>
 </section>
 
-<!-- Contact Section Link -->
-<section id="contact-section" class="contact-section">
-  <div class="contact-content">
-    <h2 class="section-title" data-aos="fade-up">İletişim</h2>
-    <p class="contact-subtitle" data-aos="fade-up" data-aos-delay="50ms">Projeleriniz veya işbirliği için benimle iletişime geçebilirsiniz</p>
-    
-    <div class="contact-link-container" data-aos="fade-up" data-aos-delay="100ms">
-      <a href="contact.html" class="btn-contact-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-          <polyline points="22,6 12,13 2,6"></polyline>
-        </svg>
-        <span>İletişim Sayfasına Git</span>
+<!-- Contact -->
+<section id="contact-section" class="contact-section contact-home">
+  <div class="section-container contact-home-grid">
+    <div class="contact-home-content" data-aos="fade-up">
+      <span class="section-eyebrow">İletişim</span>
+      <h2 class="section-title">Bir uygulama fikrin mi var?</h2>
+      <p class="contact-subtitle">Mobil uygulama, SaaS araçları veya teknik iş birlikleri için iletişime geçebilirsin.</p>
+      <div class="contact-trust-badges">
+        <span class="tech-badge">Mobil Uygulama</span>
+        <span class="tech-badge">SaaS Araçları</span>
+        <span class="tech-badge">Teknik İş Birliği</span>
+      </div>
+    </div>
+
+    <div class="contact-home-actions" data-aos="fade-up" data-aos-delay="100">
+      <a href="mailto:bambinifojo@gmail.com" class="contact-link-card">
+        <span class="contact-link-card-icon">📧</span>
+        <span class="contact-link-card-body">
+          <strong>E-posta Gönder</strong>
+          <span>bambinifojo@gmail.com</span>
+        </span>
+      </a>
+      <a href="https://github.com/Bambinifojo" target="_blank" rel="noopener" class="contact-link-card">
+        <span class="contact-link-card-icon">💻</span>
+        <span class="contact-link-card-body">
+          <strong>GitHub</strong>
+          <span>Açık kaynak projeler ve kod</span>
+        </span>
+      </a>
+      <a href="https://play.google.com/store/apps/developer?id=Bambinifojo" target="_blank" rel="noopener" class="contact-link-card">
+        <span class="contact-link-card-icon">📱</span>
+        <span class="contact-link-card-body">
+          <strong>Play Store</strong>
+          <span>Yayındaki mobil uygulamalar</span>
+        </span>
+      </a>
+      <a href="contact.html" class="contact-link-card contact-link-card-featured">
+        <span class="contact-link-card-icon">✉️</span>
+        <span class="contact-link-card-body">
+          <strong>İletişim Sayfası</strong>
+          <span>Mesaj formu ve detaylı iletişim</span>
+        </span>
       </a>
     </div>
   </div>
 </section>
 
+<!-- Footer -->
 <footer id="contact">
   <div class="footer-content">
-    <div class="footer-links">
-      <a href="#home">Ana Sayfa</a>
-      <a href="#apps">Uygulamalar</a>
-      <a href="contact.html">İletişim</a>
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">Bambinifojo</div>
+        <p class="footer-brand-desc">Mobil uygulamalar, yapay zeka destekli araçlar ve ölçeklenebilir dijital sistemler geliştiren bağımsız mobile product studio.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Sayfalar</div>
+        <div class="footer-links">
+          <a href="#home">Ana Sayfa</a>
+          <a href="#about">Hakkımda</a>
+          <a href="#apps">Uygulamalar</a>
+          <a href="contact.html">İletişim</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Bağlantılar</div>
+        <div class="footer-links">
+          <a href="https://github.com/Bambinifojo" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://play.google.com/store/apps/developer?id=Bambinifojo" target="_blank" rel="noopener">Play Store</a>
+          <a href="/admin-login">Panel</a>
+        </div>
+      </div>
     </div>
-    
-    <div class="social-links">
-      <a href="https://github.com/Bambinifojo" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-        </svg>
-      </a>
-      <a href="mailto:bambinifojo@gmail.com" target="_blank" rel="noopener" title="E-posta" aria-label="E-posta">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-        </svg>
-      </a>
-      <a href="https://play.google.com/store/apps/developer?id=Bambinifojo" target="_blank" rel="noopener" title="Google Play" aria-label="Google Play">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-        </svg>
-      </a>
-    </div>
-    
-    <div class="footer-copyright">
-      <p>© 2025 Bambinifojo. Tüm hakları saklıdır.</p>
+    <div class="footer-bottom">
+      <div class="social-links">
+        <a href="https://github.com/Bambinifojo" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+        <a href="mailto:bambinifojo@gmail.com" target="_blank" rel="noopener" title="E-posta" aria-label="E-posta">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+        </a>
+        <a href="https://play.google.com/store/apps/developer?id=Bambinifojo" target="_blank" rel="noopener" title="Google Play" aria-label="Google Play">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+          </svg>
+        </a>
+      </div>
+      <div class="footer-copyright">
+        <p>© 2026 Bambinifojo. Tüm hakları saklıdır.</p>
+      </div>
     </div>
   </div>
 </footer>
 
 <script>
-// Theme Toggle
 const themeToggle = document.getElementById('themeToggle');
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-const currentTheme = localStorage.getItem('theme') || (prefersDark.matches ? 'dark' : 'light');
+const currentTheme = localStorage.getItem('theme') || 'dark';
 
 document.documentElement.setAttribute('data-theme', currentTheme);
 
-themeToggle.addEventListener('click', () => {
-  const currentTheme = document.documentElement.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+function toggleTheme() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  const newTheme = theme === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', newTheme);
   localStorage.setItem('theme', newTheme);
+}
+
+themeToggle.addEventListener('click', toggleTheme);
+themeToggle.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    toggleTheme();
+  }
 });
 
-// Hamburger Menü - scripts.js'deki toggleMenu fonksiyonu ve menu item click handler'ları kullanılıyor
-
-
-// Scroll Animations
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
-
+const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -351,27 +550,16 @@ const observer = new IntersectionObserver((entries) => {
       const delay = parseInt(delayAttr.replace('ms', '')) || 0;
       setTimeout(() => {
         entry.target.style.opacity = '1';
-        const aosType = entry.target.getAttribute('data-aos');
-        if (aosType === 'zoom-in') {
-          entry.target.style.transform = 'scale(1)';
-        } else {
-          entry.target.style.transform = 'translateY(0)';
-        }
+        entry.target.style.transform = entry.target.getAttribute('data-aos') === 'zoom-in' ? 'scale(1)' : 'translateY(0)';
       }, delay);
     }
   });
 }, observerOptions);
 
-// Observe elements with data-aos attribute
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-aos]').forEach(el => {
     el.style.opacity = '0';
-    const aosType = el.getAttribute('data-aos');
-    if (aosType === 'zoom-in') {
-      el.style.transform = 'scale(0.8)';
-    } else {
-      el.style.transform = 'translateY(30px)';
-    }
+    el.style.transform = el.getAttribute('data-aos') === 'zoom-in' ? 'scale(0.8)' : 'translateY(30px)';
     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     observer.observe(el);
   });
@@ -380,23 +568,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- AI Asistan Widget -->
 <div class="ai-assistant-widget" id="aiAssistantWidget">
-  <!-- Floating Button -->
-  <button class="ai-assistant-toggle" id="aiAssistantToggle" title="AI Asistan" aria-label="AI Asistan">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <span class="ai-assistant-label">AI Asistan Beta</span>
+  <button type="button" class="ai-assistant-toggle" id="aiAssistantToggle" title="AI Asistan Beta" aria-label="AI Asistan Beta">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      <path d="M13 8H7"></path>
-      <path d="M17 12H7"></path>
+      <path d="M9 10h.01"></path>
+      <path d="M15 10h.01"></path>
     </svg>
-    <span class="ai-badge" id="aiBadge">3</span>
+    <span class="ai-badge" id="aiBadge" title="Demo kredi">3</span>
   </button>
 
-  <!-- Modal Backdrop -->
-  <div class="ai-modal-backdrop" id="aiModalBackdrop"></div>
+  <div class="ai-modal-backdrop" id="aiModalBackdrop" aria-hidden="true"></div>
+</div>
 
-  <!-- Chat Modal -->
-  <div class="ai-assistant-modal" id="aiAssistantModal">
+<div class="ai-assistant-modal" id="aiAssistantModal" aria-hidden="true">
     <div class="ai-modal-content">
-      <!-- Header -->
       <div class="ai-modal-header">
         <div class="ai-header-left">
           <div class="ai-logo">
@@ -405,16 +591,19 @@ document.addEventListener('DOMContentLoaded', () => {
               <path d="M2 17l10 5 10-5"></path>
               <path d="M2 12l10 5 10-5"></path>
             </svg>
-            <span>AI Asistan</span>
+            <div class="ai-logo-text">
+              <strong class="ai-logo-title">Bambinifojo AI</strong>
+              <span class="ai-logo-subtitle">Beta asistan</span>
+            </div>
           </div>
         </div>
         <div class="ai-header-right">
-          <button class="ai-header-btn" id="aiMinimizeBtn" title="Küçült">
+          <button type="button" class="ai-header-btn" id="aiMinimizeBtn" title="Küçült" aria-label="Küçült">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
           </button>
-          <button class="ai-header-btn" id="aiCloseBtn" title="Kapat">
+          <button type="button" class="ai-header-btn" id="aiCloseBtn" title="Kapat" aria-label="Kapat">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -423,20 +612,12 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
 
-
-      <!-- Chat Messages -->
       <div class="ai-chat-messages" id="aiChatMessages"></div>
 
-      <!-- Input Area -->
       <div class="ai-input-area">
         <div class="ai-input-wrapper">
-          <textarea 
-            id="aiMessageInput" 
-            class="ai-message-input" 
-            placeholder="Mesaj yaz..."
-            rows="1"
-          ></textarea>
-          <button class="ai-send-btn" id="aiSendBtn" title="Gönder">
+          <textarea id="aiMessageInput" class="ai-message-input" placeholder="Mesaj yaz..." rows="1"></textarea>
+          <button type="button" class="ai-send-btn" id="aiSendBtn" title="Gönder" aria-label="Gönder">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="22" y1="2" x2="11" y2="13"></line>
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -445,17 +626,16 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="ai-status-bar">
           <span class="ai-status-text" id="aiStatusText">
-            <span id="aiCredits">3</span> kredi kaldı
+            Demo kredi: <span id="aiCredits">3</span>
           </span>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- EmailJS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="slider.js"></script>
-<script src="ai-assistant.js"></script>
+<script src="js/slider-manager.js?v=1.0.0"></script>
+<script src="slider.js?v=1.1.0"></script>
+<script src="ai-assistant.js?v=1.0.3"></script>
 </body>
 </html>

@@ -187,6 +187,12 @@ function setupHamburgerMenu() {
 }
 
 // Site verilerini yükle
+function applyStoredSiteSettings() {
+  if (typeof SiteSettingsStore === 'undefined') return;
+  const saved = SiteSettingsStore.load();
+  if (saved) SiteSettingsStore.applyToDocument(saved);
+}
+
 async function loadSiteData() {
   try {
     let siteData = null;
@@ -260,6 +266,7 @@ async function loadSiteData() {
     
     if (!siteData) {
       console.warn('Site verisi bulunamadı, varsayılan değerler kullanılıyor');
+      applyStoredSiteSettings();
       return;
     }
     
@@ -267,17 +274,10 @@ async function loadSiteData() {
     
     // Header
     if (data.site.header) {
-      const logo = document.querySelector('.logo');
-      const tagline = document.querySelector('.header-tagline');
-      if (logo && data.site.header.logo) {
-        // Logo metnini güncelle (mevcut yapıyı koru, sadece metni değiştir)
-        const logoText = data.site.header.logo;
-        if (logoText !== 'Bambinifojo') {
-          // Logo metni değişmişse güncelle
-          logo.innerHTML = logoText.split('').map((letter, i) => 
-            `<span class="logo-letter ${i === 0 ? 'logo-accent' : ''}">${letter}</span>`
-          ).join('');
-        }
+      const brandName = document.querySelector('.brand-name');
+      const tagline = document.querySelector('.header-tagline, .brand-subtitle');
+      if (brandName && data.site.header.logo) {
+        brandName.textContent = data.site.header.logo;
       }
       if (tagline && data.site.header.tagline) {
         tagline.textContent = data.site.header.tagline;
@@ -286,15 +286,12 @@ async function loadSiteData() {
     
     // Hero Section
     if (data.site.hero) {
-      const heroTitle = document.querySelector('.hero-brand');
-      const heroTagline = document.querySelector('.hero-tagline');
-      const playStoreBtn = document.querySelector('.btn-playstore');
+      const heroTitle = document.querySelector('.hero-title, .hero-brand');
+      const heroTagline = document.querySelector('.hero-subtitle, .hero-tagline');
+      const playStoreBtn = document.querySelector('.hero-cta .btn-playstore');
       
       if (heroTitle && data.site.hero.title) {
-        const titleText = data.site.hero.title;
-        heroTitle.innerHTML = titleText.split('').map((letter, i) => 
-          `<span class="brand-letter ${i === 0 ? 'brand-accent' : ''}" data-letter="${letter}">${letter}</span>`
-        ).join('');
+        heroTitle.textContent = data.site.hero.title;
       }
       
       if (heroTagline && data.site.hero.tagline) {
@@ -305,9 +302,8 @@ async function loadSiteData() {
         playStoreBtn.href = data.site.hero.playStoreUrl;
       }
       
-      // Hero Stats
       if (data.site.hero.stats && data.site.hero.stats.length > 0) {
-        const statsContainer = document.querySelector('.hero-stats');
+        const statsContainer = document.querySelector('.stats-grid, .hero-stats');
         if (statsContainer) {
           statsContainer.innerHTML = data.site.hero.stats.map((stat, index) => `
             <div class="stat-item" data-aos="fade-up" data-aos-delay="${(index + 3) * 100}ms">
@@ -356,29 +352,19 @@ async function loadSiteData() {
       
       if (skillsGrid && data.site.skills.items) {
         skillsGrid.innerHTML = data.site.skills.items.map((skill, index) => `
-          <div class="skill-item" data-aos="fade-up" data-aos-delay="${index * 50}ms">
-            <div class="skill-icon">${skill.icon}</div>
+          <div class="service-card skill-item" data-aos="fade-up" data-aos-delay="${index * 50}ms">
+            <div class="service-icon skill-icon">${skill.icon}</div>
             <h4>${skill.name}</h4>
-            <div class="skill-bar">
-              <div class="skill-progress" data-width="${skill.level}"></div>
-            </div>
+            <p class="service-desc skill-desc">${skill.description || ''}</p>
           </div>
         `).join('');
-        
-        // Skill progress animasyonlarını başlat
-        setTimeout(() => {
-          document.querySelectorAll('.skill-progress').forEach(progress => {
-            const width = progress.getAttribute('data-width');
-            progress.style.width = width + '%';
-          });
-        }, 100);
       }
     }
     
     // Contact Section
     if (data.site.contact) {
       const contactTitle = document.querySelector('#contact-section .section-title');
-      const contactSubtitle = document.querySelector('.contact-subtitle');
+      const contactSubtitle = document.querySelector('#contact-section .contact-subtitle');
       
       if (contactTitle && data.site.contact.title) {
         contactTitle.textContent = data.site.contact.title;
@@ -388,9 +374,93 @@ async function loadSiteData() {
         contactSubtitle.textContent = data.site.contact.subtitle;
       }
     }
+
+    applyStoredSiteSettings();
   } catch (error) {
     console.error('Site verileri yüklenirken hata:', error);
   }
+}
+
+function isValidAppLink(url) {
+  return url && url.trim() !== '' && url.trim() !== '#';
+}
+
+function getAppStatus(app) {
+  if (app.status === 'published' || app.status === 'beta' || app.status === 'development' || app.status === 'draft') {
+    if (app.status === 'published') return 'live';
+    if (app.status === 'development') return 'dev';
+    return app.status;
+  }
+  if (app.status === 'live' || app.status === 'beta' || app.status === 'dev') {
+    return app.status;
+  }
+  if (app.playStoreUrl && app.playStoreUrl.includes('play.google.com')) return 'live';
+  if (app.details && app.details.includes('play.google.com')) return 'live';
+  if (app.detailUrl || app.detailPage || (app.details && app.details !== '#' && app.details.includes('bambinifojo.github.io'))) {
+    return 'beta';
+  }
+  return 'dev';
+}
+
+function getStatusLabel(status) {
+  const map = {
+    live: 'Yayında',
+    published: 'Yayında',
+    beta: 'Beta',
+    dev: 'Geliştiriliyor',
+    development: 'Geliştiriliyor',
+    draft: 'Taslak'
+  };
+  return map[status] || 'Geliştiriliyor';
+}
+
+function normalizeAppForRender(app) {
+  return {
+    title: app.name || app.title,
+    description: app.shortDescription || app.description,
+    icon: app.imageUrl || app.icon,
+    status: app.status,
+    tags: app.technologies || app.tags,
+    details: app.playStoreUrl || app.details,
+    detailPage: app.detailUrl || app.detailPage,
+    playStoreUrl: app.playStoreUrl,
+    githubUrl: app.githubUrl,
+    privacy: app.privacy,
+    active: app.active !== false,
+    featured: !!app.featured,
+    order: app.order
+  };
+}
+
+function isShowcaseApp(app) {
+  const normalized = normalizeAppForRender(app);
+  if (app.active === false) return false;
+  return isValidAppLink(normalized.details)
+    || isValidAppLink(normalized.detailPage)
+    || isValidAppLink(normalized.playStoreUrl)
+    || isValidAppLink(app.detailUrl)
+    || isValidAppLink(app.githubUrl);
+}
+
+function getAppTechTags(app) {
+  if (app.technologies && app.technologies.length > 0) {
+    return app.technologies.slice(0, 3);
+  }
+  if (app.tags && app.tags.length > 0) {
+    return app.tags.slice(0, 3);
+  }
+  if (app.features && app.features.length > 0) {
+    return app.features.slice(0, 3);
+  }
+  if (app.category) {
+    return app.category.split(/[&•,]/).map(t => t.trim()).filter(Boolean).slice(0, 3);
+  }
+  return ['Android'];
+}
+
+function truncateText(text, maxLength) {
+  if (!text || text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + '…';
 }
 
 async function loadApps(){
@@ -398,169 +468,154 @@ async function loadApps(){
     console.log('📱 loadApps() fonksiyonu çağrıldı');
     const container = document.getElementById("apps-container");
     if (!container) {
-      console.warn('⚠️ apps-container elementi bulunamadı');
-      // task-cosmos/index.html gibi detay sayfalarında apps-container yok, bu normal
-      // Admin paneli veya diğer sayfalarda da apps-container olmayabilir
-      // Bu durum normal olduğu için uyarı göstermiyoruz
       return;
     }
     
     console.log('✅ apps-container bulundu');
     
-    // Loading state göster
     container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 20px; color: #666; opacity: 0.8;">Uygulamalar yükleniyor...</p></div>';
+    
+    let apps = null;
+
+    if (typeof AppsManagerStore !== 'undefined') {
+      const stored = AppsManagerStore.getApps();
+      if (stored && stored.length) {
+        apps = AppsManagerStore.sortForDisplay(stored, { includeInactive: false });
+        console.log('✅ bambinifojo_apps yüklendi:', apps.length, 'uygulama');
+      }
+    }
     
     let data = null;
     
-    // Önce Firebase'den yüklemeyi dene
-    if (typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
-      try {
-        console.log('🔥 Firebase\'den veri yükleniyor...');
-        const snapshot = await firebaseDatabase.ref('apps').once('value');
-        const appsData = snapshot.val();
-        console.log('🔥 Firebase snapshot:', appsData);
-        if (appsData && appsData.apps && appsData.apps.length > 0) {
-          data = appsData;
-          console.log('✅ Firebase\'den veri yüklendi:', appsData.apps.length, 'uygulama');
-        } else {
-          console.warn('⚠️ Firebase\'den boş veri geldi, JSON\'dan yüklenecek');
+    if (!apps || !apps.length) {
+      // Önce Firebase'den yüklemeyi dene
+      if (typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
+        try {
+          console.log('🔥 Firebase\'den veri yükleniyor...');
+          const snapshot = await firebaseDatabase.ref('apps').once('value');
+          const appsDataFromFirebase = snapshot.val();
+          if (appsDataFromFirebase && appsDataFromFirebase.apps && appsDataFromFirebase.apps.length > 0) {
+            data = appsDataFromFirebase;
+            console.log('✅ Firebase\'den veri yüklendi:', appsDataFromFirebase.apps.length, 'uygulama');
+          }
+        } catch (firebaseError) {
+          console.warn('❌ Firebase\'den yükleme hatası, JSON dosyasından yüklenecek:', firebaseError);
         }
-      } catch (firebaseError) {
-        console.warn('❌ Firebase\'den yükleme hatası, JSON dosyasından yüklenecek:', firebaseError);
       }
-    } else {
-      console.log('ℹ️ Firebase database tanımlı değil, JSON\'dan yüklenecek');
-    }
-    
-    // Firebase'den yüklenemediyse JSON dosyasından yükle
-    if (!data || !data.apps || data.apps.length === 0) {
-      // Path'i mevcut dizine göre ayarla (root veya task-cosmos/)
-      const appsPath = window.location.pathname.includes('/task-cosmos/') 
-        ? '../data/apps.json' 
-        : 'data/apps.json';
-      console.log('📄 JSON dosyası yükleniyor:', appsPath);
-      const res = await fetch(appsPath);
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+      
+      if (!data || !data.apps || data.apps.length === 0) {
+        const appsPath = window.location.pathname.includes('/task-cosmos/') 
+          ? '../data/apps.json' 
+          : 'data/apps.json';
+        console.log('📄 JSON dosyası yükleniyor:', appsPath);
+        const res = await fetch(appsPath);
+        if (res.ok) {
+          data = await res.json();
+          console.log('✅ JSON dosyasından veri yüklendi:', data.apps?.length || 0, 'uygulama');
+        }
       }
-      data = await res.json();
-      console.log('✅ JSON dosyasından veri yüklendi:', data.apps?.length || 0, 'uygulama');
+
+      if (data?.apps?.length) {
+        apps = data.apps.filter((app) => app.active !== false);
+        apps.sort((a, b) => {
+          if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
+          return (Number(a.order) || 0) - (Number(b.order) || 0);
+        });
+      }
     }
     
     container.innerHTML = "";
     
-    if (!data || !data.apps || data.apps.length === 0) {
-      console.error('❌ Uygulama verisi bulunamadı!');
-      container.innerHTML = '<p style="color: #666; text-align: center; padding: 40px; opacity: 0.8;">Henüz uygulama eklenmemiş.</p>';
+    if (!apps || apps.length === 0) {
+      container.innerHTML = `
+        <div class="apps-empty-state">
+          <h3>Yakında yeni uygulamalar</h3>
+          <p>Stüdyoda geliştirilen ürünler burada listelenecek. Takipte kalın.</p>
+        </div>
+      `;
       return;
     }
     
-    console.log('🎨', data.apps.length, 'uygulama render ediliyor...');
-    
-    // Helper function: Icon'un URL mi emoji mi olduğunu kontrol et
-    const renderIcon = (icon) => {
+    const showcaseApps = apps.filter(isShowcaseApp);
+    console.log('🎨', showcaseApps.length, 'ürün kartı render ediliyor...');
+
+    if (showcaseApps.length === 0) {
+      container.innerHTML = `
+        <div class="apps-empty-state">
+          <h3>Yakında yeni uygulamalar</h3>
+          <p>Stüdyoda geliştirilen ürünler burada listelenecek. Takipte kalın.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const renderIcon = (icon, title) => {
       const iconValue = icon || '📱';
-      // URL kontrolü: http veya https ile başlıyorsa URL'dir
       if (iconValue.startsWith('http://') || iconValue.startsWith('https://')) {
-        return `<img src="${escapeHtml(iconValue)}" alt="App icon" class="app-icon-image" onerror="this.style.display='none'; this.parentElement.innerHTML='📱';" />`;
+        return `<img src="${escapeHtml(iconValue)}" alt="${escapeHtml(title)} icon" class="app-icon-image" onerror="this.style.display='none'; this.parentElement.textContent='📱';" />`;
       }
       return iconValue;
     };
-    
-    data.apps.forEach((app, index) => {
-      const icon = app.icon || '📱';
-      const rating = app.rating || 4.5;
-      const downloads = app.downloads || '1K+';
-      const category = app.category || 'Uygulama';
-      const features = app.features || [];
-      // details linki # veya boş ise soluk görün
-      const hasPlayStore = app.details && app.details.trim() !== '' && app.details.trim() !== '#';
-      
-      const card = document.createElement('div');
-      card.className = 'app-card';
-      if (!hasPlayStore) {
-        card.classList.add('app-card-coming-soon');
-      }
-      card.style.animationDelay = `${index * 0.1}s`;
+
+    showcaseApps.forEach((app, index) => {
+      const normalized = normalizeAppForRender(app);
+      const status = getAppStatus(app);
+      const statusClass = status === 'live' || status === 'published' ? 'status-live' : status === 'beta' ? 'status-beta' : status === 'draft' ? 'status-draft' : 'status-dev';
+      const techTags = getAppTechTags(app);
+      const playStoreUrl = app.playStoreUrl || (normalized.details && normalized.details.includes('play.google.com') ? normalized.details : '');
+      const detailUrl = app.detailUrl || normalized.detailPage || (isValidAppLink(normalized.details) && !playStoreUrl ? normalized.details : null);
+      const githubUrl = app.githubUrl || '';
+
+      const card = document.createElement('article');
+      card.className = 'product-card app-card';
       card.setAttribute('data-aos', 'fade-up');
       card.setAttribute('data-aos-delay', `${index * 100}ms`);
-      
-      // Rating stars
-      const stars = Math.floor(rating);
-      const hasHalfStar = rating % 1 >= 0.5;
-      let starsHTML = '';
-      for (let i = 0; i < 5; i++) {
-        if (i < stars) {
-          starsHTML += '<span class="star filled">★</span>';
-        } else if (i === stars && hasHalfStar) {
-          starsHTML += '<span class="star half">★</span>';
-        } else {
-          starsHTML += '<span class="star">★</span>';
-        }
+
+      const tagsHTML = techTags.map(tag => `<span class="product-tag">${escapeHtml(tag)}</span>`).join('');
+      const actionsHTML = [];
+
+      if (detailUrl) {
+        actionsHTML.push(`<a href="${detailUrl}" class="btn-product btn-product-primary" onclick="event.stopPropagation();">Detay</a>`);
       }
-      
-      // Features list
-      const featuresHTML = features.length > 0 
-        ? `<div class="app-features">
-            ${features.slice(0, 3).map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
-          </div>`
-        : '';
-      
-      // Check if app has a detail page
-      const detailPage = app.detailPage || (app.title === 'Task Cosmos' ? 'task-cosmos/' : null);
-      
+      if (playStoreUrl) {
+        actionsHTML.push(`<a href="${playStoreUrl}" class="btn-product btn-product-primary" target="_blank" rel="noopener" onclick="event.stopPropagation();">Play Store</a>`);
+      }
+      if (githubUrl) {
+        actionsHTML.push(`<a href="${githubUrl}" class="btn-product" target="_blank" rel="noopener" onclick="event.stopPropagation();">GitHub</a>`);
+      }
+      if (isValidAppLink(app.privacy)) {
+        actionsHTML.push(`<a href="${app.privacy}" class="btn-product" target="_blank" rel="noopener" onclick="event.stopPropagation();">Gizlilik</a>`);
+      }
+
       card.innerHTML = `
-        <div class="app-card-header" ${detailPage ? 'style="cursor: pointer;"' : ''}>
-          <div class="app-icon-large">${renderIcon(icon)}</div>
-          <div class="app-header-info">
-            <div class="app-category">${category}</div>
-            <h3 class="app-title">${app.title}</h3>
-            <div class="app-rating">
-              <div class="stars">${starsHTML}</div>
-              <span class="rating-value">${rating}</span>
-              <span class="downloads-count">${downloads} indirme</span>
+        <div class="product-card-header">
+          <div class="product-icon app-icon-large">${renderIcon(normalized.icon, normalized.title)}</div>
+          <div class="product-meta">
+            <h3 class="product-name app-title">${escapeHtml(normalized.title)}</h3>
+            <div class="product-badges">
+              <span class="status-badge ${statusClass}">${getStatusLabel(status)}</span>
+              ${tagsHTML}
             </div>
           </div>
         </div>
-        
-        <p class="app-description">${app.description}</p>
-        
-        ${featuresHTML}
-        
-        <div class="app-actions">
-          ${hasPlayStore ? `
-            <a href="${app.details}" class="btn-play-store" target="_blank" rel="noopener" onclick="event.stopPropagation();">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
-              </svg>
-              <span>Google Play'de İndir</span>
-            </a>
-          ` : `
-            <button class="btn-coming-soon" disabled onclick="event.stopPropagation();">
-              <span>Yakında</span>
-            </button>
-          `}
-          <a href="${app.privacy}" class="btn-privacy" target="_blank" rel="noopener" onclick="event.stopPropagation();">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            <span>Gizlilik</span>
-          </a>
+        <div class="product-body">
+          <p class="product-desc app-description">${escapeHtml(truncateText(normalized.description, 140))}</p>
+          <div class="product-actions app-actions">
+            ${actionsHTML.join('')}
+          </div>
         </div>
       `;
-      
-      // Add click event to navigate to detail page
-      if (detailPage) {
+
+      if (detailUrl) {
         card.style.cursor = 'pointer';
         card.addEventListener('click', (e) => {
-          // Don't navigate if clicking on buttons or links
-          if (e.target.closest('.app-actions') || e.target.closest('a') || e.target.closest('button')) {
+          if (e.target.closest('.product-actions') || e.target.closest('a') || e.target.closest('button')) {
             return;
           }
-          window.location.href = detailPage;
+          window.location.href = detailUrl;
         });
       }
-      
+
       container.appendChild(card);
     });
     
@@ -1346,6 +1401,19 @@ function initContactForm() {
       
       // Open email client
       window.location.href = mailtoLink;
+
+      // Admin dashboard için local kayıt
+      try {
+        const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+        submissions.unshift({
+          ...formData,
+          status: 'new',
+          timestamp: Date.now()
+        });
+        localStorage.setItem('contactSubmissions', JSON.stringify(submissions.slice(0, 100)));
+      } catch (storageError) {
+        console.warn('İletişim mesajı kaydedilemedi:', storageError);
+      }
       
       // Show success message
       messageDiv.textContent = 'E-posta uygulamanız açılıyor... Mesajınızı gönderebilirsiniz.';
@@ -1372,8 +1440,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setupHamburgerMenu();
   
   // Site verilerini yükle (sadece ana sayfa için)
-  if (!window.location.pathname.includes('/task-cosmos/')) {
+  if (!window.location.pathname.includes('/task-cosmos/') && !window.location.pathname.includes('/task-scanner/')) {
     loadSiteData();
+  } else {
+    applyStoredSiteSettings();
   }
   
   // Search initialization

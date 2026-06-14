@@ -2,90 +2,70 @@
   "site": {
     "header": {
       "logo": "Bambinifojo",
-      "tagline": "Mobil Uygulama Geliştirici"
+      "tagline": "Mobile Product Studio"
     },
     "hero": {
-      "title": "Bambinifojo",
-      "tagline": "Android cihazlar için güzel ve kullanımı kolay arayüzlere sahip uygulamalar geliştiriyoruz",
+      "title": "Mobil uygulamalar, SaaS araçları ve geleceğe dönük dijital ürünler.",
+      "tagline": "Android, Flutter, Firebase ve yapay zeka destekli geliştirme süreçleriyle; hızlı, sade ve kullanıcı odaklı ürünler geliştiriyorum.",
       "playStoreUrl": "https://play.google.com/store/apps/developer?id=Bambinifojo",
       "stats": [
-        {
-          "number": "2+",
-          "label": "Uygulama"
-        },
-        {
-          "number": "100%",
-          "label": "Kalite"
-        },
-        {
-          "number": "∞",
-          "label": "İnovasyon"
-        }
+        { "number": "2+", "label": "Yayındaki Uygulama" },
+        { "number": "100%", "label": "Mobil Öncelikli Tasarım" },
+        { "number": "∞", "label": "Sürekli Gelişim" },
+        { "number": "⚡", "label": "Flutter / Android / Firebase Stack" }
       ]
     },
     "about": {
-      "title": "Hakkımda",
+      "title": "Ürün odaklı mobil geliştirme",
       "texts": [
-        "Bağımsız bir mobil uygulama geliştiricisiyim. Android, Flutter, Firebase ve oyun motorları ile uygulamalar ve mini oyunlar geliştiriyorum.",
-        "Amacım, herkesin kolayca kullanabileceği sade ve işlevsel deneyimler oluşturmak."
+        "Bağımsız bir mobil ürün geliştiricisiyim. Android, Flutter, Firebase ve yapay zeka destekli süreçlerle; kullanıcı ihtiyacını çözen, ölçeklenebilir dijital ürünler geliştiriyorum.",
+        "Amacım; karmaşık problemleri sade, hızlı ve güvenilir dijital ürünlere dönüştürmek."
       ],
       "technologies": [
-        {
-          "icon": "🤖",
-          "name": "Android"
-        },
-        {
-          "icon": "🎨",
-          "name": "Flutter"
-        },
-        {
-          "icon": "🔥",
-          "name": "Firebase"
-        },
-        {
-          "icon": "🎮",
-          "name": "Oyun Motorları"
-        }
+        { "icon": "📱", "name": "Android" },
+        { "icon": "🎯", "name": "Flutter" },
+        { "icon": "🔥", "name": "Firebase" },
+        { "icon": "🤖", "name": "AI" }
       ]
     },
     "skills": {
-      "title": "Teknolojiler & Yetenekler",
+      "title": "Teknolojiler & Hizmetler",
       "items": [
         {
           "name": "Android Development",
-          "icon": "🤖",
-          "level": 90
+          "icon": "📱",
+          "description": "Native Android deneyimleri, performanslı arayüzler."
         },
         {
-          "name": "Flutter",
-          "icon": "🎨",
-          "level": 85
+          "name": "Flutter Apps",
+          "icon": "🎯",
+          "description": "Tek kod tabanıyla mobil uygulamalar."
         },
         {
-          "name": "Firebase",
+          "name": "Firebase Backend",
           "icon": "🔥",
-          "level": 80
+          "description": "Auth, Firestore, Storage ve bildirim altyapısı."
         },
         {
           "name": "UI/UX Design",
           "icon": "✨",
-          "level": 75
+          "description": "Sade, anlaşılır ve modern kullanıcı deneyimi."
         },
         {
-          "name": "Game Development",
-          "icon": "🎮",
-          "level": 70
+          "name": "Web Development",
+          "icon": "🌐",
+          "description": "Modern web arayüzleri ve landing sayfaları."
         },
         {
-          "name": "Backend Development",
-          "icon": "⚙️",
-          "level": 65
+          "name": "Performance Optimization",
+          "icon": "⚡",
+          "description": "Hızlı açılan, düşük kaynak tüketen uygulamalar."
         }
       ]
     },
     "contact": {
-      "title": "İletişim",
-      "subtitle": "Projeleriniz veya işbirliği için benimle iletişime geçebilirsiniz",
+      "title": "Bir uygulama fikrin mi var?",
+      "subtitle": "Mobil uygulama, SaaS araçları veya teknik iş birlikleri için iletişime geçebilirsin.",
       "items": [
         {
           "type": "email",
@@ -115,5 +95,3 @@
     }
   }
 }
-
-

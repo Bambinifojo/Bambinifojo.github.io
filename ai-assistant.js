@@ -6,8 +6,9 @@ let aiLastCreditReset = Date.now();
 let appsData = null;
 let feedbackData = [];
 let votesData = {};
-let aiScrollPosition = 0; // Modal açılırken scroll pozisyonunu kaydet
 const AI_CREDIT_RESET_TIME = 60 * 60 * 1000; // 1 saat
+const AI_WELCOME_MESSAGE = 'Merhaba! Bambinifojo Studio asistanıyım. Uygulamalar, iş birlikleri veya teknik sorular hakkında yardımcı olabilirim.';
+const AI_DEMO_FALLBACK_MESSAGE = 'Şu an demo modda çalışıyorum. Uygulamalar ve teknik iş birlikleri hakkında sorularınızı yanıtlayabilirim.';
 
 // Uygulamaları ve site verilerini yükle
 async function loadAppsData() {
@@ -70,19 +71,21 @@ function saveFeedbackAndVotes() {
 }
 
 // Sayfa yüklendiğinde
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadAppsData();
-    loadFeedbackAndVotes();
+document.addEventListener('DOMContentLoaded', () => {
     initializeAIAssistant();
+    loadFeedbackAndVotes();
     loadAICredits();
     checkCreditReset();
     updateAITheme();
-    
-    // Tema değişikliğini dinle
+
+    loadAppsData().catch((error) => {
+        console.warn('AI asistan veri yükleme hatası:', error);
+    });
+
     const themeObserver = new MutationObserver(() => {
         updateAITheme();
     });
-    
+
     const htmlElement = document.documentElement;
     if (htmlElement) {
         themeObserver.observe(htmlElement, {
@@ -117,21 +120,27 @@ function initializeAIAssistant() {
 
     // Toggle button
     if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             toggleAIModal();
         });
     }
 
     // Close button
     if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             closeAIModal();
         });
     }
 
     // Minimize button
     if (minimizeBtn) {
-        minimizeBtn.addEventListener('click', () => {
+        minimizeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             closeAIModal();
         });
     }
@@ -161,18 +170,8 @@ function initializeAIAssistant() {
 
     // Kategori butonları kaldırıldı - direkt sohbet modu
 
-    // Backdrop'a tıklayınca modal'ı kapat
-    const backdrop = document.getElementById('aiModalBackdrop');
-    if (backdrop) {
-        backdrop.addEventListener('click', () => {
-            closeAIModal();
-        });
-    }
-
-    // Modal dışına tıklayınca kapatma (opsiyonel - backdrop kullanıyoruz artık)
     if (modal) {
         modal.addEventListener('click', (e) => {
-            // Sadece modal içeriğine tıklanırsa kapatma (backdrop zaten var)
             e.stopPropagation();
         });
     }
@@ -181,7 +180,6 @@ function initializeAIAssistant() {
 // Modal'ı aç/kapat
 function toggleAIModal() {
     const modal = document.getElementById('aiAssistantModal');
-    const backdrop = document.getElementById('aiModalBackdrop');
     
     if (modal) {
         const isActive = modal.classList.contains('active');
@@ -198,68 +196,72 @@ function toggleAIModal() {
 
 function openAIModal() {
     const modal = document.getElementById('aiAssistantModal');
-    const backdrop = document.getElementById('aiModalBackdrop');
-    
-    if (modal) {
-        // Kapanış animasyonunu kaldır
+    if (!modal) return;
+
+    try {
         modal.classList.remove('closing');
-        
-        // Backdrop'u göster
-        if (backdrop) {
-            backdrop.classList.add('active');
-        }
-        
-        // Modal'ı göster
         modal.classList.add('active');
-        
-        // Body scroll lock - scroll pozisyonunu kaydet
-        aiScrollPosition = window.scrollY || window.pageYOffset || 0;
-        document.body.style.top = `-${aiScrollPosition}px`;
-        document.body.classList.add('ai-modal-open');
-        
-        // Chat messages'ı direkt aktif yap
-        const chatMessages = document.getElementById('aiChatMessages');
-        if (chatMessages) chatMessages.classList.add('active');
-        
-        // Input'a focus
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('ai-assistant-open');
+
+        renderAssistantWelcomeMessage();
+
         const input = document.getElementById('aiMessageInput');
         if (input) {
             setTimeout(() => input.focus(), 100);
         }
+    } catch (error) {
+        console.error('AI asistan açılırken hata:', error);
+        renderAssistantFallbackMessage();
     }
 }
 
 function closeAIModal() {
     const modal = document.getElementById('aiAssistantModal');
-    const backdrop = document.getElementById('aiModalBackdrop');
-    
-    if (modal) {
-        // Active class'ını kaldır (transition otomatik çalışacak)
-        modal.classList.remove('active');
-        modal.classList.add('closing');
-        
-        // Backdrop'u gizle
-        if (backdrop) {
-            backdrop.classList.remove('active');
-        }
-        
-        // Animasyon tamamlanana kadar bekle
-        setTimeout(() => {
-            modal.classList.remove('closing');
-            
-            // Body scroll lock'u kaldır ve scroll pozisyonunu restore et
-            document.body.style.top = '';
-            document.body.classList.remove('ai-modal-open');
-            document.body.style.position = '';
-            document.body.style.width = '';
-            document.body.style.overflow = '';
-            
-            // Scroll pozisyonunu restore et
-            if (aiScrollPosition > 0) {
-                window.scrollTo(0, aiScrollPosition);
-            }
-            aiScrollPosition = 0;
-        }, 300); // Animasyon süresi ile eşleşmeli
+    if (!modal) return;
+
+    modal.classList.remove('active');
+    modal.classList.add('closing');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('ai-assistant-open');
+
+    setTimeout(() => {
+        modal.classList.remove('closing');
+    }, 300);
+
+    const toggleBtn = document.getElementById('aiAssistantToggle');
+    if (toggleBtn) {
+        toggleBtn.style.pointerEvents = 'auto';
+        toggleBtn.style.visibility = 'visible';
+        toggleBtn.style.opacity = '1';
+    }
+}
+
+function renderAssistantWelcomeMessage() {
+    const chatMessages = document.getElementById('aiChatMessages');
+    if (!chatMessages) return;
+
+    chatMessages.classList.add('active');
+
+    if (chatMessages.children.length > 0) return;
+
+    if (aiMessages.length > 0) {
+        aiMessages.forEach(msg => renderAIMessageToDOM(msg.role, msg.content));
+        return;
+    }
+
+    const welcome = appsData ? AI_WELCOME_MESSAGE : AI_DEMO_FALLBACK_MESSAGE;
+    addAIMessage('assistant', welcome);
+}
+
+function renderAssistantFallbackMessage() {
+    const chatMessages = document.getElementById('aiChatMessages');
+    if (!chatMessages) return;
+
+    chatMessages.classList.add('active');
+
+    if (chatMessages.children.length === 0) {
+        renderAIMessageToDOM('assistant', AI_DEMO_FALLBACK_MESSAGE);
     }
 }
 
@@ -777,8 +779,23 @@ function handleContactQuery() {
     return response;
 }
 
-// Mesaj ekle - İyileştirilmiş formatlama
-function addAIMessage(role, content) {
+function formatAIMessageContent(content) {
+    let formattedContent = content
+        .replace(/^### (.*$)/gim, '<h3 style="font-size: 1.1rem; font-weight: 700; margin: 12px 0 8px 0; color: inherit;">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 style="font-size: 1.2rem; font-weight: 700; margin: 14px 0 10px 0; color: inherit;">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.3rem; font-weight: 700; margin: 16px 0 12px 0; color: inherit;">$1</h1>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700;">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>')
+        .replace(/```([\s\S]*?)```/g, '<pre style="background: rgba(0,0,0,0.1); padding: 8px; border-radius: 6px; overflow-x: auto; margin: 8px 0;"><code>$1</code></pre>')
+        .replace(/`([^`]+)`/g, '<code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>')
+        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener" style="color: #667eea; text-decoration: underline;">$1</a>')
+        .replace(/\n\n/g, '</p><p style="margin: 8px 0;">')
+        .replace(/\n/g, '<br>');
+
+    return '<p style="margin: 0;">' + formattedContent + '</p>';
+}
+
+function renderAIMessageToDOM(role, content) {
     const chatMessages = document.getElementById('aiChatMessages');
     if (!chatMessages) return;
 
@@ -791,42 +808,19 @@ function addAIMessage(role, content) {
 
     const messageContent = document.createElement('div');
     messageContent.className = 'ai-message-content';
-    
-    // Gelişmiş Markdown formatlama
-    let formattedContent = content
-        // Başlıklar
-        .replace(/^### (.*$)/gim, '<h3 style="font-size: 1.1rem; font-weight: 700; margin: 12px 0 8px 0; color: inherit;">$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2 style="font-size: 1.2rem; font-weight: 700; margin: 14px 0 10px 0; color: inherit;">$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.3rem; font-weight: 700; margin: 16px 0 12px 0; color: inherit;">$1</h1>')
-        // Kalın metin
-        .replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700;">$1</strong>')
-        // İtalik metin
-        .replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>')
-        // Kod blokları
-        .replace(/```([\s\S]*?)```/g, '<pre style="background: rgba(0,0,0,0.1); padding: 8px; border-radius: 6px; overflow-x: auto; margin: 8px 0;"><code>$1</code></pre>')
-        // Inline kod
-        .replace(/`([^`]+)`/g, '<code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>')
-        // Linkler
-        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener" style="color: #667eea; text-decoration: underline;">$1</a>')
-        // Satır sonları
-        .replace(/\n\n/g, '</p><p style="margin: 8px 0;">')
-        .replace(/\n/g, '<br>');
-    
-    // Paragraf sarmalama
-    formattedContent = '<p style="margin: 0;">' + formattedContent + '</p>';
-    
-    messageContent.innerHTML = formattedContent;
+    messageContent.innerHTML = formatAIMessageContent(content);
 
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(messageContent);
     chatMessages.appendChild(messageDiv);
 
-    // Scroll to bottom
     setTimeout(() => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }, 100);
+}
 
-    // Mesajı kaydet
+function addAIMessage(role, content) {
+    renderAIMessageToDOM(role, content);
     aiMessages.push({ role, content, timestamp: Date.now() });
     saveAIMessages();
 }
@@ -905,8 +899,11 @@ function updateAICredits() {
 
     if (badgeEl) {
         badgeEl.textContent = aiCredits;
+        badgeEl.title = 'Demo kredi';
         if (aiCredits === 0) {
             badgeEl.style.background = '#ef4444';
+        } else {
+            badgeEl.style.background = '';
         }
     }
 
@@ -965,24 +962,22 @@ function saveAIMessages() {
 // Mesajları yükle
 function loadAIMessages() {
     const saved = sessionStorage.getItem('aiMessages');
-    if (saved) {
-        try {
-            aiMessages = JSON.parse(saved);
-            // Mesajları göster
-            aiMessages.forEach(msg => {
-                addAIMessage(msg.role, msg.content);
-            });
-            
-            // Eğer mesaj varsa welcome section'ı gizle
-            if (aiMessages.length > 0) {
-                const welcomeSection = document.getElementById('aiWelcomeSection');
-                const chatMessages = document.getElementById('aiChatMessages');
-                if (welcomeSection) welcomeSection.style.display = 'none';
-                if (chatMessages) chatMessages.classList.add('active');
-            }
-        } catch (e) {
-            aiMessages = [];
+    if (!saved) return;
+
+    try {
+        const parsed = JSON.parse(saved);
+        aiMessages = Array.isArray(parsed) ? parsed : [];
+
+        aiMessages.forEach(msg => {
+            renderAIMessageToDOM(msg.role, msg.content);
+        });
+
+        if (aiMessages.length > 0) {
+            document.getElementById('aiChatMessages')?.classList.add('active');
         }
+    } catch (e) {
+        console.warn('AI mesajları yüklenemedi:', e);
+        aiMessages = [];
     }
 }
 

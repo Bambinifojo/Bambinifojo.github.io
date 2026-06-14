@@ -65,6 +65,10 @@ function showSection(section) {
   }
   
   // Section'a özel işlemler
+  if (section === 'dashboard' && typeof refreshAdminDashboard === 'function') {
+    setTimeout(() => refreshAdminDashboard(), 100);
+  }
+
   if (section === 'users' && typeof renderUsers === 'function') {
     renderUsers();
   }
@@ -97,12 +101,27 @@ function showSection(section) {
     }, 100);
   }
   
-  if (section === 'site' || section === 'settings') {
-    // Site section'ı açıldığında direkt içeriği göster (modal açma)
+  if (section === 'slider') {
     setTimeout(() => {
-      // İlk section'ı göster (header)
-      if (typeof showSiteSection === 'function') {
-        showSiteSection('header');
+      if (typeof initAdminSliderManager === 'function') initAdminSliderManager();
+      else if (typeof onSliderSectionShow === 'function') onSliderSectionShow();
+    }, 100);
+  }
+
+  if (section === 'apps') {
+    setTimeout(() => {
+      if (typeof initAdminAppsManager === 'function') initAdminAppsManager();
+      else if (typeof renderApps === 'function') renderApps();
+    }, 100);
+  }
+
+  if (section === 'site' || section === 'settings') {
+    setTimeout(() => {
+      if (typeof initAdminSiteSettings === 'function') {
+        initAdminSiteSettings();
+      }
+      if (typeof loadSiteSectionData === 'function') {
+        loadSiteSectionData('header');
       } else if (typeof loadSiteData === 'function') {
         loadSiteData();
       }

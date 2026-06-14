@@ -2529,6 +2529,10 @@ function updateStats() {
   
   // Son aktiviteler
   updateRecentActivities();
+
+  if (typeof refreshAdminDashboard === 'function') {
+    refreshAdminDashboard();
+  }
 }
 
 // Sayı animasyonu
@@ -2839,7 +2843,21 @@ function autoRefreshPreview() {
 }
 
 // Uygulamaları listele
+function syncAppsManagerStore() {
+  if (typeof AppsManagerStore === 'undefined' || !appsData?.apps) return;
+  try {
+    AppsManagerStore.save(AppsManagerStore.syncFromLegacyApps(appsData.apps));
+  } catch (e) {
+    console.warn('Apps manager senkronizasyonu atlandı:', e.message);
+  }
+}
+
 function renderApps() {
+  if (typeof AdminAppsManager !== 'undefined' && document.getElementById('adminAppsList')) {
+    AdminAppsManager.refreshApps();
+    return;
+  }
+
   const container = document.getElementById('appsList');
   if (!container) {
     console.warn('⚠️ appsList container bulunamadı');
@@ -3476,6 +3494,12 @@ function autoSaveApp() {
 
 // Form göster
 function showAddForm() {
+  if (typeof AdminAppsManager !== 'undefined' && document.getElementById('adminAppsRoot')) {
+    if (typeof showSection === 'function') showSection('apps');
+    setTimeout(() => AdminAppsManager.openCreate(), 120);
+    return;
+  }
+
   // Apps section'ına geç
   showSection('apps');
   
@@ -3976,6 +4000,7 @@ async function saveApp(event) {
   }
 
   updateStats();
+  syncAppsManagerStore();
   renderApps();
   
   // Tüm bölümleri otomatik güncelle
@@ -4251,6 +4276,7 @@ async function deleteApp(index) {
   }
 
   updateStats();
+  syncAppsManagerStore();
   renderApps();
   
   // Tüm bölümleri otomatik güncelle

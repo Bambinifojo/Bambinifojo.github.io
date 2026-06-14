@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="admin-html">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
@@ -6003,6 +6003,7 @@
     }
   }
 </style>
+<link rel="stylesheet" href="admin.css?v=1.0.4"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script>
   // Chart.js yüklendikten sonra storage kullanımını devre dışı bırak
@@ -6026,11 +6027,17 @@
 <script src="js/admin-state.js?v=1.0.1"></script>
 <script src="js/admin-auth.js?v=1.0.1"></script>
 <script src="js/admin-data.js?v=1.0.1"></script>
-<script src="js/admin-ui.js?v=1.0.1"></script>
+<script src="js/apps-manager.js?v=1.0.0"></script>
+<script src="js/admin-apps-manager.js?v=1.0.0"></script>
+<script src="js/site-settings.js?v=1.0.0"></script>
+<script src="js/admin-site-settings.js?v=1.0.0"></script>
+<script src="js/admin-ui.js?v=1.0.4"></script>
 <script src="js/admin-apps.js?v=1.0.1"></script>
 <script src="js/admin-site.js?v=1.0.1"></script>
-<script src="js/admin-dashboard.js?v=1.0.1"></script>
-<script src="js/admin-slider.js?v=1.0.1"></script>
+<script src="js/admin-dashboard.js?v=1.0.5"></script>
+<script src="js/slider-manager.js?v=1.0.0"></script>
+<script src="js/admin-slider-manager.js?v=1.0.0"></script>
+<script src="js/admin-slider.js?v=1.0.2"></script>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -6038,7 +6045,7 @@
 <!-- Firebase config kaldırıldı - 404 hatası önleme -->
 <script defer src="admin.js?v=1.0.1"></script>
 </head>
-<body>
+<body class="admin-app" data-theme="dark">
   <div class="admin-container">
     <!-- Top Navigation Bar -->
     <div class="admin-topbar">
@@ -6052,7 +6059,10 @@
         </button>
         <a href="/" target="_blank" rel="noopener noreferrer" class="admin-logo">
           <div class="admin-logo-icon">B</div>
-          <div class="admin-logo-text">Admin Panel</div>
+          <div class="admin-logo-text">
+            Bambinifojo
+            <span class="admin-logo-subtitle">Studio Control Panel</span>
+          </div>
         </a>
       </div>
       <div class="admin-topbar-right">
@@ -6103,8 +6113,13 @@
     <div class="admin-main">
       <!-- Sidebar Navigation -->
       <div class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-brand">
+          <strong>Bambinifojo</strong>
+          <span>Studio Control Panel</span>
+        </div>
+
         <div class="admin-sidebar-section">
-          <div class="admin-sidebar-title">Ana Menü</div>
+          <div class="admin-sidebar-title">Kontrol Merkezi</div>
           <a href="#dashboard" class="admin-nav-item active" data-section="dashboard">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="7" height="7"></rect>
@@ -6114,13 +6129,6 @@
             </svg>
             Dashboard
           </a>
-          <a href="#apps" class="admin-nav-item" data-section="apps">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="9" y1="3" x2="9" y2="21"></line>
-            </svg>
-            Uygulamalar
-          </a>
           <a href="#site" class="admin-nav-item" data-section="site">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"></circle>
@@ -6128,6 +6136,53 @@
             </svg>
             Site Ayarları
           </a>
+          <a href="#apps" class="admin-nav-item" data-section="apps">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+            Uygulamalar
+          </a>
+          <a href="#slider" class="admin-nav-item" data-section="slider">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="10" rx="2" ry="2"></rect>
+              <line x1="2" y1="4" x2="22" y2="4"></line>
+              <line x1="2" y1="20" x2="22" y2="20"></line>
+            </svg>
+            Slider
+          </a>
+          <a href="#feedback" class="admin-nav-item" data-section="feedback">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Mesajlar
+          </a>
+          <a href="#ai-settings" class="admin-nav-item" data-section="ai-settings">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"></path>
+            </svg>
+            AI Asistan
+          </a>
+          <a href="#notifications" class="admin-nav-item" data-section="notifications">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Görünüm
+          </a>
+          <a href="/" target="_blank" rel="noopener noreferrer" class="admin-nav-item admin-nav-external">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            Siteye Dön
+          </a>
+        </div>
+
+        <div class="admin-sidebar-section">
+          <div class="admin-sidebar-title">Sistem</div>
           <a href="#users" class="admin-nav-item" data-section="users">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -6142,30 +6197,6 @@
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
             </svg>
             GitHub Ayarları
-          </a>
-          <a href="#feedback" class="admin-nav-item" data-section="feedback">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-            Geri Bildirimler
-          </a>
-          <a href="#notifications" class="admin-nav-item" data-section="notifications">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            Bildirim Ayarları
-          </a>
-          <a href="#slider" class="admin-nav-item" data-section="slider">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="7" width="20" height="10" rx="2" ry="2"></rect>
-              <line x1="2" y1="4" x2="22" y2="4"></line>
-              <line x1="2" y1="20" x2="22" y2="20"></line>
-            </svg>
-            Slider Yönetimi
-          </a>
-          <a href="#ai-settings" class="admin-nav-item" data-section="ai-settings" onclick="event.preventDefault(); if(typeof showSection === 'function') { showSection('ai-settings'); } else { console.error('showSection fonksiyonu bulunamadı'); }">
-            🤖 AI Asistan Ayarları
           </a>
         </div>
         <div class="admin-sidebar-section">
@@ -6204,11 +6235,11 @@
           <div id="dashboardSection" class="admin-section dashboard-section-mobile">
             <div class="admin-page-header">
               <h1 class="admin-page-title">Dashboard</h1>
-              <p class="admin-page-subtitle">Genel bakış ve istatistikler</p>
+              <p class="admin-page-subtitle">Bambinifojo Studio kontrol merkezi — site, uygulamalar ve asistan özeti</p>
             </div>
 
             <!-- Statistics Cards -->
-            <div class="admin-grid stat-cards-grid">
+            <div class="admin-grid stat-cards-grid admin-stat-grid">
               <div class="stat-card">
                 <div class="stat-card-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
@@ -6216,9 +6247,11 @@
                     <line x1="9" y1="3" x2="9" y2="21"></line>
                   </svg>
                 </div>
-                <div class="stat-card-value" id="totalApps">0</div>
-                <div class="stat-card-label">Toplam Uygulama</div>
-                <div class="stat-card-trend" id="totalAppsTrend"></div>
+                <div class="stat-card-content">
+                  <div class="stat-card-label">Toplam Uygulama</div>
+                  <div class="stat-card-value" id="totalApps">0</div>
+                  <div class="stat-card-hint">Tüm ürün kayıtları</div>
+                </div>
               </div>
 
               <div class="stat-card stat-card-success">
@@ -6227,32 +6260,85 @@
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>
-                <div class="stat-card-value" id="publishedApps">0</div>
-                <div class="stat-card-label">Yayında Olan</div>
-                <div class="stat-card-trend" id="publishedAppsTrend"></div>
+                <div class="stat-card-content">
+                  <div class="stat-card-label">Yayındaki Uygulama</div>
+                  <div class="stat-card-value" id="publishedApps">0</div>
+                  <div class="stat-card-hint">Play Store linki olanlar</div>
+                </div>
               </div>
 
-              <div class="stat-card stat-card-warning">
-                <div class="stat-card-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
+              <div class="stat-card stat-card-amber">
+                <div class="stat-card-icon">✉️</div>
+                <div class="stat-card-content">
+                  <div class="stat-card-label">Gelen Mesaj</div>
+                  <div class="stat-card-value" id="totalMessages">0</div>
+                  <div class="stat-card-hint">İletişim + geri bildirim</div>
                 </div>
-                <div class="stat-card-value" id="comingSoonApps">0</div>
-                <div class="stat-card-label">Yakında</div>
-                <div class="stat-card-trend" id="comingSoonAppsTrend"></div>
               </div>
 
-              <div class="stat-card stat-card-blue">
+              <div class="stat-card stat-card-cyan">
                 <div class="stat-card-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    <rect x="2" y="7" width="20" height="10" rx="2" ry="2"></rect>
                   </svg>
                 </div>
-                <div class="stat-card-value" id="avgRating">0.0</div>
-                <div class="stat-card-label">Ortalama Rating</div>
-                <div class="stat-card-trend" id="avgRatingTrend"></div>
+                <div class="stat-card-content">
+                  <div class="stat-card-label">Slider Öğesi</div>
+                  <div class="stat-card-value" id="sliderItems">0</div>
+                  <div class="stat-card-hint">Aktif slider içeriği</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-card-purple">
+                <div class="stat-card-icon">🤖</div>
+                <div class="stat-card-content">
+                  <div class="stat-card-label">AI Demo Kredi</div>
+                  <div class="stat-card-value" id="aiDemoCredits">3</div>
+                  <div class="stat-card-hint">Ziyaretçi demo limiti</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-card-blue stat-card-update">
+                <div class="stat-card-icon">🕒</div>
+                <div class="stat-card-content">
+                  <div class="stat-card-label">Son Güncelleme</div>
+                  <div class="stat-card-value stat-card-value-text" id="lastUpdate">Henüz kayıt yok</div>
+                  <div class="stat-card-hint" id="lastUpdateMeta">Son admin aktivitesi bulunamadı</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sistem Durumu -->
+            <div class="admin-card admin-system-status">
+              <h2 class="section-title">Sistem Durumu</h2>
+              <p class="admin-page-subtitle" style="margin-top:8px;">Veri kaynağı ve servis durumları</p>
+              <div class="admin-status-grid" id="adminSystemStatusGrid"></div>
+            </div>
+
+            <!-- Hızlı Aksiyonlar -->
+            <div class="admin-card" style="margin-bottom:24px;">
+              <h2 class="section-title">Hızlı Aksiyonlar</h2>
+              <div class="admin-quick-grid" style="margin-top:16px;">
+                <button type="button" class="admin-quick-action" onclick="showAddForm()">
+                  <span class="admin-quick-action-icon">➕</span>
+                  <span>Yeni Uygulama Ekle</span>
+                </button>
+                <button type="button" class="admin-quick-action" onclick="if(typeof showSection==='function')showSection('slider')">
+                  <span class="admin-quick-action-icon">🎬</span>
+                  <span>Slider Düzenle</span>
+                </button>
+                <button type="button" class="admin-quick-action" onclick="if(typeof showSection==='function')showSection('feedback')">
+                  <span class="admin-quick-action-icon">✉️</span>
+                  <span>Mesajları Gör</span>
+                </button>
+                <button type="button" class="admin-quick-action" onclick="showSiteSettings()">
+                  <span class="admin-quick-action-icon">⚙️</span>
+                  <span>Site Ayarlarını Güncelle</span>
+                </button>
+                <button type="button" class="admin-quick-action" onclick="if(typeof showSection==='function')showSection('ai-settings')">
+                  <span class="admin-quick-action-icon">🤖</span>
+                  <span>AI Ayarları</span>
+                </button>
               </div>
             </div>
 
@@ -6408,40 +6494,61 @@
                 </button>
               </div>
               <h1 class="admin-page-title">Uygulamalar</h1>
-              <p class="admin-page-subtitle">Uygulamalarınızı yönetin ve düzenleyin</p>
+              <p class="admin-page-subtitle">Ana sitede görünen uygulama kartlarını buradan yönet.</p>
             </div>
 
-            <div class="admin-card">
-              <div class="flex-between apps-header">
-                <h2 class="margin-0 apps-header-title">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" class="apps-header-icon">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="9" y1="3" x2="9" y2="21"></line>
-                  </svg>
-                  <span>Uygulama Listesi</span>
-                  <span id="appsCount" class="apps-count"></span>
-                </h2>
-                <div class="apps-header-actions">
-                  <button class="btn btn-secondary btn-sm" onclick="reloadAppsFromJSON()" title="apps.json'dan yeniden yükle">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                      <polyline points="23 4 23 10 17 10"></polyline>
-                      <polyline points="1 20 1 14 7 14"></polyline>
-                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                    </svg>
-                    <span>Yenile</span>
-                  </button>
-                  <button class="btn btn-primary btn-sm apps-add-btn" onclick="showAddForm()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    <span>Yeni Ekle</span>
-                  </button>
+            <div id="adminAppsToast" class="admin-toast" aria-live="polite"></div>
+
+            <div id="adminAppsRoot" class="admin-apps-manager">
+              <div class="admin-apps-toolbar">
+                <div class="admin-apps-toolbar-actions">
+                  <button type="button" class="btn btn-primary" id="adminAppsAddBtn">Yeni Uygulama</button>
+                  <button type="button" class="btn btn-secondary" id="adminAppsExportBtn">Dışa Aktar</button>
+                  <button type="button" class="btn btn-secondary" id="adminAppsImportBtn">İçe Aktar</button>
+                </div>
+                <div class="admin-apps-filters">
+                  <input type="search" id="adminAppsSearch" class="admin-apps-search" placeholder="Uygulama ara..." autocomplete="off">
+                  <select id="adminAppsStatusFilter" class="admin-apps-select">
+                    <option value="all">Tüm Durumlar</option>
+                    <option value="published">Yayında</option>
+                    <option value="beta">Beta</option>
+                    <option value="development">Geliştiriliyor</option>
+                    <option value="draft">Taslak</option>
+                  </select>
+                  <select id="adminAppsActiveFilter" class="admin-apps-select">
+                    <option value="all">Tümü</option>
+                    <option value="active">Aktif</option>
+                    <option value="inactive">Pasif</option>
+                  </select>
                 </div>
               </div>
-              <div id="appsList" class="apps-list">
+
+              <div class="admin-apps-list-header">
+                <h2 class="admin-form-group-title">Ürün Listesi <span id="appsCount" class="apps-count"></span></h2>
+              </div>
+
+              <div id="adminAppsList" class="admin-apps-list">
                 <p class="loading-text">Yükleniyor...</p>
               </div>
+
+              <details class="admin-site-legacy">
+                <summary>Gelişmiş uygulama editörü (eski form — detay sayfası, ekran görüntüleri)</summary>
+                <div class="admin-card" style="margin-top:16px;">
+                  <div class="flex-between apps-header">
+                    <h2 class="margin-0 apps-header-title">
+                      <span>Klasik Liste</span>
+                    </h2>
+                    <div class="apps-header-actions">
+                      <button class="btn btn-secondary btn-sm" onclick="reloadAppsFromJSON()" title="apps.json'dan yeniden yükle">
+                        <span>Yenile</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div id="appsList" class="apps-list">
+                    <p class="loading-text">Yükleniyor...</p>
+                  </div>
+                </div>
+              </details>
             </div>
           </div>
 
@@ -6465,11 +6572,141 @@
                   <span>Dashboard</span>
                 </button>
               </div>
-              <h1 class="admin-page-title">⚙️ Site Ayarları</h1>
-              <p class="admin-page-subtitle">Site içeriğini ve görünümünü yönetin</p>
+              <h1 class="admin-page-title">Site Ayarları</h1>
+              <p class="admin-page-subtitle">Marka, hero, linkler ve SEO metinlerini kod açmadan yönetin</p>
             </div>
 
-            <div class="admin-card">
+            <div id="adminSiteSettingsToast" class="admin-toast" aria-live="polite"></div>
+
+            <div class="admin-site-settings-toolbar">
+              <button type="button" class="btn btn-primary" id="ssSaveBtn">Kaydet</button>
+              <button type="button" class="btn btn-secondary" id="ssResetBtn">Varsayılana Sıfırla</button>
+              <button type="button" class="btn btn-secondary" id="ssExportBtn">Dışa Aktar</button>
+              <button type="button" class="btn btn-secondary" id="ssImportBtn">İçe Aktar</button>
+            </div>
+
+            <div id="adminSiteSettingsRoot" class="admin-site-settings-layout">
+              <form id="adminSiteSettingsForm" class="admin-site-settings-form" onsubmit="return false;">
+                <div class="admin-card admin-form-group-card">
+                  <h3 class="admin-form-group-title">Marka Bilgileri</h3>
+                  <div class="admin-form-grid">
+                    <div class="form-group">
+                      <label for="ssBrandName">Site adı *</label>
+                      <input type="text" id="ssBrandName" required placeholder="Bambinifojo">
+                    </div>
+                    <div class="form-group">
+                      <label for="ssBrandSubtitle">Alt slogan</label>
+                      <input type="text" id="ssBrandSubtitle" placeholder="Mobile Product Studio">
+                    </div>
+                    <div class="form-group admin-form-full">
+                      <label for="ssFooterText">Footer açıklaması</label>
+                      <textarea id="ssFooterText" rows="3" placeholder="Footer metni..."></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="admin-card admin-form-group-card">
+                  <h3 class="admin-form-group-title">Hero Alanı</h3>
+                  <div class="admin-form-grid">
+                    <div class="form-group">
+                      <label for="ssHeroBadge">Hero badge metni</label>
+                      <input type="text" id="ssHeroBadge" placeholder="Mobile Product Studio">
+                    </div>
+                    <div class="form-group admin-form-full">
+                      <label for="ssHeroTitle">Hero başlığı *</label>
+                      <input type="text" id="ssHeroTitle" required placeholder="Ana başlık">
+                    </div>
+                    <div class="form-group admin-form-full">
+                      <label for="ssHeroDescription">Hero açıklaması</label>
+                      <textarea id="ssHeroDescription" rows="3" placeholder="Alt açıklama metni..."></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label for="ssPrimaryCtaText">Ana CTA metni</label>
+                      <input type="text" id="ssPrimaryCtaText" placeholder="Uygulamaları İncele">
+                    </div>
+                    <div class="form-group">
+                      <label for="ssPrimaryCtaUrl">Ana CTA linki</label>
+                      <input type="text" id="ssPrimaryCtaUrl" placeholder="#apps">
+                    </div>
+                    <div class="form-group">
+                      <label for="ssSecondaryCtaText">İkincil CTA metni</label>
+                      <input type="text" id="ssSecondaryCtaText" placeholder="Play Store">
+                    </div>
+                    <div class="form-group">
+                      <label for="ssSecondaryCtaUrl">İkincil CTA linki</label>
+                      <input type="text" id="ssSecondaryCtaUrl" placeholder="https://play.google.com/...">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="admin-card admin-form-group-card">
+                  <h3 class="admin-form-group-title">Sosyal / İletişim Linkleri</h3>
+                  <div class="admin-form-grid">
+                    <div class="form-group">
+                      <label for="ssEmail">E-posta</label>
+                      <input type="email" id="ssEmail" placeholder="ornek@email.com">
+                    </div>
+                    <div class="form-group">
+                      <label for="ssGithubUrl">GitHub linki</label>
+                      <input type="url" id="ssGithubUrl" placeholder="https://github.com/...">
+                    </div>
+                    <div class="form-group">
+                      <label for="ssPlayStoreUrl">Play Store linki</label>
+                      <input type="url" id="ssPlayStoreUrl" placeholder="https://play.google.com/...">
+                    </div>
+                    <div class="form-group">
+                      <label for="ssPortfolioUrl">Portfolio linki</label>
+                      <input type="url" id="ssPortfolioUrl" placeholder="https://...">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="admin-card admin-form-group-card">
+                  <h3 class="admin-form-group-title">SEO Ayarları</h3>
+                  <div class="admin-form-grid">
+                    <div class="form-group admin-form-full">
+                      <label for="ssSeoTitle">SEO title</label>
+                      <input type="text" id="ssSeoTitle" placeholder="Sayfa başlığı">
+                    </div>
+                    <div class="form-group admin-form-full">
+                      <label for="ssSeoDescription">SEO description</label>
+                      <textarea id="ssSeoDescription" rows="3" placeholder="Meta açıklama"></textarea>
+                      <small id="ssSeoCounter" class="admin-field-hint">0 / 160 karakter</small>
+                    </div>
+                    <div class="form-group admin-form-full">
+                      <label for="ssOgImageUrl">Open Graph görsel URL (opsiyonel)</label>
+                      <input type="url" id="ssOgImageUrl" placeholder="https://.../og-image.jpg">
+                    </div>
+                  </div>
+                </div>
+              </form>
+
+              <aside class="admin-site-settings-side">
+                <div class="admin-card admin-site-preview-card">
+                  <h3 class="admin-form-group-title">Canlı Önizleme</h3>
+                  <div class="admin-site-preview">
+                    <div class="admin-site-preview-brand" id="ssPreviewBrand">Bambinifojo</div>
+                    <div class="admin-site-preview-sub" id="ssPreviewSubtitle">Mobile Product Studio</div>
+                    <span class="admin-site-preview-badge" id="ssPreviewBadge">Mobile Product Studio</span>
+                    <h4 class="admin-site-preview-title" id="ssPreviewTitle">Hero başlığı</h4>
+                    <p class="admin-site-preview-desc" id="ssPreviewDesc">Hero açıklaması burada görünür.</p>
+                    <div class="admin-site-preview-ctas">
+                      <span class="admin-preview-btn admin-preview-btn-primary" id="ssPreviewPrimary">Uygulamaları İncele</span>
+                      <span class="admin-preview-btn admin-preview-btn-secondary" id="ssPreviewSecondary">Play Store</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="admin-card admin-site-help-card">
+                  <h3 class="admin-form-group-title">Yardım</h3>
+                  <p class="admin-help-text">Kaydettiğiniz ayarlar <code>bambinifojo_site_settings</code> anahtarıyla localStorage'da saklanır. Ana site açıldığında bu ayarlar otomatik uygulanır.</p>
+                  <p class="admin-help-text">Firebase bağlıysa ileride aynı obje buluta taşınabilir. Şimdilik JSON dışa/içe aktarma ile yedek alabilirsiniz.</p>
+                </div>
+              </aside>
+            </div>
+
+            <details class="admin-site-legacy">
+              <summary>Gelişmiş bölüm ayarları (Hakkımda, Yetenekler, İletişim)</summary>
+            <div class="admin-card" style="margin-top:16px;">
               <div class="section-tabs">
                 <button class="section-tab active" onclick="showSiteSection('header')">📝 Header</button>
                 <button class="section-tab" onclick="showSiteSection('hero')">🚀 Hero</button>
@@ -6576,6 +6813,7 @@
                 </div>
               </div>
             </div>
+            </details>
           </div>
 
           <!-- Feedback Section -->
@@ -7429,6 +7667,163 @@
       </div>
     </div>
 
+      <!-- Sprint 3 — Uygulama Yönetimi Modal -->
+      <div id="adminAppModal" class="admin-modal-overlay">
+        <div class="admin-modal-panel admin-app-modal-panel">
+          <div class="admin-modal-header">
+            <h2 id="adminAppModalTitle">Yeni Uygulama</h2>
+            <button type="button" class="admin-modal-close" id="adminAppModalClose" aria-label="Kapat">✕</button>
+          </div>
+          <form id="adminAppForm" class="admin-app-form">
+            <input type="hidden" id="appMgrId">
+            <div class="admin-form-grid">
+              <div class="form-group admin-form-full">
+                <label for="appMgrName">Uygulama adı *</label>
+                <input type="text" id="appMgrName" required placeholder="TaskScanner">
+              </div>
+              <div class="form-group admin-form-full">
+                <label for="appMgrShortDesc">Kısa açıklama *</label>
+                <textarea id="appMgrShortDesc" rows="2" required placeholder="Ana sitede görünen kısa metin"></textarea>
+              </div>
+              <div class="form-group admin-form-full">
+                <label for="appMgrLongDesc">Uzun açıklama</label>
+                <textarea id="appMgrLongDesc" rows="3" placeholder="Detay sayfası / hakkında metni"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="appMgrIcon">Icon / emoji</label>
+                <input type="text" id="appMgrIcon" placeholder="📱">
+              </div>
+              <div class="form-group">
+                <label for="appMgrImageUrl">Görsel URL</label>
+                <input type="url" id="appMgrImageUrl" placeholder="https://...">
+              </div>
+              <div class="form-group">
+                <label for="appMgrStatus">Durum</label>
+                <select id="appMgrStatus">
+                  <option value="published">Yayında</option>
+                  <option value="beta">Beta</option>
+                  <option value="development">Geliştiriliyor</option>
+                  <option value="draft">Taslak</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="appMgrPlatform">Platform</label>
+                <input type="text" id="appMgrPlatform" placeholder="Android">
+              </div>
+              <div class="form-group admin-form-full">
+                <label for="appMgrTechnologies">Teknolojiler (virgülle)</label>
+                <input type="text" id="appMgrTechnologies" placeholder="Android, Network, Utility">
+              </div>
+              <div class="form-group">
+                <label for="appMgrPlayStore">Play Store linki</label>
+                <input type="url" id="appMgrPlayStore" placeholder="https://play.google.com/...">
+              </div>
+              <div class="form-group">
+                <label for="appMgrGithub">GitHub linki</label>
+                <input type="url" id="appMgrGithub" placeholder="https://github.com/...">
+              </div>
+              <div class="form-group admin-form-full">
+                <label for="appMgrDetail">Detay linki</label>
+                <input type="text" id="appMgrDetail" placeholder="task-scanner/ veya https://...">
+              </div>
+              <div class="form-group">
+                <label for="appMgrOrder">Sıralama</label>
+                <input type="number" id="appMgrOrder" min="1" value="1">
+              </div>
+              <div class="form-group admin-app-checks">
+                <label class="admin-switch">
+                  <input type="checkbox" id="appMgrFeatured">
+                  <span>Öne çıkar</span>
+                </label>
+                <label class="admin-switch">
+                  <input type="checkbox" id="appMgrActive" checked>
+                  <span>Aktif</span>
+                </label>
+              </div>
+            </div>
+            <div class="admin-modal-footer">
+              <button type="button" class="btn btn-danger" id="adminAppDeleteBtn" style="display:none;">Sil</button>
+              <div class="admin-modal-footer-right">
+                <button type="button" class="btn btn-secondary" id="adminAppModalCancel">Vazgeç</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Sprint 4 — Slider / Medya Modal -->
+      <div id="adminSliderModal" class="admin-modal-overlay">
+        <div class="admin-modal-panel admin-app-modal-panel">
+          <div class="admin-modal-header">
+            <h2 id="adminSliderModalTitle">Yeni Medya</h2>
+            <button type="button" class="admin-modal-close" id="adminSliderModalClose" aria-label="Kapat">✕</button>
+          </div>
+          <form id="adminSliderForm" class="admin-app-form">
+            <input type="hidden" id="slMgrId">
+            <div class="admin-form-grid">
+              <div class="form-group admin-form-full">
+                <label for="slMgrTitle">Başlık *</label>
+                <input type="text" id="slMgrTitle" required placeholder="AI destekli mobil ürünler">
+              </div>
+              <div class="form-group admin-form-full">
+                <label for="slMgrDescription">Açıklama</label>
+                <textarea id="slMgrDescription" rows="2" placeholder="Kısa açıklama metni"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="slMgrBadge">Badge metni</label>
+                <input type="text" id="slMgrBadge" placeholder="Öne çıkan">
+              </div>
+              <div class="form-group">
+                <label for="slMgrMediaType">Medya tipi *</label>
+                <select id="slMgrMediaType" required>
+                  <option value="image">Görsel</option>
+                  <option value="video">Video</option>
+                  <option value="youtube">YouTube</option>
+                </select>
+              </div>
+              <div class="form-group admin-form-full">
+                <label for="slMgrMediaUrl">Medya URL</label>
+                <input type="url" id="slMgrMediaUrl" placeholder="https://...">
+              </div>
+              <div class="form-group admin-form-full">
+                <label for="slMgrThumbnailUrl">Thumbnail URL (opsiyonel)</label>
+                <input type="url" id="slMgrThumbnailUrl" placeholder="https://.../thumb.jpg">
+              </div>
+              <div class="form-group">
+                <label for="slMgrCtaText">CTA metni</label>
+                <input type="text" id="slMgrCtaText" placeholder="Detayları Gör">
+              </div>
+              <div class="form-group">
+                <label for="slMgrCtaUrl">CTA linki</label>
+                <input type="text" id="slMgrCtaUrl" placeholder="#apps">
+              </div>
+              <div class="form-group">
+                <label for="slMgrOrder">Sıralama</label>
+                <input type="number" id="slMgrOrder" min="1" value="1">
+              </div>
+              <div class="form-group admin-app-checks">
+                <label class="admin-switch">
+                  <input type="checkbox" id="slMgrFeatured">
+                  <span>Öne çıkar</span>
+                </label>
+                <label class="admin-switch">
+                  <input type="checkbox" id="slMgrActive" checked>
+                  <span>Aktif</span>
+                </label>
+              </div>
+            </div>
+            <div class="admin-modal-footer">
+              <button type="button" class="btn btn-danger" id="adminSliderDeleteBtn" style="display:none;">Sil</button>
+              <div class="admin-modal-footer-right">
+                <button type="button" class="btn btn-secondary" id="adminSliderModalCancel">Vazgeç</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- Uygulama Ekleme/Düzenleme Modal -->
       <div id="appFormModal" class="modal-overlay">
         <div class="modal-content">
@@ -7994,79 +8389,61 @@
                   <span>Dashboard</span>
                 </button>
               </div>
-              <h1 class="admin-page-title">🎬 Slider Yönetimi</h1>
-              <p class="admin-page-subtitle">Ana sayfada görüntülenecek uygulamaları seçin ve slider ayarlarını yapılandırın</p>
+              <h1 class="admin-page-title">Slider / Medya Yönetimi</h1>
+              <p class="admin-page-subtitle">Ana sayfadaki öne çıkan medya ve hero içeriklerini buradan yönet.</p>
             </div>
 
-            <!-- Slider Ayarları -->
-            <div class="admin-card">
-              <h2>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                ⚙️ Slider Ayarları
-              </h2>
-              
-              <div class="slider-settings-container">
-                <label class="slider-settings-label">
-                  Auto-Play Interval (milisaniye)
-                </label>
-                <input 
-                  type="number" 
-                  id="sliderAutoPlayInterval" 
-                  min="1000" 
-                  max="60000" 
-                  step="1000"
-                  value="6000"
-                  placeholder="Örn: 6000 (6 saniye)"
-                  class="form-input slider-input"
-                />
-                <p class="slider-hint">Slider'daki resimlerin ne kadar sürede otomatik geçeceğini ayarlayın. Minimum: 1000ms, Maksimum: 60000ms</p>
+            <div id="adminSliderToast" class="admin-toast" aria-live="polite"></div>
+
+            <div id="adminSliderRoot" class="admin-slider-manager">
+              <div class="admin-apps-toolbar">
+                <div class="admin-apps-toolbar-actions">
+                  <button type="button" class="btn btn-primary" id="adminSliderAddBtn">Yeni Medya</button>
+                  <button type="button" class="btn btn-secondary" id="adminSliderExportBtn">Dışa Aktar</button>
+                  <button type="button" class="btn btn-secondary" id="adminSliderImportBtn">İçe Aktar</button>
+                </div>
+                <div class="admin-apps-filters">
+                  <input type="search" id="adminSliderSearch" class="admin-apps-search" placeholder="Medya ara..." autocomplete="off">
+                  <select id="adminSliderTypeFilter" class="admin-apps-select">
+                    <option value="all">Tüm Tipler</option>
+                    <option value="image">Görsel</option>
+                    <option value="video">Video</option>
+                    <option value="youtube">YouTube</option>
+                  </select>
+                  <select id="adminSliderActiveFilter" class="admin-apps-select">
+                    <option value="all">Tümü</option>
+                    <option value="active">Aktif</option>
+                    <option value="inactive">Pasif</option>
+                  </select>
+                </div>
               </div>
-              
-              <button class="btn btn-primary slider-button-full" onclick="updateSliderAutoPlayInterval()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" class="slider-icon-margin">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                  <polyline points="7 3 7 8 15 8"></polyline>
-                </svg>
-                <span>Auto-Play Interval'ı Güncelle</span>
-              </button>
-            </div>
 
-            <!-- Slider Uygulamaları -->
-            <div class="admin-card">
-              <h2>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="9" y1="3" x2="9" y2="21"></line>
-                </svg>
-                📱 Uygulamaları Seçin
-              </h2>
-              <p class="admin-page-subtitle">Aşağıdaki listeden slider'da görünmesini istediğiniz uygulamaları seçin. Seçilen uygulamalar ana sayfada sırayla gösterilecektir.</p>
-              
-              <div id="sliderAppsList" class="apps-list slider-apps-container">
+              <div class="admin-apps-list-header">
+                <h2 class="admin-form-group-title">Medya Vitrini <span id="sliderItemsCount" class="apps-count"></span></h2>
+              </div>
+
+              <div id="adminSliderList" class="admin-slider-list">
                 <p class="loading-text">Yükleniyor...</p>
               </div>
-              
-              <button class="btn btn-success slider-update-button" onclick="updateSliderApps()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" class="slider-icon-margin">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span>Slider'ı Güncelle</span>
-              </button>
-            </div>
 
-            <!-- İpuçları -->
-            <div class="admin-card slider-tips-card">
-              <h3 class="slider-tips-title">💡 İpuçları</h3>
-              <ul class="slider-tips-list">
-                <li>Slider, seçtiğiniz uygulamaları otomatik olarak sırayla gösterecektir</li>
-                <li>Firebase'e kaydedildiğinde, admin panelinden refresh gerekmez - otomatik güncellenir</li>
-                <li>Auto-Play Interval'ı ayarlayarak slider hızını kontrol edebilirsiniz</li>
-                <li>En az 1 uygulama seçmelisiniz slider çalışması için</li>
-              </ul>
+              <details class="admin-site-legacy">
+                <summary>Gelişmiş slider ayarları (uygulama seçimi, auto-play)</summary>
+                <div class="admin-card" style="margin-top:16px;">
+                  <h2 class="admin-form-group-title">Auto-Play Interval</h2>
+                  <div class="slider-settings-container">
+                    <input type="number" id="sliderAutoPlayInterval" min="1000" max="60000" step="1000" value="6000" class="form-input slider-input" placeholder="6000">
+                    <p class="admin-field-hint">Milisaniye cinsinden otomatik geçiş süresi (1000–60000)</p>
+                  </div>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="updateSliderAutoPlayInterval()" style="margin-top:12px;">Interval Güncelle</button>
+
+                  <h2 class="admin-form-group-title" style="margin-top:24px;">Uygulamalardan Seç</h2>
+                  <p class="admin-page-subtitle">Eski yöntem: uygulama listesinden slider oluşturma.</p>
+                  <div id="sliderAppsList" class="apps-list slider-apps-container">
+                    <p class="loading-text">Yükleniyor...</p>
+                  </div>
+                  <button type="button" class="btn btn-success slider-update-button" onclick="updateSliderApps()" style="margin-top:12px;">Slider'ı Güncelle (Legacy)</button>
+                </div>
+              </details>
             </div>
           </div>
         </div>

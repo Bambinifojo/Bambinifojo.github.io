@@ -10,64 +10,72 @@
 
 ## 📋 Genel Bakış
 
-Bambinifojo Portfolio Website, GitHub Pages üzerinde yayınlanan portfolio sitesidir. Bu raporda son yapılan değişiklikler ve güncel durum özetlenmektedir.
+Bambinifojo Portfolio Website, GitHub Pages üzerinde yayınlanan portfolio sitesidir. Bu raporda app-ads.txt, GitHub Pages deploy ve AdMob entegrasyonu dahil güncel durum özetlenmektedir.
 
 ---
 
-## ✅ Son Yapılan İşlemler (2026-02-26)
+## ✅ Tamamlanan İşlemler (2026-02-26)
 
-### 1. 📄 app-ads.txt Eklendi (AdMob / Google Play Uyumu)
+### 1. 📄 app-ads.txt
 
-**Yapılanlar:**
-- ✅ Repo kök dizinine `app-ads.txt` dosyası oluşturuldu
-- ✅ İçerik: `google.com, pub-5489366034196043, DIRECT, f08c47fec0942fa0`
-- ✅ Amaç: AdMob reklam doğrulaması ve Google Play geliştirici web sitesi eşleştirmesi
+- ✅ Repo köküne `app-ads.txt` eklendi  
+- ✅ İçerik: `google.com, pub-5489366034196043, DIRECT, f08c47fec0942fa0`  
+- ✅ Canlı: https://bambinifojo.github.io/app-ads.txt erişilebilir  
+- ✅ Amaç: AdMob doğrulaması, Google Play geliştirici web sitesi eşleştirmesi  
 
-**Beklenen sonuç (push sonrası):**
-- `https://bambinifojo.github.io/app-ads.txt` adresi birkaç dakika içinde açılacak
-- Google Play Console → Task Cosmos → Mağaza listeleme → Geliştirici iletişim bilgilerinde web sitesi: `https://bambinifojo.github.io` olarak ayarlanmalı
-- AdMob’da “Güncellemeleri kontrol edin” ile bu adres taranacak
+### 2. 🚀 GitHub Pages Workflow
 
-**Durum:** ✅ Dosya oluşturuldu, commit bekliyor
+- ✅ `.github/workflows/pages.yml` oluşturuldu  
+- ✅ Build job: checkout, npm ci, npm run build, `upload-pages-artifact@v3` ile "github-pages" artifact  
+- ✅ Deploy job: `deploy-pages@v4` ile GitHub Pages’e deploy  
+- ✅ İlk hata (No artifacts named "github-pages") giderildi: `upload-artifact@v4` → `upload-pages-artifact@v3`  
+- ✅ Deploy başarılı; site ve app-ads.txt canlı  
 
-### 2. 📝 Diğer Değişiklikler
+### 3. 📱 AdMob Hesap Ayarları
 
-- `admin.js` – değiştirilmiş (staged değil)
-- `ai-assistant.js` – değiştirilmiş (staged değil)
+- ✅ Hesap ayrıntılarında **“Web sitem yok”** kaldırıldı  
+- ✅ **Web sitesi** alanına `https://bambinifojo.github.io` eklendi  
+- ⏳ AdMob’un app-ads.txt taraması birkaç saat – 24 saat içinde güncellenebilir  
 
-Bu dosyalar bu commit ile birlikte eklenmiştir.
+### 4. 📝 Diğer Commit’ler
 
----
-
-## 📁 Bu Commit Kapsamındaki Dosyalar
-
-| Dosya | Durum |
-|-------|--------|
-| `app-ads.txt` | Yeni (untracked) |
-| `DURUM_RAPORU_2026-02-26.md` | Yeni (bu rapor) |
-| `admin.js` | Değiştirilmiş |
-| `ai-assistant.js` | Değiştirilmiş |
+- `admin.js`, `ai-assistant.js` güncellemeleri  
+- `DURUM_RAPORU_2026-02-26.md` (bu rapor)  
 
 ---
 
-## 🎯 Sonraki Adımlar (Manuel)
+## 📁 Son Commit’ler
 
-1. **GitHub’a push**  
-   Commit’ten sonra `git push` ile değişiklikleri gönderin.
+| Commit     | Açıklama |
+|-----------|----------|
+| 0332e53   | Pages workflow: upload-pages-artifact (deploy-pages uyumu) |
+| 3ce9d81   | GitHub Pages workflow, app-ads.txt, durum raporu, admin/ai güncellemeleri |
+| ac01b1e   | Update assetlinks.json SHA256 (com.taskcosmos.app) |
 
-2. **Google Play Console**  
-   Geliştirici iletişim bilgileri → Web sitesi: `https://bambinifojo.github.io` (sonda `/` yok).
+---
 
-3. **AdMob**  
-   “Güncellemeleri kontrol edin” ile app-ads.txt taraması yapılacak.
+## 🎯 Reklamlar Nerede Çıkar?
+
+- **Uygulama (Task Cosmos vb.):** AdMob reklamları uygulama içinde, reklam eklediğin ekranlarda görünür. app-ads.txt bu yayıncıyı doğrular.  
+- **Site (bambinifojo.github.io):** Varsayılan olarak sitede reklam yok. İstenirse Google AdSense ile siteye de reklam eklenebilir.  
+
+---
+
+## 📌 Notlar
+
+- **Başka projede reklam:** Aynı AdMob hesabı → ek işlem yok. Farklı pub-ID → aynı app-ads.txt dosyasına yeni satır eklenir.  
+- **app-ads.txt görünürlüğü:** Dosyanın herkese açık olması gerekli ve güvenli; şifre/özel anahtar içermez.  
 
 ---
 
 ## ✅ Özet
 
-**Bu oturumda:**  
-- app-ads.txt eklendi (AdMob/Play uyumu)  
-- Durum raporu yazıldı  
-- Tüm ilgili değişiklikler commit için hazırlandı  
+| Konu            | Durum |
+|-----------------|--------|
+| Site canlı      | ✅ https://bambinifojo.github.io |
+| app-ads.txt     | ✅ Erişilebilir |
+| GitHub Pages deploy | ✅ Workflow çalışıyor |
+| AdMob web sitesi   | ✅ Hesaba eklendi |
+| Doğrulama (app-ads.txt) | ⏳ AdMob tarafı güncellenene kadar beklenebilir |
 
 **Rapor Tarihi:** 2026-02-26
