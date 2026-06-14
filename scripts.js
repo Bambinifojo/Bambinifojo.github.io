@@ -459,6 +459,97 @@ function isValidAppLink(url) {
   return url && url.trim() !== '' && url.trim() !== '#';
 }
 
+const NAV_HEADER_OFFSET = 88;
+
+function getSectionIdFromHref(href) {
+  if (!href) return null;
+  const value = href.trim();
+  if (value === '#' || value === '#home') return 'home';
+  const hashIndex = value.indexOf('#');
+  if (hashIndex === -1) return null;
+  const id = value.slice(hashIndex + 1).split('?')[0];
+  return id || 'home';
+}
+
+function isHomePagePath(pathname) {
+  const path = pathname || window.location.pathname;
+  return path === '/' || path.endsWith('/') || path.endsWith('/index.html');
+}
+
+function isSamePageHashLink(href) {
+  if (!href || !href.includes('#')) return false;
+  const value = href.trim();
+  if (value.startsWith('#')) return true;
+  try {
+    const url = new URL(value, window.location.href);
+    return url.origin === window.location.origin && isHomePagePath(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function scrollToSection(sectionId) {
+  if (!sectionId || sectionId === 'home') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return true;
+  }
+  const target = document.getElementById(sectionId);
+  if (!target) return false;
+  const top = target.getBoundingClientRect().top + window.pageYOffset - NAV_HEADER_OFFSET;
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  return true;
+}
+
+function resolvePublicHref(url) {
+  if (!isValidAppLink(url)) return null;
+  const value = url.trim();
+  if (/^(https?:|mailto:|tel:)/i.test(value)) return value;
+  if (value.startsWith('/')) return value;
+  return `/${value.replace(/^\.\//, '')}`;
+}
+
+function initSiteNavigation() {
+  function handleHashFromUrl() {
+    const sectionId = window.location.hash.slice(1);
+    if (!sectionId) return;
+    requestAnimationFrame(() => {
+      setTimeout(() => scrollToSection(sectionId), 80);
+    });
+  }
+
+  window.addEventListener('hashchange', handleHashFromUrl);
+  if (window.location.hash) {
+    handleHashFromUrl();
+  }
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link || link.target === '_blank' || event.defaultPrevented) return;
+
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+    const sectionId = getSectionIdFromHref(href);
+    if (!sectionId) return;
+
+    if (isSamePageHashLink(href)) {
+      event.preventDefault();
+      if (typeof closeMenu === 'function' && isMenuOpen()) {
+        closeMenu();
+      }
+      const nextHash = sectionId === 'home' ? '#home' : `#${sectionId}`;
+      if (window.location.hash !== nextHash) {
+        history.pushState(null, '', nextHash);
+      }
+      scrollToSection(sectionId);
+    } else if (href.includes('#')) {
+      if (typeof closeMenu === 'function' && isMenuOpen()) {
+        closeMenu();
+      }
+    }
+  });
+}
+
 function getAppStatus(app) {
   if (app.status === 'published' || app.status === 'beta' || app.status === 'development' || app.status === 'draft') {
     if (app.status === 'published') return 'live';
@@ -550,51 +641,52 @@ async function loadApps(){
     container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 20px; color: #666; opacity: 0.8;">Uygulamalar yükleniyor...</p></div>';
     
     let apps = null;
+    let data = null;
 
-    if (typeof AppsManagerStore !== 'undefined') {
-      const stored = AppsManagerStore.getApps();
-      if (stored && stored.length) {
-        apps = AppsManagerStore.sortForDisplay(stored, { includeInactive: false });
-        console.log('✅ bambinifojo_apps yüklendi:', apps.length, 'uygulama');
+    const appsPath = window.location.pathname.includes('/task-cosmos/')
+      || window.location.pathname.includes('/task-scanner/')
+      ? '../data/apps.json'
+      : 'data/apps.json';
+
+    try {
+      console.log('📄 JSON dosyası yükleniyor:', appsPath);
+      const res = await fetch(`${appsPath}?t=${Date.now()}`);
+      if (res.ok) {
+        data = await res.json();
+        console.log('✅ JSON dosyasından veri yüklendi:', data.apps?.length || 0, 'uygulama');
+      }
+    } catch (jsonError) {
+      console.warn('❌ JSON yükleme hatası:', jsonError);
+    }
+
+    if (data?.apps?.length) {
+      apps = data.apps.filter((app) => app.active !== false);
+      apps.sort((a, b) => {
+        if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
+        return (Number(a.order) || 0) - (Number(b.order) || 0);
+      });
+    }
+
+    if ((!apps || !apps.length) && typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
+      try {
+        console.log('🔥 Firebase\'den veri yükleniyor...');
+        const snapshot = await firebaseDatabase.ref('apps').once('value');
+        const appsDataFromFirebase = snapshot.val();
+        if (appsDataFromFirebase?.apps?.length) {
+          data = appsDataFromFirebase;
+          apps = data.apps.filter((app) => app.active !== false);
+          console.log('✅ Firebase\'den veri yüklendi:', apps.length, 'uygulama');
+        }
+      } catch (firebaseError) {
+        console.warn('❌ Firebase\'den yükleme hatası:', firebaseError);
       }
     }
-    
-    let data = null;
-    
-    if (!apps || !apps.length) {
-      // Önce Firebase'den yüklemeyi dene
-      if (typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
-        try {
-          console.log('🔥 Firebase\'den veri yükleniyor...');
-          const snapshot = await firebaseDatabase.ref('apps').once('value');
-          const appsDataFromFirebase = snapshot.val();
-          if (appsDataFromFirebase && appsDataFromFirebase.apps && appsDataFromFirebase.apps.length > 0) {
-            data = appsDataFromFirebase;
-            console.log('✅ Firebase\'den veri yüklendi:', appsDataFromFirebase.apps.length, 'uygulama');
-          }
-        } catch (firebaseError) {
-          console.warn('❌ Firebase\'den yükleme hatası, JSON dosyasından yüklenecek:', firebaseError);
-        }
-      }
-      
-      if (!data || !data.apps || data.apps.length === 0) {
-        const appsPath = window.location.pathname.includes('/task-cosmos/') 
-          ? '../data/apps.json' 
-          : 'data/apps.json';
-        console.log('📄 JSON dosyası yükleniyor:', appsPath);
-        const res = await fetch(appsPath);
-        if (res.ok) {
-          data = await res.json();
-          console.log('✅ JSON dosyasından veri yüklendi:', data.apps?.length || 0, 'uygulama');
-        }
-      }
 
-      if (data?.apps?.length) {
-        apps = data.apps.filter((app) => app.active !== false);
-        apps.sort((a, b) => {
-          if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
-          return (Number(a.order) || 0) - (Number(b.order) || 0);
-        });
+    if ((!apps || !apps.length) && typeof AppsManagerStore !== 'undefined') {
+      const stored = AppsManagerStore.getApps();
+      if (stored?.length) {
+        apps = AppsManagerStore.sortForDisplay(stored, { includeInactive: false });
+        console.log('✅ bambinifojo_apps yüklendi:', apps.length, 'uygulama');
       }
     }
     
@@ -637,7 +729,8 @@ async function loadApps(){
       const statusClass = status === 'live' || status === 'published' ? 'status-live' : status === 'beta' ? 'status-beta' : status === 'draft' ? 'status-draft' : 'status-dev';
       const techTags = getAppTechTags(app);
       const playStoreUrl = app.playStoreUrl || (normalized.details && normalized.details.includes('play.google.com') ? normalized.details : '');
-      const detailUrl = app.detailUrl || normalized.detailPage || (isValidAppLink(normalized.details) && !playStoreUrl ? normalized.details : null);
+      const rawDetailUrl = app.detailUrl || normalized.detailPage || (isValidAppLink(normalized.details) && !playStoreUrl ? normalized.details : null);
+      const detailUrl = resolvePublicHref(rawDetailUrl);
       const githubUrl = app.githubUrl || '';
 
       const card = document.createElement('article');
@@ -1548,46 +1641,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // Close menu when clicking menu items
-  const menuItems = document.querySelectorAll('.sidebar .menu-item');
-  menuItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      const href = item.getAttribute('href');
-      
-      // Menüyü hemen kapat
-      closeMenu();
-      
-      // Hash (#) ile başlayan linkler için smooth scroll
-      if (href && href !== '#' && href !== '#home' && href.startsWith('#')) {
-        e.preventDefault();
-        // Hash ile başlayan linkler için (örn: #about, #contact)
-        const target = document.querySelector(href);
-        if (target) {
-          setTimeout(() => {
-            const headerOffset = 80;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth'
-            });
-          }, 100);
-        }
-      } else if (href === '#home' || href === '#') {
-        e.preventDefault();
-        // Ana sayfaya scroll
-        setTimeout(() => {
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-        }, 100);
-      }
-      // HTML dosyalarına veya external linklere giden linkler için preventDefault yapma
-      // Normal link davranışına izin ver (sayfa değişimi için)
-    });
-  });
-  
+  initSiteNavigation();
+
   // Header scroll effect
   const header = document.querySelector('.main-header');
   if (header) {
@@ -1623,63 +1678,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const scrollIndicator = document.querySelector('.scroll-indicator');
   if (scrollIndicator) {
     scrollIndicator.addEventListener('click', () => {
-      const appsSection = document.getElementById('apps');
-      if (appsSection) {
-        appsSection.scrollIntoView({ behavior: 'smooth' });
-      }
+      scrollToSection('apps');
     });
   }
-  
-  // Smooth scroll for all anchor links (menu items hariç - onlar zaten yukarıda handle ediliyor)
-  document.querySelectorAll('a[href^="#"]:not(.menu-item)').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      const href = this.getAttribute('href');
-      if (href === '#' || href === '#home') {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        // Close menu if open
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const hamburger = document.getElementById('hamburger');
-        if (sidebar && overlay && hamburger) {
-          sidebar.classList.remove('active');
-          overlay.classList.remove('active');
-          hamburger.classList.remove('active');
-          document.body.style.overflow = '';
-          document.body.classList.remove('menu-open');
-        }
-        return;
-      }
-      
-      if (href !== '#' && href !== '') {
-        const target = document.querySelector(href);
-        if (target) {
-          e.preventDefault();
-          const headerOffset = 80;
-          const elementPosition = target.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-          
-          // Close menu if open
-          const sidebar = document.getElementById('sidebar');
-          const overlay = document.getElementById('overlay');
-          const hamburger = document.getElementById('hamburger');
-          if (sidebar && overlay && hamburger) {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            hamburger.classList.remove('active');
-            document.body.style.overflow = '';
-            document.body.classList.remove('menu-open');
-          }
-        }
-      }
-    });
-  });
-  
   // Initialize skill progress bars with Intersection Observer
   const skillProgressBars = document.querySelectorAll('.skill-progress');
   const skillObserver = new IntersectionObserver((entries) => {
@@ -1701,53 +1703,4 @@ document.addEventListener('DOMContentLoaded', () => {
     skillObserver.observe(bar);
   });
 
-  // Hash navigation handler
-  function handleHashNavigation() {
-    const hash = window.location.hash.slice(1); // Remove # symbol
-    
-    if (hash) {
-      const element = document.getElementById(hash);
-      if (element) {
-        // Close menu if open
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const hamburger = document.getElementById('hamburger');
-        if (sidebar && sidebar.classList.contains('active')) {
-          sidebar.classList.remove('active');
-          overlay?.classList.remove('active');
-          hamburger?.classList.remove('active');
-          document.body.style.overflow = '';
-          document.body.classList.remove('menu-open');
-        }
-        
-        // Scroll to element with smooth behavior
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }
-    } else {
-      // If no hash, scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  // Handle hash on page load
-  if (window.location.hash) {
-    handleHashNavigation();
-  }
-
-  // Handle hash changes
-  window.addEventListener('hashchange', handleHashNavigation);
-
-  // Handle anchor clicks
-  document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', function(e) {
-      const href = this.getAttribute('href');
-      if (href !== '#') {
-        e.preventDefault();
-        window.location.hash = href;
-        handleHashNavigation();
-      }
-    });
-  });
 });
