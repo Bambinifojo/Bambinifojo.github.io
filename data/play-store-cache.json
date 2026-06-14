@@ -1,0 +1,81 @@
+{
+  "updatedAt": "2026-06-14T21:21:04.458Z",
+  "apps": {
+    "com.taskscanner.app": {
+      "title": "Task Scanner – Ağ tarama",
+      "icon": "https://play-lh.googleusercontent.com/aVqsEK4-Cn7mDXNElmt8fj62Eei2PLq8VlUBMvG8hBFPOTraIjAjHsoZYNmgSddp1Zl1ytHYHB9Hg_l0X_S3Lg",
+      "rating": 4.7,
+      "downloads": "10+",
+      "screenshots": [
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 1",
+          "image": "https://play-lh.googleusercontent.com/lxmTwtTokk92P6Iygx9vzVM-Kqgt6KhBj2cx0ZfnV09IrxX7sRCwrC8qPYFXbhRTmHyts6-nZ-lVbCjZ7JeCwg=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 2",
+          "image": "https://play-lh.googleusercontent.com/GBzPlSXG4mBbJCYZEsfrSb2jZv7rkVzVaymEKbIQwIZczgQ58ub2W7N-odif5tjGc2Hlh6BDxA0YcZeAMOSZ_g=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 3",
+          "image": "https://play-lh.googleusercontent.com/TkGwwP6AQFohoRndyqDJYPVKCn2NlMog0RxxtiSZ6vkuDMaaOVhUvFcUUHf5g553SyEkGQPtKwaXFb-qDwuaNg=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 4",
+          "image": "https://play-lh.googleusercontent.com/8wSL7KMPP5db4D_WUm01O3mKkVRcqoFeQXmnscQt8H-c9QPfRy9x0QZGWwKycGO1Oj3P1y7LOTF8rT8hVO2NHw=w1052-h592-rw"
+        }
+      ]
+    },
+    "com.taskcosmos.app": {
+      "title": "Task Cosmos – Gezegen Atlası",
+      "icon": "https://play-lh.googleusercontent.com/AjFL8h7iRUOA0JIkdy0ytg3tIvPCeqQjkwYpSz0csZuXJ5a7V_1yjohLxFit1nvfeQTAj-3RMDNLvhim9JkSgA",
+      "rating": 5,
+      "downloads": "10+",
+      "screenshots": [
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 1",
+          "image": "https://play-lh.googleusercontent.com/6VEHQ-C5k-Mc4dh3k-G76Ol54ueb9gPrsImklGrww5T2QTrXZDFKEnEOSOC0bLUIEX3OdR-p4lEt16BIxhka=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 2",
+          "image": "https://play-lh.googleusercontent.com/va4Z2Tv1WL0279L7Y_6okefExsjZgoZMUoCX3WH2YCoJWhuG3TnxPhTN_WEJ7VfkA1R-WXOEPO2Kg7tnPGjV=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 3",
+          "image": "https://play-lh.googleusercontent.com/LT_JiEH7YdNsd70tWzbhB3S1EPnO8ww__G4Cf383_RG9eJHxcJiQXgwlxfDjD-XaGQCkCsz-AroInvPf5Pg8=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 4",
+          "image": "https://play-lh.googleusercontent.com/9EJe38UhfDEeQbG3kLDxs61rx_vDhZfT3jrtUU2UknAgnL2jUkEuEw0-HLRnpsqB711YAzBXQwUGpCV-8t5MNA=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 5",
+          "image": "https://play-lh.googleusercontent.com/huyTbI9rhpDwGtcW-voG8FcHIxyD_LvcuNRJnLBTtxun-oojhzVzfcBTgAqqFBnOyabhu8TnayGGlDdCaJXYmQ=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 6",
+          "image": "https://play-lh.googleusercontent.com/91dJKSDp_c0iTu0If5sP2grzd_N6CIh4E5AcVYK-BoHYwU9t-Z6AdXTFbL1YtDLIbNKMXtBv2h8xifUoGryF=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 7",
+          "image": "https://play-lh.googleusercontent.com/LLkonsSv9_cJFZ0gb0uIAZdRzIMrKtlXe0e0riiyI9-drbZyvN-tB49BQq7DE1te6NTPyBl_RgKuPEMkFc95o6s=w1052-h592-rw"
+        },
+        {
+          "icon": "📱",
+          "title": "Ekran Görüntüsü 8",
+          "image": "https://play-lh.googleusercontent.com/ytYsrefV04WRWbzYMVhCiuINmZtxJBfpzmPvohR2yWqwLsAnK3siJANbtzIgk3niif2Z0e-tcAxy-3KTBgVTNg=w1052-h592-rw"
+        }
+      ]
+    }
+  }
+}

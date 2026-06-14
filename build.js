@@ -122,6 +122,23 @@ if (json) {
 
 console.log('\n' + '='.repeat(50));
 
+// Play Store görsellerini güncelle (GitHub Pages için önbellek)
+console.log('\n📱 Play Store görselleri güncelleniyor...');
+try {
+  const { spawnSync } = require('child_process');
+  const result = spawnSync(process.execPath, ['scripts/fetch-play-store.js'], {
+    cwd: __dirname,
+    stdio: 'inherit'
+  });
+  if (result.status !== 0) {
+    console.log('   ⚠️  Play Store güncellemesi tamamlanamadı (mevcut önbellek kullanılacak).');
+  }
+} catch (error) {
+  console.log(`   ⚠️  Play Store güncellemesi atlandı: ${error.message}`);
+}
+
+console.log('\n' + '='.repeat(50));
+
 if (allFilesExist) {
   console.log('✅ Build başarılı! Site hazır.');
   console.log('\n📝 Sonraki adımlar:');

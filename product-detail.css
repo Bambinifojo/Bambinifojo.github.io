@@ -208,6 +208,19 @@
     background: var(--surface-soft);
     border: 1px solid var(--border);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.product-visual-icon.has-image {
+    padding: 0;
+    background: transparent;
+}
+
+.product-visual-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .product-visual-tags {

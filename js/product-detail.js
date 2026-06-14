@@ -76,7 +76,16 @@
     `);
 
     const visualIcon = document.getElementById('productVisualIcon');
-    if (visualIcon) visualIcon.textContent = app.icon || '📱';
+    if (visualIcon) {
+      const iconUrl = app.imageUrl || app.playIcon;
+      if (iconUrl) {
+        visualIcon.innerHTML = `<img src="${escapeHtml(iconUrl)}" alt="${escapeHtml(app.title)} ikonu" loading="eager" />`;
+        visualIcon.classList.add('has-image');
+      } else {
+        visualIcon.classList.remove('has-image');
+        visualIcon.textContent = app.icon || '📱';
+      }
+    }
 
     const tags = app.tags || app.features || [];
     const tagsEl = document.getElementById('productVisualTags');
@@ -223,12 +232,23 @@
     return app;
   }
 
+  async function enrichFromPlayStore(app) {
+    if (globalThis.PlayStoreClient?.enrichAppFromPlayStore) {
+      try {
+        return await globalThis.PlayStoreClient.enrichAppFromPlayStore(app);
+      } catch (error) {
+        console.warn('Play Store görselleri yüklenemedi, yerel veri kullanılıyor:', error);
+      }
+    }
+    return app;
+  }
+
   async function initProductDetail() {
     const appTitle = document.body.dataset.appTitle;
     if (!appTitle) return;
 
     try {
-      const app = await loadAppData(appTitle);
+      const app = await enrichFromPlayStore(await loadAppData(appTitle));
       renderHero(app);
       renderAbout(app);
       renderFeatures(app);
