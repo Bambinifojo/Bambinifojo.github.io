@@ -8,7 +8,7 @@
 <meta name="description" content="Mobil uygulamalar, SaaS araçları ve geleceğe dönük dijital ürünler geliştiren bağımsız mobile product studio."/>
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles.css?v=1.0.2"/>
-<link rel="stylesheet" href="studio.css?v=1.1.0"/>
+<link rel="stylesheet" href="studio.css?v=1.1.1"/>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="firebase-init.js"></script>
@@ -614,6 +614,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       <div class="ai-chat-messages" id="aiChatMessages"></div>
 
+      <div class="ai-quick-replies" id="aiQuickReplies" hidden></div>
+
       <div class="ai-input-area">
         <div class="ai-input-wrapper">
           <textarea id="aiMessageInput" class="ai-message-input" placeholder="Mesaj yaz..." rows="1"></textarea>
@@ -636,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="js/slider-manager.js?v=1.0.0"></script>
 <script src="slider.js?v=1.1.0"></script>
-<script src="ai-assistant.js?v=1.0.3"></script>
+<script src="js/ai-settings-manager.js?v=1.0.0"></script>
+<script src="ai-assistant.js?v=1.1.0"></script>
 </body>
 </html>

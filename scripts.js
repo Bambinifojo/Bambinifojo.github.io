@@ -1404,13 +1404,25 @@ function initContactForm() {
 
       // Admin dashboard için local kayıt
       try {
-        const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-        submissions.unshift({
-          ...formData,
-          status: 'new',
-          timestamp: Date.now()
-        });
-        localStorage.setItem('contactSubmissions', JSON.stringify(submissions.slice(0, 100)));
+        if (typeof MessagesManagerStore !== 'undefined') {
+          MessagesManagerStore.addMessage({
+            type: 'contact',
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            source: 'contact_form',
+            status: 'new'
+          });
+        } else {
+          const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+          submissions.unshift({
+            ...formData,
+            status: 'new',
+            timestamp: Date.now()
+          });
+          localStorage.setItem('contactSubmissions', JSON.stringify(submissions.slice(0, 100)));
+        }
       } catch (storageError) {
         console.warn('İletişim mesajı kaydedilemedi:', storageError);
       }

@@ -70,6 +70,9 @@ const AdminDashboard = {
   },
 
   getMessageCount() {
+    if (typeof MessagesManagerStore !== 'undefined') {
+      return MessagesManagerStore.getStats().total;
+    }
     try {
       const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
       const feedback = JSON.parse(localStorage.getItem('aiFeedback') || '[]');
@@ -80,7 +83,17 @@ const AdminDashboard = {
     }
   },
 
+  getNewMessageCount() {
+    if (typeof MessagesManagerStore !== 'undefined') {
+      return MessagesManagerStore.getStats().newCount;
+    }
+    return 0;
+  },
+
   getAiCredits() {
+    if (typeof AiSettingsStore !== 'undefined') {
+      return AiSettingsStore.load().demoCredits;
+    }
     try {
       const saved = localStorage.getItem('aiCredits');
       if (!saved) return 3;
@@ -120,6 +133,16 @@ const AdminDashboard = {
     if (typeof SliderManagerStore !== 'undefined') {
       const sliderTs = SliderManagerStore.getLatestUpdatedAt();
       if (sliderTs) candidates.push(new Date(sliderTs));
+    }
+
+    if (typeof MessagesManagerStore !== 'undefined') {
+      const msgTs = MessagesManagerStore.getLatestUpdatedAt();
+      if (msgTs) candidates.push(new Date(msgTs));
+    }
+
+    if (typeof AiSettingsStore !== 'undefined') {
+      const aiTs = AiSettingsStore.getLatestUpdatedAt();
+      if (aiTs) candidates.push(new Date(aiTs));
     }
 
     try {
@@ -170,6 +193,8 @@ const AdminDashboard = {
     this.setText('totalApps', stats.total);
     this.setText('publishedApps', stats.published);
     this.setText('totalMessages', this.getMessageCount());
+    const msgHintEl = document.querySelector('#totalMessages')?.closest('.stat-card-content')?.querySelector('.stat-card-hint');
+    if (msgHintEl) msgHintEl.textContent = `${this.getNewMessageCount()} yeni mesaj`;
     this.setText('sliderItems', this.getSliderCount());
     const sliderHintEl = document.querySelector('#sliderItems')?.closest('.stat-card-content')?.querySelector('.stat-card-hint');
     if (sliderHintEl) sliderHintEl.textContent = `${this.getSliderActiveCount()} aktif içerik`;
@@ -241,7 +266,25 @@ const AdminDashboard = {
     const empty = container.querySelector('.activities-empty') ||
       (container.textContent.trim().includes('Henüz aktivite yok') && !container.querySelector('.activity-item'));
 
-    if (empty || container.children.length === 0) {
+    if (!empty && container.children.length > 0) return;
+
+    if (typeof MessagesManagerStore !== 'undefined') {
+      const latest = MessagesManagerStore.sortMessages(MessagesManagerStore.getMessages(), 'desc')[0];
+      if (latest) {
+        container.innerHTML = `
+          <div class="activity-item">
+            <div class="activity-icon">✉️</div>
+            <div class="activity-content">
+              <p class="activity-message">Son mesaj: ${this.escape(latest.subject || latest.name || 'İletişim')}</p>
+              <p class="activity-time">${this.escape(latest.name || 'Ziyaretçi')} · ${this.formatTime(latest.createdAt)}</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+    }
+
+    try {
       const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
       const latestMsg = submissions[0];
 
@@ -257,15 +300,15 @@ const AdminDashboard = {
         `;
         return;
       }
+    } catch (e) { /* ignore */ }
 
-      container.innerHTML = `
-        <div class="admin-empty-state">
-          <div class="admin-empty-state-icon">📋</div>
-          <strong>Henüz aktivite yok</strong>
-          <p>İlk uygulama veya site güncellemesi burada görünecek.</p>
-        </div>
-      `;
-    }
+    container.innerHTML = `
+      <div class="admin-empty-state">
+        <div class="admin-empty-state-icon">📋</div>
+        <strong>Henüz aktivite yok</strong>
+        <p>İlk uygulama veya site güncellemesi burada görünecek.</p>
+      </div>
+    `;
   },
 
   formatTime(ts) {

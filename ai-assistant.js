@@ -10,6 +10,48 @@ const AI_CREDIT_RESET_TIME = 60 * 60 * 1000; // 1 saat
 const AI_WELCOME_MESSAGE = 'Merhaba! Bambinifojo Studio asistanıyım. Uygulamalar, iş birlikleri veya teknik sorular hakkında yardımcı olabilirim.';
 const AI_DEMO_FALLBACK_MESSAGE = 'Şu an demo modda çalışıyorum. Uygulamalar ve teknik iş birlikleri hakkında sorularınızı yanıtlayabilirim.';
 
+let aiRuntimeSettings = null;
+
+function getAIWelcomeMessage() {
+    return aiRuntimeSettings?.welcomeMessage || AI_WELCOME_MESSAGE;
+}
+
+function getAIFallbackMessage() {
+    return aiRuntimeSettings?.fallbackMessage || AI_DEMO_FALLBACK_MESSAGE;
+}
+
+function getAIDemoCreditsDefault() {
+    if (aiRuntimeSettings && typeof aiRuntimeSettings.demoCredits === 'number') {
+        return aiRuntimeSettings.demoCredits;
+    }
+    if (typeof AiSettingsStore !== 'undefined') {
+        return AiSettingsStore.getDemoCreditsDefault();
+    }
+    return 3;
+}
+
+function loadAISettingsFromStore() {
+    if (typeof AiSettingsStore === 'undefined') return null;
+    aiRuntimeSettings = AiSettingsStore.load();
+    AiSettingsStore.applyToDocument(aiRuntimeSettings);
+    bindSiteQuickReplies(aiRuntimeSettings);
+    return aiRuntimeSettings;
+}
+
+function bindSiteQuickReplies(settings) {
+    const container = document.getElementById('aiQuickReplies');
+    if (!container || typeof AiSettingsStore === 'undefined') return;
+
+    AiSettingsStore.renderQuickReplies(container, settings, (reply) => {
+        const input = document.getElementById('aiMessageInput');
+        if (input) {
+            input.value = reply;
+            input.dispatchEvent(new Event('input'));
+        }
+        sendAIMessage();
+    });
+}
+
 // Uygulamaları ve site verilerini yükle
 async function loadAppsData() {
     try {
@@ -72,6 +114,7 @@ function saveFeedbackAndVotes() {
 
 // Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {
+    loadAISettingsFromStore();
     initializeAIAssistant();
     loadFeedbackAndVotes();
     loadAICredits();
@@ -250,7 +293,7 @@ function renderAssistantWelcomeMessage() {
         return;
     }
 
-    const welcome = appsData ? AI_WELCOME_MESSAGE : AI_DEMO_FALLBACK_MESSAGE;
+    const welcome = appsData ? getAIWelcomeMessage() : getAIFallbackMessage();
     addAIMessage('assistant', welcome);
 }
 
@@ -261,7 +304,7 @@ function renderAssistantFallbackMessage() {
     chatMessages.classList.add('active');
 
     if (chatMessages.children.length === 0) {
-        renderAIMessageToDOM('assistant', AI_DEMO_FALLBACK_MESSAGE);
+        renderAIMessageToDOM('assistant', getAIFallbackMessage());
     }
 }
 
@@ -489,6 +532,21 @@ function handleFeedback(message) {
     
     feedbackData.push(feedback);
     saveFeedbackAndVotes();
+
+    if (typeof MessagesManagerStore !== 'undefined') {
+        try {
+            MessagesManagerStore.addMessage({
+                type: 'ai_feedback',
+                name: 'AI Kullanıcı',
+                subject: 'AI Geri Bildirim',
+                message,
+                source: 'ai_assistant',
+                status: 'new'
+            });
+        } catch (e) {
+            console.warn('AI geri bildirimi mesaj store\'a yazılamadı:', e.message);
+        }
+    }
     
     return `✅ Geri bildiriminiz kaydedildi! Teşekkür ederiz.\n\n` +
            `"${message}"\n\n` +
@@ -923,16 +981,20 @@ function saveAICredits() {
 
 // Kredileri yükle
 function loadAICredits() {
+    const defaultCredits = getAIDemoCreditsDefault();
     const saved = localStorage.getItem('aiCredits');
     if (saved) {
         try {
             const data = JSON.parse(saved);
-            aiCredits = data.credits || 3;
+            aiCredits = typeof data.credits === 'number' ? data.credits : defaultCredits;
             aiLastCreditReset = data.lastReset || Date.now();
         } catch (e) {
-            aiCredits = 3;
+            aiCredits = defaultCredits;
             aiLastCreditReset = Date.now();
         }
+    } else {
+        aiCredits = defaultCredits;
+        aiLastCreditReset = Date.now();
     }
     updateAICredits();
 }
@@ -943,7 +1005,7 @@ function checkCreditReset() {
     const timeSinceReset = now - aiLastCreditReset;
 
     if (timeSinceReset >= AI_CREDIT_RESET_TIME) {
-        aiCredits = 3;
+        aiCredits = getAIDemoCreditsDefault();
         aiLastCreditReset = now;
         saveAICredits();
         updateAICredits();

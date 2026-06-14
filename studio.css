@@ -1876,6 +1876,37 @@ body:not(.ai-assistant-open) .ai-assistant-toggle {
     background: transparent !important;
 }
 
+.ai-quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 16px 12px;
+    flex-shrink: 0;
+}
+
+.ai-quick-replies[hidden] {
+    display: none !important;
+}
+
+.ai-quick-reply {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.ai-quick-reply:hover,
+.ai-quick-reply:focus-visible {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.45);
+    outline: none;
+}
+
 .ai-message.assistant .ai-message-content {
     background: rgba(255, 255, 255, 0.06);
     color: var(--text);

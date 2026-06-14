@@ -6003,7 +6003,7 @@
     }
   }
 </style>
-<link rel="stylesheet" href="admin.css?v=1.0.4"/>
+<link rel="stylesheet" href="admin.css?v=1.0.5"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script>
   // Chart.js yüklendikten sonra storage kullanımını devre dışı bırak
@@ -6031,12 +6031,16 @@
 <script src="js/admin-apps-manager.js?v=1.0.0"></script>
 <script src="js/site-settings.js?v=1.0.0"></script>
 <script src="js/admin-site-settings.js?v=1.0.0"></script>
-<script src="js/admin-ui.js?v=1.0.4"></script>
+<script src="js/admin-ui.js?v=1.0.5"></script>
 <script src="js/admin-apps.js?v=1.0.1"></script>
 <script src="js/admin-site.js?v=1.0.1"></script>
-<script src="js/admin-dashboard.js?v=1.0.5"></script>
+<script src="js/admin-dashboard.js?v=1.0.6"></script>
 <script src="js/slider-manager.js?v=1.0.0"></script>
 <script src="js/admin-slider-manager.js?v=1.0.0"></script>
+<script src="js/messages-manager.js?v=1.0.0"></script>
+<script src="js/admin-messages-manager.js?v=1.0.0"></script>
+<script src="js/ai-settings-manager.js?v=1.0.0"></script>
+<script src="js/admin-ai-settings.js?v=1.0.0"></script>
 <script src="js/admin-slider.js?v=1.0.2"></script>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -6836,41 +6840,73 @@
                   <span>Dashboard</span>
                 </button>
               </div>
-              <h1 class="admin-page-title">Geri Bildirimler & Oylar</h1>
-              <p class="admin-page-subtitle">Kullanıcı geri bildirimlerini ve oylarını görüntüleyin</p>
+              <h1 class="admin-page-title">Mesajlar</h1>
+              <p class="admin-page-subtitle">İletişim formu ve AI geri bildirimlerini buradan yönet.</p>
             </div>
 
-            <div class="admin-grid">
-              <!-- Geri Bildirimler -->
-              <div class="admin-card">
-                <div class="flex-between apps-header">
-                  <h2 class="margin-0 apps-header-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" class="apps-header-icon">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                    <span>Uygulama Geri Bildirimleri</span>
-                </h2>
-                  <select id="feedbackAppFilter" class="btn btn-secondary btn-sm feedback-app-filter" onchange="renderFeedback()" title="Uygulama filtresi seçin">
-                    <option value="all">Tüm Uygulamalar</option>
-                  </select>
+            <div id="adminMessagesToast" class="admin-toast" aria-live="polite"></div>
+
+            <div id="adminMessagesRoot" class="admin-messages-manager">
+              <div class="admin-apps-toolbar">
+                <div class="admin-apps-toolbar-actions">
+                  <button type="button" class="btn btn-secondary" id="adminMessagesExportBtn">Dışa Aktar</button>
+                  <button type="button" class="btn btn-secondary" id="adminMessagesImportBtn">İçe Aktar</button>
+                  <button type="button" class="btn btn-secondary" id="adminMessagesMarkReadBtn">Tümünü Okundu Yap</button>
+                  <button type="button" class="btn btn-secondary" id="adminMessagesToggleArchivedBtn">Arşivlenenleri Gizle</button>
                 </div>
-                <div id="feedbackList" class="apps-list">
-                  <p class="loading-text">Yükleniyor...</p>
+                <div class="admin-apps-filters">
+                  <input type="search" id="adminMessagesSearch" class="admin-apps-search" placeholder="Mesaj ara..." autocomplete="off">
+                  <select id="adminMessagesTypeFilter" class="admin-apps-select">
+                    <option value="all">Tüm Tipler</option>
+                    <option value="contact">İletişim</option>
+                    <option value="ai_feedback">AI Geri Bildirim</option>
+                  </select>
+                  <select id="adminMessagesStatusFilter" class="admin-apps-select">
+                    <option value="all">Tüm Durumlar</option>
+                    <option value="new">Yeni</option>
+                    <option value="read">Okundu</option>
+                    <option value="replied">Yanıtlandı</option>
+                    <option value="archived">Arşiv</option>
+                  </select>
+                  <select id="adminMessagesSortFilter" class="admin-apps-select">
+                    <option value="desc">Yeni → Eski</option>
+                    <option value="asc">Eski → Yeni</option>
+                  </select>
                 </div>
               </div>
 
-              <!-- Oylar -->
-              <div class="admin-card">
-                <h2>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                  Oylar
-                </h2>
-                <div id="votesList" class="apps-list">
-                  <p class="loading-text">Yükleniyor...</p>
-                </div>
+              <div class="admin-apps-list-header">
+                <h2 class="admin-form-group-title">Gelen Kutusu <span id="messagesCount" class="apps-count"></span></h2>
               </div>
+
+              <div id="adminMessagesList" class="admin-messages-list">
+                <p class="loading-text">Yükleniyor...</p>
+              </div>
+
+              <details class="admin-site-legacy">
+                <summary>Eski geri bildirim & oylar (legacy)</summary>
+                <div class="admin-grid" style="margin-top:16px;">
+                  <div class="admin-card">
+                    <div class="flex-between apps-header">
+                      <h2 class="margin-0 apps-header-title">
+                        <span>Uygulama Geri Bildirimleri</span>
+                      </h2>
+                      <select id="feedbackAppFilter" class="btn btn-secondary btn-sm feedback-app-filter" onchange="if(typeof renderFeedback==='function')renderFeedback()" title="Uygulama filtresi seçin">
+                        <option value="all">Tüm Uygulamalar</option>
+                      </select>
+                    </div>
+                    <div id="feedbackList" class="apps-list">
+                      <p class="loading-text">Legacy görünüm</p>
+                    </div>
+                  </div>
+                  <div class="admin-card">
+                    <h2>Oylar</h2>
+                    <div id="votesList" class="apps-list">
+                      <p class="loading-text">Yükleniyor...</p>
+                    </div>
+                  </div>
+                </div>
+              </details>
             </div>
           </div>
 
@@ -7418,20 +7454,100 @@
                   <span>Dashboard</span>
                 </button>
               </div>
-              <h1 class="admin-page-title">🤖 AI Asistan Ayarları</h1>
-              <p class="admin-page-subtitle">AI asistan ayarlarını yönetin ve yapılandırın</p>
+              <h1 class="admin-page-title">AI Asistan Ayarları</h1>
+              <p class="admin-page-subtitle">Karşılama mesajı, demo kredi, hazır cevaplar ve görünürlük ayarlarını yönet.</p>
             </div>
 
-            <div class="admin-card">
-              <h2>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                  <path d="M2 17l10 5 10-5"></path>
-                  <path d="M2 12l10 5 10-5"></path>
-                </svg>
-                AI Asistan Konfigürasyonu
-              </h2>
+            <div id="adminAiSettingsToast" class="admin-toast" aria-live="polite"></div>
 
+            <div id="adminAiSettingsRoot" class="admin-ai-settings-manager">
+              <div class="admin-ai-settings-layout">
+                <form id="adminAiSettingsForm" class="admin-ai-settings-form">
+                  <div class="admin-card">
+                    <h2 class="admin-form-group-title">Genel</h2>
+                    <div class="admin-form-grid">
+                      <div class="form-group admin-form-full">
+                        <label class="admin-switch">
+                          <input type="checkbox" id="aiSetEnabled" checked>
+                          <span>Asistan aktif</span>
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label for="aiSetTitle">Başlık</label>
+                        <input type="text" id="aiSetTitle" placeholder="Bambinifojo AI">
+                      </div>
+                      <div class="form-group">
+                        <label for="aiSetSubtitle">Alt başlık</label>
+                        <input type="text" id="aiSetSubtitle" placeholder="Beta asistan">
+                      </div>
+                      <div class="form-group">
+                        <label for="aiSetDemoCredits">Demo kredi sayısı</label>
+                        <input type="number" id="aiSetDemoCredits" min="0" max="99" value="3">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="admin-card">
+                    <h2 class="admin-form-group-title">Mesajlar</h2>
+                    <div class="admin-form-grid">
+                      <div class="form-group admin-form-full">
+                        <label for="aiSetWelcome">Karşılama mesajı</label>
+                        <textarea id="aiSetWelcome" rows="3"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label for="aiSetPlaceholder">Placeholder</label>
+                        <input type="text" id="aiSetPlaceholder" placeholder="Mesaj yaz...">
+                      </div>
+                      <div class="form-group admin-form-full">
+                        <label for="aiSetFallback">Fallback mesajı</label>
+                        <textarea id="aiSetFallback" rows="2"></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="admin-card">
+                    <div class="admin-apps-list-header">
+                      <h2 class="admin-form-group-title">Hazır Cevaplar</h2>
+                      <button type="button" class="btn btn-secondary btn-sm" id="adminAiQuickAddBtn">Yeni Cevap</button>
+                    </div>
+                    <div id="adminAiQuickRepliesList" class="admin-ai-quick-list"></div>
+                  </div>
+
+                  <div class="admin-ai-settings-actions">
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" id="adminAiSettingsResetBtn">Varsayılana Sıfırla</button>
+                    <button type="button" class="btn btn-secondary" id="adminAiSettingsExportBtn">Dışa Aktar</button>
+                    <button type="button" class="btn btn-secondary" id="adminAiSettingsImportBtn">İçe Aktar</button>
+                  </div>
+                </form>
+
+                <aside class="admin-ai-preview-card admin-card">
+                  <h2 class="admin-form-group-title">Canlı Önizleme</h2>
+                  <div class="admin-ai-preview-panel">
+                    <div class="admin-ai-preview-header">
+                      <div>
+                        <strong id="aiPreviewTitle">Bambinifojo AI</strong>
+                        <span id="aiPreviewSubtitle" class="admin-ai-preview-sub">Beta asistan</span>
+                      </div>
+                      <span id="aiPreviewStatus" class="admin-ai-preview-status is-on">Aktif</span>
+                    </div>
+                    <div class="admin-ai-preview-body">
+                      <p class="admin-ai-preview-welcome" id="aiPreviewWelcome">—</p>
+                      <div class="admin-ai-preview-chips" id="aiPreviewQuickReplies"></div>
+                      <div class="admin-ai-preview-input">
+                        <span id="aiPreviewPlaceholder">Mesaj yaz...</span>
+                        <span class="admin-ai-preview-send">➤</span>
+                      </div>
+                      <p class="admin-ai-preview-meta">Demo kredi: <strong id="aiPreviewCredits">3</strong></p>
+                      <p class="admin-ai-preview-fallback" id="aiPreviewFallback">—</p>
+                    </div>
+                  </div>
+                </aside>
+              </div>
+
+              <details class="admin-site-legacy">
+                <summary>Gelişmiş AI API ayarları (OpenAI, EmailJS)</summary>
+                <div class="admin-card" style="margin-top:16px;">
               <form id="aiSettingsForm" onsubmit="saveAISettings(event)">
                 <!-- Temel Ayarlar -->
                 <div class="site-form-section">
@@ -7581,14 +7697,16 @@
                 </div>
 
                 <div class="form-actions">
-                  <button type="submit" class="btn btn-primary" id="saveAISettingsBtn">
-                    <span>💾 Kaydet</span>
+                  <button type="submit" class="btn btn-primary" id="saveAISettingsBtn" form="aiSettingsForm">
+                    <span>💾 API Ayarlarını Kaydet</span>
                   </button>
-                  <button type="button" class="btn btn-secondary" onclick="loadAISettings()">
+                  <button type="button" class="btn btn-secondary" onclick="if(typeof loadLegacyAISettings==='function')loadLegacyAISettings();">
                     <span>🔄 Yenile</span>
                   </button>
                 </div>
               </form>
+                </div>
+              </details>
             </div>
           </div>
 
@@ -7821,6 +7939,65 @@
               </div>
             </div>
           </form>
+        </div>
+      </div>
+
+      <!-- Sprint 5 — Mesaj Detay Modal -->
+      <div id="adminMessageModal" class="admin-modal-overlay">
+        <div class="admin-modal-panel admin-message-modal-panel">
+          <div class="admin-modal-header">
+            <h2 id="adminMessageDetailTitle">Mesaj Detayı</h2>
+            <button type="button" class="admin-modal-close" id="adminMessageModalClose" aria-label="Kapat">✕</button>
+          </div>
+          <div class="admin-message-detail">
+            <div class="admin-message-detail-grid">
+              <div class="admin-message-detail-item">
+                <span class="admin-message-detail-label">Gönderen</span>
+                <strong id="adminMsgDetailName">—</strong>
+              </div>
+              <div class="admin-message-detail-item">
+                <span class="admin-message-detail-label">E-posta</span>
+                <span id="adminMsgDetailEmail">—</span>
+              </div>
+              <div class="admin-message-detail-item">
+                <span class="admin-message-detail-label">Tip</span>
+                <span id="adminMsgDetailType">—</span>
+              </div>
+              <div class="admin-message-detail-item">
+                <span class="admin-message-detail-label">Tarih</span>
+                <span id="adminMsgDetailDate">—</span>
+              </div>
+              <div class="admin-message-detail-item admin-form-full">
+                <span class="admin-message-detail-label">Konu</span>
+                <strong id="adminMsgDetailSubject">—</strong>
+              </div>
+              <div class="admin-message-detail-item admin-form-full">
+                <span class="admin-message-detail-label">Kaynak</span>
+                <span id="adminMsgDetailSource">—</span>
+              </div>
+              <div class="admin-message-detail-item admin-form-full">
+                <span class="admin-message-detail-label">Durum</span>
+                <select id="adminMsgDetailStatus" class="admin-apps-select">
+                  <option value="new">Yeni</option>
+                  <option value="read">Okundu</option>
+                  <option value="replied">Yanıtlandı</option>
+                  <option value="archived">Arşiv</option>
+                </select>
+              </div>
+              <div class="admin-message-detail-item admin-form-full">
+                <span class="admin-message-detail-label">Mesaj</span>
+                <p id="adminMsgDetailMessage" class="admin-message-detail-body">—</p>
+              </div>
+            </div>
+            <div class="admin-modal-footer">
+              <button type="button" class="btn btn-danger" id="adminMsgDetailDeleteBtn">Sil</button>
+              <div class="admin-modal-footer-right">
+                <a href="#" id="adminMsgReplyBtn" class="btn btn-primary" target="_blank" rel="noopener">E-posta ile Yanıtla</a>
+                <button type="button" class="btn btn-secondary" id="adminMsgDetailArchiveBtn">Arşivle</button>
+                <button type="button" class="btn btn-secondary" id="adminMessageModalCancel">Kapat</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -8777,6 +8777,11 @@ function saveAISettings(event) {
 
 // AI Ayarlarını Yükle
 function loadAISettings() {
+  if (typeof initAdminAiSettings === 'function' && document.getElementById('adminAiSettingsRoot')) {
+    initAdminAiSettings();
+    return;
+  }
+
   // LocalStorage'dan yükle
   const saved = localStorage.getItem('aiConfig');
   if (saved) {

@@ -74,9 +74,8 @@ function showSection(section) {
   }
   
   if (section === 'feedback') {
-    // Section gösterildikten sonra render et (DOM hazır olsun)
     setTimeout(() => {
-      if (typeof renderFeedback === 'function') renderFeedback();
+      if (typeof initAdminMessagesManager === 'function') initAdminMessagesManager();
       if (typeof renderVotes === 'function') renderVotes();
     }, 100);
   }
@@ -91,12 +90,11 @@ function showSection(section) {
   }
   
   if (section === 'ai-settings') {
-    // Section gösterildikten sonra AI ayarlarını yükle (DOM hazır olsun)
     setTimeout(() => {
-      if (typeof loadAISettings === 'function') {
+      if (typeof initAdminAiSettings === 'function') {
+        initAdminAiSettings();
+      } else if (typeof loadAISettings === 'function') {
         loadAISettings();
-      } else {
-        console.warn('loadAISettings fonksiyonu bulunamadı');
       }
     }, 100);
   }
