@@ -235,13 +235,18 @@ const AdminSliderManager = (function () {
     $('adminSliderModalTitle').textContent = title;
     $('adminSliderDeleteBtn').style.display = showDelete ? 'inline-flex' : 'none';
     writeForm(item || SliderManagerStore.createEmpty(items.length + 1));
-    $('adminSliderModal')?.classList.add('active');
+    $('adminSliderModal')?.classList.add('active', 'is-open');
     document.body.classList.add('modal-open');
+    if (typeof lockAdminBodyScroll === 'function') lockAdminBodyScroll();
   }
 
   function closeModal() {
-    $('adminSliderModal')?.classList.remove('active');
-    document.body.classList.remove('modal-open');
+    $('adminSliderModal')?.classList.remove('active', 'is-open');
+    if (typeof unlockAdminBodyScroll === 'function') {
+      unlockAdminBodyScroll();
+    } else {
+      document.body.classList.remove('modal-open');
+    }
     editingId = null;
   }
 

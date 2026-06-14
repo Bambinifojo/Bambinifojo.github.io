@@ -8,13 +8,13 @@
 <meta name="description" content="Mobil uygulamalar, SaaS araçları ve geleceğe dönük dijital ürünler geliştiren bağımsız mobile product studio."/>
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles.css?v=1.0.2"/>
-<link rel="stylesheet" href="studio.css?v=1.2.2"/>
+<link rel="stylesheet" href="studio.css?v=1.2.4"/>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="firebase-init.js"></script>
 <script src="js/apps-manager.js?v=1.0.0"></script>
 <script src="js/site-settings.js?v=1.0.0"></script>
-<script defer src="scripts.js?v=1.1.2"></script>
+<script defer src="scripts.js?v=1.1.4"></script>
 </head>
 <body>
 
@@ -504,10 +504,18 @@
 
 <!-- Apps -->
 <section id="apps" class="apps-section">
-  <span class="section-eyebrow">Ürünler</span>
-  <h2 class="section-title" data-aos="fade-up">Uygulamalar</h2>
-  <p class="section-desc" data-aos="fade-up" data-aos-delay="50ms">Yayında ve geliştirme aşamasındaki mobil ürünler.</p>
-  <div id="apps-container"></div>
+  <div class="apps-section-inner">
+    <span class="section-eyebrow">Ürünler</span>
+    <h2 class="section-title" data-aos="fade-up">Yayındaki ve geliştirilen mobil ürünler</h2>
+    <p class="section-desc" data-aos="fade-up" data-aos-delay="50ms">Kullanıcı ihtiyacına odaklanan Android, Flutter ve yapay zeka destekli uygulamalar.</p>
+    <div class="apps-filter-bar" data-aos="fade-up" data-aos-delay="80ms" role="tablist" aria-label="Uygulama durumu filtresi">
+      <button type="button" class="apps-filter-chip active" data-filter="all" role="tab" aria-selected="true">Tümü</button>
+      <button type="button" class="apps-filter-chip" data-filter="live" role="tab" aria-selected="false">Yayında</button>
+      <button type="button" class="apps-filter-chip" data-filter="beta" role="tab" aria-selected="false">Beta</button>
+      <button type="button" class="apps-filter-chip" data-filter="dev" role="tab" aria-selected="false">Geliştiriliyor</button>
+    </div>
+    <div id="apps-container" class="apps-showcase-grid"></div>
+  </div>
 </section>
 
 <!-- Contact -->

@@ -17,21 +17,9 @@ function showSection(section) {
     item.classList.remove('active');
   });
   
-  // Section ID'sini oluştur (kebab-case'den camelCase'e çevir)
-  let sectionId = section + 'Section';
-  // Özel durumlar: kebab-case'den camelCase'e çevir
-  if (section === 'ai-settings') {
-    sectionId = 'aiSettingsSection';
-    console.log('🟢 AI Settings için sectionId:', sectionId);
-  }
-  if (section === 'settings') {
-    sectionId = 'siteSection';
-    console.log('🟢 Settings için siteSection kullanılıyor');
-  }
-  if (section === 'github-settings') {
-    sectionId = 'githubSettingsSection';
-    console.log('🟢 GitHub Settings için sectionId:', sectionId);
-  }
+  const sectionId = typeof resolveAdminSectionId === 'function'
+    ? resolveAdminSectionId(section)
+    : `${section}Section`;
   
   // Seçilen section'ı göster
   const targetSection = document.getElementById(sectionId);
@@ -340,24 +328,21 @@ function closeTopbarMenu() {
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) return;
-  
-  // Sidebar'ı kapat (modal açıldığında)
+
   if (typeof closeSidebar === 'function') {
     closeSidebar();
   }
-  
-  // Sidebar overlay'i gizle
+
   const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
   if (sidebarOverlay) {
     sidebarOverlay.style.display = 'none';
   }
-  
-  modal.classList.add('active');
+
+  modal.classList.add('active', 'is-open');
   document.body.classList.add('modal-open');
-  
-  // Scroll pozisyonunu kaydet
-  const scrollY = window.scrollY;
-  document.body.style.top = `-${scrollY}px`;
+  if (typeof lockAdminBodyScroll === 'function') {
+    lockAdminBodyScroll();
+  }
 }
 
 /**
@@ -374,30 +359,30 @@ function closeModal(modalId, formId = null) {
   }
   
   setTimeout(() => {
-    modal.classList.remove('active');
-    document.body.classList.remove('modal-open');
-    
-    // Sidebar overlay'i geri getir
+    modal.classList.remove('active', 'is-open');
+
     const sidebarOverlay = document.querySelector('.admin-sidebar-overlay');
     const sidebar = document.getElementById('adminSidebar');
     if (sidebarOverlay && sidebar && sidebar.classList.contains('open')) {
       sidebarOverlay.style.display = '';
     }
-    
-    // Scroll pozisyonunu geri yükle
-    const scrollY = document.body.style.top;
-    document.body.style.top = '';
-    if (scrollY) {
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+
+    if (typeof unlockAdminBodyScroll === 'function') {
+      unlockAdminBodyScroll();
+    } else {
+      document.body.classList.remove('modal-open');
+      const scrollY = document.body.style.top;
+      document.body.style.top = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+      }
     }
-    
-    // Animasyon stillerini sıfırla
+
     if (modalContent) {
       modalContent.style.animation = '';
       modal.style.animation = '';
     }
-    
-    // Form'u temizle
+
     if (formId) {
       const form = document.getElementById(formId);
       if (form) form.reset();
@@ -474,13 +459,14 @@ function closeAllModals() {
   if (typeof closeChangePasswordModal === 'function') {
     closeChangePasswordModal();
   }
-  // Tüm modal overlay'leri kapat
-  document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-    modal.classList.remove('active');
+  document.querySelectorAll('.modal-overlay.active, .admin-modal-overlay.active').forEach((modal) => {
+    modal.classList.remove('active', 'is-open');
   });
-  // Topbar menu'yu kapat
   if (typeof closeTopbarMenu === 'function') {
     closeTopbarMenu();
+  }
+  if (typeof unlockAdminBodyScroll === 'function') {
+    unlockAdminBodyScroll();
   }
 }
 
@@ -623,39 +609,26 @@ document.addEventListener('DOMContentLoaded', () => {
     showSection(section);
   });
   
-  // Hash change handling (hash-based routing için)
+  if (typeof initAdminPublicLinks === 'function') {
+    initAdminPublicLinks();
+  }
+
+  document.querySelectorAll('.admin-nav-item[href^="#"]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      e.preventDefault();
+      const section = href.slice(1);
+      if (section && typeof showSection === 'function') {
+        showSection(section);
+      }
+    });
+  });
+
   window.addEventListener('hashchange', () => {
     const section = getSectionFromPath();
-    if (section) {
-      // Section ID'sini oluştur (kebab-case'den camelCase'e çevir)
-      let sectionId = section + 'Section';
-      if (section === 'ai-settings') {
-        sectionId = 'aiSettingsSection';
-      }
-      
-      // showSection'ı çağırmadan sadece section'ı göster (sonsuz döngüyü önle)
-      const sectionEl = document.getElementById(sectionId);
-      const allSections = document.querySelectorAll('.admin-section');
-      allSections.forEach(sec => sec.classList.add('hidden'));
-      if (sectionEl) {
-        sectionEl.classList.remove('hidden');
-        
-        // Section'a özel işlemler
-        if (section === 'ai-settings') {
-          setTimeout(() => {
-            if (typeof loadAISettings === 'function') {
-              loadAISettings();
-            }
-          }, 100);
-        }
-      }
-      // Active nav item'ı güncelle
-      const navItems = document.querySelectorAll('.admin-nav-item');
-      navItems.forEach(item => item.classList.remove('active'));
-      const activeNav = document.querySelector(`a[href="#${section}"]`);
-      if (activeNav) {
-        activeNav.classList.add('active');
-      }
+    if (section && typeof showSection === 'function') {
+      showSection(section);
     }
   });
 });

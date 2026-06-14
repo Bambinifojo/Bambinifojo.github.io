@@ -7,6 +7,10 @@
       "status": "live",
       "tags": ["Android", "Network", "Utility"],
       "category": "Ağ & Güvenlik",
+      "platform": "Android",
+      "focus": "LAN / Cihaz Analizi",
+      "heroPitch": "Yerel ağdaki cihazları keşfetmek, analiz etmek ve bağlantı durumlarını görmek için geliştirilen modern ağ tarama aracı.",
+      "techStack": ["Android", "Network Scanner", "LAN Discovery", "Device Analysis", "Modern UI"],
       "rating": 4.7,
       "downloads": "10+",
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.taskscanner.app",
@@ -14,10 +18,9 @@
       "privacy": "https://bambinifojo.github.io/task-scanner/privacy-policy.html",
       "detailPage": "task-scanner/",
       "features": [
-        "Tek Tuşla Tarama",
-        "IP ve MAC Adresi",
-        "Cihaz Türü Tahmini",
-        "Açık Port Analizi"
+        "Cihaz keşfi",
+        "IP / MAC analizi",
+        "Ping ve gecikme ölçümü"
       ],
       "about": {
         "title": "Hakkında",
@@ -29,37 +32,43 @@
       "featureCards": [
         {
           "icon": "🔍",
-          "title": "Hızlı Ağ Taraması",
-          "description": "Yerel ağınızdaki tüm cihazları tek tuşla tarayın. IP adresleri, MAC adresleri ve cihaz bilgilerini anında görüntüleyin. Hızlı ve verimli tarama algoritması ile sonuçları saniyeler içinde alın."
+          "title": "Ağ Cihaz Taraması",
+          "description": "Yerel ağınızdaki tüm cihazları tek tuşla tarayın ve anında listeyi görüntüleyin.",
+          "tag": "Tarama"
+        },
+        {
+          "icon": "🌐",
+          "title": "IP / MAC Analizi",
+          "description": "IP adresleri, MAC bilgileri ve üretici verileriyle cihazları detaylı inceleyin.",
+          "tag": "Analiz"
+        },
+        {
+          "icon": "📶",
+          "title": "Ping ve Gecikme Ölçümü",
+          "description": "Favori cihazlara hızlı ping atın ve bağlantı gecikmesini ölçün.",
+          "tag": "Bağlantı"
         },
         {
           "icon": "📡",
           "title": "Cihaz Türü Tahmini",
-          "description": "MAC adresi ve açık portlar üzerinden cihaz türünü otomatik olarak tahmin edin. Telefon, tablet, bilgisayar, router ve diğer IoT cihazlarını kolayca tanımlayın."
+          "description": "MAC ve port verileriyle telefon, router, IoT gibi cihaz türlerini tahmin edin.",
+          "tag": "Keşif"
         },
         {
-          "icon": "🔐",
-          "title": "Port Analizi",
-          "description": "Her cihazın açık portlarını tespit edin ve hangi servislerin çalıştığını görün. Ağ güvenliğinizi artırmak için potansiyel güvenlik açıklarını belirleyin."
+          "icon": "🗺️",
+          "title": "Yerel Ağ Görünümü",
+          "description": "Tarama geçmişi ve filtrelerle ağınızı düzenli ve okunabilir şekilde yönetin.",
+          "tag": "Geçmiş"
         },
         {
-          "icon": "🏭",
-          "title": "Üretici Bilgisi",
-          "description": "MAC adresi veritabanı kullanarak cihaz üreticilerini görüntüleyin. Hangi marka ve model cihazların ağınıza bağlı olduğunu öğrenin."
-        },
-        {
-          "icon": "🔓",
-          "title": "Şeffaf ve Açık Kaynak",
-          "description": "Tamamen şeffaf ve açık kaynak kodlu bir uygulama. Kodları inceleyebilir, geliştirebilir ve kendi ihtiyaçlarınıza göre özelleştirebilirsiniz."
-        },
-        {
-          "icon": "⚙️",
-          "title": "Genişletilebilir Yapı",
-          "description": "Modüler yapısı sayesinde kolayca yeni özellikler ekleyebilirsiniz. Plugin sistemi ile uygulamayı kendi ihtiyaçlarınıza göre genişletin."
+          "icon": "⚡",
+          "title": "Pro Özellik Altyapısı",
+          "description": "Modüler yapı ile yeni analiz ve premium özellikler için genişletilebilir mimari.",
+          "tag": "Altyapı"
         }
       ],
       "screenshots": {
-        "title": "Ekran Görüntüleri",
+        "title": "Uygulama Deneyimi",
         "subtitle": "Uygulamanın görsel özelliklerini keşfedin",
         "items": [
           {
@@ -90,19 +99,22 @@
       "description": "Yapay zeka destekli gezegen atlası. Canlı NASA verileri, kozmik görevler ve uzay keşfi tek uygulamada.",
       "icon": "🚀",
       "status": "live",
-      "tags": ["Android", "Education", "Science"],
+      "tags": ["Android", "Education", "AI"],
       "detailPage": "task-cosmos/",
       "category": "Eğitim",
+      "platform": "Android",
+      "focus": "Uzay / Astronomi / AI",
+      "heroPitch": "AI destekli uzay keşif ve astronomi öğrenme platformu. Canlı NASA verileri, günlük kozmik görseller, ISS takibi ve gezegen karşılaştırmalarıyla evreni cebine getir.",
+      "techStack": ["Android", "AI Assistant", "NASA API", "Local Storage", "Modern UI"],
       "rating": 4.8,
       "downloads": "10+",
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.taskcosmos.app",
       "details": "https://bambinifojo.github.io/task-cosmos/",
       "privacy": "https://bambinifojo.github.io/task-cosmos/privacy-policy.html",
       "features": [
-        "Gezegen Atlası",
-        "Canlı NASA Verileri",
-        "Kozmik Görevler",
-        "AI Uzay Rehberi"
+        "NASA verileri",
+        "ISS takibi",
+        "AI rehber"
       ],
       "about": {
         "title": "Hakkında",
@@ -113,28 +125,44 @@
       "featuresSubtitle": "Task Cosmos'un güçlü özelliklerini keşfedin",
       "featureCards": [
         {
-          "icon": "🎮",
-          "title": "Günlük Kozmik Görevler",
-          "description": "Her gün yeni eğitici görevler tamamlayın, mini testler çözün ve rozetler kazanarak kozmik rütbenizi yükseltin."
+          "icon": "🖼️",
+          "title": "NASA Günün Görseli",
+          "description": "APOD ile günlük astronomi fotoğrafını keşfedin ve AI ile detaylı açıklamalar alın.",
+          "tag": "Keşif"
         },
         {
           "icon": "🛰️",
-          "title": "Canlı Uzay Verileri",
-          "description": "ISS konumunu anlık izleyin, NASA DONKI ile uzay hava durumunu takip edin ve günün astronomi fotoğrafını AI ile keşfedin."
+          "title": "ISS Takibi",
+          "description": "Uluslararası Uzay İstasyonunun anlık konumunu ve yörünge verilerini canlı izleyin.",
+          "tag": "Canlı Veri"
+        },
+        {
+          "icon": "⚖️",
+          "title": "Gezegen Karşılaştırma",
+          "description": "Gezegenleri yan yana kıyaslayın; boyut, kütle ve atmosfer verilerini görselleştirin.",
+          "tag": "Atlas"
+        },
+        {
+          "icon": "☀️",
+          "title": "Uzay Hava Durumu",
+          "description": "NASA DONKI verileriyle güneş fırtınaları ve uzay hava durumunu takip edin.",
+          "tag": "NASA"
         },
         {
           "icon": "🤖",
-          "title": "AI Uzay Uzmanı",
-          "description": "Ansiklopedi asistanına sorular sorun, karmaşık kavramları çocuk gibi anlat moduyla öğrenin ve canlı verilerle sohbet edin."
+          "title": "AI Rehber",
+          "description": "Ansiklopedi asistanı ile uzay hakkında sorular sorun ve karmaşık kavramları öğrenin.",
+          "tag": "AI"
         },
         {
-          "icon": "🌍",
-          "title": "Gezegen Atlası",
-          "description": "Güneş sistemindeki gezegenleri keşfedin, boyut ve yerçekimi verilerini karşılaştırın, uzay görevlerini detaylı inceleyin."
+          "icon": "📚",
+          "title": "Astronomi Arşivi",
+          "description": "Kapsamlı uzay kütüphanesi, öğrenme yolları ve gezegen atlası ile derinlemesine keşif.",
+          "tag": "Eğitim"
         }
       ],
       "screenshots": {
-        "title": "Ekran Görüntüleri",
+        "title": "Uygulama Deneyimi",
         "subtitle": "Uygulamanın görsel özelliklerini keşfedin",
         "items": [
           {

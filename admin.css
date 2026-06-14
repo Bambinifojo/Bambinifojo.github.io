@@ -1834,3 +1834,525 @@ body.admin-app {
         position: static;
     }
 }
+
+/* ── Legacy modal harmonization (Şifre Değiştir vb.) ── */
+.admin-app .modal-overlay {
+    background: rgba(11, 16, 32, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 24px 16px;
+}
+
+.admin-app .modal-content {
+    background: var(--admin-bg-soft);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-text);
+    border-radius: 20px;
+    box-shadow: var(--admin-shadow);
+    max-width: 520px;
+}
+
+.admin-app #changePasswordModal .modal-content {
+    max-width: 440px;
+}
+
+.admin-app .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--admin-border);
+    background: var(--admin-bg-soft);
+    border-radius: 20px 20px 0 0;
+    box-shadow: none;
+}
+
+.admin-app .modal-header::before {
+    display: none;
+}
+
+.admin-app .modal-header h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--admin-text);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+.admin-app .modal-close {
+    width: 36px;
+    height: 36px;
+    margin-left: 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--admin-border);
+    color: var(--admin-muted);
+    font-size: 1rem;
+    box-shadow: none;
+}
+
+.admin-app .modal-close:hover {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.35);
+    color: var(--admin-text);
+    transform: none;
+}
+
+.admin-app .modal-close::before {
+    display: none;
+}
+
+.admin-app .modal-body {
+    padding: 22px 24px 24px;
+}
+
+.admin-app .modal-body .form-group {
+    margin-bottom: 16px;
+}
+
+.admin-app .modal-body .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--admin-muted);
+}
+
+.admin-app .modal-body .form-group input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-app .modal-body .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.admin-app .modal-body .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.admin-app .modal-body .form-actions .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--admin-border);
+    color: var(--admin-muted);
+}
+
+.admin-app .modal-body .form-actions .btn-secondary:hover {
+    color: var(--admin-text);
+    border-color: rgba(148, 163, 184, 0.45);
+}
+
+.admin-app .admin-password-toggle {
+    color: var(--admin-muted);
+}
+
+.admin-app .admin-password-toggle:hover {
+    color: var(--admin-text);
+}
+
+.admin-app .admin-nav-external {
+    margin-top: 4px;
+}
+
+/* ── Site Ayarları önizleme polish ── */
+.admin-app .admin-site-preview {
+    padding: 22px 22px 20px;
+}
+
+.admin-app .admin-site-preview-brand,
+.admin-app .admin-site-preview-sub,
+.admin-app .admin-site-preview-title,
+.admin-app .admin-site-preview-desc {
+    max-width: 100%;
+    word-break: break-word;
+}
+
+.admin-app .admin-site-settings-toolbar {
+    padding: 14px 16px;
+    border-radius: var(--admin-radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--admin-border);
+}
+
+.admin-app .admin-page-header {
+    margin-bottom: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Sprint 4.5 — Admin UI Stabilization / Modal System
+   Overrides legacy inline styles in admin.html
+   ═══════════════════════════════════════════════════════════════ */
+
+.admin-app {
+    --admin-z-topbar: 1000;
+    --admin-z-drawer-backdrop: 1900;
+    --admin-z-drawer: 2000;
+    --admin-z-modal: 10000;
+    --admin-z-toast: 11000;
+}
+
+html.admin-html,
+body.admin-app {
+    overflow-x: hidden !important;
+}
+
+.admin-app .admin-shell,
+.admin-app .admin-container,
+.admin-app .admin-main,
+.admin-app .admin-content,
+.admin-app #adminPanel {
+    max-width: 100% !important;
+    overflow-x: clip;
+    box-sizing: border-box;
+}
+
+/* ── Compact dashboard spacing ── */
+.admin-app .admin-content {
+    padding: 40px 32px 40px !important;
+}
+
+.admin-app .admin-page-header {
+    margin-bottom: 20px !important;
+}
+
+.admin-app .stat-cards-grid,
+.admin-app .admin-stat-grid {
+    gap: 14px !important;
+    margin-bottom: 20px !important;
+}
+
+.admin-app .stat-card {
+    min-height: 132px;
+    padding: 22px 24px !important;
+    align-items: center;
+}
+
+.admin-app .stat-card-value {
+    font-size: 1.5rem !important;
+}
+
+/* ── Sidebar: desktop sticky / mobile drawer ── */
+@media (min-width: 1024px) {
+    .admin-app .admin-sidebar {
+        display: block !important;
+        position: sticky !important;
+        top: var(--admin-topbar-h) !important;
+        height: calc(100vh - var(--admin-topbar-h)) !important;
+        width: var(--admin-sidebar-w) !important;
+        transform: none !important;
+        background: rgba(15, 23, 42, 0.92) !important;
+        border-right: 1px solid var(--admin-border) !important;
+        z-index: 1 !important;
+        padding: 20px 0 24px !important;
+    }
+
+    .admin-app .admin-sidebar-overlay {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    body.admin-app.admin-sidebar-collapsed .admin-sidebar {
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        overflow: hidden !important;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    body.admin-app.admin-sidebar-collapsed .admin-content {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 1023px) {
+    .admin-app .admin-menu-toggle {
+        display: inline-flex !important;
+    }
+
+    .admin-app .admin-sidebar {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        height: 100% !important;
+        width: min(280px, 88vw) !important;
+        z-index: var(--admin-z-drawer) !important;
+        transform: translateX(-105%) !important;
+        background: rgba(11, 16, 32, 0.98) !important;
+        border-right: 1px solid var(--admin-border) !important;
+        box-shadow: 8px 0 40px rgba(0, 0, 0, 0.45) !important;
+        padding: calc(var(--admin-topbar-h) + 12px) 0 24px !important;
+    }
+
+    .admin-app .admin-sidebar.open {
+        transform: translateX(0) !important;
+    }
+
+    .admin-app .admin-sidebar-overlay {
+        display: block !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: var(--admin-z-drawer-backdrop) !important;
+        opacity: 0;
+        pointer-events: none;
+        background: rgba(2, 6, 23, 0.65) !important;
+        transition: opacity 0.25s ease;
+    }
+
+    .admin-app .admin-sidebar-overlay.active {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    .admin-app .admin-content {
+        padding: 24px 16px 32px !important;
+        max-width: 100% !important;
+    }
+}
+
+.admin-app .admin-topbar {
+    z-index: var(--admin-z-topbar) !important;
+}
+
+/* ── Unified modal system ── */
+.admin-app .admin-modal-overlay,
+.admin-app .modal-overlay {
+    display: none;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: var(--admin-z-modal) !important;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    background: rgba(2, 6, 23, 0.68) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow-y: auto;
+    opacity: 1 !important;
+    visibility: visible !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+.admin-app .admin-modal-overlay.active,
+.admin-app .admin-modal-overlay.is-open,
+.admin-app .modal-overlay.active,
+.admin-app .modal-overlay.is-open {
+    display: flex !important;
+}
+
+body.admin-app.modal-open .admin-sidebar-overlay {
+    display: none !important;
+}
+
+.admin-app .admin-modal-panel,
+.admin-app .modal-content,
+.admin-app .admin-legacy-modal {
+    display: flex !important;
+    flex-direction: column !important;
+    width: min(720px, 100%) !important;
+    max-width: min(720px, 100%) !important;
+    max-height: calc(100vh - 48px) !important;
+    overflow: hidden !important;
+    margin: auto !important;
+    background: rgba(15, 23, 42, 0.96) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45) !important;
+    color: var(--admin-text) !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+.admin-app .admin-app-modal-panel,
+.admin-app .admin-message-modal-panel,
+.admin-app .admin-modal-lg {
+    width: min(920px, 100%) !important;
+    max-width: min(920px, 100%) !important;
+}
+
+.admin-app #changePasswordModal .modal-content {
+    max-width: min(440px, 100%) !important;
+    width: min(440px, 100%) !important;
+}
+
+.admin-app .admin-modal-header,
+.admin-app .modal-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    position: static !important;
+}
+
+.admin-app .admin-modal-header::before,
+.admin-app .modal-header::before {
+    display: none !important;
+}
+
+.admin-app .admin-modal-header h2,
+.admin-app .modal-header h2 {
+    margin: 0 !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    color: var(--admin-text) !important;
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+}
+
+.admin-app .admin-modal-close,
+.admin-app .modal-close {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--admin-border) !important;
+    color: var(--admin-muted) !important;
+    font-size: 1rem !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+.admin-app .admin-modal-close:hover,
+.admin-app .modal-close:hover {
+    background: rgba(99, 102, 241, 0.15) !important;
+    color: var(--admin-text) !important;
+    transform: none !important;
+}
+
+.admin-app .admin-modal-close::before,
+.admin-app .modal-close::before {
+    display: none !important;
+}
+
+.admin-app .admin-app-form {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 !important;
+}
+
+.admin-app .admin-app-form .admin-form-grid,
+.admin-app .admin-modal-body,
+.admin-app .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 24px !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-app .admin-modal-footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 0 !important;
+    padding: 16px 24px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(15, 23, 42, 0.98);
+}
+
+.admin-app .admin-modal-footer-right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-app .modal-body .form-actions {
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.admin-app .admin-toast {
+    z-index: var(--admin-z-toast);
+}
+
+@media (max-width: 640px) {
+    .admin-app .admin-modal-overlay,
+    .admin-app .modal-overlay {
+        padding: 12px !important;
+        align-items: flex-end !important;
+    }
+
+    .admin-app .admin-modal-panel,
+    .admin-app .modal-content,
+    .admin-app .admin-app-modal-panel,
+    .admin-app .admin-message-modal-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: calc(100vh - 24px) !important;
+        border-radius: 22px 22px 18px 18px !important;
+    }
+
+    .admin-app .admin-modal-header,
+    .admin-app .modal-header,
+    .admin-app .admin-modal-body,
+    .admin-app .modal-body,
+    .admin-app .admin-app-form .admin-form-grid,
+    .admin-app .admin-modal-footer {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+
+    .admin-app .admin-modal-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .admin-app .admin-modal-footer-right {
+        flex-direction: column-reverse;
+        width: 100%;
+    }
+
+    .admin-app .admin-modal-footer .btn,
+    .admin-app .modal-body .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Thin scrollbar for admin surfaces */
+.admin-app .admin-sidebar,
+.admin-app .admin-content,
+.admin-app .admin-modal-body,
+.admin-app .modal-body,
+.admin-app .admin-app-form .admin-form-grid {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.admin-app .admin-sidebar::-webkit-scrollbar,
+.admin-app .admin-content::-webkit-scrollbar,
+.admin-app .admin-modal-body::-webkit-scrollbar,
+.admin-app .modal-body::-webkit-scrollbar,
+.admin-app .admin-app-form .admin-form-grid::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.admin-app .admin-sidebar::-webkit-scrollbar-thumb,
+.admin-app .admin-content::-webkit-scrollbar-thumb,
+.admin-app .admin-modal-body::-webkit-scrollbar-thumb,
+.admin-app .modal-body::-webkit-scrollbar-thumb,
+.admin-app .admin-app-form .admin-form-grid::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+}

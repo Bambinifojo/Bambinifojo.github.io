@@ -206,8 +206,9 @@ const AdminMessagesManager = (function () {
     }
 
     renderDetail(id);
-    $('adminMessageModal')?.classList.add('active');
+    $('adminMessageModal')?.classList.add('active', 'is-open');
     document.body.classList.add('modal-open');
+    if (typeof lockAdminBodyScroll === 'function') lockAdminBodyScroll();
   }
 
   function renderDetail(id) {
@@ -237,8 +238,12 @@ const AdminMessagesManager = (function () {
   }
 
   function closeDetail() {
-    $('adminMessageModal')?.classList.remove('active');
-    document.body.classList.remove('modal-open');
+    $('adminMessageModal')?.classList.remove('active', 'is-open');
+    if (typeof unlockAdminBodyScroll === 'function') {
+      unlockAdminBodyScroll();
+    } else {
+      document.body.classList.remove('modal-open');
+    }
     detailId = null;
   }
 

@@ -6003,7 +6003,7 @@
     }
   }
 </style>
-<link rel="stylesheet" href="admin.css?v=1.0.5"/>
+<link rel="stylesheet" href="admin.css?v=1.0.7"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script>
   // Chart.js yüklendikten sonra storage kullanımını devre dışı bırak
@@ -6023,7 +6023,7 @@
     }
   }
 </script>
-<script src="js/admin-utils.js?v=1.0.1"></script>
+<script src="js/admin-utils.js?v=1.0.3"></script>
 <script src="js/admin-state.js?v=1.0.1"></script>
 <script src="js/admin-auth.js?v=1.0.1"></script>
 <script src="js/admin-data.js?v=1.0.1"></script>
@@ -6031,7 +6031,7 @@
 <script src="js/admin-apps-manager.js?v=1.0.0"></script>
 <script src="js/site-settings.js?v=1.0.0"></script>
 <script src="js/admin-site-settings.js?v=1.0.0"></script>
-<script src="js/admin-ui.js?v=1.0.5"></script>
+<script src="js/admin-ui.js?v=1.0.7"></script>
 <script src="js/admin-apps.js?v=1.0.1"></script>
 <script src="js/admin-site.js?v=1.0.1"></script>
 <script src="js/admin-dashboard.js?v=1.0.6"></script>
@@ -6050,7 +6050,7 @@
 <script defer src="admin.js?v=1.0.1"></script>
 </head>
 <body class="admin-app" data-theme="dark">
-  <div class="admin-container">
+  <div class="admin-container admin-shell">
     <!-- Top Navigation Bar -->
     <div class="admin-topbar">
       <div class="admin-topbar-left">
@@ -6061,7 +6061,7 @@
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <a href="/" target="_blank" rel="noopener noreferrer" class="admin-logo">
+        <a href="index.html" data-public-home class="admin-logo" target="_blank" rel="noopener noreferrer">
           <div class="admin-logo-icon">B</div>
           <div class="admin-logo-text">
             Bambinifojo
@@ -6091,7 +6091,7 @@
             </svg>
             <span class="btn-text">Şifre Değiştir</span>
           </button>
-          <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" title="Ana Sayfa">
+          <a href="index.html#home" data-public-home="home" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" title="Ana Sayfa">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="btn-icon">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -6175,7 +6175,7 @@
             </svg>
             Görünüm
           </a>
-          <a href="/" target="_blank" rel="noopener noreferrer" class="admin-nav-item admin-nav-external">
+          <a href="index.html" data-public-home target="_blank" rel="noopener noreferrer" class="admin-nav-item admin-nav-external">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
               <polyline points="15 3 21 3 21 9"></polyline>
@@ -6368,7 +6368,7 @@
                       </svg>
                       Yenile
                     </button>
-                    <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm preview-link" title="Yeni Sekmede Aç">
+                    <a href="index.html" data-public-home target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm preview-link" title="Yeni Sekmede Aç">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="icon-spacing">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>
@@ -6379,7 +6379,7 @@
                   </div>
                 </div>
                 <div id="homePreview" class="preview-container">
-                  <iframe id="homePreviewFrame" src="/" title="Ana Sayfa Canlı Önizleme" class="preview-frame"></iframe>
+                  <iframe id="homePreviewFrame" src="index.html" title="Ana Sayfa Canlı Önizleme" class="preview-frame"></iframe>
                   <div class="preview-badge">
                     Canlı Önizleme
                   </div>
@@ -8429,10 +8429,10 @@
 
       <!-- Şifre Değiştirme Modal -->
       <div id="changePasswordModal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content admin-legacy-modal">
           <div class="modal-header">
             <h2>Şifre Değiştir</h2>
-            <button type="button" class="modal-close" onclick="closeChangePasswordModal()">✖</button>
+            <button type="button" class="modal-close" onclick="closeChangePasswordModal()" aria-label="Kapat">✕</button>
           </div>
           <div class="modal-body">
             <form id="changePasswordForm" onsubmit="changePassword(event)" autocomplete="off">
@@ -8481,12 +8481,8 @@
               </div>
 
               <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                  <span>🔐 Şifreyi Değiştir</span>
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="closeChangePasswordModal()">
-                  <span>❌ İptal</span>
-                </button>
+                <button type="submit" class="btn btn-primary">Şifreyi Değiştir</button>
+                <button type="button" class="btn btn-secondary" onclick="closeChangePasswordModal()">İptal</button>
               </div>
             </form>
           </div>

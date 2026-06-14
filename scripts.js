@@ -628,181 +628,339 @@ function truncateText(text, maxLength) {
   return text.slice(0, maxLength).trim() + '…';
 }
 
+function getAppHighlights(app) {
+  if (Array.isArray(app.features) && app.features.length) {
+    return app.features.slice(0, 3);
+  }
+  if (Array.isArray(app.featureCards) && app.featureCards.length) {
+    return app.featureCards.slice(0, 3).map((f) => f.title || f.description).filter(Boolean);
+  }
+  return [];
+}
+
+function getShowcaseDescription(app) {
+  return app.heroPitch || app.shortDescription || app.description || '';
+}
+
+function getMockupTheme(app) {
+  const title = (app.name || app.title || '').toLowerCase();
+  const category = (app.category || '').toLowerCase();
+  const tags = (app.tags || app.technologies || []).join(' ').toLowerCase();
+
+  if (title.includes('scanner') || category.includes('ağ') || tags.includes('network')) {
+    return 'scanner';
+  }
+  if (title.includes('cosmos') || category.includes('eğitim') || tags.includes('education') || tags.includes('space') || tags.includes('ai')) {
+    return 'cosmos';
+  }
+  return 'default';
+}
+
+function getShowcaseMediaUrl(app) {
+  if (app.imageUrl) return app.imageUrl;
+  const screenshot = app.screenshots?.items?.[0]?.image;
+  if (screenshot) return resolvePublicHref(screenshot);
+  return null;
+}
+
+function renderScannerMockup() {
+  return `
+    <div class="showcase-mockup mockup-theme-scanner">
+      <div class="mockup-panel">
+        <div class="mockup-panel-header">
+          <span>Network Scan</span>
+          <div class="mockup-dot-row">
+            <span class="mockup-dot active"></span>
+            <span class="mockup-dot"></span>
+            <span class="mockup-dot"></span>
+          </div>
+        </div>
+        <div class="mockup-node-grid">
+          <div class="mockup-node"></div>
+          <div class="mockup-node"></div>
+          <div class="mockup-node"></div>
+        </div>
+        <div class="mockup-device-list">
+          <div class="mockup-device-row"><span>Router · 192.168.1.1</span><span>12ms</span></div>
+          <div class="mockup-device-row"><span>Phone · 192.168.1.24</span><span>8ms</span></div>
+          <div class="mockup-device-row"><span>IoT · 192.168.1.55</span><span>21ms</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCosmosMockup() {
+  const stars = [
+    { top: '12%', left: '18%' },
+    { top: '28%', left: '72%' },
+    { top: '45%', left: '35%' },
+    { top: '18%', left: '55%' },
+    { top: '62%', left: '80%' }
+  ].map((s) => `<span class="mockup-star" style="top:${s.top};left:${s.left}"></span>`).join('');
+
+  return `
+    <div class="showcase-mockup mockup-theme-cosmos">
+      <div class="mockup-stars">${stars}</div>
+      <div class="mockup-panel">
+        <div class="mockup-panel-header">
+          <span>Cosmos Live</span>
+          <div class="mockup-dot-row">
+            <span class="mockup-dot active"></span>
+            <span class="mockup-dot"></span>
+          </div>
+        </div>
+        <div class="mockup-cosmos-card">
+          <strong>ISS · Canlı Takip</strong>
+          <p>NASA verileri, gezegen atlası ve AI rehber ile uzay keşfi.</p>
+          <div class="mockup-cosmos-stats">
+            <span class="mockup-cosmos-stat">NASA APOD</span>
+            <span class="mockup-cosmos-stat">ISS Live</span>
+            <span class="mockup-cosmos-stat">AI Guide</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDefaultMockup() {
+  return `
+    <div class="showcase-mockup mockup-theme-default">
+      <div class="mockup-panel">
+        <div class="mockup-panel-header">
+          <span>Product Dashboard</span>
+          <div class="mockup-dot-row">
+            <span class="mockup-dot active"></span>
+            <span class="mockup-dot"></span>
+            <span class="mockup-dot"></span>
+          </div>
+        </div>
+        <div class="mockup-default-bars">
+          <div class="mockup-default-bar"></div>
+          <div class="mockup-default-bar"></div>
+          <div class="mockup-default-bar"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderShowcaseMedia(app) {
+  const mediaUrl = getShowcaseMediaUrl(app);
+  if (mediaUrl) {
+    const title = escapeHtml(app.name || app.title || 'Uygulama');
+    return `<img src="${escapeHtml(mediaUrl)}" alt="${title} önizleme" loading="lazy" />`;
+  }
+
+  const theme = getMockupTheme(app);
+  if (theme === 'scanner') return renderScannerMockup();
+  if (theme === 'cosmos') return renderCosmosMockup();
+  return renderDefaultMockup();
+}
+
+function getStatusFilterKey(app) {
+  const status = getAppStatus(app);
+  if (status === 'live' || status === 'published') return 'live';
+  if (status === 'beta') return 'beta';
+  return 'dev';
+}
+
+function matchesAppsFilter(app, filter) {
+  if (!filter || filter === 'all') return true;
+  return getStatusFilterKey(app) === filter;
+}
+
+let showcaseAppsCache = [];
+let currentAppsFilter = 'all';
+
+function renderShowcaseApps(apps, filter) {
+  const container = document.getElementById('apps-container');
+  if (!container) return;
+
+  const activeFilter = filter || currentAppsFilter;
+  const filtered = apps.filter((app) => matchesAppsFilter(app, activeFilter));
+
+  container.innerHTML = '';
+
+  if (!apps.length) {
+    container.innerHTML = `
+      <div class="apps-empty-state">
+        <h3>Henüz yayında uygulama bulunmuyor.</h3>
+        <p>Admin panelden uygulama ekleyerek burada gösterebilirsin.</p>
+      </div>
+    `;
+    return;
+  }
+
+  if (!filtered.length) {
+    container.innerHTML = `
+      <div class="apps-filter-empty">
+        Bu filtreye uygun uygulama bulunamadı. Farklı bir durum seçmeyi dene.
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach((app, index) => {
+    const normalized = normalizeAppForRender(app);
+    const status = getAppStatus(app);
+    const statusClass = status === 'live' || status === 'published' ? 'status-live' : status === 'beta' ? 'status-beta' : status === 'draft' ? 'status-draft' : 'status-dev';
+    const techTags = getAppTechTags(app);
+    const highlights = getAppHighlights(app);
+    const description = getShowcaseDescription(app);
+    const playStoreUrl = app.playStoreUrl || (normalized.details && normalized.details.includes('play.google.com') ? normalized.details : '');
+    const rawDetailUrl = app.detailUrl || app.detailPage || (isValidAppLink(normalized.details) && !playStoreUrl ? normalized.details : null);
+    const detailUrl = resolvePublicHref(rawDetailUrl);
+    const githubUrl = app.githubUrl || '';
+
+    const card = document.createElement('article');
+    card.className = 'showcase-product-card app-card';
+    card.setAttribute('data-status', getStatusFilterKey(app));
+    card.setAttribute('data-aos', 'fade-up');
+    card.setAttribute('data-aos-delay', `${index * 100}ms`);
+
+    const highlightsHTML = highlights.length
+      ? `<ul class="showcase-card-features">${highlights.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
+      : '';
+
+    const tagsHTML = techTags.map((tag) => `<span class="product-tag">${escapeHtml(tag)}</span>`).join('');
+    const actionsHTML = [];
+
+    if (detailUrl) {
+      actionsHTML.push(`<a href="${detailUrl}" class="btn-product btn-product-primary" onclick="event.stopPropagation();">Detay</a>`);
+    }
+    if (playStoreUrl) {
+      actionsHTML.push(`<a href="${playStoreUrl}" class="btn-product btn-product-primary" target="_blank" rel="noopener" onclick="event.stopPropagation();">Play Store</a>`);
+    }
+    if (githubUrl) {
+      actionsHTML.push(`<a href="${githubUrl}" class="btn-product" target="_blank" rel="noopener" onclick="event.stopPropagation();">GitHub</a>`);
+    }
+
+    card.innerHTML = `
+      <div class="showcase-card-media">${renderShowcaseMedia(app)}</div>
+      <div class="showcase-card-body">
+        <div class="showcase-card-top">
+          <h3 class="showcase-card-title app-title">${escapeHtml(normalized.title)}</h3>
+          <span class="status-badge ${statusClass}">${getStatusLabel(status)}</span>
+        </div>
+        <p class="showcase-card-desc app-description">${escapeHtml(truncateText(description, 200))}</p>
+        ${highlightsHTML}
+        <div class="showcase-card-tags product-badges">${tagsHTML}</div>
+        <div class="showcase-card-actions product-actions app-actions">
+          ${actionsHTML.join('')}
+        </div>
+      </div>
+    `;
+
+    const mediaImg = card.querySelector('.showcase-card-media img');
+    if (mediaImg) {
+      mediaImg.addEventListener('error', () => {
+        const media = card.querySelector('.showcase-card-media');
+        if (!media) return;
+        const theme = getMockupTheme(app);
+        media.innerHTML = theme === 'scanner' ? renderScannerMockup() : theme === 'cosmos' ? renderCosmosMockup() : renderDefaultMockup();
+      }, { once: true });
+    }
+
+    if (detailUrl) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.showcase-card-actions') || e.target.closest('a') || e.target.closest('button')) {
+          return;
+        }
+        window.location.href = detailUrl;
+      });
+    }
+
+    container.appendChild(card);
+  });
+}
+
+function initAppsFilters() {
+  const bar = document.querySelector('.apps-filter-bar');
+  if (!bar || bar.dataset.bound === 'true') return;
+  bar.dataset.bound = 'true';
+
+  bar.addEventListener('click', (e) => {
+    const chip = e.target.closest('.apps-filter-chip');
+    if (!chip) return;
+
+    currentAppsFilter = chip.dataset.filter || 'all';
+    bar.querySelectorAll('.apps-filter-chip').forEach((btn) => {
+      const isActive = btn === chip;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+
+    renderShowcaseApps(showcaseAppsCache, currentAppsFilter);
+  });
+}
+
 async function loadApps(){
   try {
-    console.log('📱 loadApps() fonksiyonu çağrıldı');
     const container = document.getElementById("apps-container");
     if (!container) {
       return;
     }
-    
-    console.log('✅ apps-container bulundu');
-    
+
     container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading" style="margin: 0 auto;"></div><p style="margin-top: 20px; color: #666; opacity: 0.8;">Uygulamalar yükleniyor...</p></div>';
-    
+
     let apps = null;
-    let data = null;
+
+    if (typeof AppsManagerStore !== 'undefined') {
+      const stored = AppsManagerStore.getApps();
+      if (stored?.length) {
+        apps = AppsManagerStore.sortForDisplay(stored, { includeInactive: false });
+      }
+    }
 
     const appsPath = window.location.pathname.includes('/task-cosmos/')
       || window.location.pathname.includes('/task-scanner/')
       ? '../data/apps.json'
       : 'data/apps.json';
 
-    try {
-      console.log('📄 JSON dosyası yükleniyor:', appsPath);
-      const res = await fetch(`${appsPath}?t=${Date.now()}`);
-      if (res.ok) {
-        data = await res.json();
-        console.log('✅ JSON dosyasından veri yüklendi:', data.apps?.length || 0, 'uygulama');
+    if (!apps?.length) {
+      try {
+        const res = await fetch(`${appsPath}?t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.apps?.length) {
+            apps = data.apps.filter((app) => app.active !== false);
+            apps.sort((a, b) => {
+              if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
+              return (Number(a.order) || 0) - (Number(b.order) || 0);
+            });
+          }
+        }
+      } catch (jsonError) {
+        console.warn('JSON yükleme hatası:', jsonError);
       }
-    } catch (jsonError) {
-      console.warn('❌ JSON yükleme hatası:', jsonError);
-    }
-
-    if (data?.apps?.length) {
-      apps = data.apps.filter((app) => app.active !== false);
-      apps.sort((a, b) => {
-        if (!!a.featured !== !!b.featured) return a.featured ? -1 : 1;
-        return (Number(a.order) || 0) - (Number(b.order) || 0);
-      });
     }
 
     if ((!apps || !apps.length) && typeof firebaseDatabase !== 'undefined' && firebaseDatabase) {
       try {
-        console.log('🔥 Firebase\'den veri yükleniyor...');
         const snapshot = await firebaseDatabase.ref('apps').once('value');
         const appsDataFromFirebase = snapshot.val();
         if (appsDataFromFirebase?.apps?.length) {
-          data = appsDataFromFirebase;
-          apps = data.apps.filter((app) => app.active !== false);
-          console.log('✅ Firebase\'den veri yüklendi:', apps.length, 'uygulama');
+          apps = appsDataFromFirebase.apps.filter((app) => app.active !== false);
         }
       } catch (firebaseError) {
-        console.warn('❌ Firebase\'den yükleme hatası:', firebaseError);
+        console.warn('Firebase yükleme hatası:', firebaseError);
       }
     }
 
-    if ((!apps || !apps.length) && typeof AppsManagerStore !== 'undefined') {
-      const stored = AppsManagerStore.getApps();
-      if (stored?.length) {
-        apps = AppsManagerStore.sortForDisplay(stored, { includeInactive: false });
-        console.log('✅ bambinifojo_apps yüklendi:', apps.length, 'uygulama');
-      }
-    }
-    
-    container.innerHTML = "";
-    
-    if (!apps || apps.length === 0) {
-      container.innerHTML = `
-        <div class="apps-empty-state">
-          <h3>Yakında yeni uygulamalar</h3>
-          <p>Stüdyoda geliştirilen ürünler burada listelenecek. Takipte kalın.</p>
-        </div>
-      `;
-      return;
-    }
-    
-    const showcaseApps = apps.filter(isShowcaseApp);
-    console.log('🎨', showcaseApps.length, 'ürün kartı render ediliyor...');
-
-    if (showcaseApps.length === 0) {
-      container.innerHTML = `
-        <div class="apps-empty-state">
-          <h3>Yakında yeni uygulamalar</h3>
-          <p>Stüdyoda geliştirilen ürünler burada listelenecek. Takipte kalın.</p>
-        </div>
-      `;
-      return;
-    }
-
-    const renderIcon = (icon, title) => {
-      const iconValue = icon || '📱';
-      if (iconValue.startsWith('http://') || iconValue.startsWith('https://')) {
-        return `<img src="${escapeHtml(iconValue)}" alt="${escapeHtml(title)} icon" class="app-icon-image" onerror="this.style.display='none'; this.parentElement.textContent='📱';" />`;
-      }
-      return iconValue;
-    };
-
-    showcaseApps.forEach((app, index) => {
-      const normalized = normalizeAppForRender(app);
-      const status = getAppStatus(app);
-      const statusClass = status === 'live' || status === 'published' ? 'status-live' : status === 'beta' ? 'status-beta' : status === 'draft' ? 'status-draft' : 'status-dev';
-      const techTags = getAppTechTags(app);
-      const playStoreUrl = app.playStoreUrl || (normalized.details && normalized.details.includes('play.google.com') ? normalized.details : '');
-      const rawDetailUrl = app.detailUrl || normalized.detailPage || (isValidAppLink(normalized.details) && !playStoreUrl ? normalized.details : null);
-      const detailUrl = resolvePublicHref(rawDetailUrl);
-      const githubUrl = app.githubUrl || '';
-
-      const card = document.createElement('article');
-      card.className = 'product-card app-card';
-      card.setAttribute('data-aos', 'fade-up');
-      card.setAttribute('data-aos-delay', `${index * 100}ms`);
-
-      const tagsHTML = techTags.map(tag => `<span class="product-tag">${escapeHtml(tag)}</span>`).join('');
-      const actionsHTML = [];
-
-      if (detailUrl) {
-        actionsHTML.push(`<a href="${detailUrl}" class="btn-product btn-product-primary" onclick="event.stopPropagation();">Detay</a>`);
-      }
-      if (playStoreUrl) {
-        actionsHTML.push(`<a href="${playStoreUrl}" class="btn-product btn-product-primary" target="_blank" rel="noopener" onclick="event.stopPropagation();">Play Store</a>`);
-      }
-      if (githubUrl) {
-        actionsHTML.push(`<a href="${githubUrl}" class="btn-product" target="_blank" rel="noopener" onclick="event.stopPropagation();">GitHub</a>`);
-      }
-      if (isValidAppLink(app.privacy)) {
-        actionsHTML.push(`<a href="${app.privacy}" class="btn-product" target="_blank" rel="noopener" onclick="event.stopPropagation();">Gizlilik</a>`);
-      }
-
-      card.innerHTML = `
-        <div class="product-card-header">
-          <div class="product-icon app-icon-large">${renderIcon(normalized.icon, normalized.title)}</div>
-          <div class="product-meta">
-            <h3 class="product-name app-title">${escapeHtml(normalized.title)}</h3>
-            <div class="product-badges">
-              <span class="status-badge ${statusClass}">${getStatusLabel(status)}</span>
-              ${tagsHTML}
-            </div>
-          </div>
-        </div>
-        <div class="product-body">
-          <p class="product-desc app-description">${escapeHtml(truncateText(normalized.description, 140))}</p>
-          <div class="product-actions app-actions">
-            ${actionsHTML.join('')}
-          </div>
-        </div>
-      `;
-
-      if (detailUrl) {
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('.product-actions') || e.target.closest('a') || e.target.closest('button')) {
-            return;
-          }
-          window.location.href = detailUrl;
-        });
-      }
-
-      container.appendChild(card);
-    });
-    
-    console.log('✅ Uygulamalar başarıyla render edildi');
+    showcaseAppsCache = (apps || []).filter(isShowcaseApp);
+    initAppsFilters();
+    renderShowcaseApps(showcaseAppsCache, currentAppsFilter);
   } catch (error) {
-    console.error('❌ Uygulamalar yüklenirken hata:', error);
-    console.error('❌ Hata detayları:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
+    console.error('Uygulamalar yüklenirken hata:', error);
     const container = document.getElementById("apps-container");
     if (container) {
       container.innerHTML = `
-        <div style="text-align: center; padding: 40px;">
-          <p style="color: #ef4444; margin-bottom: 10px; font-weight: 600;">⚠️ Uygulamalar yüklenirken bir hata oluştu</p>
-          <p style="color: #666; opacity: 0.8; margin-bottom: 20px;">${error.message}</p>
-          <button onclick="location.reload()" style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer;">
-            Sayfayı Yenile
-          </button>
+        <div class="apps-empty-state">
+          <h3>Uygulamalar yüklenemedi</h3>
+          <p>${escapeHtml(error.message || 'Beklenmeyen bir hata oluştu.')}</p>
         </div>
       `;
     }

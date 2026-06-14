@@ -183,6 +183,85 @@ function throttle(func, limit) {
   };
 }
 
+/**
+ * Admin hash section → DOM id eşlemesi
+ */
+function resolveAdminSectionId(section) {
+  const map = {
+    'ai-settings': 'aiSettingsSection',
+    'github-settings': 'githubSettingsSection',
+    settings: 'siteSection',
+    site: 'siteSection'
+  };
+  if (map[section]) return map[section];
+  return `${section}Section`;
+}
+
+/**
+ * Ana site URL (admin panelinden güvenli çıkış)
+ */
+function getPublicSiteUrl(hash) {
+  const fragment = hash ? (hash.startsWith('#') ? hash : `#${hash}`) : '';
+  const path = window.location.pathname || '';
+
+  if (path.endsWith('.html')) {
+    const base = path.replace(/[^/]+$/, '');
+    return `${base || '/'}index.html${fragment}`;
+  }
+
+  if (path.endsWith('/admin') || path === '/admin') {
+    return `/index.html${fragment}`;
+  }
+
+  return `index.html${fragment}`;
+}
+
+/**
+ * Admin panelindeki ana site linklerini güncelle
+ */
+function initAdminPublicLinks() {
+  const homeUrl = getPublicSiteUrl('');
+  const homeWithAnchor = getPublicSiteUrl('#home');
+
+  document.querySelectorAll('[data-public-home]').forEach((el) => {
+    el.setAttribute('href', el.dataset.publicHome === 'home' ? homeWithAnchor : homeUrl);
+  });
+
+  const previewFrame = document.getElementById('homePreviewFrame');
+  if (previewFrame) {
+    previewFrame.src = homeUrl;
+  }
+}
+
+/**
+ * Modal/sidebar sonrası body scroll kilidini temizle
+ */
+function unlockAdminBodyScroll() {
+  const scrollY = document.body.style.top;
+  document.body.classList.remove('modal-open', 'sidebar-open');
+  document.body.style.top = '';
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+  document.body.style.height = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  if (scrollY) {
+    window.scrollTo(0, Math.abs(parseInt(scrollY, 10) || 0));
+  }
+}
+
+/**
+ * Modal/sidebar için body scroll kilidi
+ */
+function lockAdminBodyScroll() {
+  const scrollY = window.scrollY;
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+}
+
 // Export functions for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -193,8 +272,21 @@ if (typeof module !== 'undefined' && module.exports) {
     safeJsonStringify,
     formatErrorMessage,
     debounce,
-    throttle
+    throttle,
+    resolveAdminSectionId,
+    getPublicSiteUrl,
+    initAdminPublicLinks,
+    unlockAdminBodyScroll,
+    lockAdminBodyScroll
   };
+}
+
+if (typeof window !== 'undefined') {
+  window.resolveAdminSectionId = resolveAdminSectionId;
+  window.getPublicSiteUrl = getPublicSiteUrl;
+  window.initAdminPublicLinks = initAdminPublicLinks;
+  window.unlockAdminBodyScroll = unlockAdminBodyScroll;
+  window.lockAdminBodyScroll = lockAdminBodyScroll;
 }
 
 

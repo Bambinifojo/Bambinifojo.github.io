@@ -525,62 +525,42 @@ function isSidebarOpen() {
   return sidebar && sidebar.classList.contains('open');
 }
 
-// Sidebar toggle (Mobile) - Basit versiyon
+// Sidebar toggle — desktop: collapse, mobile: drawer
 function toggleSidebar() {
-  console.log('📱 toggleSidebar çağrıldı');
-  
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
   const hamburgerBtn = document.getElementById('hamburgerMenuBtn');
-  
-  if (!sidebar || !overlay) {
-    console.error('❌ Sidebar veya overlay bulunamadı');
+  const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+
+  if (!sidebar) return;
+
+  if (!isMobile) {
+    const willCollapse = !document.body.classList.contains('admin-sidebar-collapsed');
+    document.body.classList.toggle('admin-sidebar-collapsed', willCollapse);
+    document.body.classList.remove('sidebar-open', 'admin-sidebar-open');
+    sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+    if (hamburgerBtn) hamburgerBtn.classList.toggle('active', willCollapse);
+    if (typeof unlockAdminBodyScroll === 'function') unlockAdminBodyScroll();
     return;
   }
-  
+
+  if (!overlay) return;
+
   const isOpen = sidebar.classList.contains('open');
-  
+
   if (isOpen) {
-    // Kapat
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
-    document.body.classList.remove('sidebar-open');
-    
-    // Scroll'u serbest bırak
-    const scrollY = document.body.style.top;
-    document.body.style.top = '';
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.width = '';
-    if (scrollY) {
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
-    }
-    
-    // Buton durumunu güncelle
-    if (hamburgerBtn) {
-      hamburgerBtn.classList.remove('active');
-    }
-    
-    console.log('📱 Sidebar kapatıldı');
+    document.body.classList.remove('sidebar-open', 'admin-sidebar-open');
+    if (hamburgerBtn) hamburgerBtn.classList.remove('active');
+    if (typeof unlockAdminBodyScroll === 'function') unlockAdminBodyScroll();
   } else {
-    // Aç
     sidebar.classList.add('open');
     overlay.classList.add('active');
-    document.body.classList.add('sidebar-open');
-    
-    // Scroll'u kilitle
-    const scrollY = window.scrollY;
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    
-    // Buton durumunu güncelle
-    if (hamburgerBtn) {
-      hamburgerBtn.classList.add('active');
-    }
-    
-    console.log('📱 Sidebar açıldı');
+    document.body.classList.add('sidebar-open', 'admin-sidebar-open');
+    if (hamburgerBtn) hamburgerBtn.classList.add('active');
+    if (typeof lockAdminBodyScroll === 'function') lockAdminBodyScroll();
   }
 }
 
@@ -615,18 +595,21 @@ function openSidebar() {
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
   const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
-  
-  if (sidebar && overlay) {
+  const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+
+  if (!sidebar) return;
+
+  if (isMobile && overlay) {
     if (!sidebar.classList.contains('open')) {
       sidebar.classList.add('open');
       overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('sidebar-open');
-      
-      if (hamburger) {
-        hamburger.classList.add('active');
-      }
+      document.body.classList.add('sidebar-open', 'admin-sidebar-open');
+      if (typeof lockAdminBodyScroll === 'function') lockAdminBodyScroll();
+      if (hamburger) hamburger.classList.add('active');
     }
+  } else {
+    document.body.classList.remove('admin-sidebar-collapsed');
+    if (hamburger) hamburger.classList.remove('active');
   }
 }
 
@@ -635,16 +618,19 @@ function closeSidebar() {
   const sidebar = document.getElementById('adminSidebar');
   const overlay = document.getElementById('adminSidebarOverlay');
   const hamburger = document.getElementById('hamburgerMenuBtn') || document.getElementById('topbarMenuBtn');
-  
-  if (sidebar && overlay) {
+
+  if (sidebar) {
     sidebar.classList.remove('open');
+  }
+  if (overlay) {
     overlay.classList.remove('active');
-    document.body.style.overflow = '';
-    document.body.classList.remove('sidebar-open');
-    
-    if (hamburger) {
-      hamburger.classList.remove('active');
-    }
+  }
+  document.body.classList.remove('sidebar-open', 'admin-sidebar-open');
+  if (hamburger) {
+    hamburger.classList.remove('active');
+  }
+  if (typeof unlockAdminBodyScroll === 'function') {
+    unlockAdminBodyScroll();
   }
 }
 
@@ -917,84 +903,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 100);
   
-  // Browser back/forward butonları için (hash-based routing)
-  window.addEventListener('hashchange', (e) => {
-    const section = getSectionFromPath();
-    if (section) {
-      // showSection'ı çağırmadan sadece section'ı göster (sonsuz döngüyü önle)
-      let sectionId = section + 'Section';
-      if (section === 'ai-settings') {
-        sectionId = 'aiSettingsSection';
-      }
-      
-      const sectionEl = document.getElementById(sectionId);
-      if (sectionEl) {
-        // Tüm section'ları gizle
-        document.querySelectorAll('.admin-section').forEach(sec => {
-          sec.classList.add('hidden');
-        });
-        // Seçilen section'ı göster
-        sectionEl.classList.remove('hidden');
-        
-        // Nav item'ları güncelle
-        document.querySelectorAll('.admin-nav-item').forEach(item => {
-          item.classList.remove('active');
-        });
-        // Nav item'ı aktif yap (hash-based routing için)
-        document.querySelectorAll('.admin-nav-item').forEach(item => {
-          const href = item.getAttribute('href');
-          const dataSection = item.getAttribute('data-section');
-          if (href === `#${section}` || dataSection === section) {
-            item.classList.add('active');
-          }
-        });
-        
-        // Section'a özel işlemler
-        if (section === 'users') {
-          renderUsers();
-        } else if (section === 'feedback') {
-          renderFeedback();
-          renderVotes();
-        } else if (section === 'notifications') {
-          loadNotificationsConfig();
-          // appsData yüklenmesini bekle, sonra dropdown'ı doldur
-          // Önce appsData'nın yüklendiğinden emin ol
-          if (!appsData || !appsData.apps || appsData.apps.length === 0) {
-            const saved = localStorage.getItem('appsData');
-            if (saved) {
-              try {
-                appsData = JSON.parse(saved);
-              } catch (e) {
-                console.error('LocalStorage\'dan appsData parse edilemedi:', e);
-              }
-            }
-          }
-          setTimeout(() => {
-            populateAppNotificationSelect();
-            renderActiveNotifications();
-            // Bildirim geçmişini yükle
-            if (typeof loadNotificationHistory === 'function') {
-              loadNotificationHistory();
-            }
-            // Bildirim istatistiklerini yükle
-            if (typeof loadNotificationStats === 'function') {
-              loadNotificationStats();
-            }
-          }, 200);
-          // Süre tipi değişikliği için event listener ekle
-          const durationTypeEl = document.getElementById('notification_duration_type');
-          if (durationTypeEl) {
-            durationTypeEl.addEventListener('change', onNotificationDurationTypeChange);
-          }
-        } else if (section === 'dashboard') {
-          updateStats();
-          setTimeout(() => {
-            refreshPreview(false);
-          }, 500);
-        }
-      }
-    }
-  });
+  if (typeof initAdminPublicLinks === 'function') {
+    initAdminPublicLinks();
+  }
   
   // Session varsa verileri yükle
   if (checkAdminSession()) {
@@ -1069,19 +980,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     observer.observe(usersSection, { attributes: true });
   }
-  
-  // Sidebar linklerine click event listener ekle (hash-based routing için)
-  document.querySelectorAll('.admin-nav-item[href^="#"]').forEach(link => {
-    link.addEventListener('click', (e) => {
-      const href = link.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        const section = href.replace('#', '');
-        // Hash değişikliği otomatik olarak hashchange event'ini tetikleyecek
-        // Ancak preventDefault yapmıyoruz, böylece hash değişikliği normal şekilde çalışır
-        // showSection fonksiyonu hashchange event'inde çağrılacak
-      }
-    });
-  });
   
   // Hızlı işlemler linklerine click event listener ekle
   document.querySelectorAll('.admin-nav-item[data-action]').forEach(link => {

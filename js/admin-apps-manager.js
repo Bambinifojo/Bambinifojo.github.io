@@ -246,13 +246,18 @@ const AdminAppsManager = (function () {
     $('adminAppModalTitle').textContent = title;
     $('adminAppDeleteBtn').style.display = showDelete ? 'inline-flex' : 'none';
     writeForm(app || AppsManagerStore.createEmpty(apps.length + 1));
-    $('adminAppModal')?.classList.add('active');
+    $('adminAppModal')?.classList.add('active', 'is-open');
     document.body.classList.add('modal-open');
+    if (typeof lockAdminBodyScroll === 'function') lockAdminBodyScroll();
   }
 
   function closeModal() {
-    $('adminAppModal')?.classList.remove('active');
-    document.body.classList.remove('modal-open');
+    $('adminAppModal')?.classList.remove('active', 'is-open');
+    if (typeof unlockAdminBodyScroll === 'function') {
+      unlockAdminBodyScroll();
+    } else {
+      document.body.classList.remove('modal-open');
+    }
     editingId = null;
   }
 
